@@ -108,3 +108,6 @@ fabric.properties
 ## Project
 
 
+.idea
+go-toodledo.iml
+go-toodledo
