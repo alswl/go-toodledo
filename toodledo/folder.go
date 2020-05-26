@@ -2,6 +2,7 @@ package toodledo
 
 import (
 	"context"
+	"net/url"
 )
 
 type FolderService Service
@@ -16,8 +17,8 @@ type Folder struct {
 
 func (s *FolderService) Get(ctx context.Context) ([]*Folder, *Response, error) {
 	path := "/3/folders/get.php"
-	
-	req, err := s.client.NewRequest("GET", path, nil)
+
+	req, err := s.client.NewRequest("GET", path, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -29,4 +30,24 @@ func (s *FolderService) Get(ctx context.Context) ([]*Folder, *Response, error) {
 	}
 
 	return folders, resp, nil
+}
+
+func (s *FolderService) Add(ctx context.Context, name string) (*Folder, *Response, error) {
+	path := "/3/folders/add.php"
+
+	form := url.Values{}
+	form.Add("name", name)
+	req, err := s.client.NewRequest("POST", path, nil, form)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var folders []*Folder
+	resp, err := s.client.Do(ctx, req, &folders)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	// return first folder, this API always return one folder.
+	return folders[0], resp, nil
 }
