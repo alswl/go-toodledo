@@ -2,6 +2,7 @@ package toodledo
 
 import (
 	"context"
+	"errors"
 	"net/url"
 	"strconv"
 )
@@ -81,4 +82,28 @@ func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string
 
 	// return first folder, this API always return one folder.
 	return folders[0], resp, nil
+}
+
+func (s *FolderService) Delete(ctx context.Context, id int) (*Response, error) {
+	path := "/3/folders/delete.php"
+
+	form := url.Values{}
+	form.Add("id", strconv.Itoa(id))
+
+	req, err := s.client.NewRequest("POST", path, nil, form)
+	if err != nil {
+		return nil, err
+	}
+
+	var result *map[string]int
+	resp, err := s.client.Do(ctx, req, &result)
+	if err != nil {
+		return resp, err
+	}
+	if (*result)["deleted"] != id {
+		return resp, errors.New("delete failed")
+	}
+
+	// return first folder, this API always return one folder.
+	return resp, nil
 }

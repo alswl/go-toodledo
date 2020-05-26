@@ -38,7 +38,7 @@ func TestClient_NewRequest(t *testing.T) {
 				BaseURL:       tt.fields.BaseURL,
 				FolderService: tt.fields.Folder,
 			}
-			got, err := c.NewRequest(tt.args.method, tt.args.urlStr, tt.args.body)
+			got, err := c.NewRequest(tt.args.method, tt.args.urlStr, nil, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.NewRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return

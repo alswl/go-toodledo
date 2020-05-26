@@ -18,7 +18,8 @@ func main() {
 	
 	//testGet(client)
 	//testAdd(client)
-	testEdit(client)
+	//testEdit(client)
+	testDelete(client)
 }
 
 func testGet(client *toodledo.Client) {
@@ -51,4 +52,13 @@ func testEdit(client *toodledo.Client) {
 		return
 	}
 	fmt.Printf("Successfully get: %v\n", folder)
+}
+
+func testDelete(client *toodledo.Client) {
+	ctx := context.Background()
+	resp, err := client.FolderService.Delete(ctx, 9096513)
+	if err != nil {
+		log.Fatal(err, resp)
+		return
+	}
 }
