@@ -1,23 +1,32 @@
 package toodledo
 
-import "context"
+import (
+	"context"
+)
 
-type FolderService service
+type FolderService Service
 
 type Folder struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Private  int    `json:"private"`
+	Archived int    `json:"archived"`
+	Ord      int    `json:"ord"`
 }
 
-func (s *FolderService) Get(ctx context.Context) (*Folder, *Response, error) {
-	req, err := s.client.NewRequest("GET", "folder", nil)
+func (s *FolderService) Get(ctx context.Context) ([]*Folder, *Response, error) {
+	path := "/3/folders/get.php"
+	
+	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	f := &Folder{}
-	resp, err := s.client.Do(ctx, req, f)
+	var folders []*Folder
+	resp, err := s.client.Do(ctx, req, &folders)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return f, resp, nil
+	return folders, resp, nil
 }

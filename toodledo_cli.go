@@ -1,17 +1,25 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/alswl/go-toodledo/toodledo"
+	"log"
 	"os"
-	"net/http"
-	"./toodledo"
 )
 
 func main() {
-	fmt.Println("Hello, GO !")
-	app_id := os.Getenv("TOODLE_APP_ID")
-	fmt.Println(app_id)
+	accessToken := os.Getenv("TOODLEDO_ACCESS_TOKEN")
 
-	client := http.Client{}
-	toodledo.NewClient(&client)
+	if accessToken == "" {
+		log.Fatal("Unauthorized: No TOODLEDO_ACCESS_TOKEN present")
+	}
+
+	ctx := context.Background()
+	client := toodledo.NewClient(accessToken)
+	folder, _, err := client.FolderService.Get(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Successfully get: %v\n", folder)
 }

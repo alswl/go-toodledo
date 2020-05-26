@@ -34,11 +34,11 @@ func TestClient_NewRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				clientMu: tt.fields.clientMu,
-				client:   tt.fields.client,
-				BaseURL:  tt.fields.BaseURL,
-				common:   tt.fields.common,
-				Folder:   tt.fields.Folder,
+				clientMu:      tt.fields.clientMu,
+				client:        tt.fields.client,
+				BaseURL:       tt.fields.BaseURL,
+				common:        tt.fields.common,
+				FolderService: tt.fields.Folder,
 			}
 			got, err := c.NewRequest(tt.args.method, tt.args.urlStr, tt.args.body)
 			if (err != nil) != tt.wantErr {
@@ -77,11 +77,11 @@ func TestClient_Do(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				clientMu: tt.fields.clientMu,
-				client:   tt.fields.client,
-				BaseURL:  tt.fields.BaseURL,
-				common:   tt.fields.common,
-				Folder:   tt.fields.Folder,
+				clientMu:      tt.fields.clientMu,
+				client:        tt.fields.client,
+				BaseURL:       tt.fields.BaseURL,
+				common:        tt.fields.common,
+				FolderService: tt.fields.Folder,
 			}
 			got, err := c.Do(tt.args.ctx, tt.args.req, tt.args.v)
 			if (err != nil) != tt.wantErr {
