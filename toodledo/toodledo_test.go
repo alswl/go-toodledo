@@ -14,7 +14,6 @@ func TestClient_NewRequest(t *testing.T) {
 		clientMu sync.Mutex
 		client   *http.Client
 		BaseURL  *url.URL
-		common   service
 		Folder   *FolderService
 	}
 	type args struct {
@@ -37,10 +36,9 @@ func TestClient_NewRequest(t *testing.T) {
 				clientMu:      tt.fields.clientMu,
 				client:        tt.fields.client,
 				BaseURL:       tt.fields.BaseURL,
-				common:        tt.fields.common,
 				FolderService: tt.fields.Folder,
 			}
-			got, err := c.NewRequest(tt.args.method, tt.args.urlStr, tt.args.body)
+			got, err := c.NewRequest(tt.args.method, tt.args.urlStr, nil, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.NewRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -57,7 +55,6 @@ func TestClient_Do(t *testing.T) {
 		clientMu sync.Mutex
 		client   *http.Client
 		BaseURL  *url.URL
-		common   service
 		Folder   *FolderService
 	}
 	type args struct {
@@ -80,7 +77,6 @@ func TestClient_Do(t *testing.T) {
 				clientMu:      tt.fields.clientMu,
 				client:        tt.fields.client,
 				BaseURL:       tt.fields.BaseURL,
-				common:        tt.fields.common,
 				FolderService: tt.fields.Folder,
 			}
 			got, err := c.Do(tt.args.ctx, tt.args.req, tt.args.v)
@@ -108,7 +104,7 @@ func TestNewClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewClient(tt.args.httpClient); !reflect.DeepEqual(got, tt.want) {
+			if got := NewClient(""); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewClient() = %v, want %v", got, tt.want)
 			}
 		})
