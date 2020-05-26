@@ -3,6 +3,7 @@ package toodledo
 import (
 	"context"
 	"net/url"
+	"strconv"
 )
 
 type FolderService Service
@@ -37,6 +38,36 @@ func (s *FolderService) Add(ctx context.Context, name string) (*Folder, *Respons
 
 	form := url.Values{}
 	form.Add("name", name)
+	req, err := s.client.NewRequest("POST", path, nil, form)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var folders []*Folder
+	resp, err := s.client.Do(ctx, req, &folders)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	// return first folder, this API always return one folder.
+	return folders[0], resp, nil
+}
+
+func (s *FolderService) Edit(ctx context.Context, id int, name string) (*Folder, *Response, error) {
+	return s.EditWithPrivate(ctx, id, name, -1)
+	
+}
+
+func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string, private int) (*Folder, *Response, error) {
+	path := "/3/folders/edit.php"
+
+	form := url.Values{}
+	form.Add("id", strconv.Itoa(id))
+	form.Add("name", name)
+	if private != -1 {
+		form.Add("private", string(private))
+	}
+	
 	req, err := s.client.NewRequest("POST", path, nil, form)
 	if err != nil {
 		return nil, nil, err

@@ -17,7 +17,8 @@ func main() {
 	client := toodledo.NewClient(accessToken)
 	
 	//testGet(client)
-	testAdd(client)
+	//testAdd(client)
+	testEdit(client)
 }
 
 func testGet(client *toodledo.Client) {
@@ -34,9 +35,19 @@ func testGet(client *toodledo.Client) {
 
 func testAdd(client *toodledo.Client) {
 	ctx := context.Background()
-	folder, _, err := client.FolderService.Add(ctx, "test-abc")
+	folder, resp, err := client.FolderService.Add(ctx, "test-abc")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err, resp)
+		return
+	}
+	fmt.Printf("Successfully get: %v\n", folder)
+}
+
+func testEdit(client *toodledo.Client) {
+	ctx := context.Background()
+	folder, resp, err := client.FolderService.Edit(ctx, 9096513, "test-cba")
+	if err != nil {
+		log.Fatal(err, resp)
 		return
 	}
 	fmt.Printf("Successfully get: %v\n", folder)

@@ -1,6 +1,7 @@
 package toodledo
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -37,7 +38,7 @@ func (c *Client) NewRequest(method, urlStr string, params map[string]string, for
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if params != nil {
 		for k, v := range params {
 			u.Query().Add(k, v)
@@ -86,7 +87,9 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	if err != nil {
 		return nil, err
 	}
-	response := &Response{resp}
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	response := &Response{resp, string(bodyBytes)}
 	if v != nil {
 		if w, ok := v.(io.Writer); ok {
 			io.Copy(w, resp.Body)
@@ -141,4 +144,5 @@ func NewClient(accessToken string) *Client {
 type Response struct {
 	*http.Response
 	// TODO
+	text string
 }
