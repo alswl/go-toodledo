@@ -38,13 +38,13 @@ func TestClient_NewRequest(t *testing.T) {
 				BaseURL:       tt.fields.BaseURL,
 				FolderService: tt.fields.Folder,
 			}
-			got, err := c.NewRequest(tt.args.method, tt.args.urlStr, nil, nil)
+			got, err := c.NewRequestWithParamsAndForm(tt.args.method, tt.args.urlStr, nil, nil)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.NewRequest() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Client.NewRequestWithParamsAndForm() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.NewRequest() = %v, want %v", got, tt.want)
+				t.Errorf("Client.NewRequestWithParamsAndForm() = %v, want %v", got, tt.want)
 			}
 		})
 	}

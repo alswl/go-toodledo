@@ -28,18 +28,31 @@ type Client struct {
 
 	common Service
 
+	AccountService *AccountService
 	FolderService *FolderService
 	TaskService   *TaskService
 	// TODO
 }
 
-func (c *Client) NewRequest(method, urlStr string, params map[string]string, form url.Values) (*http.Request, error) {
+func (c *Client) NewRequest(method, urlStr string) (*http.Request, error) {
+	return c.NewRequestWithParamsAndForm(method, urlStr, map[string]string{}, url.Values{})
+}
+
+func (c *Client) NewRequestWithParams(method, urlStr string, params map[string]string) (*http.Request, error) {
+	return c.NewRequestWithParamsAndForm(method, urlStr, params, url.Values{})
+}
+
+func (c *Client) NewRequestWithForm(method, urlStr string, form url.Values) (*http.Request, error) {
+	return c.NewRequestWithParamsAndForm(method, urlStr, map[string]string{}, url.Values{})
+}
+
+func (c *Client) NewRequestWithParamsAndForm(method, urlStr string, params map[string]string, form url.Values) (*http.Request, error) {
 	u, err := c.BaseURL.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
-	if params != nil {
+	if len(params) != 0 {
 		for k, v := range params {
 			u.Query().Add(k, v)
 		}
@@ -47,7 +60,7 @@ func (c *Client) NewRequest(method, urlStr string, params map[string]string, for
 	}
 
 	var buf io.Reader
-	if form != nil {
+	if len(form) != 0 {
 		buf = strings.NewReader(form.Encode())
 	}
 
@@ -135,6 +148,7 @@ func NewClient(accessToken string) *Client {
 
 	client := &Client{client: httpClient, BaseURL: baseURL, accessToken: accessToken}
 	client.common.client = client // TODO why
+	client.AccountService = (*AccountService)(&client.common)
 	client.FolderService = (*FolderService)(&client.common)
 	client.TaskService = (*TaskService)(&client.common)
 	// TODO
@@ -144,5 +158,5 @@ func NewClient(accessToken string) *Client {
 type Response struct {
 	*http.Response
 	// TODO
-	text string
+	Text string
 }

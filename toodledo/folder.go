@@ -20,7 +20,7 @@ type Folder struct {
 func (s *FolderService) Get(ctx context.Context) ([]*Folder, *Response, error) {
 	path := "/3/folders/get.php"
 
-	req, err := s.client.NewRequest("GET", path, nil, nil)
+	req, err := s.client.NewRequest("GET", path)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -39,7 +39,7 @@ func (s *FolderService) Add(ctx context.Context, name string) (*Folder, *Respons
 
 	form := url.Values{}
 	form.Add("name", name)
-	req, err := s.client.NewRequest("POST", path, nil, form)
+	req, err := s.client.NewRequestWithForm("POST", path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -69,7 +69,7 @@ func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string
 		form.Add("private", string(private))
 	}
 	
-	req, err := s.client.NewRequest("POST", path, nil, form)
+	req, err := s.client.NewRequestWithForm("POST", path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -90,7 +90,7 @@ func (s *FolderService) Delete(ctx context.Context, id int) (*Response, error) {
 	form := url.Values{}
 	form.Add("id", strconv.Itoa(id))
 
-	req, err := s.client.NewRequest("POST", path, nil, form)
+	req, err := s.client.NewRequestWithForm("POST", path, form)
 	if err != nil {
 		return nil, err
 	}
