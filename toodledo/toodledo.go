@@ -11,6 +11,8 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+	log "github.com/sirupsen/logrus"
+	"errors"
 )
 
 const (
@@ -29,8 +31,9 @@ type Client struct {
 	common Service
 
 	AccountService *AccountService
-	FolderService *FolderService
-	TaskService   *TaskService
+	FolderService  *FolderService
+	GoalService    *GoalService
+	TaskService    *TaskService
 	// TODO
 }
 
@@ -43,7 +46,7 @@ func (c *Client) NewRequestWithParams(method, urlStr string, params map[string]s
 }
 
 func (c *Client) NewRequestWithForm(method, urlStr string, form url.Values) (*http.Request, error) {
-	return c.NewRequestWithParamsAndForm(method, urlStr, map[string]string{}, url.Values{})
+	return c.NewRequestWithParamsAndForm(method, urlStr, map[string]string{}, form)
 }
 
 func (c *Client) NewRequestWithParamsAndForm(method, urlStr string, params map[string]string, form url.Values) (*http.Request, error) {
@@ -97,17 +100,21 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	defer resp.Body.Close()
 
 	err = CheckResponse(resp)
+	err = CheckToodledoResponse(resp)
 	if err != nil {
 		return nil, err
 	}
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	response := &Response{resp, string(bodyBytes)}
+	log.WithFields(log.Fields{"response": response.Text}).Debug("requested toodledo")
 	if v != nil {
-		if w, ok := v.(io.Writer); ok {
-			io.Copy(w, resp.Body)
+		if writer, ok := v.(io.Writer); ok {
+			io.Copy(writer, resp.Body)
 		} else {
 			decErr := json.NewDecoder(resp.Body).Decode(v)
+			log.Warn("decErr: ", decErr)
+			log.Warn("v: ", v)
 			if decErr == io.EOF {
 				decErr = nil // ignore EOF errors caused by empty response body
 			}
@@ -138,6 +145,19 @@ func CheckResponse(r *http.Response) error {
 	return &ApiError{Response: r, Body: string(data), Message: "error"}
 }
 
+func CheckToodledoResponse(r *http.Response) error {
+	bodyBytes, _ := ioutil.ReadAll(r.Body)
+	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	errorResponse := ErrorResponse{}
+	errForErr := json.NewDecoder(r.Body).Decode(&errorResponse)
+	if errForErr != nil {
+		r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+		return nil
+	}
+
+	return errors.New(errorResponse.ErrorDesc)
+}
+
 type Service struct {
 	client *Client
 }
@@ -147,10 +167,11 @@ func NewClient(accessToken string) *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
 
 	client := &Client{client: httpClient, BaseURL: baseURL, accessToken: accessToken}
-	client.common.client = client // TODO why
+	client.common.client = client
 	client.AccountService = (*AccountService)(&client.common)
 	client.FolderService = (*FolderService)(&client.common)
 	client.TaskService = (*TaskService)(&client.common)
+	client.GoalService = (*GoalService)(&client.common)
 	// TODO
 	return client
 }
