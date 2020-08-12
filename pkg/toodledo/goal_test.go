@@ -1,11 +1,11 @@
-package pkg
+package toodledo
 
 import (
-	"testing"
+	"bytes"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
-	"bytes"
+	"testing"
 )
 
 func TestGoalService_Add(t *testing.T) {

@@ -1,4 +1,4 @@
-package pkg
+package toodledo
 
 import "context"
 

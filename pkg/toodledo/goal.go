@@ -1,11 +1,11 @@
-package pkg
+package toodledo
 
 import (
 	"context"
-	"net/url"
-	"strconv"
 	"github.com/go-playground/validator"
 	log "github.com/sirupsen/logrus"
+	"net/url"
+	"strconv"
 )
 
 type GoalService Service
@@ -89,7 +89,7 @@ func (s *GoalService) Add(ctx context.Context, goalAdd GoalAdd) (*Goal, *Respons
 	var goals []*Goal
 	resp, err := s.client.Do(ctx, req, &goals)
 	log.Warn(resp, err)
-	
+
 	if err != nil {
 		log.WithFields(log.Fields{"resp": resp, "err": err}).Warn("err")
 		return nil, resp, err
