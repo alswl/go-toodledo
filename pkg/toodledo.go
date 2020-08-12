@@ -1,4 +1,4 @@
-package toodledo
+package pkg
 
 import (
 	"bytes"
