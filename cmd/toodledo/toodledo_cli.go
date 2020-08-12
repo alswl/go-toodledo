@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/alswl/go-toodledo/pkg/toodledo"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -58,7 +58,7 @@ func testDelete(client *toodledo.Client) {
 	ctx := context.Background()
 	resp, err := client.FolderService.Delete(ctx, 9096513)
 	if err != nil {
-		log.Fatal(err, resp)
+		log.WithField("resp", resp).WithError(err).Fatal("delete folder failed")
 		return
 	}
 }
