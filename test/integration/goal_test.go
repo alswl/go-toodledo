@@ -3,8 +3,8 @@ package integration
 import (
 	"context"
 	"github.com/alswl/go-toodledo/toodledo"
-	"github.com/stretchr/testify/assert"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 

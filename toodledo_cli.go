@@ -15,7 +15,7 @@ func main() {
 	}
 
 	client := toodledo.NewClient(accessToken)
-	
+
 	//testGet(client)
 	//testAdd(client)
 	//testEdit(client)

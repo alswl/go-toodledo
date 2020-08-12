@@ -8,10 +8,7 @@ Grant: `open 'https://api.toodledo.com/3/account/authorize.php?response_type=cod
 ## Install
 
 ```
-go get github.com/leodido/go-urn
-go get github.com/go-playground/universal-translator
-go get github.com/go-playground/validator
-go get github.com/Sirupsen/logrus
+go mod download
 ```
 
 
