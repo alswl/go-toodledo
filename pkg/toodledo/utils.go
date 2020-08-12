@@ -1,8 +1,8 @@
-package pkg
+package toodledo
 
 import "strconv"
 
-func bool2int(input bool)(output int) {
+func bool2int(input bool) (output int) {
 	if input {
 		output = 1
 	} else {
@@ -11,6 +11,6 @@ func bool2int(input bool)(output int) {
 	return
 }
 
-func bool2ints(input bool)(output string) {
+func bool2ints(input bool) (output string) {
 	return strconv.Itoa(bool2int(input))
 }

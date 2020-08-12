@@ -1,18 +1,18 @@
-package pkg
+package toodledo
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 	"sync"
-	log "github.com/sirupsen/logrus"
-	"errors"
 )
 
 const (

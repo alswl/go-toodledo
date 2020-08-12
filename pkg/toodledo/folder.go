@@ -1,4 +1,4 @@
-package pkg
+package toodledo
 
 import (
 	"context"
@@ -56,7 +56,7 @@ func (s *FolderService) Add(ctx context.Context, name string) (*Folder, *Respons
 
 func (s *FolderService) Edit(ctx context.Context, id int, name string) (*Folder, *Response, error) {
 	return s.EditWithPrivate(ctx, id, name, -1)
-	
+
 }
 
 func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string, private int) (*Folder, *Response, error) {
@@ -68,7 +68,7 @@ func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string
 	if private != -1 {
 		form.Add("private", string(private))
 	}
-	
+
 	req, err := s.client.NewRequestWithForm("POST", path, form)
 	if err != nil {
 		return nil, nil, err

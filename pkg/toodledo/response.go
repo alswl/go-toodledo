@@ -1,4 +1,4 @@
-package pkg
+package toodledo
 
 type ErrorResponse struct {
 	ErrorCode int    `json:"errorCode"`

@@ -2,7 +2,7 @@ package integration
 
 import (
 	"context"
-	toodledo "github.com/alswl/go-toodledo/pkg"
+	"github.com/alswl/go-toodledo/pkg/toodledo"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"testing"

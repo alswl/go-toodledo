@@ -1,4 +1,4 @@
-package pkg
+package toodledo
 
 import (
 	"context"
@@ -16,7 +16,7 @@ func TestAccountService_Get(t *testing.T) {
 		return
 	}
 	client := NewClient(accessToken)
-	
+
 	type args struct {
 		ctx context.Context
 	}
@@ -29,15 +29,15 @@ func TestAccountService_Get(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "OK",
-			s: *client.AccountService,
-			args: args{ctx: context.Background()},
-			want: nil,
-			want1: nil,
+			name:    "OK",
+			s:       *client.AccountService,
+			args:    args{ctx: context.Background()},
+			want:    nil,
+			want1:   nil,
 			wantErr: false,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, got1, err := tt.s.Get(tt.args.ctx)

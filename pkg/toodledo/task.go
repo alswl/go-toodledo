@@ -1,4 +1,4 @@
-package pkg
+package toodledo
 
 type TaskService Service
 

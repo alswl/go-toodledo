@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	toodledo "github.com/alswl/go-toodledo/pkg"
+	"github.com/alswl/go-toodledo/pkg/toodledo"
 	"log"
 	"os"
 )
