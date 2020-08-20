@@ -3,6 +3,7 @@ package toodledo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/url"
 	"strconv"
 )
@@ -66,7 +67,7 @@ func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string
 	form.Add("id", strconv.Itoa(id))
 	form.Add("name", name)
 	if private != -1 {
-		form.Add("private", string(private))
+		form.Add("private", fmt.Sprint(private))
 	}
 
 	req, err := s.client.NewRequestWithForm("POST", path, form)
