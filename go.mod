@@ -9,7 +9,7 @@ require (
 	github.com/ianlancetaylor/demangle v0.0.0-20200811041817-f3adf8b39d88 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.6.0
-	github.com/stretchr/testify v1.6.1 // indirect
+	github.com/stretchr/testify v1.6.1
 	golang.org/x/arch v0.0.0-20200511175325-f7c78586839d // indirect
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de // indirect
 	golang.org/x/tools v0.0.0-20200811215021-48a8ffc5b207 // indirect

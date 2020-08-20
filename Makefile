@@ -52,7 +52,7 @@ COMMIT := $(if $(COMMIT),$(COMMIT),"Unknown")
 # Define all targets. At least the following commands are required:
 #
 
-.PHONY: build container push test clean
+.PHONY: build container push test integration clean
 
 build:
 	@for target in $(TARGETS); do                                                      \
@@ -85,7 +85,10 @@ push: container
 	done
 
 test:
-	@go test ./...
+	@go test -tags=\!integration ./...
+
+integration:
+	@go test -tags=integration ./...
 
 clean:
 	@rm -vrf ${OUTPUT_DIR}/*

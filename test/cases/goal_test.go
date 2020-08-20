@@ -1,4 +1,6 @@
-package integration
+//+build integration
+
+package cases
 
 import (
 	"context"
