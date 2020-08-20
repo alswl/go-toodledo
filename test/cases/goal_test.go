@@ -7,11 +7,12 @@ import (
 	"github.com/alswl/go-toodledo/pkg/toodledo"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
 func TestGoalService_Get(t *testing.T) {
-	accessToken := "***REMOVED***"
+	accessToken := os.Getenv("TOODLEDO_ACCESS_TOKEN")
 	assert.NotNil(t, accessToken)
 
 	client := toodledo.NewClient(accessToken)
@@ -24,7 +25,7 @@ func TestGoalService_Get(t *testing.T) {
 }
 
 func TestGoalService_Add(t *testing.T) {
-	accessToken := "***REMOVED***"
+	accessToken := os.Getenv("TOODLEDO_ACCESS_TOKEN")
 	assert.NotNil(t, accessToken)
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
