@@ -1,10 +1,8 @@
 package toodledo
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io"
@@ -56,10 +54,11 @@ func (c *Client) NewRequestWithParamsAndForm(method, urlStr string, params map[s
 	}
 
 	if len(params) != 0 {
+		q := u.Query()
 		for k, v := range params {
-			u.Query().Add(k, v)
+			q.Add(k, v)
 		}
-		u.RawQuery = u.Query().Encode()
+		u.RawQuery = q.Encode()
 	}
 
 	var buf io.Reader
@@ -80,10 +79,11 @@ func (c *Client) NewRequestWithParamsAndForm(method, urlStr string, params map[s
 	return req, nil
 }
 
+// Do request to toodledo API server and unmarshalled, req is request, v is response unmarshalled, Response is http response
+// toodledo api document: https://api.toodledo.com/3/account/index.php
 func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Response, error) {
 	req.WithContext(ctx)
 	query := req.URL.Query()
-	// toodledo api document: https://api.toodledo.com/3/account/index.php
 	query.Add("access_token", c.accessToken)
 	req.URL.RawQuery = query.Encode()
 
@@ -95,35 +95,48 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 		default:
 		}
 		return nil, err
-
 	}
 	defer resp.Body.Close()
 
-	err = CheckResponse(resp)
-	err = CheckToodledoResponse(resp)
+	err = CheckResponseStatus(resp)
 	if err != nil {
 		return nil, err
 	}
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
-	response := &Response{resp, string(bodyBytes)}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	body := string(bodyBytes)
+	if err != nil {
+		return nil, err
+	}
+	if toodledoError, ok := CheckToodledoResponse(body); !ok {
+		return &Response{
+			Response: resp,
+			Text:     toodledoError.ErrorDesc,
+		}, ApiError{
+				Response: nil,
+				Body:     body,
+				Message:  toodledoError.ErrorDesc,
+			}
+	}
+	response := &Response{resp, body}
 	log.WithFields(log.Fields{"response": response.Text}).Debug("requested toodledo")
 	if v != nil {
 		if writer, ok := v.(io.Writer); ok {
-			io.Copy(writer, resp.Body)
+			io.Copy(writer, strings.NewReader(body))
 		} else {
-			decErr := json.NewDecoder(resp.Body).Decode(v)
-			log.Warn("decErr: ", decErr)
-			log.Warn("v: ", v)
+			decErr := json.NewDecoder(strings.NewReader(body)).Decode(v)
+			if decErr != nil {
+				log.Warn("decErr: ", decErr)
+				log.Warn("v: ", v)
+			}
 			if decErr == io.EOF {
 				decErr = nil // ignore EOF errors caused by empty response body
 			}
 			if decErr != nil {
-				err = decErr
+				return response, decErr
 			}
 		}
 	}
-	return response, err
+	return response, nil
 }
 
 type ApiError struct {
@@ -132,30 +145,31 @@ type ApiError struct {
 	Message  string `json:"message"`
 }
 
-func (e *ApiError) Error() string {
+func (e ApiError) Error() string {
 	return fmt.Sprintf("%v %d %v %v",
 		e.Response.Request.Method, e.Response.StatusCode, e.Message, e.Body)
 }
 
-func CheckResponse(r *http.Response) error {
+func CheckResponseStatus(r *http.Response) error {
 	if c := r.StatusCode; 200 <= c && c <= 299 {
 		return nil
 	}
-	data, _ := ioutil.ReadAll(r.Body)
-	return &ApiError{Response: r, Body: string(data), Message: "error"}
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	
+	return &ApiError{Response: r, Body: string(data), Message: "http status error"}
 }
 
-func CheckToodledoResponse(r *http.Response) error {
-	bodyBytes, _ := ioutil.ReadAll(r.Body)
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+// CheckToodledoResponse check body is Toodledo Error Response format
+func CheckToodledoResponse(body string) (ErrorResponse, bool) {
 	errorResponse := ErrorResponse{}
-	errForErr := json.NewDecoder(r.Body).Decode(&errorResponse)
-	if errForErr != nil {
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
-		return nil
+	err := json.NewDecoder(strings.NewReader(body)).Decode(&errorResponse)
+	if err == nil && errorResponse.ErrorCode != 0 {
+		return errorResponse, false
 	}
-
-	return errors.New(errorResponse.ErrorDesc)
+	return ErrorResponse{}, true
 }
 
 type Service struct {

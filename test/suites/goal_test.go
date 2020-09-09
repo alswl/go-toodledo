@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestGoalService_Get(t *testing.T) {
@@ -43,7 +44,16 @@ func TestGoalService_Delete(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	client := ClientForTest()
 	ctx := context.Background()
-
-	_, err := client.GoalService.Delete(ctx, 510357)
+	now := time.Now()
+	nowString := now.Format("20060102150405")
+	
+	name := toodledo.GoalAdd{Name: fmt.Sprintf("goal-%s", nowString)}
+	// TODO test
+	newGoal, _, err := client.GoalService.Add(ctx, name)
+	if err != nil {
+		panic(err)
+	}
+	
+	_, err = client.GoalService.Delete(ctx, newGoal.ID)
 	assert.Nil(t, err)
 }

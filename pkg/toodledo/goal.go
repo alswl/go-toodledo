@@ -88,7 +88,6 @@ func (s *GoalService) Add(ctx context.Context, goalAdd GoalAdd) (*Goal, *Respons
 
 	var goals []*Goal
 	resp, err := s.client.Do(ctx, req, &goals)
-	log.Warn(resp, err)
 
 	if err != nil {
 		log.WithFields(log.Fields{"resp": resp, "err": err}).Warn("err")
@@ -97,4 +96,21 @@ func (s *GoalService) Add(ctx context.Context, goalAdd GoalAdd) (*Goal, *Respons
 
 	// get first
 	return goals[0], resp, nil
+}
+func (s *GoalService) Delete(ctx context.Context, id int) (*Response, error) {
+	path := "/3/goals/delete.php"
+
+	req, err := s.client.NewRequestWithParams("POST", path, map[string]string{"id": strconv.Itoa(id)})
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(ctx, req, nil)
+
+	if err != nil {
+		log.WithFields(log.Fields{"resp": resp, "err": err}).Warn("err")
+		return resp, err
+	}
+
+	return resp, nil
 }
