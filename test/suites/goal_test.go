@@ -15,7 +15,7 @@ import (
 func TestGoalService_Get(t *testing.T) {
 	client := ClientForTest()
 	ctx := context.Background()
-	
+
 	elems, _, err := client.GoalService.Get(ctx)
 
 	assert.NoError(t, err)
@@ -30,7 +30,7 @@ func TestGoalService_Add(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	client := ClientForTest()
 	ctx := context.Background()
-	
+
 	goal := toodledo.GoalAdd{Name: "goal-b"}
 	elem, _, err := client.GoalService.Add(ctx, goal)
 
@@ -46,14 +46,14 @@ func TestGoalService_Delete(t *testing.T) {
 	ctx := context.Background()
 	now := time.Now()
 	nowString := now.Format("20060102150405")
-	
+
 	name := toodledo.GoalAdd{Name: fmt.Sprintf("goal-%s", nowString)}
 	// TODO test
 	newGoal, _, err := client.GoalService.Add(ctx, name)
 	if err != nil {
 		panic(err)
 	}
-	
+
 	_, err = client.GoalService.Delete(ctx, newGoal.ID)
 	assert.Nil(t, err)
 }

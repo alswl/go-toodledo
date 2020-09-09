@@ -109,9 +109,9 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	}
 	if toodledoError, ok := CheckToodledoResponse(body); !ok {
 		return &Response{
-			Response: resp,
-			Text:     toodledoError.ErrorDesc,
-		}, ApiError{
+				Response: resp,
+				Text:     toodledoError.ErrorDesc,
+			}, ApiError{
 				Response: nil,
 				Body:     body,
 				Message:  toodledoError.ErrorDesc,
@@ -158,7 +158,7 @@ func CheckResponseStatus(r *http.Response) error {
 	if err != nil {
 		return err
 	}
-	
+
 	return &ApiError{Response: r, Body: string(data), Message: "http status error"}
 }
 

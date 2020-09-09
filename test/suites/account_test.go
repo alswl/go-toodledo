@@ -49,4 +49,3 @@ func testDelete(client *toodledo.Client) {
 		return
 	}
 }
-

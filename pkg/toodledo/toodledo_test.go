@@ -137,14 +137,14 @@ func TestClient_NewRequestWithParams(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "",
-			fields:  fields{},
-			args:    args{
+			name:   "",
+			fields: fields{},
+			args: args{
 				method: "POST",
 				urlStr: "http://test.com",
 				params: map[string]string{"a": "b"},
 			},
-			want: nil,
+			want:    nil,
 			wantErr: false,
 		},
 	}
