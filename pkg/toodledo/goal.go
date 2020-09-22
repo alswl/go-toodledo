@@ -2,15 +2,16 @@ package toodledo
 
 import (
 	"context"
+	"github.com/alswl/go-toodledo/pkg/toodledo/models"
 	"github.com/go-playground/validator"
 	log "github.com/sirupsen/logrus"
 	"net/url"
 	"strconv"
 )
 
-type GoalService Service
+// TODO @jingchao interface
 
-type GoalLevel int
+type GoalService Service
 
 const (
 	GOAL_LEVEL_LIFE_TIME  int = 0
@@ -18,30 +19,9 @@ const (
 	GOAL_LEVEL_SHORT_TERM int = 2
 )
 
-type Goal struct {
-	ID    int       `json:"id"`
-	Name  string    `json:"name"`
-	Level GoalLevel `json:"level"`
-	// 0 or 1
-	Archived    int    `json:"archived"`
-	Contributes int    `json:"contributes"`
-	Note        string `json:"note"`
-}
-
 var validate *validator.Validate
 
-type GoalAdd struct {
-	// required
-	Name  string `validate:"required`
-	Level *GoalLevel
-	// 0 or 1
-	Contributes *int
-	// 0 or 1
-	Private *bool
-	Note    *string
-}
-
-func (s *GoalService) Get(ctx context.Context) ([]*Goal, *Response, error) {
+func (s *GoalService) Get(ctx context.Context) ([]*models.Goal, *Response, error) {
 	path := "/3/goals/get.php"
 
 	req, err := s.client.NewRequest("GET", path)
@@ -49,7 +29,7 @@ func (s *GoalService) Get(ctx context.Context) ([]*Goal, *Response, error) {
 		return nil, nil, err
 	}
 
-	var goals []*Goal
+	var goals []*models.Goal
 	resp, err := s.client.Do(ctx, req, &goals)
 	if err != nil {
 		return nil, resp, err
@@ -58,7 +38,7 @@ func (s *GoalService) Get(ctx context.Context) ([]*Goal, *Response, error) {
 	return goals, resp, nil
 }
 
-func (s *GoalService) Add(ctx context.Context, goalAdd GoalAdd) (*Goal, *Response, error) {
+func (s *GoalService) Add(ctx context.Context, goalAdd models.GoalAdd) (*models.Goal, *Response, error) {
 	path := "/3/goals/add.php"
 
 	validate = validator.New()
@@ -86,7 +66,7 @@ func (s *GoalService) Add(ctx context.Context, goalAdd GoalAdd) (*Goal, *Respons
 		return nil, nil, err
 	}
 
-	var goals []*Goal
+	var goals []*models.Goal
 	resp, err := s.client.Do(ctx, req, &goals)
 
 	if err != nil {
@@ -97,6 +77,12 @@ func (s *GoalService) Add(ctx context.Context, goalAdd GoalAdd) (*Goal, *Respons
 	// get first
 	return goals[0], resp, nil
 }
+
+func (s *GoalService) Edit(ctx context.Context, goalEdit models.GoalEdit) (models.Goal, Response, error) {
+	// TODO @alswl
+	panic("not impl")
+}
+
 func (s *GoalService) Delete(ctx context.Context, id int) (*Response, error) {
 	path := "/3/goals/delete.php"
 

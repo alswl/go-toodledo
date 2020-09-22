@@ -5,7 +5,7 @@ package suites
 import (
 	"context"
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/toodledo"
+	"github.com/alswl/go-toodledo/pkg/toodledo/models"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -31,7 +31,7 @@ func TestGoalService_Add(t *testing.T) {
 	client := ClientForTest()
 	ctx := context.Background()
 
-	goal := toodledo.GoalAdd{Name: "goal-b"}
+	goal := models.GoalAdd{Name: "goal-b"}
 	elem, _, err := client.GoalService.Add(ctx, goal)
 
 	fmt.Println(elem)
@@ -47,7 +47,7 @@ func TestGoalService_Delete(t *testing.T) {
 	now := time.Now()
 	nowString := now.Format("20060102150405")
 
-	name := toodledo.GoalAdd{Name: fmt.Sprintf("goal-%s", nowString)}
+	name := models.GoalAdd{Name: fmt.Sprintf("goal-%s", nowString)}
 	// TODO test
 	newGoal, _, err := client.GoalService.Add(ctx, name)
 	if err != nil {

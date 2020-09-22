@@ -2,6 +2,7 @@ package toodledo
 
 import (
 	"context"
+	"github.com/alswl/go-toodledo/pkg/toodledo/models"
 	"reflect"
 	"testing"
 )
@@ -14,7 +15,7 @@ func TestFolderService_Get(t *testing.T) {
 		name    string
 		s       FolderService
 		args    args
-		want    []*Folder
+		want    []*models.Folder
 		want1   *Response
 		wantErr bool
 	}{

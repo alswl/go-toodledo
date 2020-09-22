@@ -184,7 +184,9 @@ func NewClient(accessToken string) *Client {
 	client.common.client = client
 	client.AccountService = (*AccountService)(&client.common)
 	client.FolderService = (*FolderService)(&client.common)
-	client.TaskService = (*TaskService)(&client.common)
+
+	var ts TaskService = &taskService{client}
+	client.TaskService = &ts
 	client.GoalService = (*GoalService)(&client.common)
 	// TODO
 	return client

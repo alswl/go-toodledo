@@ -4,21 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/alswl/go-toodledo/pkg/toodledo/models"
 	"net/url"
 	"strconv"
 )
 
 type FolderService Service
 
-type Folder struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Private  int    `json:"private"`
-	Archived int    `json:"archived"`
-	Ord      int    `json:"ord"`
-}
-
-func (s *FolderService) Get(ctx context.Context) ([]*Folder, *Response, error) {
+func (s *FolderService) Get(ctx context.Context) ([]*models.Folder, *Response, error) {
 	path := "/3/folders/get.php"
 
 	req, err := s.client.NewRequest("GET", path)
@@ -26,7 +19,7 @@ func (s *FolderService) Get(ctx context.Context) ([]*Folder, *Response, error) {
 		return nil, nil, err
 	}
 
-	var folders []*Folder
+	var folders []*models.Folder
 	resp, err := s.client.Do(ctx, req, &folders)
 	if err != nil {
 		return nil, resp, err
@@ -35,7 +28,7 @@ func (s *FolderService) Get(ctx context.Context) ([]*Folder, *Response, error) {
 	return folders, resp, nil
 }
 
-func (s *FolderService) Add(ctx context.Context, name string) (*Folder, *Response, error) {
+func (s *FolderService) Add(ctx context.Context, name string) (*models.Folder, *Response, error) {
 	path := "/3/folders/add.php"
 
 	form := url.Values{}
@@ -45,7 +38,7 @@ func (s *FolderService) Add(ctx context.Context, name string) (*Folder, *Respons
 		return nil, nil, err
 	}
 
-	var folders []*Folder
+	var folders []*models.Folder
 	resp, err := s.client.Do(ctx, req, &folders)
 	if err != nil {
 		return nil, resp, err
@@ -55,12 +48,12 @@ func (s *FolderService) Add(ctx context.Context, name string) (*Folder, *Respons
 	return folders[0], resp, nil
 }
 
-func (s *FolderService) Edit(ctx context.Context, id int, name string) (*Folder, *Response, error) {
+func (s *FolderService) Edit(ctx context.Context, id int, name string) (*models.Folder, *Response, error) {
 	return s.EditWithPrivate(ctx, id, name, -1)
 
 }
 
-func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string, private int) (*Folder, *Response, error) {
+func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string, private int) (*models.Folder, *Response, error) {
 	path := "/3/folders/edit.php"
 
 	form := url.Values{}
@@ -75,7 +68,7 @@ func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string
 		return nil, nil, err
 	}
 
-	var folders []*Folder
+	var folders []*models.Folder
 	resp, err := s.client.Do(ctx, req, &folders)
 	if err != nil {
 		return nil, resp, err
