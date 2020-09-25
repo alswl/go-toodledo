@@ -29,7 +29,7 @@ func TestClient_NewRequest(t *testing.T) {
 		want    *http.Request
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		// TODO: AddExtend test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -70,7 +70,7 @@ func TestClient_Do(t *testing.T) {
 		want    *Response
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		// TODO: AddExtend test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -101,7 +101,7 @@ func TestNewClient(t *testing.T) {
 		args args
 		want *Client
 	}{
-		// TODO: Add test cases.
+		// TODO: AddExtend test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

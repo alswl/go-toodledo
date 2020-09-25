@@ -14,12 +14,13 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://api.toodledo.com"
+	DefaultBaseUrl = "https://api.toodledo.com"
 )
 
 type Client struct {
 	clientMu sync.Mutex
 	client   *http.Client
+	requests *Requests
 
 	BaseURL     *url.URL
 	accessToken string
@@ -32,6 +33,8 @@ type Client struct {
 	FolderService  *FolderService
 	GoalService    *GoalService
 	TaskService    *TaskService
+	ContextService ContextService
+
 	// TODO
 }
 
@@ -112,9 +115,9 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 				Response: resp,
 				Text:     toodledoError.ErrorDesc,
 			}, ApiError{
-				Response: nil,
-				Body:     body,
-				Message:  toodledoError.ErrorDesc,
+				Response:      resp,
+				Body:          body,
+				ErrorResponse: toodledoError,
 			}
 	}
 	response := &Response{resp, body}
@@ -140,14 +143,14 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 }
 
 type ApiError struct {
+	ErrorResponse
+	// TODO remove Response
 	Response *http.Response
 	Body     string
-	Message  string `json:"message"`
 }
 
 func (e ApiError) Error() string {
-	return fmt.Sprintf("%v %d %v %v",
-		e.Response.Request.Method, e.Response.StatusCode, e.Message, e.Body)
+	return fmt.Sprintf("API Error, code %v, desc: %v", e.ErrorCode, e.ErrorDesc)
 }
 
 func CheckResponseStatus(r *http.Response) error {
@@ -159,7 +162,10 @@ func CheckResponseStatus(r *http.Response) error {
 		return err
 	}
 
-	return &ApiError{Response: r, Body: string(data), Message: "http status error"}
+	return &ApiError{Response: r, Body: string(data), ErrorResponse: ErrorResponse{
+		ErrorCode: -1,
+		ErrorDesc: "HTTP request error",
+	}}
 }
 
 // CheckToodledoResponse check body is Toodledo Error Response format
@@ -178,20 +184,25 @@ type Service struct {
 
 func NewClient(accessToken string) *Client {
 	httpClient := http.DefaultClient
-	baseURL, _ := url.Parse(defaultBaseURL)
+	baseURL, _ := url.Parse(DefaultBaseUrl)
 
-	client := &Client{client: httpClient, BaseURL: baseURL, accessToken: accessToken}
+	client := &Client{client: httpClient, BaseURL: baseURL, accessToken: accessToken, requests: NewRequests()}
 	client.common.client = client
 	client.AccountService = (*AccountService)(&client.common)
 	client.FolderService = (*FolderService)(&client.common)
+	client.GoalService = (*GoalService)(&client.common)
 
 	var ts TaskService = &taskService{client}
 	client.TaskService = &ts
-	client.GoalService = (*GoalService)(&client.common)
-	// TODO
+
+	var cs ContextService = &contextService{client}
+	client.ContextService = cs
+
+	// TODO add more service
 	return client
 }
 
+// TODO remove Response
 type Response struct {
 	*http.Response
 	// TODO

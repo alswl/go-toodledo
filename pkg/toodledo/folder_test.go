@@ -19,7 +19,7 @@ func TestFolderService_Get(t *testing.T) {
 		want1   *Response
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		// TODO: AddExtend test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
