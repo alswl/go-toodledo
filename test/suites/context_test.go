@@ -28,3 +28,23 @@ func Test_contextService_Add(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, context, fmt.Sprintf("resp: %s", body))
 }
+
+func Test_contextService_Edit(t *testing.T) {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetLevel(logrus.DebugLevel)
+	client := ClientForTest()
+
+	context, _, body, err := client.ContextService.Edit(1292681, "test-5")
+	assert.NoError(t, err)
+	assert.NotNil(t, context, fmt.Sprintf("resp: %s", body))
+}
+
+func Test_contextService_Delete(t *testing.T) {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetLevel(logrus.DebugLevel)
+	client := ClientForTest()
+
+	context, body, err := client.ContextService.Delete(1297923)
+	assert.NoError(t, err)
+	assert.NotNil(t, context, fmt.Sprintf("resp: %s", body))
+}
