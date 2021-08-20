@@ -7,16 +7,16 @@ Grant: `open 'https://api.toodledo.com/3/account/authorize.php?response_type=cod
 
 ## Install
 
-```
-go mod download
-```
+TODO
 
 
 ## Build
 
 
 ```
-go build
+make build
+make test
+make integration
 
 export TOODLEDO_APP_CLIENT_ID=
 export TOODLEDO_APP_SECRET=

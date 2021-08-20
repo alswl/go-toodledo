@@ -1,13 +1,12 @@
 //+build integration
 
-package cases
+package suites
 
 import (
 	"context"
 	"fmt"
 	"github.com/alswl/go-toodledo/pkg/toodledo"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 func testGet(client *toodledo.Client) {
@@ -49,18 +48,4 @@ func testDelete(client *toodledo.Client) {
 		log.WithField("resp", resp).WithError(err).Fatal("delete folder failed")
 		return
 	}
-}
-
-func main() {
-
-	accessToken := os.Getenv("TOODLEDO_ACCESS_TOKEN")
-	if accessToken == "" {
-		log.Fatal("Unauthorized: No TOODLEDO_ACCESS_TOKEN present")
-	}
-
-	client := toodledo.NewClient(accessToken)
-
-	testGet(client)
-	testAdd(client)
-	testEdit(client)
 }

@@ -15,9 +15,6 @@
 # Tweak the variables based on your project.
 #
 
-# Current version of the project.
-VERSION ?= v0.1.0
-
 # Target binaries. You can build multiple binaries for a single project.
 TARGETS := toodledo
 
@@ -47,6 +44,13 @@ BUILD_DIR := ./build
 COMMIT := $(strip $(shell git rev-parse --short HEAD 2>/dev/null))
 COMMIT := $(COMMIT)$(shell git diff-files --quiet || echo '-dirty')
 COMMIT := $(if $(COMMIT),$(COMMIT),"Unknown")
+
+# Current version of the project.
+MAJOR_VERSION = 1
+MINOR_VERSION = 0
+PATCH_VERSION = 0
+BUILD_VERSION = $(COMMIT)
+VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)-$(NOW_SHORT)
 
 #
 # Define all targets. At least the following commands are required:
