@@ -10,123 +10,109 @@ externalDocs:
   url: "https://api.toodledo.com/3/index.php"
 host: "api.toodledo.com"
 basePath: "/3"
-tags: []
+tags:
+  - name: folder
+  - name: context
+  - name: goal
+  - name: location
+  - name: task
+  - name: saved search
+  - name: note
+  - name: list
 schemes:
-- "https"
-paths:
-  /folders/add.php:
-    get:
-      tags:
-      - "folder"
-      security:
-        - oAuth2:
-            - read
-            - write
-      produces:
-      - "application/xml"
-      - "application/json"
-      responses:
-        "200":
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Folder"
-        '401':
-          $ref: '#/definitions/responses/Unauthorized'
-        '429':
-          $ref: '#/definitions/responses/TooManyRequests'
-        '503':
-          $ref: '#/definitions/responses/ServiceUnavailable'
-    post:
-      tags:
-      - "folder"
-      security:
-        - oAuth2:
-            - read
-            - write
-      consumes:
-      - "application/json"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - in: "query"
-        name: "name"
-        required: true
-      - in: "query"
-        name: "private"
-        type: integer
-        format: "int32"
-        required: false
-      responses:
-        "200":
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Folder"
-        '401':
-          $ref: '#/definitions/responses/Unauthorized'
-        '429':
-          $ref: '#/definitions/responses/TooManyRequests'
-        '503':
-          $ref: '#/definitions/responses/ServiceUnavailable'
+  - "https"
 securityDefinitions:
   OAuth2:
     type: oauth2
     flow: accessCode
-    authorizationUrl: https://example.com/oauth/authorize
+    authorizationUrl: https://api.toodledo.com/3/account/authorize.php
     tokenUrl: https://api.toodledo.com/3/account/token.php
     scopes:
       read: Grants read access
       write: Grants write access
+paths:
+  /folders/get.php:
+    get:
+      tags:
+        - "folder"
+      security:
+        - OAuth2:
+            - read
+            - write
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "ok"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Folder"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+  /folders/add.php:
+    post:
+      tags:
+        - "folder"
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - "application/json"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "query"
+          type: string
+          name: "name"
+          required: true
+        - in: "query"
+          name: "private"
+          type: integer
+          format: "int32"
+          required: false
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Folder"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
-  responses:
-    Unkown:
-      description: Unknown Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/definitions/schemas/Error'
-    Unauthorized:
-      description: 401 Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/definitions/schemas/Error'
-    TooManyRequests:
-      description: 429 Too many API requests
-      content:
-        application/json:
-          schema:
-            $ref: '#/definitions/schemas/Error'
-    ServiceUnavailable:
-      description: 503 ServiceUnavailable
-      content:
-        application/json:
-          schema:
-            $ref: '#/definitions/schemas/Error'
-  schemas:
-    # Schema for error response body
-    Error:
-      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-      required:
-        - code
-        - message
-    Error:
-      type: object
-      properties:
-        errorCode:
-          type: string
-        errorDesc:
-          type: string
-      required:
-        - errorCode
-        - errorDesc
+  Error:
+    type: object
+    properties:
+      errorCode:
+        type: string
+      errorDesc:
+        type: string
+    required:
+      - errorCode
+      - errorDesc
   Folder:
     type: "object"
     properties:
@@ -136,15 +122,12 @@ definitions:
       name:
         type: "string"
       private:
-        type: "boolean"
-        format: "int32"
-      archived:
-        type: "boolean"
-        format: "int32"
-      ord:
         type: "integer"
         format: "int32"
-      order:
+      archived:
+        type: "integer"
+        format: "int32"
+      ord:
         type: "integer"
         format: "int32"
   ApiResponse:
