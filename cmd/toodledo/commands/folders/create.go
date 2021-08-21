@@ -12,8 +12,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-var GetCmd = &cobra.Command{
-	Use: "get",
+var CreateCmd = &cobra.Command{
+	Use:  "create",
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		t := viper.GetString("auth.access_token")
 		if t == "" {
@@ -21,9 +22,12 @@ var GetCmd = &cobra.Command{
 			return
 		}
 		auth := auth.NewSimpleAuth(t)
+		name := args[0]
 
 		cli := client.NewHTTPClient(strfmt.NewFormats())
-		res, err := cli.Folder.GetFoldersGetPhp(folder.NewGetFoldersGetPhpParams(), auth)
+		params := folder.NewPostFoldersAddPhpParams()
+		params.SetName(name)
+		res, err := cli.Folder.PostFoldersAddPhp(params, auth)
 		if err != nil {
 			logrus.Error(err)
 			return
