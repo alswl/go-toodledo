@@ -4,21 +4,22 @@ import (
 	"fmt"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/folder"
+	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
 
-type Auth struct {
+type SimpleAuth struct {
 	accessToken string
 }
 
-func NewAuth(accessToken string) *Auth {
-	return &Auth{accessToken: accessToken}
+func NewSimpleAuth(accessToken string) *SimpleAuth {
+	return &SimpleAuth{accessToken: accessToken}
 }
 
-func (a *Auth) AuthenticateRequest(request runtime.ClientRequest, registry strfmt.Registry) error {
+func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry strfmt.Registry) error {
 	request.SetQueryParam("access_token", a.accessToken)
 	return nil
 }
@@ -28,13 +29,13 @@ func main() {
 	if accessToken == "" {
 		log.Fatal("Unauthorized: No TOODLEDO_ACCESS_TOKEN present")
 	}
-	auth := NewAuth(accessToken)
+	auth := NewSimpleAuth(accessToken)
 
 	cli := client.NewHTTPClient(strfmt.NewFormats())
-	fs, err := cli.Folder.GetFoldersGetPhp(folder.NewGetFoldersGetPhpParams(), auth)
+	res, err := cli.Folder.GetFoldersGetPhp(folder.NewGetFoldersGetPhpParams(), auth)
 	if err != nil {
 		log.Error(err)
 		return
 	}
-	fmt.Printf("%v", fs)
+	fmt.Print(render.TablesRender(res.Payload))
 }

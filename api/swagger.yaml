@@ -107,7 +107,7 @@ definitions:
     type: object
     properties:
       errorCode:
-        type: string
+        type: integer
       errorDesc:
         type: string
     required:

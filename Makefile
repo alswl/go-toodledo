@@ -46,8 +46,8 @@ COMMIT := $(COMMIT)$(shell git diff-files --quiet || echo '-dirty')
 COMMIT := $(if $(COMMIT),$(COMMIT),"Unknown")
 
 # Current version of the project.
-MAJOR_VERSION = 1
-MINOR_VERSION = 0
+MAJOR_VERSION = 0
+MINOR_VERSION = 1
 PATCH_VERSION = 0
 BUILD_VERSION = $(COMMIT)
 VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)-$(NOW_SHORT)
@@ -60,7 +60,7 @@ VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)-
 
 build:
 	@for target in $(TARGETS); do                                                      \
-	  go build -i -v -o $(OUTPUT_DIR)/$${target}                                       \
+	  go build -v -o $(OUTPUT_DIR)/$${target}                                          \
 	    -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)                      \
 	    -X $(ROOT)/pkg/version.Commit=$(COMMIT)                                        \
 	    -X $(ROOT)/pkg/version.Package=$(ROOT)"                                        \

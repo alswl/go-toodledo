@@ -21,7 +21,7 @@ type Error struct {
 
 	// error code
 	// Required: true
-	ErrorCode *string `json:"errorCode"`
+	ErrorCode *int64 `json:"errorCode"`
 
 	// error desc
 	// Required: true

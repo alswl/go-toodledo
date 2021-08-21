@@ -11,6 +11,7 @@ require (
 	github.com/go-openapi/validate v0.20.2
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/jedib0t/go-pretty/v6 v6.2.4
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/sirupsen/logrus v1.6.0
