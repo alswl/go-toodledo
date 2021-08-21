@@ -102,6 +102,54 @@ paths:
           description: ServiceUnavailable
           schema:
             $ref: '#/definitions/Error'
+  /folders/edit.php:
+    post:
+      tags:
+        - "folder"
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - "application/json"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "query"
+          type: string
+          name: "id"
+          required: true
+        - in: "query"
+          type: string
+          name: "name"
+        - in: "query"
+          name: "private"
+          type: integer
+          format: "int32"
+        - in: "query"
+          name: "archived"
+          type: integer
+          format: "int32"
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Folder"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   Error:
     type: object
