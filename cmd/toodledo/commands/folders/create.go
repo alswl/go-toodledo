@@ -32,6 +32,6 @@ var CreateCmd = &cobra.Command{
 			logrus.Error(err)
 			return
 		}
-		fmt.Print(render.TablesRender(res.Payload))
+		fmt.Print(render.Tables4Folder(res.Payload))
 	},
 }

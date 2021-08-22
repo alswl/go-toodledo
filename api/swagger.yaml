@@ -185,6 +185,158 @@ paths:
           description: ServiceUnavailable
           schema:
             $ref: '#/definitions/Error'
+  /contexts/get.php:
+    get:
+      tags:
+        - "context"
+      security:
+        - OAuth2:
+            - read
+            - write
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "ok"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Context"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+  /contexts/add.php:
+    post:
+      tags:
+        - "context"
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - "application/json"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "query"
+          type: string
+          name: "name"
+          required: true
+        - in: "query"
+          name: "private"
+          type: integer
+          required: false
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Context"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+  /contexts/edit.php:
+    post:
+      tags:
+        - "context"
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - "application/json"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "query"
+          type: string
+          name: "id"
+          required: true
+        - in: "query"
+          type: string
+          name: "name"
+        - in: "query"
+          name: "private"
+          type: integer
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Context"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+  /contexts/delete.php:
+    post:
+      tags:
+        - "context"
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - "application/json"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "query"
+          name: "id"
+          type: integer
+          required: true
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: "object"
+            properties:
+              deleted:
+                type: integer
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+
 definitions:
   Error:
     type: object
@@ -208,6 +360,15 @@ definitions:
       archived:
         type: "integer"
       ord:
+        type: "integer"
+  Context:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      private:
         type: "integer"
   ApiResponse:
     type: "object"

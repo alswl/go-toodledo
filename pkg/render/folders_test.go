@@ -31,8 +31,8 @@ func TestTablesRender(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := TablesRender(tt.args.folders); got != tt.want {
-				t.Errorf("TablesRender() = %v, want %v", got, tt.want)
+			if got := Tables4Folder(tt.args.folders); got != tt.want {
+				t.Errorf("Tables4Folder() = %v, want %v", got, tt.want)
 			}
 		})
 	}

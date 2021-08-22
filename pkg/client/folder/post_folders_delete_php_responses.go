@@ -6,7 +6,7 @@ package folder
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
+	ccontext "context"
 	"fmt"
 	"io"
 
@@ -197,7 +197,7 @@ func (o *PostFoldersDeletePhpOKBody) Validate(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this post folders delete php o k body based on context it is used
-func (o *PostFoldersDeletePhpOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (o *PostFoldersDeletePhpOKBody) ContextValidate(ctx ccontext.Context, formats strfmt.Registry) error {
 	return nil
 }
 

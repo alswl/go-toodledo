@@ -6,7 +6,7 @@ package folder
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
+	ccontext "context"
 	"net/http"
 	"time"
 
@@ -39,7 +39,7 @@ func NewPostFoldersAddPhpParamsWithTimeout(timeout time.Duration) *PostFoldersAd
 
 // NewPostFoldersAddPhpParamsWithContext creates a new PostFoldersAddPhpParams object
 // with the ability to set a context for a request.
-func NewPostFoldersAddPhpParamsWithContext(ctx context.Context) *PostFoldersAddPhpParams {
+func NewPostFoldersAddPhpParamsWithContext(ctx ccontext.Context) *PostFoldersAddPhpParams {
 	return &PostFoldersAddPhpParams{
 		Context: ctx,
 	}
@@ -67,7 +67,7 @@ type PostFoldersAddPhpParams struct {
 	Private *int64
 
 	timeout    time.Duration
-	Context    context.Context
+	Context    ccontext.Context
 	HTTPClient *http.Client
 }
 
@@ -98,13 +98,13 @@ func (o *PostFoldersAddPhpParams) SetTimeout(timeout time.Duration) {
 }
 
 // WithContext adds the context to the post folders add php params
-func (o *PostFoldersAddPhpParams) WithContext(ctx context.Context) *PostFoldersAddPhpParams {
+func (o *PostFoldersAddPhpParams) WithContext(ctx ccontext.Context) *PostFoldersAddPhpParams {
 	o.SetContext(ctx)
 	return o
 }
 
 // SetContext adds the context to the post folders add php params
-func (o *PostFoldersAddPhpParams) SetContext(ctx context.Context) {
+func (o *PostFoldersAddPhpParams) SetContext(ctx ccontext.Context) {
 	o.Context = ctx
 }
 

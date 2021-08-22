@@ -6,7 +6,7 @@ package folder
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
+	ccontext "context"
 	"net/http"
 	"time"
 
@@ -38,7 +38,7 @@ func NewGetFoldersGetPhpParamsWithTimeout(timeout time.Duration) *GetFoldersGetP
 
 // NewGetFoldersGetPhpParamsWithContext creates a new GetFoldersGetPhpParams object
 // with the ability to set a context for a request.
-func NewGetFoldersGetPhpParamsWithContext(ctx context.Context) *GetFoldersGetPhpParams {
+func NewGetFoldersGetPhpParamsWithContext(ctx ccontext.Context) *GetFoldersGetPhpParams {
 	return &GetFoldersGetPhpParams{
 		Context: ctx,
 	}
@@ -59,7 +59,7 @@ func NewGetFoldersGetPhpParamsWithHTTPClient(client *http.Client) *GetFoldersGet
 */
 type GetFoldersGetPhpParams struct {
 	timeout    time.Duration
-	Context    context.Context
+	Context    ccontext.Context
 	HTTPClient *http.Client
 }
 
@@ -90,13 +90,13 @@ func (o *GetFoldersGetPhpParams) SetTimeout(timeout time.Duration) {
 }
 
 // WithContext adds the context to the get folders get php params
-func (o *GetFoldersGetPhpParams) WithContext(ctx context.Context) *GetFoldersGetPhpParams {
+func (o *GetFoldersGetPhpParams) WithContext(ctx ccontext.Context) *GetFoldersGetPhpParams {
 	o.SetContext(ctx)
 	return o
 }
 
 // SetContext adds the context to the get folders get php params
-func (o *GetFoldersGetPhpParams) SetContext(ctx context.Context) {
+func (o *GetFoldersGetPhpParams) SetContext(ctx ccontext.Context) {
 	o.Context = ctx
 }
 

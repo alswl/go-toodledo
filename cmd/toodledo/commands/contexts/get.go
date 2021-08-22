@@ -1,10 +1,10 @@
-package folders
+package contexts
 
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/folder"
+	"github.com/alswl/go-toodledo/pkg/client/context"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
@@ -23,11 +23,11 @@ var GetCmd = &cobra.Command{
 		auth := auth.NewSimpleAuth(t)
 
 		cli := client.NewHTTPClient(strfmt.NewFormats())
-		res, err := cli.Folder.GetFoldersGetPhp(folder.NewGetFoldersGetPhpParams(), auth)
+		res, err := cli.Context.GetContextsGetPhp(context.NewGetContextsGetPhpParams(), auth)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-		fmt.Print(render.Tables4Folder(res.Payload))
+		fmt.Print(render.Tables4Context(res.Payload))
 	},
 }

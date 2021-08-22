@@ -7,7 +7,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
-func TablesRender(folders []*models.Folder) string {
+func Tables4Folder(folders []*models.Folder) string {
 	var output string
 	buf := bytes.NewBufferString(output)
 	t := table.NewWriter()
@@ -20,6 +20,23 @@ func TablesRender(folders []*models.Folder) string {
 	var rows []table.Row
 	for _, folder := range folders {
 		rows = append(rows, table.Row{folder.ID, folder.Name, folder.Archived})
+	}
+	t.AppendRows(rows)
+	t.Render()
+	return buf.String()
+}
+
+func Tables4Context(contexts []*models.Context) string {
+	var output string
+	buf := bytes.NewBufferString(output)
+	t := table.NewWriter()
+	t.SetOutputMirror(buf)
+	t.SetStyle(table.StyleLight)
+	t.Style().Options.DrawBorder = false
+	t.AppendHeader(table.Row{"#", "Name"})
+	var rows []table.Row
+	for _, x := range contexts {
+		rows = append(rows, table.Row{x.ID, x.Name})
 	}
 	t.AppendRows(rows)
 	t.Render()

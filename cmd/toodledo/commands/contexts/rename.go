@@ -1,10 +1,10 @@
-package folders
+package contexts
 
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/folder"
+	"github.com/alswl/go-toodledo/pkg/client/context"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/alswl/go-toodledo/pkg/service"
 	"github.com/go-openapi/strfmt"
@@ -33,20 +33,20 @@ var RenameCmd = &cobra.Command{
 			return
 		}
 
-		f, err := service.FindFolderByName(auth, name)
+		f, err := service.FindContextByName(auth, name)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
 
-		p := folder.NewPostFoldersEditPhpParams()
+		p := context.NewPostContextsEditPhpParams()
 		p.SetID(strconv.Itoa(int(f.ID)))
 		p.SetName(&newName)
-		res, err := cli.Folder.PostFoldersEditPhp(p, auth)
+		res, err := cli.Context.PostContextsEditPhp(p, auth)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-		fmt.Print(render.Tables4Folder(res.Payload))
+		fmt.Print(render.Tables4Context(res.Payload))
 	},
 }
