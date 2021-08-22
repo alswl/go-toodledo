@@ -15,8 +15,10 @@
 # Tweak the variables based on your project.
 #
 
+PROJECT := go-toodledo
 # Target binaries. You can build multiple binaries for a single project.
 TARGETS := toodledo
+NOW_SHORT := $(shell date +%Y%m%d%H%M)
 
 # Container registries.
 REGISTRIES ?= ""
@@ -29,7 +31,7 @@ IMAGE_PREFIX ?= $(strip )
 IMAGE_SUFFIX ?= $(strip )
 
 # This repo's root import path (under GOPATH).
-ROOT := alswl/go-toodledo
+ROOT := github.com/alswl/go-toodledo
 
 # Project main package location (can be multiple ones).
 CMD_DIR := ./cmd
@@ -50,36 +52,56 @@ MAJOR_VERSION = 0
 MINOR_VERSION = 1
 PATCH_VERSION = 0
 BUILD_VERSION = $(COMMIT)
-VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)-$(NOW_SHORT)
+GO_MOD_VERSION = $(shell cat go.mod | sha256sum | cut -c-6)
+VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
 
-#
 # Define all targets. At least the following commands are required:
 #
 
-.PHONY: build container push test integration clean swagger
+.PHONY: build container push test integration-test clean generate-code lint-test lint fmt compress
 
-build:
+build: fmt
 	@for target in $(TARGETS); do                                                      \
 	  go build -v -o $(OUTPUT_DIR)/$${target}                                          \
-	    -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)                      \
+	    -ldflags "-s -w -X pkg/version.Version=$(VERSION)                      \
 	    -X $(ROOT)/pkg/version.Commit=$(COMMIT)                                        \
+	    -X $(ROOT)/pkg/version.BuildDate=$(NOW_SHORT)                                  \
 	    -X $(ROOT)/pkg/version.Package=$(ROOT)"                                        \
 	    $(CMD_DIR)/$${target};                                                         \
 	done
-	
 
-swagger:
+download:
+	go mod download
+
+generate-code:
+	# swagger
 	(cd pkg; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override)
+
+	# generate mock of interfaces for testing
+	rm -rf test/mock
+	cd pkg && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock && cd ..
+	cd cmd && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock && cd ..
+
+lint-test:
+	echo "gofmt"
+	@test $$(gofmt -l ./pkg/ ./test/ ./cmd/ | wc -l) -eq 0
+
+	echo "ensure integration test with integration tags"
+	@test $$(find test -name '*_test.go' | wc -l) -eq $$(cat $$(find test -name '*_test.go') | grep '//+build integration' | wc -l)
+
+fmt:
+	go fmt ./pkg/... ./cmd/...
+	go vet ./pkg/... ./cmd/...
+
+lint:
+	gofmt -w ./pkg/ ./test/ ./cmd/
 
 container:
 	@for target in $(TARGETS); do                                                      \
 	  for registry in $(REGISTRIES); do                                                \
 	    image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                \
 	    docker build -t $${registry}$${image}:$(VERSION)                               \
-	      --build-arg ROOT=$(ROOT) --build-arg TARGET=$${target}                       \
-	      --build-arg CMD_DIR=$(CMD_DIR)                                               \
-	      --build-arg VERSION=$(VERSION)                                               \
-	      --build-arg COMMIT=$(COMMIT)                                                 \
+	      --progress=plain                                                             \
 	      -f $(BUILD_DIR)/$${target}/Dockerfile .;                                     \
 	  done                                                                             \
 	done
@@ -92,10 +114,15 @@ push: container
 	  done                                                                             \
 	done
 
-test:
+compress:
+	@for target in $(TARGETS); do   \
+	  upx $(OUTPUT_DIR)/$${target}; \
+	done
+
+test: lint
 	@go test -tags=\!integration ./...
 
-integration:
+integration-test:
 	@go test -tags=integration ./...
 
 clean:

@@ -15,7 +15,7 @@ import (
 )
 
 var RenameCmd = &cobra.Command{
-	Use: "rename",
+	Use:  "rename",
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		t := viper.GetString("auth.access_token")
@@ -25,7 +25,7 @@ var RenameCmd = &cobra.Command{
 		}
 		auth := auth.NewSimpleAuth(t)
 		cli := client.NewHTTPClient(strfmt.NewFormats())
-		
+
 		name := args[0]
 		newName := args[1]
 		if name == newName {
