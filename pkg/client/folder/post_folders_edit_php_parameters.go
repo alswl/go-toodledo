@@ -61,9 +61,7 @@ func NewPostFoldersEditPhpParamsWithHTTPClient(client *http.Client) *PostFolders
 type PostFoldersEditPhpParams struct {
 
 	// Archived.
-	//
-	// Format: int32
-	Archived *int32
+	Archived *int64
 
 	// ID.
 	ID string
@@ -72,9 +70,7 @@ type PostFoldersEditPhpParams struct {
 	Name *string
 
 	// Private.
-	//
-	// Format: int32
-	Private *int32
+	Private *int64
 
 	timeout    time.Duration
 	Context    context.Context
@@ -130,13 +126,13 @@ func (o *PostFoldersEditPhpParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithArchived adds the archived to the post folders edit php params
-func (o *PostFoldersEditPhpParams) WithArchived(archived *int32) *PostFoldersEditPhpParams {
+func (o *PostFoldersEditPhpParams) WithArchived(archived *int64) *PostFoldersEditPhpParams {
 	o.SetArchived(archived)
 	return o
 }
 
 // SetArchived adds the archived to the post folders edit php params
-func (o *PostFoldersEditPhpParams) SetArchived(archived *int32) {
+func (o *PostFoldersEditPhpParams) SetArchived(archived *int64) {
 	o.Archived = archived
 }
 
@@ -163,13 +159,13 @@ func (o *PostFoldersEditPhpParams) SetName(name *string) {
 }
 
 // WithPrivate adds the private to the post folders edit php params
-func (o *PostFoldersEditPhpParams) WithPrivate(private *int32) *PostFoldersEditPhpParams {
+func (o *PostFoldersEditPhpParams) WithPrivate(private *int64) *PostFoldersEditPhpParams {
 	o.SetPrivate(private)
 	return o
 }
 
 // SetPrivate adds the private to the post folders edit php params
-func (o *PostFoldersEditPhpParams) SetPrivate(private *int32) {
+func (o *PostFoldersEditPhpParams) SetPrivate(private *int64) {
 	o.Private = private
 }
 
@@ -184,12 +180,12 @@ func (o *PostFoldersEditPhpParams) WriteToRequest(r runtime.ClientRequest, reg s
 	if o.Archived != nil {
 
 		// query param archived
-		var qrArchived int32
+		var qrArchived int64
 
 		if o.Archived != nil {
 			qrArchived = *o.Archived
 		}
-		qArchived := swag.FormatInt32(qrArchived)
+		qArchived := swag.FormatInt64(qrArchived)
 		if qArchived != "" {
 
 			if err := r.SetQueryParam("archived", qArchived); err != nil {
@@ -228,12 +224,12 @@ func (o *PostFoldersEditPhpParams) WriteToRequest(r runtime.ClientRequest, reg s
 	if o.Private != nil {
 
 		// query param private
-		var qrPrivate int32
+		var qrPrivate int64
 
 		if o.Private != nil {
 			qrPrivate = *o.Private
 		}
-		qPrivate := swag.FormatInt32(qrPrivate)
+		qPrivate := swag.FormatInt64(qrPrivate)
 		if qPrivate != "" {
 
 			if err := r.SetQueryParam("private", qPrivate); err != nil {

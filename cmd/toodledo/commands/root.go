@@ -31,7 +31,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
 	
 	foldersCmd.AddCommand(folders.GetCmd, folders.CreateCmd, folders.RenameCmd, folders.ArchiveCmd,
-		folders.UnArchiveCmd)
+		folders.ActivateCmd, folders.DeleteCmd)
 	
 	rootCmd.AddCommand(foldersCmd)
 

@@ -56,7 +56,7 @@ VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)-
 # Define all targets. At least the following commands are required:
 #
 
-.PHONY: build container push test integration clean
+.PHONY: build container push test integration clean swagger
 
 build:
 	@for target in $(TARGETS); do                                                      \
@@ -66,6 +66,10 @@ build:
 	    -X $(ROOT)/pkg/version.Package=$(ROOT)"                                        \
 	    $(CMD_DIR)/$${target};                                                         \
 	done
+	
+
+swagger:
+	(cd pkg; swagger generate client -f ../api/swagger.yaml -A toodledo)
 
 container:
 	@for target in $(TARGETS); do                                                      \
