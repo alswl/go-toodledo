@@ -6,7 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
+	ccontext "context"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -65,7 +65,7 @@ func (m *Error) validateErrorDesc(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this error based on context it is used
-func (m *Error) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *Error) ContextValidate(ctx ccontext.Context, formats strfmt.Registry) error {
 	return nil
 }
 

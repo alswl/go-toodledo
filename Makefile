@@ -69,7 +69,7 @@ build:
 	
 
 swagger:
-	(cd pkg; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates)
+	(cd pkg; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override)
 
 container:
 	@for target in $(TARGETS); do                                                      \

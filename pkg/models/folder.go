@@ -6,7 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
+	ccontext "context"
 
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -39,7 +39,7 @@ func (m *Folder) Validate(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this folder based on context it is used
-func (m *Folder) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *Folder) ContextValidate(ctx ccontext.Context, formats strfmt.Registry) error {
 	return nil
 }
 
