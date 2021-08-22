@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  description: "API Swagger for Toodledo, docment link: https://api.toodledo.com/3/index.php , powered by @alswl"
+  description: "API Swagger for Toodledo, document link: https://api.toodledo.com/3/index.php , powered by @alswl"
   version: "3.0.0"
   title: "Swagger Toodledo"
   contact:
@@ -337,6 +337,178 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  /goals/get.php:
+    get:
+      tags:
+        - "goal"
+      security:
+        - OAuth2:
+            - read
+            - write
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "ok"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Goal"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+  /goals/add.php:
+    post:
+      tags:
+        - "goal"
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - "application/json"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "query"
+          type: string
+          name: "name"
+          required: true
+        - in: "query"
+          type: integer
+          name: "level"
+        - in: "query"
+          type: integer
+          name: "contributes"
+        - in: "query"
+          name: "private"
+          type: integer
+        - in: "query"
+          type: string
+          name: "note"
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Goal"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+  /goals/edit.php:
+    post:
+      tags:
+        - "goal"
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - "application/json"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "query"
+          type: string
+          name: "id"
+          required: true
+        - in: "query"
+          type: string
+          name: "name"
+        - in: "query"
+          type: integer
+          name: "level"
+        - in: "query"
+          type: integer
+          name: "contributes"
+        - in: "query"
+          name: "archived"
+          type: integer
+        - in: "query"
+          name: "private"
+          type: integer
+        - in: "query"
+          type: string
+          name: "note"
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Goal"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+  /goals/delete.php:
+    post:
+      tags:
+        - "goal"
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - "application/json"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "query"
+          name: "id"
+          type: integer
+          required: true
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: "object"
+            properties:
+              deleted:
+                type: integer
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+
 definitions:
   Error:
     type: object
@@ -370,6 +542,23 @@ definitions:
         type: "string"
       private:
         type: "integer"
+  Goal:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      level:
+        type: "integer"
+      contributes:
+        type: "integer"
+      name:
+        type: "string"
+      archived:
+        type: "integer"
+      private:
+        type: "integer"
+      note:
+        type: "string"
   ApiResponse:
     type: "object"
     properties:
