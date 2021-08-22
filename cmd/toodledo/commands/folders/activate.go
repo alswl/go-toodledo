@@ -35,6 +35,6 @@ var ActivateCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Print(render.TablesRender([]*models.Folder{newF}))
+		fmt.Print(render.Tables4Folder([]*models.Folder{newF}))
 	},
 }

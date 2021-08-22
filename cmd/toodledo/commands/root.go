@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/contexts"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/folders"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -11,17 +12,18 @@ import (
 
 var (
 	// Used for flags.
-	cfgFile     string
-	userLicense string
+	cfgFile string
 )
 
 var rootCmd = &cobra.Command{
 	Use:              "toodledo",
 	TraverseChildren: true,
 }
-
-var foldersCmd = &cobra.Command{
+var folderCmd = &cobra.Command{
 	Use: "folder",
+}
+var contextCmd = &cobra.Command{
+	Use: "context",
 }
 
 func init() {
@@ -29,11 +31,12 @@ func init() {
 
 	rootCmd.PersistentFlags().StringP("access_token", "", "", "")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
-	
-	foldersCmd.AddCommand(folders.GetCmd, folders.CreateCmd, folders.RenameCmd, folders.ArchiveCmd,
-		folders.ActivateCmd, folders.DeleteCmd)
-	
-	rootCmd.AddCommand(foldersCmd)
+
+	folderCmd.AddCommand(folders.GetCmd, folders.CreateCmd, folders.DeleteCmd,
+		folders.RenameCmd, folders.ArchiveCmd, folders.ActivateCmd)
+	contextCmd.AddCommand(contexts.GetCmd, contexts.CreateCmd, contexts.DeleteCmd, contexts.RenameCmd)
+
+	rootCmd.AddCommand(folderCmd, contextCmd)
 
 	viper.BindPFlag("access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 

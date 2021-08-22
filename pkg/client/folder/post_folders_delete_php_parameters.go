@@ -6,7 +6,7 @@ package folder
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
+	ccontext "context"
 	"net/http"
 	"time"
 
@@ -39,7 +39,7 @@ func NewPostFoldersDeletePhpParamsWithTimeout(timeout time.Duration) *PostFolder
 
 // NewPostFoldersDeletePhpParamsWithContext creates a new PostFoldersDeletePhpParams object
 // with the ability to set a context for a request.
-func NewPostFoldersDeletePhpParamsWithContext(ctx context.Context) *PostFoldersDeletePhpParams {
+func NewPostFoldersDeletePhpParamsWithContext(ctx ccontext.Context) *PostFoldersDeletePhpParams {
 	return &PostFoldersDeletePhpParams{
 		Context: ctx,
 	}
@@ -64,7 +64,7 @@ type PostFoldersDeletePhpParams struct {
 	ID int64
 
 	timeout    time.Duration
-	Context    context.Context
+	Context    ccontext.Context
 	HTTPClient *http.Client
 }
 
@@ -95,13 +95,13 @@ func (o *PostFoldersDeletePhpParams) SetTimeout(timeout time.Duration) {
 }
 
 // WithContext adds the context to the post folders delete php params
-func (o *PostFoldersDeletePhpParams) WithContext(ctx context.Context) *PostFoldersDeletePhpParams {
+func (o *PostFoldersDeletePhpParams) WithContext(ctx ccontext.Context) *PostFoldersDeletePhpParams {
 	o.SetContext(ctx)
 	return o
 }
 
 // SetContext adds the context to the post folders delete php params
-func (o *PostFoldersDeletePhpParams) SetContext(ctx context.Context) {
+func (o *PostFoldersDeletePhpParams) SetContext(ctx ccontext.Context) {
 	o.Context = ctx
 }
 
