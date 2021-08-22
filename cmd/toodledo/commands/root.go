@@ -5,6 +5,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/contexts"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/folders"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/goals"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/tasks"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -29,6 +30,9 @@ var contextCmd = &cobra.Command{
 var goalCmd = &cobra.Command{
 	Use: "goal",
 }
+var taskCmd = &cobra.Command{
+	Use: "task",
+}
 
 func init() {
 	cobra.OnInitialize(initConfig)
@@ -41,8 +45,9 @@ func init() {
 	contextCmd.AddCommand(contexts.GetCmd, contexts.CreateCmd, contexts.DeleteCmd, contexts.RenameCmd)
 	goalCmd.AddCommand(goals.GetCmd, goals.CreateCmd, goals.DeleteCmd,
 		goals.RenameCmd, goals.ArchiveCmd, goals.ActivateCmd)
+	taskCmd.AddCommand(tasks.GetCmd)
 
-	rootCmd.AddCommand(folderCmd, contextCmd, goalCmd)
+	rootCmd.AddCommand(taskCmd, folderCmd, contextCmd, goalCmd)
 
 	viper.BindPFlag("access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 

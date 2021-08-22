@@ -13,6 +13,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/client/context"
 	"github.com/alswl/go-toodledo/pkg/client/folder"
 	"github.com/alswl/go-toodledo/pkg/client/goal"
+	"github.com/alswl/go-toodledo/pkg/client/task"
 )
 
 // Default toodledo HTTP client.
@@ -60,6 +61,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Toodledo {
 	cli.Context = context.New(transport, formats)
 	cli.Folder = folder.New(transport, formats)
 	cli.Goal = goal.New(transport, formats)
+	cli.Task = task.New(transport, formats)
 	return cli
 }
 
@@ -110,6 +112,8 @@ type Toodledo struct {
 
 	Goal goal.ClientService
 
+	Task task.ClientService
+
 	Transport runtime.ClientTransport
 }
 
@@ -119,4 +123,5 @@ func (c *Toodledo) SetTransport(transport runtime.ClientTransport) {
 	c.Context.SetTransport(transport)
 	c.Folder.SetTransport(transport)
 	c.Goal.SetTransport(transport)
+	c.Task.SetTransport(transport)
 }

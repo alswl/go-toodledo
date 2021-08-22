@@ -509,6 +509,59 @@ paths:
           description: ServiceUnavailable
           schema:
             $ref: '#/definitions/Error'
+  /tasks/get.php:
+    get:
+      tags:
+        - task
+      security:
+        - OAuth2:
+            - read
+            - write
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: before
+          type: integer
+          description: A GMT unix timestamp. Used to find tasks with a modified date and time before this date and time.
+        - in: query
+          name: after
+          type: integer
+          description: A GMT unix timestamp. Used to find tasks with a modified date and time before this date and time.
+        - in: query
+          name: comp
+          type: integer
+          description: Boolean (0 or 1). Set to 0 to find only uncompleted tasks. Set to 1 to find only completed tasks. Omit variable, or set to -1 to retrieve both completed and uncompleted tasks.
+        - in: query
+          name: id
+          type: integer
+        - in: query
+          name: start
+          type: integer
+        - in: query
+          name: num
+          type: integer
+        - in: query
+          name: fields
+          type: string
+          description: A comma separated list of optional fields that you want returned. For efficiency, you should omit fields that you don't use. This will make downloading, parsing and syncing go much faster.
+      responses:
+        '200':
+          description: ok
+          schema:
+            $ref: '#/definitions/PaginatedApiResponse'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   Error:
     type: object
@@ -850,3 +903,15 @@ definitions:
         type: string
       message:
         type: string
+  PaginatedInfo:
+    type: object
+    properties:
+      num:
+        type: integer
+      total:
+        type: integer
+  PaginatedApiResponse:
+    type: array
+    items:
+      # TODO one of PaginatedInfo, Task
+      type: object
