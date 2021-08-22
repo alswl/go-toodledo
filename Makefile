@@ -63,7 +63,7 @@ VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
 build: fmt
 	@for target in $(TARGETS); do                                                      \
 	  go build -v -o $(OUTPUT_DIR)/$${target}                                          \
-	    -ldflags "-s -w -X pkg/version.Version=$(VERSION)                      \
+	    -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)                      \
 	    -X $(ROOT)/pkg/version.Commit=$(COMMIT)                                        \
 	    -X $(ROOT)/pkg/version.BuildDate=$(NOW_SHORT)                                  \
 	    -X $(ROOT)/pkg/version.Package=$(ROOT)"                                        \

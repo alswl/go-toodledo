@@ -14,7 +14,7 @@ var (
 )
 
 func Message() string {
-	const format = `toodledo: %s (Revision: %s)
+	const format = `toodledo:   %s (Revision: %s)
 package:    %s
 build date: %s
 go version: %s
