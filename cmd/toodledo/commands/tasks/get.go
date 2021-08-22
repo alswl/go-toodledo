@@ -40,13 +40,13 @@ var GetCmd = &cobra.Command{
 		for i, x := range res.Payload {
 			if i == 0 {
 				bytes, _ := json.Marshal(x)
-				// TODO service
+				// TODO using service
 				json.Unmarshal(bytes, &info)
 				continue
 			}
 			bytes, _ := json.Marshal(x)
 			var t models.Task
-			// TODO service
+			// TODO using service
 			json.Unmarshal(bytes, &t)
 			tasks = append(tasks, &t)
 		}

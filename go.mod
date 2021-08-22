@@ -16,7 +16,7 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/sirupsen/logrus v1.6.0
-	github.com/spf13/cobra v0.0.3
+	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/thoas/go-funk v0.9.0 // indirect
