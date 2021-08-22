@@ -1,3 +1,6 @@
 ```sh
-swagger generate client -f ../api/swagger.yaml -A toodledo
+make swagger
+
+# edit pkg/client/*/post_*delete_*response.go
+# fix context
 ```

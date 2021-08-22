@@ -42,3 +42,21 @@ func Tables4Context(contexts []*models.Context) string {
 	t.Render()
 	return buf.String()
 }
+func Tables4Goal(goals []*models.Goal) string {
+	var output string
+	buf := bytes.NewBufferString(output)
+	t := table.NewWriter()
+	t.SetOutputMirror(buf)
+	// TODO Color
+	//t.SetStyle(table.StyleColoredBright)
+	t.SetStyle(table.StyleLight)
+	t.Style().Options.DrawBorder = false
+	t.AppendHeader(table.Row{"#", "Name", "Level", "Private", "Archived", "Contributes", "Note"})
+	var rows []table.Row
+	for _, x := range goals {
+		rows = append(rows, table.Row{x.ID, x.Name, x.Level, x.Private, x.Archived, x.Contributes, x.Note})
+	}
+	t.AppendRows(rows)
+	t.Render()
+	return buf.String()
+}
