@@ -54,9 +54,9 @@ func ArchiveFolder(auth runtime.ClientAuthInfoWriter, id int, isArchived bool) (
 	cli := client.NewHTTPClient(strfmt.NewFormats())
 	p := folder.NewPostFoldersEditPhpParams()
 	p.SetID(strconv.Itoa(id))
-	archived := int32(0)
+	archived := int64(0)
 	if isArchived {
-		archived = int32(1)
+		archived = 1
 	}
 	p.SetArchived(&archived)
 	res, err := cli.Folder.PostFoldersEditPhp(p, auth)

@@ -81,7 +81,6 @@ paths:
         - in: "query"
           name: "private"
           type: integer
-          format: "int32"
           required: false
       responses:
         "200":
@@ -126,11 +125,9 @@ paths:
         - in: "query"
           name: "private"
           type: integer
-          format: "int32"
         - in: "query"
           name: "archived"
           type: integer
-          format: "int32"
       responses:
         "200":
           description: ok
@@ -138,6 +135,44 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Folder"
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+  /folders/delete.php:
+    post:
+      tags:
+        - "folder"
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - "application/json"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - in: "query"
+          name: "id"
+          type: integer
+          required: true
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: "object"
+            properties:
+              deleted:
+                type: integer
         '401':
           description: Unauthorized
           schema:
@@ -166,24 +201,19 @@ definitions:
     properties:
       id:
         type: "integer"
-        format: "int64"
       name:
         type: "string"
       private:
         type: "integer"
-        format: "int32"
       archived:
         type: "integer"
-        format: "int32"
       ord:
         type: "integer"
-        format: "int32"
   ApiResponse:
     type: "object"
     properties:
       code:
         type: "integer"
-        format: "int32"
       type:
         type: "string"
       message:

@@ -18,7 +18,7 @@ import (
 type Folder struct {
 
 	// archived
-	Archived int32 `json:"archived,omitempty"`
+	Archived int64 `json:"archived,omitempty"`
 
 	// id
 	ID int64 `json:"id,omitempty"`
@@ -27,10 +27,10 @@ type Folder struct {
 	Name string `json:"name,omitempty"`
 
 	// ord
-	Ord int32 `json:"ord,omitempty"`
+	Ord int64 `json:"ord,omitempty"`
 
 	// private
-	Private int32 `json:"private,omitempty"`
+	Private int64 `json:"private,omitempty"`
 }
 
 // Validate validates this folder

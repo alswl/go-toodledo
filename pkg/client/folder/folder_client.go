@@ -34,6 +34,8 @@ type ClientService interface {
 
 	PostFoldersAddPhp(params *PostFoldersAddPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostFoldersAddPhpOK, error)
 
+	PostFoldersDeletePhp(params *PostFoldersDeletePhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostFoldersDeletePhpOK, error)
+
 	PostFoldersEditPhp(params *PostFoldersEditPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostFoldersEditPhpOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
@@ -114,6 +116,45 @@ func (a *Client) PostFoldersAddPhp(params *PostFoldersAddPhpParams, authInfo run
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for PostFoldersAddPhp: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  PostFoldersDeletePhp post folders delete php API
+*/
+func (a *Client) PostFoldersDeletePhp(params *PostFoldersDeletePhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostFoldersDeletePhpOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostFoldersDeletePhpParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "PostFoldersDeletePhp",
+		Method:             "POST",
+		PathPattern:        "/folders/delete.php",
+		ProducesMediaTypes: []string{"application/json", "application/xml"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"https"},
+		Params:             params,
+		Reader:             &PostFoldersDeletePhpReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*PostFoldersDeletePhpOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for PostFoldersDeletePhp: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

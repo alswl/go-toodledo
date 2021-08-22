@@ -64,9 +64,7 @@ type PostFoldersAddPhpParams struct {
 	Name string
 
 	// Private.
-	//
-	// Format: int32
-	Private *int32
+	Private *int64
 
 	timeout    time.Duration
 	Context    context.Context
@@ -133,13 +131,13 @@ func (o *PostFoldersAddPhpParams) SetName(name string) {
 }
 
 // WithPrivate adds the private to the post folders add php params
-func (o *PostFoldersAddPhpParams) WithPrivate(private *int32) *PostFoldersAddPhpParams {
+func (o *PostFoldersAddPhpParams) WithPrivate(private *int64) *PostFoldersAddPhpParams {
 	o.SetPrivate(private)
 	return o
 }
 
 // SetPrivate adds the private to the post folders add php params
-func (o *PostFoldersAddPhpParams) SetPrivate(private *int32) {
+func (o *PostFoldersAddPhpParams) SetPrivate(private *int64) {
 	o.Private = private
 }
 
@@ -164,12 +162,12 @@ func (o *PostFoldersAddPhpParams) WriteToRequest(r runtime.ClientRequest, reg st
 	if o.Private != nil {
 
 		// query param private
-		var qrPrivate int32
+		var qrPrivate int64
 
 		if o.Private != nil {
 			qrPrivate = *o.Private
 		}
-		qPrivate := swag.FormatInt32(qrPrivate)
+		qPrivate := swag.FormatInt64(qrPrivate)
 		if qPrivate != "" {
 
 			if err := r.SetQueryParam("private", qPrivate); err != nil {

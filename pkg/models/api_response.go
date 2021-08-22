@@ -18,7 +18,7 @@ import (
 type APIResponse struct {
 
 	// code
-	Code int32 `json:"code,omitempty"`
+	Code int64 `json:"code,omitempty"`
 
 	// message
 	Message string `json:"message,omitempty"`
