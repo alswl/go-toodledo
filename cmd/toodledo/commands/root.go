@@ -6,6 +6,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/folders"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/goals"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/tasks"
+	"github.com/alswl/go-toodledo/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -20,6 +21,7 @@ var (
 var rootCmd = &cobra.Command{
 	Use:              "toodledo",
 	TraverseChildren: true,
+	Version:          version.Message(),
 }
 
 func init() {
