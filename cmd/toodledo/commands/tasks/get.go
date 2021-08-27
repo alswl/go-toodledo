@@ -14,8 +14,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-var GetCmd = &cobra.Command{
-	Use: "get",
+var ListCmd = &cobra.Command{
+	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
 		t := viper.GetString("auth.access_token")
 		if t == "" {

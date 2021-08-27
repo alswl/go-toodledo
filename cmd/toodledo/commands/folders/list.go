@@ -1,10 +1,10 @@
-package contexts
+package folders
 
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/context"
+	"github.com/alswl/go-toodledo/pkg/client/folder"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
@@ -12,8 +12,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-var GetCmd = &cobra.Command{
-	Use: "get",
+var ListCmd = &cobra.Command{
+	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
 		t := viper.GetString("auth.access_token")
 		if t == "" {
@@ -23,11 +23,11 @@ var GetCmd = &cobra.Command{
 		auth := auth.NewSimpleAuth(t)
 
 		cli := client.NewHTTPClient(strfmt.NewFormats())
-		res, err := cli.Context.GetContextsGetPhp(context.NewGetContextsGetPhpParams(), auth)
+		res, err := cli.Folder.GetFoldersGetPhp(folder.NewGetFoldersGetPhpParams(), auth)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-		fmt.Print(render.Tables4Context(res.Payload))
+		fmt.Print(render.Tables4Folder(res.Payload))
 	},
 }

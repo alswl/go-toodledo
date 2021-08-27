@@ -21,18 +21,6 @@ var rootCmd = &cobra.Command{
 	Use:              "toodledo",
 	TraverseChildren: true,
 }
-var folderCmd = &cobra.Command{
-	Use: "folder",
-}
-var contextCmd = &cobra.Command{
-	Use: "context",
-}
-var goalCmd = &cobra.Command{
-	Use: "goal",
-}
-var taskCmd = &cobra.Command{
-	Use: "task",
-}
 
 func init() {
 	cobra.OnInitialize(initConfig)
@@ -40,17 +28,9 @@ func init() {
 	rootCmd.PersistentFlags().StringP("access_token", "", "", "")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
 
-	folderCmd.AddCommand(folders.GetCmd, folders.CreateCmd, folders.DeleteCmd,
-		folders.RenameCmd, folders.ArchiveCmd, folders.ActivateCmd)
-	contextCmd.AddCommand(contexts.GetCmd, contexts.CreateCmd, contexts.DeleteCmd, contexts.RenameCmd)
-	goalCmd.AddCommand(goals.GetCmd, goals.CreateCmd, goals.DeleteCmd,
-		goals.RenameCmd, goals.ArchiveCmd, goals.ActivateCmd)
-	taskCmd.AddCommand(tasks.GetCmd)
-
-	rootCmd.AddCommand(taskCmd, folderCmd, contextCmd, goalCmd, completionCmd)
-
 	viper.BindPFlag("access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 
+	rootCmd.AddCommand(tasks.TaskCmd, folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd, completionCmd)
 }
 
 func initConfig() {
