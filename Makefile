@@ -77,6 +77,9 @@ generate-code:
 	# swagger
 	(cd pkg; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override)
 
+	# wire
+	(cd pkg/registries; wire)
+
 	# generate mock of interfaces for testing
 	rm -rf test/mock
 	cd pkg && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock && cd ..

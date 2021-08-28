@@ -2,6 +2,8 @@ package commands
 
 import (
 	"fmt"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/auth"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/configs"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/contexts"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/folders"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/goals"
@@ -32,7 +34,8 @@ func init() {
 
 	viper.BindPFlag("access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 
-	rootCmd.AddCommand(tasks.TaskCmd, folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd, completionCmd)
+	rootCmd.AddCommand(tasks.TaskCmd, folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd,
+		auth.AuthCmd, configs.ConfigCmd, completionCmd)
 }
 
 func initConfig() {
@@ -54,9 +57,9 @@ func initConfig() {
 
 	viper.AutomaticEnv()
 
-	//if err := viper.ReadInConfig(); err == nil {
-	//	fmt.Println("Using config file:", viper.ConfigFileUsed())
-	//}
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
 }
 
 func Execute() {

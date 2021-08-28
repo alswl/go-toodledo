@@ -1,12 +1,8 @@
 package registries
 
 import (
-	"github.com/alswl/go-toodledo/pkg/service"
+	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/google/wire"
 )
 
-func InitializeFolderService() service.FolderService {
-	wire.Build()
-	// TODO using wire to inject
-	return &service.FolderServiceImpl{}
-}
+var SuperSet = wire.NewSet(auth.ProvideSimpleAuth, auth.ProvideAccessToken, auth.ProvideOAuth2Config())

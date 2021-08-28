@@ -2,6 +2,7 @@ package toodledo
 
 import (
 	"context"
+	"github.com/alswl/go-toodledo/pkg"
 	"github.com/alswl/go-toodledo/pkg/toodledo/models"
 	"github.com/go-playground/validator"
 	log "github.com/sirupsen/logrus"
@@ -56,7 +57,7 @@ func (s *GoalService) Add(ctx context.Context, goalAdd models.GoalAdd) (*models.
 		form.Add("contributes", strconv.Itoa(*goalAdd.Contributes))
 	}
 	if goalAdd.Private != nil {
-		form.Add("private", bool2ints(*goalAdd.Private))
+		form.Add("private", pkg.Bool2ints(*goalAdd.Private))
 	}
 	if goalAdd.Note != nil {
 		form.Add("note", *goalAdd.Note)
