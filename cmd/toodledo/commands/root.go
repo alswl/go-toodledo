@@ -31,7 +31,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringP("access_token", "", "", "")
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.toodledo.yaml)")
 
 	viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 

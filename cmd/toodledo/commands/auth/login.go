@@ -14,6 +14,6 @@ var loginCmd = &cobra.Command{
 		// TODO
 		//pkg.OpenBrowser(u2)
 		fmt.Printf("login in your browser in %s\n", u2)
-		fmt.Println("login in your browser, then copy the url to clipboard and run `toodledo config callback YOUR-URL-AFTER-LOGIN`")
+		fmt.Println("login in your browser, then copy the url to clipboard and run `toodledo auth token YOUR-URL-AFTER-LOGIN`")
 	},
 }
