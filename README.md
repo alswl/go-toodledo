@@ -1,28 +1,50 @@
 # go-toodledo
 
+Go Client and library for Toodledo.
+
+Status: WIP
+
 ## Usage
 
-Grant: `open 'https://api.toodledo.com/3/account/authorize.php?response_type=code&client_id=donetoday&state=YourState&scope=basic%20tasks'`
+```sh
+$ toodledo
+Usage:
+  toodledo [command]
 
+Available Commands:
+  auth        Manage authentication
+  completion  Generate completion script
+  config      Manage config
+  context     Manage toodledo contexts
+  folder      Manage toodledo folders
+  goal        Manage toodledo goals
+  help        Help about any command
+  task        Manage toodledo tasks
 
-## Install
+Flags:
+      --access_token string
+      --config string         config file (default is $HOME/.cobra.yaml)
+  -h, --help                  help for toodledo
+  -v, --version               version for toodledo
 
-TODO
+Use "toodledo [command] --help" for more information about a command.
+```
 
+### Auth
+
+```sh
+# login
+toodledo auth login
+# follow steps, open link your browser
+toodledo auth login YOUR-CODE
+# verify
+toodledo auth me
+```
 
 ## Build
 
-
+```sh
+git clone https://github.com/alswl/go-toodledo.git
+make
+./bin/toodledo --help
 ```
-make build
-make test
-make integration
-
-export TOODLEDO_APP_CLIENT_ID=
-export TOODLEDO_APP_SECRET=
-export TOODLEDO_AUTH_TOKEN=
-./go-toodledo
-
-```
-
-
