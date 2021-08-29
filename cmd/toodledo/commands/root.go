@@ -9,6 +9,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/goals"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/tasks"
 	"github.com/alswl/go-toodledo/pkg/version"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -58,7 +59,7 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		logrus.Debug("config file", viper.ConfigFileUsed())
 	}
 }
 
