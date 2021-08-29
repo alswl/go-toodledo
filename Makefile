@@ -60,7 +60,7 @@ VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
 
 .PHONY: build container push test integration-test clean generate-code lint-test lint fmt compress
 
-build: fmt
+build: fmt generate-code
 	@for target in $(TARGETS); do                                                      \
 	  go build -v -o $(OUTPUT_DIR)/$${target}                                          \
 	    -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)                      \

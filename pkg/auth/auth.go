@@ -44,9 +44,6 @@ func ProvideSimpleAuth() (runtime.ClientAuthInfoWriter, error) {
 	conf := ProvideOAuth2Config()
 
 	if token.Expiry.Before(time.Now()) {
-		//ctx := context.Background()
-		//client := conf.Client(ctx, &token)
-		// refresh
 		if rt == "" {
 			return nil, errors.New("auth.refresh_token is empty")
 		}

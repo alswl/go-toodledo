@@ -13,6 +13,7 @@ externalDocs:
 host: api.toodledo.com
 basePath: /3
 tags:
+  - name: account
   - name: folder
   - name: context
   - name: goal
@@ -33,6 +34,33 @@ securityDefinitions:
       read: Grants read access
       write: Grants write access
 paths:
+  /account/get.php:
+    get:
+      tags:
+        - account
+      security:
+        - OAuth2:
+            - read
+            - write
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: ok
+          schema:
+            $ref: '#/definitions/Account'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
   /folders/get.php:
     get:
       tags:
@@ -523,15 +551,22 @@ paths:
         - in: query
           name: before
           type: integer
-          description: A GMT unix timestamp. Used to find tasks with a modified date and time before this date and time.
+          description: >-
+            A GMT unix timestamp. Used to find tasks with a modified date and
+            time before this date and time.
         - in: query
           name: after
           type: integer
-          description: A GMT unix timestamp. Used to find tasks with a modified date and time before this date and time.
+          description: >-
+            A GMT unix timestamp. Used to find tasks with a modified date and
+            time before this date and time.
         - in: query
           name: comp
           type: integer
-          description: Boolean (0 or 1). Set to 0 to find only uncompleted tasks. Set to 1 to find only completed tasks. Omit variable, or set to -1 to retrieve both completed and uncompleted tasks.
+          description: >-
+            Boolean (0 or 1). Set to 0 to find only uncompleted tasks. Set to 1
+            to find only completed tasks. Omit variable, or set to -1 to
+            retrieve both completed and uncompleted tasks.
         - in: query
           name: id
           type: integer
@@ -544,7 +579,10 @@ paths:
         - in: query
           name: fields
           type: string
-          description: A comma separated list of optional fields that you want returned. For efficiency, you should omit fields that you don't use. This will make downloading, parsing and syncing go much faster.
+          description: >-
+            A comma separated list of optional fields that you want returned.
+            For efficiency, you should omit fields that you don't use. This will
+            make downloading, parsing and syncing go much faster.
       responses:
         '200':
           description: ok
@@ -573,6 +611,134 @@ definitions:
     required:
       - errorCode
       - errorDesc
+  Account:
+    type: object
+    properties:
+      userid:
+        type: string
+        description: >-
+          A unique string that identifies the user. You will need to store this
+          and compare when a user re-authenticates their account to make sure
+          you are syncing with the same account.
+      alias:
+        type: string
+        description: The user's display name on the website.
+      email:
+        type: string
+        description: The user's login email address.
+      pro:
+        type: integer
+        format: int32
+        description: >-
+          Whether or not the user is a Silver or Gold Subscriber. You need to
+          know this if you want to use subtasks. A value of 0 means a free
+          account. 1 means Silver and 2 means Gold or higher.
+      dateformat:
+        type: integer
+        format: int32
+        description: >-
+          The user's prefered format for representing dates. (0=M D, Y, 1=M/D/Y,
+          2=D/M/Y, 3=Y-M-D)
+      timezone:
+        type: integer
+        format: int32
+        description: >-
+          The number of half hours that the user's timezone is offset from the
+          server's timezone. A value of -4 means that the user's timezone is 2
+          hours earlier than the server's timezone. The server is in the Eastern
+          Standard Timezone.
+      hidemonths:
+        type: integer
+        format: int32
+        description: >-
+          If the task is due this many months into the future, the user wants
+          them to be hidde
+      hotlistpriority:
+        type: integer
+        format: int32
+        description: The priority value above which tasks should appear on the hotlist.
+      hotlistduedate:
+        type: integer
+        format: int32
+        description: >-
+          The due date lead-time by which tasks should will appear on the
+          hotlist.
+      showtabnums:
+        type: integer
+        format: int32
+        description: >-
+          The user's preference for viewing counters showing the number of tasks
+          in each section.
+      lastedit_folder:
+        type: integer
+        format: int32
+        description: >-
+          A timestamp that indicates the last time that any task was added or
+          edited on this account. You can quickly check this field to determine
+          if you need to download updates.
+      lastedit_context:
+        type: integer
+        format: int32
+        description: >-
+          A timestamp that indicates the last time that a context was added,
+          edited or deleted. You can quickly check this field to determine if
+          you need to refresh your cached context list.
+      lastedit_goal:
+        type: integer
+        format: int32
+        description: >-
+          A timestamp that indicates the last time that a goal was edited,
+          edited or deleted. You can quickly check this field to determine if
+          you need to refresh your cached goal list.
+      lastedit_location:
+        type: integer
+        format: int32
+        description: >-
+          A timestamp that indicates the last time that a context was added,
+          edited or deleted. You can quickly check this field to determine if
+          you need to refresh your cached context list.
+      lastedit_task:
+        type: integer
+        format: int32
+        description: >-
+          A timestamp that indicates the last time that any task was added or
+          edited on this account. You can quickly check this field to determine
+          if you need to download updates.
+      lastdelete_task:
+        type: integer
+        format: int32
+        description: >-
+          A timestamp that indicates the last time that any task was deleted
+          from this account. You can quickly check this field to determine if
+          you need to identify and remove tasks from your application.
+      lastedit_note:
+        type: integer
+        format: int32
+        description: >-
+          A timestamp that indicates the last time that any note was added or
+          edited on this account. You can quickly check this field to determine
+          if you need to download updates.
+      lastdelete_note:
+        type: integer
+        format: int32
+        description: >-
+          A timestamp that indicates the last time that any note was deleted
+          from this account. You can quickly check this field to determine if
+          you need to identify and remove notes from your application.
+      lastedit_list:
+        type: integer
+        format: int32
+        description: >-
+          A timestamp that indicates the last time that any list was edited on
+          this account. You can quickly check this field to determine if you
+          need to sync lists.
+      lastedit_outline:
+        type: integer
+        format: int32
+        description: >-
+          A timestamp that indicates the last time that any outline was edited
+          on this account. You can quickly check this field to determine if you
+          need to sync outlines.
   Folder:
     type: object
     properties:
@@ -913,5 +1079,4 @@ definitions:
   PaginatedApiResponse:
     type: array
     items:
-      # TODO one of PaginatedInfo, Task
       type: object
