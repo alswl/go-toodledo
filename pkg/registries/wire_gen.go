@@ -8,6 +8,7 @@ package registries
 
 import (
 	"github.com/alswl/go-toodledo/pkg/auth"
+	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/runtime"
 )
 
@@ -19,4 +20,13 @@ func InitAuth() (runtime.ClientAuthInfoWriter, error) {
 		return nil, err
 	}
 	return clientAuthInfoWriter, nil
+}
+
+func InitTaskService() (services.TaskService, error) {
+	clientAuthInfoWriter, err := auth.ProvideSimpleAuth()
+	if err != nil {
+		return nil, err
+	}
+	taskService := services.ProvideTaskService(clientAuthInfoWriter)
+	return taskService, nil
 }

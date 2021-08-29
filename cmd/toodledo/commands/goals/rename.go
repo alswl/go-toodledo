@@ -6,7 +6,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/goal"
 	"github.com/alswl/go-toodledo/pkg/render"
-	"github.com/alswl/go-toodledo/pkg/service"
+	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -31,7 +31,7 @@ var RenameCmd = &cobra.Command{
 			return
 		}
 
-		f, err := service.FindGoalByName(auth, name)
+		f, err := services.FindGoalByName(auth, name)
 		if err != nil {
 			logrus.Error(err)
 			return

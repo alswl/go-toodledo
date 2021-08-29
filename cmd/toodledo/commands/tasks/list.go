@@ -28,18 +28,20 @@ var ListCmd = &cobra.Command{
 		params.SetComp(&comp)
 		num := int64(10)
 		params.SetNum(&num)
+
 		res, err := cli.Task.GetTasksGetPhp(params, auth)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-		var info models.PaginatedInfo
+
+		var paging models.PaginatedInfo
 		var tasks []*models.Task
 		for i, x := range res.Payload {
 			if i == 0 {
 				bytes, _ := json.Marshal(x)
 				// TODO using service
-				json.Unmarshal(bytes, &info)
+				json.Unmarshal(bytes, &paging)
 				continue
 			}
 			bytes, _ := json.Marshal(x)
@@ -48,7 +50,7 @@ var ListCmd = &cobra.Command{
 			json.Unmarshal(bytes, &t)
 			tasks = append(tasks, &t)
 		}
-		fmt.Print(info)
-		fmt.Print(render.Tables4Task(tasks))
+		fmt.Println(paging)
+		fmt.Println(render.Tables4Task(tasks))
 	},
 }

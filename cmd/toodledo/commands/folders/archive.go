@@ -5,7 +5,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/render"
-	"github.com/alswl/go-toodledo/pkg/service"
+	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -21,13 +21,13 @@ var ArchiveCmd = &cobra.Command{
 		}
 		name := args[0]
 
-		f, err := service.FindFolderByName(auth, name)
+		f, err := services.FindFolderByName(auth, name)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
 
-		newF, err := service.ArchiveFolder(auth, int(f.ID), true)
+		newF, err := services.ArchiveFolder(auth, int(f.ID), true)
 		if err != nil {
 			logrus.Error(err)
 			return

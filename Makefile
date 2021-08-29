@@ -75,18 +75,19 @@ build: fmt
 download:
 	go mod download
 
-generate-code:
+generate-code: generate-code-wired
 	@echo generate swagger
-	@(cd pkg; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override)
-
-	# wire
-	@echo generate wire
-	@(cd pkg/registries; wire)
+	@(cd pkg; rm client/*.go; rm models/*.go; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override)
 
 	@echo generate mock of interfaces for testing
 	@rm -rf test/mock
 	@(cd pkg && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
 	@(cd cmd && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
+
+generate-code-wired:
+	# wire
+	@echo generate wire
+	@(cd pkg/registries; wire)
 
 lint:
 	@echo "gofmt ensure"
