@@ -42,6 +42,7 @@ func Tables4Context(contexts []*models.Context) string {
 	t.Render()
 	return buf.String()
 }
+
 func Tables4Goal(goals []*models.Goal) string {
 	var output string
 	buf := bytes.NewBufferString(output)

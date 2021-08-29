@@ -10,9 +10,11 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
+	"github.com/alswl/go-toodledo/pkg/client/account"
 	"github.com/alswl/go-toodledo/pkg/client/context"
 	"github.com/alswl/go-toodledo/pkg/client/folder"
 	"github.com/alswl/go-toodledo/pkg/client/goal"
+	"github.com/alswl/go-toodledo/pkg/client/task"
 )
 
 // Default toodledo HTTP client.
@@ -57,9 +59,11 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Toodledo {
 
 	cli := new(Toodledo)
 	cli.Transport = transport
+	cli.Account = account.New(transport, formats)
 	cli.Context = context.New(transport, formats)
 	cli.Folder = folder.New(transport, formats)
 	cli.Goal = goal.New(transport, formats)
+	cli.Task = task.New(transport, formats)
 	return cli
 }
 
@@ -104,11 +108,15 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // Toodledo is a client for toodledo
 type Toodledo struct {
+	Account account.ClientService
+
 	Context context.ClientService
 
 	Folder folder.ClientService
 
 	Goal goal.ClientService
+
+	Task task.ClientService
 
 	Transport runtime.ClientTransport
 }
@@ -116,7 +124,9 @@ type Toodledo struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *Toodledo) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
+	c.Account.SetTransport(transport)
 	c.Context.SetTransport(transport)
 	c.Folder.SetTransport(transport)
 	c.Goal.SetTransport(transport)
+	c.Task.SetTransport(transport)
 }

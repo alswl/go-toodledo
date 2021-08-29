@@ -11,15 +11,17 @@ require (
 	github.com/go-openapi/validate v0.20.2
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible
-	github.com/google/wire v0.5.0 // indirect
+	github.com/google/wire v0.5.0
 	github.com/jedib0t/go-pretty/v6 v6.2.4
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/sirupsen/logrus v1.6.0
-	github.com/spf13/cobra v0.0.3
+	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
-	github.com/thoas/go-funk v0.9.0 // indirect
+	github.com/thoas/go-funk v0.9.0
+	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	moul.io/http2curl v1.0.0 // indirect
 )

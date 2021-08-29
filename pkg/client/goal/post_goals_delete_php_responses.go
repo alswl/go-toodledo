@@ -6,7 +6,7 @@ package goal
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
+	ccontext "context"
 	"fmt"
 	"io"
 
@@ -197,7 +197,7 @@ func (o *PostGoalsDeletePhpOKBody) Validate(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this post goals delete php o k body based on context it is used
-func (o *PostGoalsDeletePhpOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (o *PostGoalsDeletePhpOKBody) ContextValidate(ctx ccontext.Context, formats strfmt.Registry) error {
 	return nil
 }
 

@@ -6,26 +6,24 @@ import (
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/folder"
 	"github.com/alswl/go-toodledo/pkg/render"
-	"github.com/alswl/go-toodledo/pkg/service"
+	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"strconv"
 )
 
 var RenameCmd = &cobra.Command{
-	Use: "rename",
+	Use:  "rename",
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		t := viper.GetString("auth.access_token")
-		if t == "" {
-			logrus.Error("auth.access_token is empty")
+		auth, err := auth.ProvideSimpleAuth()
+		if err != nil {
+			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		auth := auth.NewSimpleAuth(t)
 		cli := client.NewHTTPClient(strfmt.NewFormats())
-		
+
 		name := args[0]
 		newName := args[1]
 		if name == newName {
@@ -33,7 +31,7 @@ var RenameCmd = &cobra.Command{
 			return
 		}
 
-		f, err := service.FindFolderByName(auth, name)
+		f, err := services.FindFolderByName(auth, name)
 		if err != nil {
 			logrus.Error(err)
 			return

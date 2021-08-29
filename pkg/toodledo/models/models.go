@@ -51,7 +51,7 @@ type Goal struct {
 
 type GoalAdd struct {
 	// required
-	Name  string `validate:"required`
+	Name  string `validate:"required"`
 	Level *GoalLevel
 	// 0 or 1
 	Contributes *int

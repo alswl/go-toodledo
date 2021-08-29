@@ -2,9 +2,14 @@ package commands
 
 import (
 	"fmt"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/auth"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/configs"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/contexts"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/folders"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/goals"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/tasks"
+	"github.com/alswl/go-toodledo/pkg/version"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -19,33 +24,19 @@ var (
 var rootCmd = &cobra.Command{
 	Use:              "toodledo",
 	TraverseChildren: true,
-}
-var folderCmd = &cobra.Command{
-	Use: "folder",
-}
-var contextCmd = &cobra.Command{
-	Use: "context",
-}
-var goalCmd = &cobra.Command{
-	Use: "goal",
+	Version:          version.Message(),
 }
 
 func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringP("access_token", "", "", "")
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.toodledo.yaml)")
 
-	folderCmd.AddCommand(folders.GetCmd, folders.CreateCmd, folders.DeleteCmd,
-		folders.RenameCmd, folders.ArchiveCmd, folders.ActivateCmd)
-	contextCmd.AddCommand(contexts.GetCmd, contexts.CreateCmd, contexts.DeleteCmd, contexts.RenameCmd)
-	goalCmd.AddCommand(goals.GetCmd, goals.CreateCmd, goals.DeleteCmd,
-		goals.RenameCmd, goals.ArchiveCmd, goals.ActivateCmd)
+	viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 
-	rootCmd.AddCommand(folderCmd, contextCmd, goalCmd)
-
-	viper.BindPFlag("access_token", rootCmd.PersistentFlags().Lookup("access_token"))
-
+	rootCmd.AddCommand(tasks.TaskCmd, folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd,
+		auth.AuthCmd, configs.ConfigCmd, completionCmd)
 }
 
 func initConfig() {
@@ -68,7 +59,7 @@ func initConfig() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		logrus.Debug("config file", viper.ConfigFileUsed())
 	}
 }
 
