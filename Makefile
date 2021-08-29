@@ -58,9 +58,11 @@ VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
 # Define all targets. At least the following commands are required:
 #
 
-.PHONY: build container push test integration-test clean generate-code lint-test lint fmt compress
+.PHONY: build container push test integration-test clean generate-code lint fmt compress
 
-build: fmt generate-code
+all: download generate-code test build
+
+build: fmt
 	@for target in $(TARGETS); do                                                      \
 	  go build -v -o $(OUTPUT_DIR)/$${target}                                          \
 	    -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)                      \
@@ -74,30 +76,29 @@ download:
 	go mod download
 
 generate-code:
-	# swagger
-	(cd pkg; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override)
+	@echo generate swagger
+	@(cd pkg; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override)
 
 	# wire
-	(cd pkg/registries; wire)
+	@echo generate wire
+	@(cd pkg/registries; wire)
 
-	# generate mock of interfaces for testing
-	rm -rf test/mock
-	cd pkg && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock && cd ..
-	cd cmd && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock && cd ..
-
-lint-test:
-	echo "gofmt"
-	@test $$(gofmt -l ./pkg/ ./test/ ./cmd/ | wc -l) -eq 0
-
-	echo "ensure integration test with integration tags"
-	@test $$(find test -name '*_test.go' | wc -l) -eq $$(cat $$(find test -name '*_test.go') | grep '//+build integration' | wc -l)
-
-fmt:
-	go fmt ./pkg/... ./cmd/...
-	go vet ./pkg/... ./cmd/...
+	@echo generate mock of interfaces for testing
+	@rm -rf test/mock
+	@(cd pkg && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
+	@(cd cmd && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
 
 lint:
+	@echo "gofmt ensure"
+	@test $$(gofmt -l ./pkg/ ./test/ ./cmd/ | wc -l) -eq 0
+
+	@echo "ensure integration test with integration tags"
+	@test $$(find test -name '*_test.go' | wc -l) -eq $$(cat $$(find test -name '*_test.go') | grep -E '// ?\+build integration' | wc -l)
+
+fmt:
 	gofmt -w ./pkg/ ./test/ ./cmd/
+	go fmt ./pkg/... ./cmd/...
+	go vet ./pkg/... ./cmd/...
 
 container:
 	@for target in $(TARGETS); do                                                      \
