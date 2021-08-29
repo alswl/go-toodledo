@@ -1,14 +1,9 @@
 package tasks
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/auth"
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/task"
-	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/registries"
 	"github.com/alswl/go-toodledo/pkg/render"
-	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -16,40 +11,19 @@ import (
 var ListCmd = &cobra.Command{
 	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := auth.ProvideSimpleAuth()
+		_, err := registries.InitAuth()
+		svc, _ := registries.InitTaskService()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		cli := client.NewHTTPClient(strfmt.NewFormats())
 
-		params := task.NewGetTasksGetPhpParams()
-		comp := int64(0)
-		params.SetComp(&comp)
-		num := int64(10)
-		params.SetNum(&num)
-
-		res, err := cli.Task.GetTasksGetPhp(params, auth)
+		tasks, paging, err := svc.QueryAll()
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
 
-		var paging models.PaginatedInfo
-		var tasks []*models.Task
-		for i, x := range res.Payload {
-			if i == 0 {
-				bytes, _ := json.Marshal(x)
-				// TODO using service
-				json.Unmarshal(bytes, &paging)
-				continue
-			}
-			bytes, _ := json.Marshal(x)
-			var t models.Task
-			// TODO using service
-			json.Unmarshal(bytes, &t)
-			tasks = append(tasks, &t)
-		}
 		fmt.Println(paging)
 		fmt.Println(render.Tables4Task(tasks))
 	},
