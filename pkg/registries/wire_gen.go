@@ -14,11 +14,7 @@ import (
 // Injectors from injectors.go:
 
 func InitAuth() (runtime.ClientAuthInfoWriter, error) {
-	string2, err := auth.ProvideAccessToken()
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := auth.ProvideSimpleAuth(string2)
+	clientAuthInfoWriter, err := auth.ProvideSimpleAuth()
 	if err != nil {
 		return nil, err
 	}

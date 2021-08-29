@@ -32,7 +32,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("access_token", "", "", "")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
 
-	viper.BindPFlag("access_token", rootCmd.PersistentFlags().Lookup("access_token"))
+	viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 
 	rootCmd.AddCommand(tasks.TaskCmd, folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd,
 		auth.AuthCmd, configs.ConfigCmd, completionCmd)

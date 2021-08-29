@@ -5,4 +5,4 @@ import (
 	"github.com/google/wire"
 )
 
-var SuperSet = wire.NewSet(auth.ProvideSimpleAuth, auth.ProvideAccessToken, auth.ProvideOAuth2Config())
+var SuperSet = wire.NewSet(auth.ProvideSimpleAuth, auth.ProvideOAuth2Config)

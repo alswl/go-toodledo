@@ -6,8 +6,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"time"
 )
 
 var tokenCmd = &cobra.Command{
@@ -25,16 +23,11 @@ var tokenCmd = &cobra.Command{
 			logrus.Error(err)
 			return
 		}
-
-		viper.Set("auth.access_token", tok.AccessToken)
-		viper.Set("auth.expired_at", tok.Expiry.Format(time.RFC3339))
-		viper.Set("auth.refresh_token", tok.RefreshToken)
-		err = viper.WriteConfig()
+		err = auth.SaveTokenToConfig(tok)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-
 		fmt.Println("ok")
 
 	},
