@@ -8,19 +8,17 @@ import (
 	"github.com/alswl/go-toodledo/pkg/service"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var ActivateCmd = &cobra.Command{
 	Use:  "activate",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		t := viper.GetString("auth.access_token")
-		if t == "" {
-			logrus.Error("auth.access_token is empty")
+		auth, err := auth.ProvideSimpleAuth()
+		if err != nil {
+			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		auth := auth.NewSimpleAuth(t)
 		name := args[0]
 
 		f, err := service.FindGoalByName(auth, name)

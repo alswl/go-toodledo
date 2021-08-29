@@ -60,7 +60,7 @@ VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
 
 .PHONY: build container push test integration-test clean generate-code lint fmt compress
 
-all: download generate-code test build
+all: download test build
 
 build: fmt
 	@for target in $(TARGETS); do                                                      \

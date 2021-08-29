@@ -18,6 +18,7 @@ var meCmd = &cobra.Command{
 		auth, err := auth.ProvideSimpleAuth()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
+			return
 		}
 		cli := client.NewHTTPClient(strfmt.NewFormats())
 		p := account.NewGetAccountGetPhpParams()

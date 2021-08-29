@@ -2,9 +2,9 @@ package folders
 
 import (
 	"fmt"
+	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/folder"
-	"github.com/alswl/go-toodledo/pkg/registries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
@@ -14,9 +14,9 @@ import (
 var ListCmd = &cobra.Command{
 	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := registries.InitAuth()
+		auth, err := auth.ProvideSimpleAuth()
 		if err != nil {
-			logrus.Error(err)
+			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
 
