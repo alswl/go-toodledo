@@ -11,7 +11,8 @@ import (
 )
 
 var ViewCmd = &cobra.Command{
-	Use: "view",
+	Use:  "view",
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		_, err := registries.InitAuth()
 		svc, _ := registries.InitTaskService()
