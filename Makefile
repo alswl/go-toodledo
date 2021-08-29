@@ -75,10 +75,14 @@ build: fmt
 download:
 	go mod download
 
-generate-code: generate-code-wired
+generate-code: generate-code-wired generate-code-mockery
+	# skip swagger for alias import error, manual trigger required.
+
+generate-code-swagger:
 	@echo generate swagger
 	@(cd pkg; rm client/*.go; rm models/*.go; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override)
 
+generate-code-mockery:
 	@echo generate mock of interfaces for testing
 	@rm -rf test/mock
 	@(cd pkg && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
