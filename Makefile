@@ -76,7 +76,8 @@ download:
 	go mod download
 
 generate-code: generate-code-wired generate-code-mockery
-	# skip swagger for alias import error, manual trigger required.
+	@echo generate stringer for enums
+	@(cd pkg/models/enums/taskstatus/; go generate)
 
 generate-code-swagger:
 	@echo generate swagger

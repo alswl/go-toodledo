@@ -7,7 +7,6 @@ package models
 
 import (
 	ccontext "context"
-
 	"github.com/go-openapi/strfmt"
 )
 

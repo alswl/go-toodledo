@@ -4,7 +4,7 @@ import "strings"
 
 type TaskField string
 
-var (
+const (
 	TASK_FIELD_ID                TaskField = "id"
 	TASK_FIELD_TITLE             TaskField = "title"
 	TASK_FIELD_MODIFIED          TaskField = "modified"

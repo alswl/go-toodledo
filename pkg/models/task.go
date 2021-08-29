@@ -7,7 +7,6 @@ package models
 
 import (
 	ccontext "context"
-
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -40,7 +39,7 @@ type Task struct {
 	Context int64 `json:"context,omitempty"`
 
 	// A GMT unix timestamp for when the task is due. The time component of this timestamp doesn't matter. When fetching from the server, it will always be noon.
-	Dudate int64 `json:"dudate,omitempty"`
+	Duedate int64 `json:"duedate,omitempty"`
 
 	// An integer representing the due date modifier.
 	// 0 = Due By
@@ -107,7 +106,7 @@ type Task struct {
 	// Tasks can be set to repeat from their due-date or their completion date. There is not a way to indicate this in a standard iCAL RRULE. To indicate this, we have a custom string of ";FROMCOMP" that we append to the RRULE if the task is set to repeat from the completion date. The absence of this string means that the task repeats from the due-date.
 	// Normally, when a task is rescheduled it moves forwards by 1 occurrence. If the user has procrastinated, the new due-date could still be in the past. Toodledo will have the option to indicate that certain repeating tasks should be rescheduled to the next future occurance of the task. If this is the case, the custom ";FASTFORWARD" string will be appended to the RRULE.
 	//
-	Repeast string `json:"repeast,omitempty"`
+	Repeat string `json:"repeat,omitempty"`
 
 	// A boolean (0 or 1) that indicates if the task is shared as a joint task (Subscription required for user). Read only.
 	Shared int64 `json:"shared,omitempty"`

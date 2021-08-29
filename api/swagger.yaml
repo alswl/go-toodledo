@@ -833,7 +833,7 @@ definitions:
           This is used with Subscriptions that have access to subtasks. This is
           an integer that indicates the manual order of subtasks within the
           parent task. Currently this is read-only.
-      dudate:
+      duedate:
         type: integer
         description: >-
           A GMT unix timestamp for when the task is due. The time component of
@@ -883,7 +883,7 @@ definitions:
           Subscription, the only valid numbers are 0,60. If you submit an
           invalid number, it will be rounded up or down to a valid non zero
           value.
-      repeast:
+      repeat:
         type: string
         description: >
           A string indicating how the task repeats. When a task is rescheduled,
