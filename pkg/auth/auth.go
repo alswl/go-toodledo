@@ -41,7 +41,10 @@ func ProvideSimpleAuth() (runtime.ClientAuthInfoWriter, error) {
 		RefreshToken: rt,
 		Expiry:       at,
 	}
-	conf := ProvideOAuth2Config()
+	conf, err := ProvideOAuth2Config()
+	if err != nil {
+		return nil, err
+	}
 
 	if token.Expiry.Before(time.Now()) {
 		if rt == "" {
@@ -62,10 +65,15 @@ func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry
 	return nil
 }
 
-func ProvideOAuth2Config() *oauth2.Config {
+func ProvideOAuth2Config() (*oauth2.Config, error) {
 	clientId := viper.GetString("auth.client_id")
 	clientSecret := viper.GetString("auth.client_secret")
-	//scope := "basic%20tasks%20write"
+	if clientId == "" {
+		return nil, errors.New("clientId is required")
+	}
+	if clientSecret == "" {
+		return nil, errors.New("clientSecret is required")
+	}
 	scopes := []string{"basic", "tasks", "write"}
 	conf := &oauth2.Config{
 		ClientID:     clientId,
@@ -76,7 +84,7 @@ func ProvideOAuth2Config() *oauth2.Config {
 			TokenURL: "https://api.toodledo.com/3/account/token.php",
 		},
 	}
-	return conf
+	return conf, nil
 }
 
 func Regenerate(conf *oauth2.Config, oldToken *oauth2.Token) (*oauth2.Token, error) {

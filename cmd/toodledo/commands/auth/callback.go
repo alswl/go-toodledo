@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/alswl/go-toodledo/pkg/auth"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -14,18 +14,22 @@ var tokenCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		code := args[0]
 		if code == "" {
-			logrus.WithField("args[0]", code).Error("url format error")
+			log.WithField("args[0]", code).Error("url format error")
 			return
 		}
-		conf := auth.ProvideOAuth2Config()
+		conf, err := auth.ProvideOAuth2Config()
+		if err != nil {
+			log.Error(err)
+			return
+		}
 		tok, err := conf.Exchange(context.Background(), code)
 		if err != nil {
-			logrus.Error(err)
+			log.Error(err)
 			return
 		}
 		err = auth.SaveTokenToConfig(tok)
 		if err != nil {
-			logrus.Error(err)
+			log.Error(err)
 			return
 		}
 		fmt.Println("ok")
