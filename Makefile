@@ -81,7 +81,7 @@ generate-code: generate-code-wired generate-code-mockery
 
 generate-code-swagger:
 	@echo generate swagger
-	@(cd pkg; rm client/*.go; rm models/*.go; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override)
+	@(cd pkg; rm client/*.go; rm models/*.go; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override -C ../api/config.yaml)
 
 generate-code-mockery:
 	@echo generate mock of interfaces for testing
