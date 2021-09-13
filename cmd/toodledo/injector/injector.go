@@ -1,9 +1,10 @@
 //go:build wireinject
 // +build wireinject
 
-package registries
+package injector
 
 import (
+	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/runtime"
@@ -16,6 +17,11 @@ func InitAuth() (runtime.ClientAuthInfoWriter, error) {
 }
 
 func InitTaskService() (services.TaskService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
+func InitApp() (*app.ToodledoCliApp, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }

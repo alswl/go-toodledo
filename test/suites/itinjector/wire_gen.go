@@ -4,15 +4,16 @@
 //go:build !wireinject
 // +build !wireinject
 
-package registries
+package itinjector
 
 import (
+	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/runtime"
 )
 
-// Injectors from injectors.go:
+// Injectors from itinjector.go:
 
 func InitAuth() (runtime.ClientAuthInfoWriter, error) {
 	clientAuthInfoWriter, err := auth.ProvideSimpleAuth()
@@ -29,4 +30,14 @@ func InitTaskService() (services.TaskService, error) {
 	}
 	taskService := services.ProvideTaskService(clientAuthInfoWriter)
 	return taskService, nil
+}
+
+func InitApp() (*app.ToodledoCliApp, error) {
+	clientAuthInfoWriter, err := auth.ProvideSimpleAuth()
+	if err != nil {
+		return nil, err
+	}
+	taskService := services.ProvideTaskService(clientAuthInfoWriter)
+	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService)
+	return toodledoCliApp, nil
 }
