@@ -53,46 +53,25 @@ MINOR_VERSION = 1
 PATCH_VERSION = 0
 BUILD_VERSION = $(COMMIT)
 GO_MOD_VERSION = $(shell cat go.mod | sha256sum | cut -c-6)
+GOOS = darwin
+GOARCH = amd64
 VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
+
 
 # Define all targets. At least the following commands are required:
 #
 
-.PHONY: build container push test integration-test clean generate-code lint fmt compress
+.PHONY: fmt build container test integration-test push clean lint download generate-code compress
 
-all: download test build
-
-build: fmt
-	@for target in $(TARGETS); do                                                      \
-	  go build -v -o $(OUTPUT_DIR)/$${target}                                          \
-	    -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)                      \
-	    -X $(ROOT)/pkg/version.Commit=$(COMMIT)                                        \
-	    -X $(ROOT)/pkg/version.BuildDate=$(NOW_SHORT)                                  \
-	    -X $(ROOT)/pkg/version.Package=$(ROOT)"                                        \
-	    $(CMD_DIR)/$${target};                                                         \
-	done
+all: download generate-code fmt test build
 
 download:
 	go mod download
 
-generate-code: generate-code-wired generate-code-mockery
-	@echo generate stringer for enums
-	@(cd pkg/models/enums/taskstatus/; go generate)
-
-generate-code-swagger:
-	@echo generate swagger
-	@(cd pkg; rm client/*.go; rm models/*.go; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override -C ../api/config.yaml)
-
-generate-code-mockery:
-	@echo generate mock of interfaces for testing
-	@rm -rf test/mock
-	@(cd pkg && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
-	@(cd cmd && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
-
-generate-code-wired:
-	# wire
-	@echo generate wire
-	@(cd pkg/registries; wire)
+fmt:
+	gofmt -w ./pkg/ ./test/ ./cmd/
+	go fmt ./pkg/... ./cmd/...
+	go vet ./pkg/... ./cmd/...
 
 lint:
 	@echo "gofmt ensure"
@@ -101,10 +80,50 @@ lint:
 	@echo "ensure integration test with integration tags"
 	@test $$(find test -name '*_test.go' | wc -l) -eq $$(cat $$(find test -name '*_test.go') | grep -E '// ?\+build integration' | wc -l)
 
-fmt:
-	gofmt -w ./pkg/ ./test/ ./cmd/
-	go fmt ./pkg/... ./cmd/...
-	go vet ./pkg/... ./cmd/...
+generate-code: generate-code-enum generate-code-mockery
+
+generate-code-enum:
+	@echo generate stringer for enums
+	@(cd pkg/models/enums/taskstatus/; go generate)
+
+generate-code-swagger:
+	@(cd pkg; rm client/zz_generated_*.go;rm client/*/zz_generated_*.go; rm models/zz_generated_*.go; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override -C ../api/config.yaml)
+
+generate-code-mockery:
+	@echo generate mock of interfaces for testing
+	@rm -rf test/mock
+	@(cd pkg && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
+	@(cd cmd && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
+
+generate-code-wire:
+	@echo generate wire
+	@(cd cmd/toodledo/injector; $$GOPATH/bin/wire)
+
+	@echo copy injector.go to itinjector.go for testing
+	@mkdir -p test/suites/itinjector
+	@cp cmd/toodledo/injector/injector.go test/suites/itinjector/itinjector.go
+	@cp cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go
+	@gsed -i 's/package injector/package itinjector/g' test/suites/itinjector/itinjector.go
+	@gsed -i 's/SuperSet/IntegrationTestSet/g' test/suites/itinjector/itinjector.go
+	@gsed -i 's/package injector/package itinjector/g' test/suites/itinjector/sets.go
+	@gsed -i 's/SuperSet/IntegrationTestSet/g' test/suites/itinjector/sets.go
+	@(cd test/suites/itinjector; $$GOPATH/bin/wire)
+
+build: fmt
+	@for target in $(TARGETS); do                                                             \
+	  GOOS=$(GOOS) GOARCH=$(GOARCH) go build -v -o $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) \
+	    -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)                             \
+	    -X $(ROOT)/pkg/version.Commit=$(COMMIT)                                               \
+	    -X $(ROOT)/pkg/version.Package=$(ROOT)"                                               \
+	    $(CMD_DIR)/$${target};                                                                \
+	  cp $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) $(OUTPUT_DIR)/$${target};                 \
+	  cp $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) $(OUTPUT_DIR)/$${target}-$(VERSION);      \
+	done
+
+compress:
+	@for target in $(TARGETS); do   \
+	  upx $(OUTPUT_DIR)/$${target}; \
+	done
 
 container:
 	@for target in $(TARGETS); do                                                      \
@@ -122,11 +141,6 @@ push: container
 	    image=$(IMAGE_PREFIX)$${target}$(IMAGE_SUFFIX);                                \
 	    docker push $${registry}$${image}:$(VERSION);                                  \
 	  done                                                                             \
-	done
-
-compress:
-	@for target in $(TARGETS); do   \
-	  upx $(OUTPUT_DIR)/$${target}; \
 	done
 
 test: lint

@@ -40,7 +40,7 @@ func (_m *TaskService) FindById(id int64) (*models.Task, error) {
 }
 
 // QueryAll provides a mock function with given fields:
-func (_m *TaskService) QueryAll() ([]*models.Task, int, error) {
+func (_m *TaskService) QueryAll() ([]*models.Task, *models.PaginatedInfo, error) {
 	ret := _m.Called()
 
 	var r0 []*models.Task
@@ -52,11 +52,13 @@ func (_m *TaskService) QueryAll() ([]*models.Task, int, error) {
 		}
 	}
 
-	var r1 int
-	if rf, ok := ret.Get(1).(func() int); ok {
+	var r1 *models.PaginatedInfo
+	if rf, ok := ret.Get(1).(func() *models.PaginatedInfo); ok {
 		r1 = rf()
 	} else {
-		r1 = ret.Get(1).(int)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*models.PaginatedInfo)
+		}
 	}
 
 	var r2 error

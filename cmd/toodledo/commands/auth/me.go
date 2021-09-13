@@ -2,7 +2,6 @@ package auth
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/account"
 	"github.com/go-openapi/strfmt"
@@ -15,7 +14,7 @@ var meCmd = &cobra.Command{
 	Use:   "me",
 	Short: "Who am i?",
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := auth.ProvideSimpleAuth()
+		auth, err := client.ProvideSimpleAuth()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return

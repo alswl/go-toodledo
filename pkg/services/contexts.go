@@ -10,6 +10,7 @@ import (
 	"github.com/thoas/go-funk"
 )
 
+// TODO using wire
 func FindContextByName(auth runtime.ClientAuthInfoWriter, name string) (*models.Context, error) {
 	cli := client.NewHTTPClient(strfmt.NewFormats())
 	ts, err := cli.Context.GetContextsGetPhp(context.NewGetContextsGetPhpParams(), auth)

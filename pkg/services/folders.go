@@ -15,20 +15,21 @@ type FolderService interface {
 	FindByName(name string) (*models.Folder, error)
 }
 
-type FolderServiceImpl struct {
-	client *client.Toodledo
+type folderService struct {
+	cli  *client.Toodledo
+	auth runtime.ClientAuthInfoWriter
 }
 
-func NewFolderServiceImpl(client *client.Toodledo) *FolderServiceImpl {
-	return &FolderServiceImpl{client: client}
+func NewFolderService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) FolderService {
+	return &folderService{cli: cli, auth: auth}
 }
 
-func (s *FolderServiceImpl) Find(id int) (*models.Folder, error) {
+func (s *folderService) Find(id int) (*models.Folder, error) {
 	// TODO
 	return nil, nil
 }
 
-func (s *FolderServiceImpl) FindByName(name string) (*models.Folder, error) {
+func (s *folderService) FindByName(name string) (*models.Folder, error) {
 
 	// TODO
 	return nil, nil

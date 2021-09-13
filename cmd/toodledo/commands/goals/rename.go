@@ -2,7 +2,6 @@ package goals
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/auth"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/goal"
 	"github.com/alswl/go-toodledo/pkg/render"
@@ -17,7 +16,7 @@ var RenameCmd = &cobra.Command{
 	Use:  "rename",
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := auth.ProvideSimpleAuth()
+		auth, err := client.ProvideSimpleAuth()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return

@@ -1,13 +1,16 @@
-package auth
+package client
 
 import (
 	"context"
 	"errors"
 	"github.com/go-openapi/runtime"
+	openapiclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
+	"os"
+
 	"time"
 )
 
@@ -15,10 +18,12 @@ type SimpleAuth struct {
 	accessToken string
 }
 
+// TODO remove this, using configs instead of accessToken
 func NewSimpleAuth(accessToken string) runtime.ClientAuthInfoWriter {
 	return &SimpleAuth{accessToken: accessToken}
 }
 
+// TODO using configs instead of accessToken
 func ProvideSimpleAuth() (runtime.ClientAuthInfoWriter, error) {
 	// TOTO remove viper dependencies
 	accessToken := viper.GetString("auth.access_token")
@@ -50,7 +55,7 @@ func ProvideSimpleAuth() (runtime.ClientAuthInfoWriter, error) {
 		if rt == "" {
 			return nil, errors.New("auth.refresh_token is empty")
 		}
-		newToken, err := Regenerate(conf, &token)
+		newToken, err := regenerate(conf, &token)
 		err = SaveTokenToConfig(newToken)
 		if err != nil {
 			return nil, err
@@ -58,6 +63,14 @@ func ProvideSimpleAuth() (runtime.ClientAuthInfoWriter, error) {
 		return NewSimpleAuth(newToken.AccessToken), nil
 	}
 	return NewSimpleAuth(accessToken), nil
+}
+
+func NewToodledoCli() *Toodledo {
+	debug := os.Getenv("DEBUG") != "" || os.Getenv("SWAGGER_DEBUG") != ""
+
+	transportConfig := openapiclient.New(DefaultHost, DefaultBasePath, []string{"https"})
+	transportConfig.Debug = debug
+	return New(transportConfig, strfmt.Default)
 }
 
 func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry strfmt.Registry) error {
@@ -87,7 +100,7 @@ func ProvideOAuth2Config() (*oauth2.Config, error) {
 	return conf, nil
 }
 
-func Regenerate(conf *oauth2.Config, oldToken *oauth2.Token) (*oauth2.Token, error) {
+func regenerate(conf *oauth2.Config, oldToken *oauth2.Token) (*oauth2.Token, error) {
 	src := conf.TokenSource(context.TODO(), oldToken)
 	newToken, err := src.Token()
 	if err != nil {
@@ -96,8 +109,9 @@ func Regenerate(conf *oauth2.Config, oldToken *oauth2.Token) (*oauth2.Token, err
 	return newToken, nil
 }
 
+// TODO move to Configs
 func SaveTokenToConfig(tok *oauth2.Token) error {
-	// TOTO remove viper dependencies
+	// TOTO move to Configs
 	viper.Set("auth.access_token", tok.AccessToken)
 	viper.Set("auth.expired_at", tok.Expiry.Format(time.RFC3339))
 	viper.Set("auth.refresh_token", tok.RefreshToken)
