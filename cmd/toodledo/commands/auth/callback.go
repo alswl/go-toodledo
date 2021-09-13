@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/auth"
+	"github.com/alswl/go-toodledo/pkg/client"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -17,7 +17,7 @@ var tokenCmd = &cobra.Command{
 			log.WithField("args[0]", code).Error("url format error")
 			return
 		}
-		conf, err := auth.ProvideOAuth2Config()
+		conf, err := client.ProvideOAuth2Config()
 		if err != nil {
 			log.Error(err)
 			return
@@ -27,7 +27,7 @@ var tokenCmd = &cobra.Command{
 			log.Error(err)
 			return
 		}
-		err = auth.SaveTokenToConfig(tok)
+		err = client.SaveTokenToConfig(tok)
 		if err != nil {
 			log.Error(err)
 			return

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/auth"
+	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -10,7 +10,7 @@ import (
 var loginCmd = &cobra.Command{
 	Use: "login",
 	Run: func(cmd *cobra.Command, args []string) {
-		conf, err := auth.ProvideOAuth2Config()
+		conf, err := client.ProvideOAuth2Config()
 		if err != nil {
 			logrus.Error(err)
 			return

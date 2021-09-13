@@ -8,7 +8,7 @@ package injector
 
 import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
-	"github.com/alswl/go-toodledo/pkg/auth"
+	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/runtime"
 )
@@ -16,7 +16,7 @@ import (
 // Injectors from injector.go:
 
 func InitAuth() (runtime.ClientAuthInfoWriter, error) {
-	clientAuthInfoWriter, err := auth.ProvideSimpleAuth()
+	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func InitAuth() (runtime.ClientAuthInfoWriter, error) {
 }
 
 func InitTaskService() (services.TaskService, error) {
-	clientAuthInfoWriter, err := auth.ProvideSimpleAuth()
+	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func InitTaskService() (services.TaskService, error) {
 }
 
 func InitApp() (*app.ToodledoCliApp, error) {
-	clientAuthInfoWriter, err := auth.ProvideSimpleAuth()
+	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
 	if err != nil {
 		return nil, err
 	}
