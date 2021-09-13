@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"errors"
-	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/go-openapi/runtime"
 	openapiclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -66,8 +65,7 @@ func ProvideSimpleAuth() (runtime.ClientAuthInfoWriter, error) {
 	return NewSimpleAuth(accessToken), nil
 }
 
-// TODO using this
-func NewToodledoCli(configs common.Configs) *Toodledo {
+func NewToodledoCli() *Toodledo {
 	debug := os.Getenv("DEBUG") != "" || os.Getenv("SWAGGER_DEBUG") != ""
 
 	transportConfig := openapiclient.New(DefaultHost, DefaultBasePath, []string{"https"})

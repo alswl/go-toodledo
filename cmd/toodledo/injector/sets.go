@@ -9,9 +9,10 @@ import (
 )
 
 var SuperSet = wire.NewSet(
+	common.NewConfigsFromViper,
+	client.NewToodledoCli,
 	client.ProvideSimpleAuth,
 	client.ProvideOAuth2Config,
-	services.ProvideTaskService,
+	services.NewTaskService,
 	app.NewToodledoCliApp,
-	common.NewConfigsFromViper,
 )

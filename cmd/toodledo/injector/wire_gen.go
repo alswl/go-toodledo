@@ -9,6 +9,7 @@ package injector
 import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/runtime"
 )
@@ -23,12 +24,26 @@ func InitAuth() (runtime.ClientAuthInfoWriter, error) {
 	return clientAuthInfoWriter, nil
 }
 
+func NewConfigs() (common.Configs, error) {
+	configs, err := common.NewConfigsFromViper()
+	if err != nil {
+		return nil, err
+	}
+	return configs, nil
+}
+
+func NewToodledoCli() (*client.Toodledo, error) {
+	toodledo := client.NewToodledoCli()
+	return toodledo, nil
+}
+
 func InitTaskService() (services.TaskService, error) {
+	toodledo := client.NewToodledoCli()
 	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
 	if err != nil {
 		return nil, err
 	}
-	taskService := services.ProvideTaskService(clientAuthInfoWriter)
+	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
 	return taskService, nil
 }
 
@@ -37,7 +52,8 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskService := services.ProvideTaskService(clientAuthInfoWriter)
+	toodledo := client.NewToodledoCli()
+	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
 	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService)
 	return toodledoCliApp, nil
 }

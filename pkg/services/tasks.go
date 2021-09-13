@@ -7,15 +7,12 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/enums"
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/strfmt"
 	"time"
 )
 
 type TaskService interface {
 	FindById(id int64) (*models.Task, error)
-
 	QueryAll() ([]*models.Task, *models.PaginatedInfo, error)
-
 	QueryModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error)
 }
 
@@ -24,15 +21,11 @@ type taskService struct {
 	auth runtime.ClientAuthInfoWriter
 }
 
-func NewTaskService(auth runtime.ClientAuthInfoWriter) *taskService {
+func NewTaskService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) TaskService {
 	return &taskService{
-		cli:  client.NewHTTPClient(strfmt.NewFormats()),
+		cli:  cli,
 		auth: auth,
 	}
-}
-
-func ProvideTaskService(auth runtime.ClientAuthInfoWriter) TaskService {
-	return NewTaskService(auth)
 }
 
 func (s *taskService) FindById(id int64) (*models.Task, error) {
