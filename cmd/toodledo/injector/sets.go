@@ -14,5 +14,6 @@ var SuperSet = wire.NewSet(
 	client.ProvideSimpleAuth,
 	client.ProvideOAuth2Config,
 	services.NewTaskService,
+	services.NewFolderService,
 	app.NewToodledoCliApp,
 )

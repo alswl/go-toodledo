@@ -7,10 +7,10 @@ import (
 
 type ToodledoCliApp struct {
 	// TODO service here
-	auth    runtime.ClientAuthInfoWriter
-	taskSvc services.TaskService
+	Auth    runtime.ClientAuthInfoWriter
+	TaskSvc services.TaskService
 }
 
 func NewToodledoCliApp(auth runtime.ClientAuthInfoWriter, taskSvc services.TaskService) *ToodledoCliApp {
-	return &ToodledoCliApp{auth: auth, taskSvc: taskSvc}
+	return &ToodledoCliApp{Auth: auth, TaskSvc: taskSvc}
 }

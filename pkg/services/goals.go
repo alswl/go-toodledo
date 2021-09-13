@@ -11,6 +11,8 @@ import (
 	"strconv"
 )
 
+// TODO using service
+
 func FindGoalByName(auth runtime.ClientAuthInfoWriter, name string) (*models.Goal, error) {
 	cli := client.NewHTTPClient(strfmt.NewFormats())
 	ts, err := cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), auth)

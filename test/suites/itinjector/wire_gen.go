@@ -37,6 +37,16 @@ func NewToodledoCli() (*client.Toodledo, error) {
 	return toodledo, nil
 }
 
+func InitFolderService() (services.FolderService, error) {
+	toodledo := client.NewToodledoCli()
+	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
+	if err != nil {
+		return nil, err
+	}
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	return folderService, nil
+}
+
 func InitTaskService() (services.TaskService, error) {
 	toodledo := client.NewToodledoCli()
 	clientAuthInfoWriter, err := client.ProvideSimpleAuth()

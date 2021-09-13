@@ -14,16 +14,14 @@ var ViewCmd = &cobra.Command{
 	Use:  "view",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO using app
-		_, err := injector.InitAuth()
-		svc, _ := injector.InitTaskService()
+		app, err := injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
 
 		id, _ := strconv.Atoi(args[0])
-		task, err := svc.FindById((int64)(id))
+		task, err := app.TaskSvc.FindById((int64)(id))
 
 		fmt.Println(render.Tables4Task([]*models.Task{task}))
 	},

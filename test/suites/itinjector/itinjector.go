@@ -27,6 +27,11 @@ func NewToodledoCli() (*client.Toodledo, error) {
 	return nil, nil
 }
 
+func InitFolderService() (services.FolderService, error) {
+	wire.Build(IntegrationTestSet)
+	return nil, nil
+}
+
 func InitTaskService() (services.TaskService, error) {
 	wire.Build(IntegrationTestSet)
 	return nil, nil
