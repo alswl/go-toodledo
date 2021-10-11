@@ -71,6 +71,13 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	}
 	toodledo := client.NewToodledoCli()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
-	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService)
+	configs, err := common.NewConfigsFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig := common.NewToodledoConfig(configs)
+	db := dao.NewBoltDB(toodledoConfig)
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter, db)
+	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService, folderService)
 	return toodledoCliApp, nil
 }

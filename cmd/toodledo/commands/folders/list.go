@@ -2,10 +2,8 @@ package folders
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/folder"
+	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/render"
-	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -13,18 +11,17 @@ import (
 var ListCmd = &cobra.Command{
 	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := client.ProvideSimpleAuth()
+		app, err := injector.InitApp()
 		if err != nil {
-			logrus.Fatal("login required, using `toodledo auth login` to login.")
+			logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
 
-		cli := client.NewHTTPClient(strfmt.NewFormats())
-		res, err := cli.Folder.GetFoldersGetPhp(folder.NewGetFoldersGetPhpParams(), auth)
+		all, err := app.FolderSvc.ListAll()
 		if err != nil {
-			logrus.Error(err)
+			logrus.WithError(err).Fatal()
 			return
 		}
-		fmt.Print(render.Tables4Folder(res.Payload))
+		fmt.Print(render.Tables4Folder(all))
 	},
 }

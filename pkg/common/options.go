@@ -1,15 +1,12 @@
 package common
 
-import (
-	"time"
-)
-
 type ToodledoConfigAuth struct {
-	AccessToken  string    `mapstructure:"access_token"`
-	ClientId     string    `mapstructure:"client_id"`
-	ClientSecret string    `mapstructure:"client_secret"`
-	ExpiredAt    time.Time `mapstructure:"expired_at"`
-	RefreshToken string    `mapstructure:"refresh_token"`
+	AccessToken  string `mapstructure:"access_token"`
+	ClientId     string `mapstructure:"client_id"`
+	ClientSecret string `mapstructure:"client_secret"`
+	// FIXME string will not works
+	ExpiredAt    string `mapstructure:"expired_at"`
+	RefreshToken string `mapstructure:"refresh_token"`
 }
 
 type ToodledoConfigDatabase struct {

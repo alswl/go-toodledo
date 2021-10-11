@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/folder"
@@ -36,9 +37,44 @@ func (s *folderService) listAll() ([]*models.Folder, error) {
 	return ts.Payload, nil
 }
 
+func (s *folderService) listAllFromDB() ([]*models.Folder, error) {
+	var fs []*models.Folder
+	s.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("folders"))
+		if b == nil {
+			return nil
+		}
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			var f models.Folder
+			_ = json.Unmarshal(v, &f)
+			fs = append(fs, &f)
+		}
+		return nil
+	})
+	return fs, nil
+}
+
+func (s *folderService) put2DB(folders []*models.Folder) error {
+	s.db.Update(func(tx *bolt.Tx) error {
+		b, _ := tx.CreateBucketIfNotExists([]byte("folders"))
+		for _, f := range folders {
+			bytes, _ := json.Marshal(f)
+			b.Put(([]byte)(strconv.Itoa((int)(f.ID))), bytes)
+		}
+		return nil
+	})
+	return nil
+}
+
 func (s *folderService) ListAll() ([]*models.Folder, error) {
 	// XXX using bolt
-	return s.listAll()
+	all, err := s.listAll()
+	if err != nil {
+		return nil, err
+	}
+	s.put2DB(all)
+	return s.listAllFromDB()
 }
 
 func (s *folderService) Find(id int) (*models.Folder, error) {
