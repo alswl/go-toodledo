@@ -10,6 +10,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/common"
+	"github.com/alswl/go-toodledo/pkg/dao"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/runtime"
 )
@@ -43,7 +44,13 @@ func InitFolderService() (services.FolderService, error) {
 	if err != nil {
 		return nil, err
 	}
-	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	configs, err := common.NewConfigsFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig := common.NewToodledoConfig(configs)
+	db := dao.NewBoltDB(toodledoConfig)
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter, db)
 	return folderService, nil
 }
 
