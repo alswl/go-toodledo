@@ -17,6 +17,8 @@ var IntegrationTestSet = wire.NewSet(
 	client.ProvideSimpleAuth,
 	client.ProvideOAuth2Config,
 	services.NewTaskService,
-	services.NewFolderService,
+	//services.NewFolderService,
+	services.NewFolderService0,
+	services.NewFolderCachedService,
 	app.NewToodledoCliApp,
 )

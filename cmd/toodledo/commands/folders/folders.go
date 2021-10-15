@@ -9,5 +9,5 @@ var FolderCmd = &cobra.Command{
 
 func init() {
 	FolderCmd.AddCommand(ListCmd, CreateCmd, DeleteCmd,
-		RenameCmd, ArchiveCmd, ActivateCmd)
+		RenameCmd, ArchiveCmd, ActivateCmd, ViewCmd)
 }
