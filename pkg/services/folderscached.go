@@ -2,24 +2,19 @@ package services
 
 import (
 	"encoding/json"
-	"errors"
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/folder"
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/strfmt"
-	"github.com/thoas/go-funk"
 	bolt "go.etcd.io/bbolt"
-	"strconv"
 )
 
 type folderCachedService struct {
-	svc *folderService
-	db  *bolt.DB
+	*folderService
+	db *bolt.DB
 }
 
 func NewFolderCachedService(svc0 *folderService, db *bolt.DB) FolderService {
-	return &folderCachedService{svc: svc0, db: db}
+	s := folderCachedService{folderService: svc0, db: db}
+	_ = s.syncIfExpired()
+	return &s
 }
 
 func (s *folderCachedService) listAll() ([]*models.Folder, error) {
@@ -54,7 +49,7 @@ func (s *folderCachedService) put2DB(folders []*models.Folder) error {
 
 func (s folderCachedService) syncIfExpired() error {
 	// TODO if expired
-	all, err := s.svc.ListAll()
+	all, err := s.folderService.ListAll()
 	if err != nil {
 		return err
 	}
@@ -93,38 +88,4 @@ func (s *folderCachedService) findByName(name string) (*models.Folder, error) {
 	})
 	// TODO nil
 	return f, nil
-}
-
-func FindFolderByName(auth runtime.ClientAuthInfoWriter, name string) (*models.Folder, error) {
-	cli := client.NewHTTPClient(strfmt.NewFormats())
-	ts, err := cli.Folder.GetFoldersGetPhp(folder.NewGetFoldersGetPhpParams(), auth)
-	if err != nil {
-		return nil, err
-	}
-	// TODO replace with svc.ListAll()
-
-	filtered := funk.Filter(ts.Payload, func(x *models.Folder) bool {
-		return x.Name == name
-	}).([]*models.Folder)
-	if len(filtered) == 0 {
-		return nil, errors.New("not found")
-	}
-	f := filtered[0]
-	return f, nil
-}
-
-func ArchiveFolder(auth runtime.ClientAuthInfoWriter, id int, isArchived bool) (*models.Folder, error) {
-	cli := client.NewHTTPClient(strfmt.NewFormats())
-	p := folder.NewPostFoldersEditPhpParams()
-	p.SetID(strconv.Itoa(id))
-	archived := int64(0)
-	if isArchived {
-		archived = 1
-	}
-	p.SetArchived(&archived)
-	res, err := cli.Folder.PostFoldersEditPhp(p, auth)
-	if err != nil {
-		return nil, err
-	}
-	return res.Payload[0], nil
 }

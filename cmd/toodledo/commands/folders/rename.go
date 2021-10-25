@@ -2,10 +2,10 @@ package folders
 
 import (
 	"fmt"
+	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/folder"
 	"github.com/alswl/go-toodledo/pkg/render"
-	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -22,7 +22,11 @@ var RenameCmd = &cobra.Command{
 			return
 		}
 		cli := client.NewHTTPClient(strfmt.NewFormats())
-
+		app, err := injector.InitApp()
+		if err != nil {
+			logrus.Fatal("login required, using `toodledo auth login` to login.")
+			return
+		}
 		name := args[0]
 		newName := args[1]
 		if name == newName {
@@ -30,7 +34,7 @@ var RenameCmd = &cobra.Command{
 			return
 		}
 
-		f, err := services.FindFolderByName(auth, name)
+		f, err := app.FolderSvc.FindByName(name)
 		if err != nil {
 			logrus.Error(err)
 			return

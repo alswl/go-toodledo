@@ -44,7 +44,7 @@ func InitFolderService() (services.FolderService, error) {
 	if err != nil {
 		return nil, err
 	}
-	folderService := services.NewFolderService0(toodledo, clientAuthInfoWriter)
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	configs, err := common.NewConfigsFromViper()
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	}
 	toodledo := client.NewToodledoCli()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
-	folderService := services.NewFolderService0(toodledo, clientAuthInfoWriter)
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	configs, err := common.NewConfigsFromViper()
 	if err != nil {
 		return nil, err
