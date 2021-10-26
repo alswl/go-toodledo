@@ -51,8 +51,11 @@ func InitFolderService() (services.FolderService, error) {
 		return nil, err
 	}
 	toodledoConfig := common.NewToodledoConfig(configs)
-	db := dao.NewBoltDB(toodledoConfig)
-	servicesFolderService := services.NewFolderCachedService(folderService, accountService, db)
+	backend, err := dao.NewBoltDB(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	servicesFolderService := services.NewFolderCachedService(folderService, accountService, backend)
 	return servicesFolderService, nil
 }
 
@@ -80,8 +83,11 @@ func InitApp() (*app.ToodledoCliApp, error) {
 		return nil, err
 	}
 	toodledoConfig := common.NewToodledoConfig(configs)
-	db := dao.NewBoltDB(toodledoConfig)
-	servicesFolderService := services.NewFolderCachedService(folderService, accountService, db)
+	backend, err := dao.NewBoltDB(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	servicesFolderService := services.NewFolderCachedService(folderService, accountService, backend)
 	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService, servicesFolderService, accountService)
 	return toodledoCliApp, nil
 }

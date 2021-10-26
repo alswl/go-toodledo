@@ -16,6 +16,7 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
 	github.com/parnurzeal/gorequest v0.2.16
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
