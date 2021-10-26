@@ -45,13 +45,14 @@ func InitFolderService() (services.FolderService, error) {
 		return nil, err
 	}
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
 	configs, err := common.NewConfigsFromViper()
 	if err != nil {
 		return nil, err
 	}
 	toodledoConfig := common.NewToodledoConfig(configs)
 	db := dao.NewBoltDB(toodledoConfig)
-	servicesFolderService := services.NewFolderCachedService(folderService, db)
+	servicesFolderService := services.NewFolderCachedService(folderService, accountService, db)
 	return servicesFolderService, nil
 }
 
@@ -73,13 +74,14 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	toodledo := client.NewToodledoCli()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
 	configs, err := common.NewConfigsFromViper()
 	if err != nil {
 		return nil, err
 	}
 	toodledoConfig := common.NewToodledoConfig(configs)
 	db := dao.NewBoltDB(toodledoConfig)
-	servicesFolderService := services.NewFolderCachedService(folderService, db)
-	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService, servicesFolderService)
+	servicesFolderService := services.NewFolderCachedService(folderService, accountService, db)
+	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService, servicesFolderService, accountService)
 	return toodledoCliApp, nil
 }

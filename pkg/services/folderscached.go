@@ -3,17 +3,18 @@ package services
 import (
 	"encoding/json"
 	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/sirupsen/logrus"
 	bolt "go.etcd.io/bbolt"
 )
 
 type folderCachedService struct {
 	*folderService
-	db *bolt.DB
+	db         *bolt.DB
+	accountSvc AccountService
 }
 
-func NewFolderCachedService(svc0 *folderService, db *bolt.DB) FolderService {
-	s := folderCachedService{folderService: svc0, db: db}
-	_ = s.syncIfExpired()
+func NewFolderCachedService(svc0 *folderService, accountSvc AccountService, db *bolt.DB) FolderService {
+	s := folderCachedService{folderService: svc0, accountSvc: accountSvc, db: db}
 	return &s
 }
 
@@ -47,8 +48,44 @@ func (s *folderCachedService) put2DB(folders []*models.Folder) error {
 	return nil
 }
 
-func (s folderCachedService) syncIfExpired() error {
-	// TODO if expired
+func (s *folderCachedService) folderIsExpired() bool {
+	// XXX if expired
+	var meCached models.Account
+	s.db.Update(func(tx *bolt.Tx) error {
+		_, _ = tx.CreateBucketIfNotExists([]byte("auth"))
+		return nil
+	})
+	s.db.View(func(tx *bolt.Tx) error {
+		// XXX move to auth
+		b := tx.Bucket([]byte("auth"))
+		c := b.Get([]byte("me"))
+		_ = json.Unmarshal(c, &meCached)
+		return nil
+	})
+
+	me, err := s.accountSvc.FindMe()
+	s.db.Update(func(tx *bolt.Tx) error {
+		// XXX move to auth
+		b := tx.Bucket([]byte("auth"))
+		json, _ := json.Marshal(me)
+		b.Put([]byte("me"), json)
+		return nil
+	})
+
+	// XXX save to cache
+	if err != nil {
+		logrus.WithField("me", me).WithError(err).Error("request failed")
+		return true
+	}
+
+	return me.LasteditFolder <= meCached.LasteditFolder
+}
+
+func (s *folderCachedService) syncIfExpired() error {
+	if s.folderIsExpired() {
+		return nil
+	}
+
 	all, err := s.folderService.ListAll()
 	if err != nil {
 		return err
