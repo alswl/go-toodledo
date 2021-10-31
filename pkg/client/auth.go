@@ -23,7 +23,7 @@ func NewSimpleAuth(accessToken string) runtime.ClientAuthInfoWriter {
 	return &SimpleAuth{accessToken: accessToken}
 }
 
-// TODO using configs instead of accessToken
+// XXX using configs instead of accessToken
 func ProvideSimpleAuth() (runtime.ClientAuthInfoWriter, error) {
 	// TOTO remove viper dependencies
 	accessToken := viper.GetString("auth.access_token")

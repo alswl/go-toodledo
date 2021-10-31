@@ -33,11 +33,11 @@ func NewBoltDB(config common.ToodledoConfig) (Backend, error) {
 	if err != nil {
 		return nil, err
 	}
-	//for _, bucket := range cfg.Buckets {
-	//	if err := b.prepare(db, []byte(bucket.Name)); err != nil {
-	//		return nil, err
-	//	}
-	//}
+	for _, bucket := range config.Database.Buckets {
+		if err := b.prepare(db, []byte(bucket)); err != nil {
+			return nil, err
+		}
+	}
 	b.db = db
 
 	return b, nil
@@ -155,6 +155,28 @@ func (b *bolt) List(bucket string) ([][]byte, error) {
 	})
 
 	return values, err
+}
+
+func (b *bolt) Truncate(bucket string) error {
+	b.Lock()
+	defer b.Unlock()
+
+	err := b.db.Update(func(tx *boltdb.Tx) error {
+		bkt := tx.Bucket([]byte(bucket))
+		if bkt == nil {
+			return ErrBucketNotFound
+		}
+
+		err := tx.DeleteBucket([]byte(bucket))
+		if err != nil {
+			return errors.Wrapf(err, "failed to truncate %s in boltdb", bucket)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return b.prepare(b.db, []byte(bucket))
 }
 
 // Close releases all database resources.

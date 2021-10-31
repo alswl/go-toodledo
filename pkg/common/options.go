@@ -10,7 +10,8 @@ type ToodledoConfigAuth struct {
 }
 
 type ToodledoConfigDatabase struct {
-	DataFile string `mapstructure:"data_file"`
+	DataFile string   `mapstructure:"data_file"`
+	Buckets  []string `mapstructure:"buckets"`
 }
 
 type ToodledoConfig struct {
@@ -20,5 +21,10 @@ type ToodledoConfig struct {
 
 func NewToodledoConfig(configs Configs) ToodledoConfig {
 	// TODO dirty, but it works
-	return *configs.Get()
+	cfg := *configs.Get()
+	// TODO consts
+	cfg.Database.Buckets = []string{
+		"folders",
+	}
+	return cfg
 }

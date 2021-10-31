@@ -9,54 +9,32 @@ import (
 
 type folderCachedService struct {
 	*folderService
+	cache      dao.Cache
 	db         dao.Backend
 	accountSvc AccountService
 }
 
-func NewFolderCachedService(svc0 *folderService, accountSvc AccountService, db dao.Backend) FolderService {
-	s := folderCachedService{folderService: svc0, accountSvc: accountSvc, db: db}
+func NewFolderCachedService(folderSvc *folderService, accountSvc AccountService, db dao.Backend) FolderService {
+	s := folderCachedService{
+		folderService: folderSvc,
+		cache:         dao.NewCache(db, "folders"),
+		db:            db,
+		accountSvc:    accountSvc,
+	}
 	return &s
 }
 
 func (s *folderCachedService) listAll() ([]*models.Folder, error) {
-	var fs []*models.Folder
-	list, _ := s.db.List("folders")
-	for _, item := range list {
-		var f models.Folder
-		_ = json.Unmarshal(item, &f)
-		fs = append(fs, &f)
+	var objs []interface{}
+	err := s.cache.ListAll(objs)
+	if err != nil {
+		return nil, err
 	}
-
-	//s.db.View(func(tx *bolt.Tx) error {
-	//	b := tx.Bucket([]byte("folders"))
-	//	if b == nil {
-	//		return nil
-	//	}
-	//	c := b.Cursor()
-	//	for k, v := c.First(); k != nil; k, v = c.Next() {
-	//		var f models.Folder
-	//		_ = json.Unmarshal(v, &f)
-	//		fs = append(fs, &f)
-	//	}
-	//	return nil
-	//})
+	fs := make([]*models.Folder, len(objs))
+	for _, obj := range objs {
+		fs = append(fs, obj.(*models.Folder))
+	}
 	return fs, nil
-}
-
-func (s *folderCachedService) put2DB(folders []*models.Folder) error {
-	for _, f := range folders {
-		bytes, _ := json.Marshal(f)
-		s.db.Put("folders", f.Name, bytes)
-	}
-	//s.db.Update(func(tx *bolt.Tx) error {
-	//	b, _ := tx.CreateBucketIfNotExists([]byte("folders"))
-	//	for _, f := range folders {
-	//		bytes, _ := json.Marshal(f)
-	//		b.Put(([]byte)(f.Name), bytes)
-	//	}
-	//	return nil
-	//})
-	return nil
 }
 
 func (s *folderCachedService) folderIsExpired() bool {
@@ -97,15 +75,27 @@ func (s *folderCachedService) folderIsExpired() bool {
 }
 
 func (s *folderCachedService) syncIfExpired() error {
-	if s.folderIsExpired() {
+	if !s.folderIsExpired() {
 		return nil
 	}
 
+	logrus.Debug("folder is not expired")
+	return s.sync()
+}
+
+func (s *folderCachedService) sync() error {
 	all, err := s.folderService.ListAll()
 	if err != nil {
 		return err
 	}
-	s.put2DB(all)
+	err = s.db.Truncate("folders")
+	if err != nil {
+		return err
+	}
+	for _, f := range all {
+		bytes, _ := json.Marshal(f)
+		s.db.Put("folders", f.Name, bytes)
+	}
 	return nil
 }
 

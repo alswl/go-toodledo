@@ -1,6 +1,7 @@
 package dao
 
 // Backend is an interface which describes what a store should support.
+// All methods are thread-safe
 // port from https://github.com/alibaba/pouch/blob/master/pkg/meta/backend.go
 type Backend interface {
 	// Put write key-value into store.
@@ -9,8 +10,11 @@ type Backend interface {
 	// Get read object from store.
 	Get(bucket string, key string) ([]byte, error)
 
-	// Remove remove all data of the key.
+	// Remove all data of the key.
 	Remove(bucket string, key string) error
+
+	// Truncate all data of the bucket.
+	Truncate(bucket string) error
 
 	// List return all objects with specify bucket.
 	List(bucket string) ([][]byte, error)
