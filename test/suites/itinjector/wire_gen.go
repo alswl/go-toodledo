@@ -18,7 +18,11 @@ import (
 // Injectors from itinjector.go:
 
 func InitAuth() (runtime.ClientAuthInfoWriter, error) {
-	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
+	configs, err := common.NewConfigsForTesting()
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +30,7 @@ func InitAuth() (runtime.ClientAuthInfoWriter, error) {
 }
 
 func NewConfigs() (common.Configs, error) {
-	configs, err := common.NewConfigsFromViper()
+	configs, err := common.NewConfigsForTesting()
 	if err != nil {
 		return nil, err
 	}
@@ -40,16 +44,16 @@ func NewToodledoCli() (*client.Toodledo, error) {
 
 func InitFolderService() (services.FolderService, error) {
 	toodledo := client.NewToodledoCli()
-	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
+	configs, err := common.NewConfigsForTesting()
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
 	if err != nil {
 		return nil, err
 	}
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	configs, err := common.NewConfigsFromViper()
-	if err != nil {
-		return nil, err
-	}
 	toodledoConfig := common.NewToodledoConfig(configs)
 	backend, err := dao.NewBoltDB(toodledoConfig)
 	if err != nil {
@@ -61,7 +65,11 @@ func InitFolderService() (services.FolderService, error) {
 
 func InitTaskService() (services.TaskService, error) {
 	toodledo := client.NewToodledoCli()
-	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
+	configs, err := common.NewConfigsForTesting()
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +78,11 @@ func InitTaskService() (services.TaskService, error) {
 }
 
 func InitApp() (*app.ToodledoCliApp, error) {
-	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
+	configs, err := common.NewConfigsForTesting()
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
 	if err != nil {
 		return nil, err
 	}
@@ -78,10 +90,6 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	configs, err := common.NewConfigsFromViper()
-	if err != nil {
-		return nil, err
-	}
 	toodledoConfig := common.NewToodledoConfig(configs)
 	backend, err := dao.NewBoltDB(toodledoConfig)
 	if err != nil {

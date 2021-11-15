@@ -104,11 +104,13 @@ generate-code-wire:
 	@echo copy injector.go to itinjector.go for testing
 	@mkdir -p test/suites/itinjector
 	@cp cmd/toodledo/injector/injector.go test/suites/itinjector/itinjector.go
-	@cp cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go
+	@#cp cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go
 	@gsed -i 's/package injector/package itinjector/g' test/suites/itinjector/itinjector.go
 	@gsed -i 's/SuperSet/IntegrationTestSet/g' test/suites/itinjector/itinjector.go
-	@gsed -i 's/package injector/package itinjector/g' test/suites/itinjector/sets.go
-	@gsed -i 's/SuperSet/IntegrationTestSet/g' test/suites/itinjector/sets.go
+	@#gsed -i 's/package injector/package itinjector/g' test/suites/itinjector/sets.go
+	@#gsed -i 's/SuperSet/IntegrationTestSet/g' test/suites/itinjector/sets.go
+	@echo diff cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go
+	diff cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go || true
 	@(cd test/suites/itinjector; $$GOPATH/bin/wire)
 
 build: fmt

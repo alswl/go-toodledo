@@ -15,6 +15,8 @@ type configs struct {
 	conf *ToodledoConfig
 }
 
+// NewConfigsFromViper build Configs from viper
+// XXX decoupling from viper
 func NewConfigsFromViper() (Configs, error) {
 	var conf ToodledoConfig
 	err := viper.Unmarshal(&conf)
@@ -26,6 +28,13 @@ func NewConfigsFromViper() (Configs, error) {
 
 func NewConfigsForTesting() (Configs, error) {
 	path := os.Getenv("TOODLEDO_CONFIG")
+	if path == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return nil, err
+		}
+		path = home + "/" + ".toodledo-test.yaml"
+	}
 	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err

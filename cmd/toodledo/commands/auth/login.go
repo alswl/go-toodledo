@@ -10,7 +10,7 @@ import (
 var loginCmd = &cobra.Command{
 	Use: "login",
 	Run: func(cmd *cobra.Command, args []string) {
-		conf, err := client.ProvideOAuth2Config()
+		conf, err := client.ProvideOAuth2ConfigFromViper()
 		if err != nil {
 			logrus.Error(err)
 			return

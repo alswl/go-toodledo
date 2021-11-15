@@ -4,16 +4,15 @@
 package services
 
 import (
-	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/alswl/go-toodledo/test/suites"
+	"github.com/alswl/go-toodledo/test/suites/itinjector"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestTaskServiceFindById(t *testing.T) {
-	auth := suites.AuthForTest()
+	app, err := itinjector.InitApp()
 
-	svc := services.NewTaskService(auth)
+	svc := app.TaskSvc
 	task, err := svc.FindById(273321713)
 	assert.NoError(t, err)
 	assert.NotNil(t, task)

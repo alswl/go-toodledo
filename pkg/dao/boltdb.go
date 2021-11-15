@@ -159,8 +159,6 @@ func (b *bolt) List(bucket string) ([][]byte, error) {
 
 func (b *bolt) Truncate(bucket string) error {
 	b.Lock()
-	defer b.Unlock()
-
 	err := b.db.Update(func(tx *boltdb.Tx) error {
 		bkt := tx.Bucket([]byte(bucket))
 		if bkt == nil {
@@ -173,6 +171,7 @@ func (b *bolt) Truncate(bucket string) error {
 		}
 		return nil
 	})
+	b.Unlock()
 	if err != nil {
 		return err
 	}

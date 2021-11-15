@@ -14,7 +14,7 @@ var DeleteCmd = &cobra.Command{
 	Use:  "delete",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := client.ProvideSimpleAuth()
+		auth, err := client.NewAuthFromViper()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return

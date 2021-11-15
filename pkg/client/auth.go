@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"errors"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/go-openapi/runtime"
 	openapiclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -23,9 +24,17 @@ func NewSimpleAuth(accessToken string) runtime.ClientAuthInfoWriter {
 	return &SimpleAuth{accessToken: accessToken}
 }
 
-// XXX using configs instead of accessToken
-func ProvideSimpleAuth() (runtime.ClientAuthInfoWriter, error) {
-	// TOTO remove viper dependencies
+// NewAuthFromViper provides auth from viper
+// XXX decoupling from viper
+func NewAuthFromViper() (runtime.ClientAuthInfoWriter, error) {
+	clientId := viper.GetString("client_id")
+	if clientId == "" {
+		return nil, errors.New("client_id is not set")
+	}
+	clientSecret := viper.GetString("client_secret")
+	if clientSecret == "" {
+		return nil, errors.New("client_secret is not set")
+	}
 	accessToken := viper.GetString("auth.access_token")
 	rt := viper.GetString("auth.refresh_token")
 	if accessToken == "" {
@@ -41,22 +50,54 @@ func ProvideSimpleAuth() (runtime.ClientAuthInfoWriter, error) {
 		return nil, errors.New("auth.expired_at parse error")
 	}
 
+	return NewAuth(clientId, clientSecret, accessToken, rt, at, SaveTokenWithViper)
+}
+
+func NewAuthFromConfigs(configs common.Configs) (runtime.ClientAuthInfoWriter, error) {
+	accessToken := configs.Get().Auth.AccessToken
+	rt := configs.Get().Auth.RefreshToken
+	if accessToken == "" {
+		logrus.Error("auth.access_token is empty")
+		return nil, errors.New("auth.access_token is empty")
+	}
+	expiredAt := configs.Get().Auth.ExpiredAt
+	if expiredAt == "" {
+		return nil, errors.New("auth.expired_at is empty")
+	}
+	at, err := time.Parse(time.RFC3339, expiredAt)
+	if err != nil {
+		return nil, errors.New("auth.expired_at parse error")
+	}
+
+	return NewAuth(configs.Get().Auth.ClientId, configs.Get().Auth.ClientSecret, accessToken, rt, at, noOps)
+}
+
+func NewAuth(clientId, clientSecret, accessToken, refreshToken string, expiredAt time.Time, saveFn func(newToken *oauth2.Token) error) (runtime.ClientAuthInfoWriter, error) {
 	token := oauth2.Token{
 		AccessToken:  accessToken,
-		RefreshToken: rt,
-		Expiry:       at,
+		RefreshToken: refreshToken,
+		Expiry:       expiredAt,
 	}
-	conf, err := ProvideOAuth2Config()
-	if err != nil {
-		return nil, err
+	scopes := []string{"basic", "tasks", "write"}
+	conf := &oauth2.Config{
+		ClientID:     clientId,
+		ClientSecret: clientSecret,
+		Scopes:       scopes,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  "https://api.toodledo.com/3/account/authorize.php",
+			TokenURL: "https://api.toodledo.com/3/account/token.php",
+		},
 	}
 
 	if token.Expiry.Before(time.Now()) {
-		if rt == "" {
+		if refreshToken == "" {
 			return nil, errors.New("auth.refresh_token is empty")
 		}
 		newToken, err := regenerate(conf, &token)
-		err = SaveTokenToConfig(newToken)
+		if err != nil {
+			return nil, err
+		}
+		err = saveFn(newToken)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +119,25 @@ func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry
 	return nil
 }
 
-func ProvideOAuth2Config() (*oauth2.Config, error) {
+func NewOAuth2ConfigFromConfigs(configs common.Configs) (*oauth2.Config, error) {
+	// TODO remove viper
+	clientId := configs.Get().Auth.ClientId
+	clientSecret := configs.Get().Auth.ClientSecret
+	scopes := []string{"basic", "tasks", "write"}
+	conf := &oauth2.Config{
+		ClientID:     clientId,
+		ClientSecret: clientSecret,
+		Scopes:       scopes,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  "https://api.toodledo.com/3/account/authorize.php",
+			TokenURL: "https://api.toodledo.com/3/account/token.php",
+		},
+	}
+	return conf, nil
+}
+
+func ProvideOAuth2ConfigFromViper() (*oauth2.Config, error) {
+	// TODO delete, 3 usage left
 	clientId := viper.GetString("auth.client_id")
 	clientSecret := viper.GetString("auth.client_secret")
 	if clientId == "" {
@@ -109,8 +168,9 @@ func regenerate(conf *oauth2.Config, oldToken *oauth2.Token) (*oauth2.Token, err
 	return newToken, nil
 }
 
-// TODO move to Configs
-func SaveTokenToConfig(tok *oauth2.Token) error {
+// SaveTokenWithViper save new token to yaml
+// TODO refactor
+func SaveTokenWithViper(tok *oauth2.Token) error {
 	// TOTO move to Configs
 	viper.Set("auth.access_token", tok.AccessToken)
 	viper.Set("auth.expired_at", tok.Expiry.Format(time.RFC3339))
@@ -119,5 +179,10 @@ func SaveTokenToConfig(tok *oauth2.Token) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func noOps(newToken *oauth2.Token) error {
+	// XXX no ops
 	return nil
 }

@@ -10,15 +10,14 @@ import (
 )
 
 var IntegrationTestSet = wire.NewSet(
-	common.NewConfigsFromViper,
+	common.NewConfigsForTesting,
 	common.NewToodledoConfig,
 	dao.NewBoltDB,
 	client.NewToodledoCli,
-	client.ProvideSimpleAuth,
-	client.ProvideOAuth2Config,
+	client.NewAuthFromConfigs,
+	client.NewOAuth2ConfigFromConfigs,
 	services.NewAccountService,
 	services.NewTaskService,
-	//services.NewFolderService,
 	services.NewFolderService,
 	services.NewFolderCachedService,
 	app.NewToodledoCliApp,
