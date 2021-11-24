@@ -20,7 +20,7 @@ var ViewCmd = &cobra.Command{
 		}
 
 		name := args[0]
-		f, err := app.FolderSvc.FindByName(name)
+		f, err := app.FolderSvc.Find(name)
 		if err != nil {
 			logrus.WithError(err).Fatal()
 			return

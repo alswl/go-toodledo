@@ -35,8 +35,8 @@ func (_m *FolderService) ArchiveFolder(id int, isArchived bool) (*models.Folder,
 	return r0, r1
 }
 
-// FindByName provides a mock function with given fields: name
-func (_m *FolderService) FindByName(name string) (*models.Folder, error) {
+// Find provides a mock function with given fields: name
+func (_m *FolderService) Find(name string) (*models.Folder, error) {
 	ret := _m.Called(name)
 
 	var r0 *models.Folder
@@ -74,6 +74,29 @@ func (_m *FolderService) ListAll() ([]*models.Folder, error) {
 	var r1 error
 	if rf, ok := ret.Get(1).(func() error); ok {
 		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Rename provides a mock function with given fields: name, newName
+func (_m *FolderService) Rename(name string, newName string) (*models.Folder, error) {
+	ret := _m.Called(name, newName)
+
+	var r0 *models.Folder
+	if rf, ok := ret.Get(0).(func(string, string) *models.Folder); ok {
+		r0 = rf(name, newName)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Folder)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(name, newName)
 	} else {
 		r1 = ret.Error(1)
 	}

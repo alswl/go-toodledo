@@ -93,7 +93,7 @@ func (s *folderCachedService) ListAll() ([]*models.Folder, error) {
 	return s.listAll()
 }
 
-func (s *folderCachedService) FindByName(name string) (*models.Folder, error) {
+func (s *folderCachedService) Find(name string) (*models.Folder, error) {
 	err := s.syncIfExpired()
 	if err != nil {
 		return nil, err
