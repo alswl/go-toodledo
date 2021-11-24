@@ -14,7 +14,7 @@ var meCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		app, err := injector.InitApp()
 		if err != nil {
-			logrus.Fatal("login required, using `toodledo auth login` to login.")
+			logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
 

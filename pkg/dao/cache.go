@@ -1,11 +1,7 @@
 package dao
 
-import (
-	"encoding/json"
-)
-
 type Cache interface {
-	ListAll([]interface{}) error
+	ListAll() ([][]byte, error)
 	Find(identity string) (interface{}, error)
 	Invalid() error
 	IsExpired() bool
@@ -20,16 +16,9 @@ func NewCache(db Backend, bucket string) Cache {
 	return &cache{db: db, bucket: bucket}
 }
 
-func (c *cache) ListAll(objs []interface{}) (err error) {
+func (c *cache) ListAll() ([][]byte, error) {
 	list, _ := c.db.List(c.bucket)
-
-	for _, item := range list {
-		var f interface{}
-		_ = json.Unmarshal(item, &f)
-		objs = append(objs, &f)
-	}
-
-	return nil
+	return list, nil
 }
 
 //func (c *cache) ListAll(objs interface{}) (err error) {

@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/go-openapi/runtime"
 	openapiclient "github.com/go-openapi/runtime/client"
@@ -27,13 +28,13 @@ func NewSimpleAuth(accessToken string) runtime.ClientAuthInfoWriter {
 // NewAuthFromViper provides auth from viper
 // XXX decoupling from viper
 func NewAuthFromViper() (runtime.ClientAuthInfoWriter, error) {
-	clientId := viper.GetString("client_id")
+	clientId := viper.GetString("auth.client_id")
 	if clientId == "" {
-		return nil, errors.New("client_id is not set")
+		return nil, errors.New("auth.client_id is not set")
 	}
-	clientSecret := viper.GetString("client_secret")
+	clientSecret := viper.GetString("auth.client_secret")
 	if clientSecret == "" {
-		return nil, errors.New("client_secret is not set")
+		return nil, errors.New("auth.client_secret is not set")
 	}
 	accessToken := viper.GetString("auth.access_token")
 	rt := viper.GetString("auth.refresh_token")
@@ -163,7 +164,7 @@ func regenerate(conf *oauth2.Config, oldToken *oauth2.Token) (*oauth2.Token, err
 	src := conf.TokenSource(context.TODO(), oldToken)
 	newToken, err := src.Token()
 	if err != nil {
-		return nil, errors.New("auth.refresh_token is empty")
+		return nil, fmt.Errorf("failed to get new token: %s", err)
 	}
 	return newToken, nil
 }

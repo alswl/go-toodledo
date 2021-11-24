@@ -25,53 +25,38 @@ func NewFolderCachedService(folderSvc *folderService, accountSvc AccountService,
 }
 
 func (s *folderCachedService) listAll() ([]*models.Folder, error) {
-	var objs []interface{}
-	err := s.cache.ListAll(objs)
+	fs := make([]*models.Folder, 0)
+	all, err := s.cache.ListAll()
 	if err != nil {
 		return nil, err
 	}
-	fs := make([]*models.Folder, len(objs))
-	for _, obj := range objs {
-		fs = append(fs, obj.(*models.Folder))
+	for _, bytes := range all {
+		f := &models.Folder{}
+		json.Unmarshal(bytes, &f)
+		fs = append(fs, f)
 	}
 	return fs, nil
 }
 
 func (s *folderCachedService) folderIsExpired() bool {
-	// XXX if expired
 	var meCached models.Account
-	//s.db.Update(func(tx *bolt.Tx) error {
-	//	_, _ = tx.CreateBucketIfNotExists([]byte("auth"))
-	//	return nil
-	//})
-	c, _ := s.db.Get("auth", "me")
-	_ = json.Unmarshal(c, &meCached)
-	//s.db.View(func(tx *bolt.Tx) error {
-	//	// XXX move to auth
-	//	b := tx.Bucket([]byte("auth"))
-	//	c := b.Get([]byte("me"))
-	//	_ = json.Unmarshal(c, &meCached)
-	//	return nil
-	//})
+	// FIXME userService
+	c, err := s.db.Get("auth", "me")
+	if err == dao.ErrObjectNotFound {
+		// missing
+		me, err := s.accountSvc.FindMe()
+		c, _ = json.Marshal(me)
+		s.db.Put("auth", "me", c)
+		// FIXME save to cache
+		if err != nil {
+			logrus.WithField("me", me).WithError(err).Error("request failed")
+			return true
+		}
 
-	me, err := s.accountSvc.FindMe()
-	json, _ := json.Marshal(me)
-	s.db.Put("auth", "me", json)
-	//s.db.Update(func(tx *bolt.Tx) error {
-	//	// XXX move to auth
-	//	b := tx.Bucket([]byte("auth"))
-	//	json, _ := json.Marshal(me)
-	//	b.Put([]byte("me"), json)
-	//	return nil
-	//})
-
-	// XXX save to cache
-	if err != nil {
-		logrus.WithField("me", me).WithError(err).Error("request failed")
-		return true
 	}
+	_ = json.Unmarshal(c, &meCached)
 
-	return me.LasteditFolder <= meCached.LasteditFolder
+	return meCached.LasteditFolder <= meCached.LasteditFolder
 }
 
 func (s *folderCachedService) syncIfExpired() error {
