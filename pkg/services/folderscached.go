@@ -2,40 +2,59 @@ package services
 
 import (
 	"encoding/json"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/dao"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/sirupsen/logrus"
+	"github.com/thoas/go-funk"
 )
 
+type FolderCachedService interface {
+	Invalidate() error
+
+	Find(name string) (*models.Folder, error)
+	ListAll() ([]*models.Folder, error)
+	Rename(name string, newName string) (*models.Folder, error)
+	ArchiveFolder(id int, isArchived bool) (*models.Folder, error)
+	Delete(name string) error
+	Create(name string) (*models.Folder, error)
+}
+
 type folderCachedService struct {
-	*folderService
+	svc        FolderService
 	cache      dao.Cache
 	db         dao.Backend
 	accountSvc AccountService
 }
 
-func NewFolderCachedService(folderSvc *folderService, accountSvc AccountService, db dao.Backend) FolderService {
+func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService, db dao.Backend) FolderCachedService {
 	s := folderCachedService{
-		folderService: folderSvc,
-		cache:         dao.NewCache(db, "folders"),
-		db:            db,
-		accountSvc:    accountSvc,
+		svc:        folderSvc,
+		cache:      dao.NewCache(db, "folders"),
+		db:         db,
+		accountSvc: accountSvc,
 	}
 	return &s
 }
 
-func (s *folderCachedService) listAll() ([]*models.Folder, error) {
-	fs := make([]*models.Folder, 0)
-	all, err := s.cache.ListAll()
-	if err != nil {
-		return nil, err
-	}
-	for _, bytes := range all {
-		f := &models.Folder{}
-		json.Unmarshal(bytes, &f)
-		fs = append(fs, f)
-	}
-	return fs, nil
+func (s *folderCachedService) Rename(name string, newName string) (*models.Folder, error) {
+	s.Invalidate()
+	return s.svc.Rename(name, newName)
+}
+
+func (s *folderCachedService) ArchiveFolder(id int, isArchived bool) (*models.Folder, error) {
+	s.Invalidate()
+	return s.svc.ArchiveFolder(id, isArchived)
+}
+
+func (s *folderCachedService) Delete(name string) error {
+	s.Invalidate()
+	return s.svc.Delete(name)
+}
+
+func (s *folderCachedService) Create(name string) (*models.Folder, error) {
+	s.Invalidate()
+	return s.svc.Create(name)
 }
 
 func (s *folderCachedService) folderIsExpired() bool {
@@ -60,6 +79,7 @@ func (s *folderCachedService) folderIsExpired() bool {
 }
 
 func (s *folderCachedService) syncIfExpired() error {
+	// TODO ticker
 	if !s.folderIsExpired() {
 		return nil
 	}
@@ -69,11 +89,11 @@ func (s *folderCachedService) syncIfExpired() error {
 }
 
 func (s *folderCachedService) sync() error {
-	all, err := s.folderService.ListAll()
+	all, err := s.svc.ListAll()
 	if err != nil {
 		return err
 	}
-	err = s.db.Truncate("folders")
+	err = s.Invalidate()
 	if err != nil {
 		return err
 	}
@@ -85,36 +105,46 @@ func (s *folderCachedService) sync() error {
 }
 
 func (s *folderCachedService) ListAll() ([]*models.Folder, error) {
-	err := s.syncIfExpired()
+	fs := make([]*models.Folder, 0)
+	all, err := s.cache.ListAll()
 	if err != nil {
 		return nil, err
 	}
-
-	return s.listAll()
+	if len(all) == 0 {
+		s.syncIfExpired()
+		all, err = s.cache.ListAll()
+		if err != nil {
+			return nil, err
+		}
+	}
+	for _, bytes := range all {
+		f := &models.Folder{}
+		json.Unmarshal(bytes, &f)
+		fs = append(fs, f)
+	}
+	return fs, nil
 }
 
 func (s *folderCachedService) Find(name string) (*models.Folder, error) {
-	err := s.syncIfExpired()
+	fs, err := s.ListAll()
 	if err != nil {
 		return nil, err
 	}
 
-	return s.findByName(name)
+	filtered := funk.Filter(fs, func(x *models.Folder) bool {
+		return x.Name == name
+	}).([]*models.Folder)
+	if len(filtered) == 0 {
+		return nil, common.ErrNotFound
+	}
+	f := filtered[0]
+	return f, nil
 }
 
-func (s *folderCachedService) findByName(name string) (*models.Folder, error) {
-	var f *models.Folder
-	c, _ := s.db.Get("folders", name)
-	_ = json.Unmarshal(c, &f)
-	//s.db.View(func(tx *bolt.Tx) error {
-	//	b := tx.Bucket([]byte("folders"))
-	//	if b == nil {
-	//		return nil
-	//	}
-	//	c := b.Get([]byte(name))
-	//	_ = json.Unmarshal(c, &f)
-	//	return nil
-	//})
-	// TODO nil
-	return f, nil
+func (s *folderCachedService) Invalidate() error {
+	err := s.db.Truncate("folders")
+	if err != nil {
+		return err
+	}
+	return nil
 }

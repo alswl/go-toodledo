@@ -18,11 +18,44 @@ type FolderService interface {
 	ListAll() ([]*models.Folder, error)
 	Rename(name string, newName string) (*models.Folder, error)
 	ArchiveFolder(id int, isArchived bool) (*models.Folder, error)
+	Delete(name string) error
+	Create(name string) (*models.Folder, error)
 }
 
 type folderService struct {
 	cli  *client.Toodledo
 	auth runtime.ClientAuthInfoWriter
+}
+
+func NewFolderService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) FolderService {
+	return &folderService{cli: cli, auth: auth}
+}
+
+func (s *folderService) Create(name string) (*models.Folder, error) {
+	params := folder.NewPostFoldersAddPhpParams()
+	params.SetName(name)
+	resp, err := s.cli.Folder.PostFoldersAddPhp(params, s.auth)
+	if err != nil {
+		logrus.WithField("resp", resp).WithError(err).Error("Failed to create")
+		return nil, err
+	}
+	return resp.Payload[0], nil
+}
+
+func (s *folderService) Delete(name string) error {
+	f, err := s.Find(name)
+	if err != nil {
+		return err
+	}
+
+	params := folder.NewPostFoldersDeletePhpParams()
+	params.SetID(f.ID)
+	resp, err := s.cli.Folder.PostFoldersDeletePhp(params, s.auth)
+	if err != nil {
+		logrus.WithField("resp", resp).WithError(err).Error("Failed to delete folder")
+		return err
+	}
+	return nil
 }
 
 func (s *folderService) Rename(name string, newName string) (*models.Folder, error) {
@@ -46,10 +79,6 @@ func (s *folderService) Rename(name string, newName string) (*models.Folder, err
 		return nil, err
 	}
 	return resp.Payload[0], nil
-}
-
-func NewFolderService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) *folderService {
-	return &folderService{cli: cli, auth: auth}
 }
 
 func (s *folderService) Find(name string) (*models.Folder, error) {

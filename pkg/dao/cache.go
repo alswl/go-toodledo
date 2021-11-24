@@ -17,8 +17,8 @@ func NewCache(db Backend, bucket string) Cache {
 }
 
 func (c *cache) ListAll() ([][]byte, error) {
-	list, _ := c.db.List(c.bucket)
-	return list, nil
+	list, err := c.db.List(c.bucket)
+	return list, err
 }
 
 //func (c *cache) ListAll(objs interface{}) (err error) {
