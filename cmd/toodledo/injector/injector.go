@@ -32,12 +32,17 @@ func InitFolderService() (services.FolderService, error) {
 	return nil, nil
 }
 
+func InitFolderCachedService() (services.FolderCachedService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
 func InitContextService() (services.ContextService, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }
 
-func InitFolderCachedService() (services.FolderCachedService, error) {
+func InitContextCachedService() (services.ContextCachedService, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }

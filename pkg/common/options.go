@@ -24,6 +24,7 @@ func NewToodledoConfig(configs Configs) ToodledoConfig {
 	// TODO fix consts
 	cfg.Database.Buckets = []string{
 		"folders",
+		"contexts",
 	}
 	return cfg
 }

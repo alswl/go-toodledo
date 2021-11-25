@@ -21,5 +21,6 @@ var IntegrationTestSet = wire.NewSet(
 	services.NewFolderService,
 	services.NewFolderCachedService,
 	services.NewContextService,
+	services.NewContextCachedService,
 	app.NewToodledoCliApp,
 )
