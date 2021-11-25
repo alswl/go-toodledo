@@ -56,6 +56,20 @@ func InitFolderService() (services.FolderService, error) {
 	return folderService, nil
 }
 
+func InitContextService() (services.ContextService, error) {
+	toodledo := client.NewToodledoCli()
+	configs, err := common.NewConfigsForTesting()
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
+	if err != nil {
+		return nil, err
+	}
+	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
+	return contextService, nil
+}
+
 func InitFolderCachedService() (services.FolderCachedService, error) {
 	toodledo := client.NewToodledoCli()
 	configs, err := common.NewConfigsForTesting()
@@ -110,6 +124,7 @@ func InitApp() (*app.ToodledoCliApp, error) {
 		return nil, err
 	}
 	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
-	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService, folderCachedService, accountService)
+	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
+	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService, folderCachedService, contextService, accountService)
 	return toodledoCliApp, nil
 }

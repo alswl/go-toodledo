@@ -17,7 +17,7 @@ type FolderService interface {
 	Find(name string) (*models.Folder, error)
 	ListAll() ([]*models.Folder, error)
 	Rename(name string, newName string) (*models.Folder, error)
-	ArchiveFolder(id int, isArchived bool) (*models.Folder, error)
+	Archive(id int, isArchived bool) (*models.Folder, error)
 	Delete(name string) error
 	Create(name string) (*models.Folder, error)
 }
@@ -106,7 +106,7 @@ func (s *folderService) ListAll() ([]*models.Folder, error) {
 	return ts.Payload, nil
 }
 
-func (s *folderService) ArchiveFolder(id int, isArchived bool) (*models.Folder, error) {
+func (s *folderService) Archive(id int, isArchived bool) (*models.Folder, error) {
 	// TODO test
 	cli := client.NewHTTPClient(strfmt.NewFormats())
 	p := folder.NewPostFoldersEditPhpParams()

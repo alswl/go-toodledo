@@ -25,6 +25,6 @@ var ViewCmd = &cobra.Command{
 			logrus.WithError(err).Fatal()
 			return
 		}
-		fmt.Print(render.Tables4Folder([]*models.Folder{f}))
+		fmt.Println(render.Tables4Folder([]*models.Folder{f}))
 	},
 }

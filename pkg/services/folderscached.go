@@ -15,7 +15,7 @@ type FolderCachedService interface {
 	Find(name string) (*models.Folder, error)
 	ListAll() ([]*models.Folder, error)
 	Rename(name string, newName string) (*models.Folder, error)
-	ArchiveFolder(id int, isArchived bool) (*models.Folder, error)
+	Archive(id int, isArchived bool) (*models.Folder, error)
 	Delete(name string) error
 	Create(name string) (*models.Folder, error)
 }
@@ -42,9 +42,9 @@ func (s *folderCachedService) Rename(name string, newName string) (*models.Folde
 	return s.svc.Rename(name, newName)
 }
 
-func (s *folderCachedService) ArchiveFolder(id int, isArchived bool) (*models.Folder, error) {
+func (s *folderCachedService) Archive(id int, isArchived bool) (*models.Folder, error) {
 	s.Invalidate()
-	return s.svc.ArchiveFolder(id, isArchived)
+	return s.svc.Archive(id, isArchived)
 }
 
 func (s *folderCachedService) Delete(name string) error {

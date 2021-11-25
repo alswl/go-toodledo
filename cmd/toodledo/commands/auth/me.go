@@ -26,6 +26,6 @@ var meCmd = &cobra.Command{
 
 		// TODO pretty
 		out, _ := yaml.Marshal(me)
-		fmt.Print((string)(out))
+		fmt.Println((string)(out))
 	},
 }

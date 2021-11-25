@@ -12,8 +12,8 @@ type FolderCachedService struct {
 	mock.Mock
 }
 
-// ArchiveFolder provides a mock function with given fields: id, isArchived
-func (_m *FolderCachedService) ArchiveFolder(id int, isArchived bool) (*models.Folder, error) {
+// Archive provides a mock function with given fields: id, isArchived
+func (_m *FolderCachedService) Archive(id int, isArchived bool) (*models.Folder, error) {
 	ret := _m.Called(id, isArchived)
 
 	var r0 *models.Folder

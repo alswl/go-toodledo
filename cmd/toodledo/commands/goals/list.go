@@ -25,6 +25,6 @@ var ListCmd = &cobra.Command{
 			logrus.Error(err)
 			return
 		}
-		fmt.Print(render.Tables4Goal(res.Payload))
+		fmt.Println(render.Tables4Goal(res.Payload))
 	},
 }

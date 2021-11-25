@@ -26,6 +26,6 @@ var RenameCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Print(render.Tables4Folder([]*models.Folder{f}))
+		fmt.Println(render.Tables4Folder([]*models.Folder{f}))
 	},
 }

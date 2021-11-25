@@ -33,6 +33,6 @@ var ArchiveCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Print(render.Tables4Goal([]*models.Goal{newF}))
+		fmt.Println(render.Tables4Goal([]*models.Goal{newF}))
 	},
 }

@@ -22,6 +22,6 @@ var DeleteCmd = &cobra.Command{
 			logrus.Fatal(err)
 			return
 		}
-		fmt.Print("done")
+		fmt.Println("done")
 	},
 }

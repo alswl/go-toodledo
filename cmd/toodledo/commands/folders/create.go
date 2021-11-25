@@ -25,6 +25,6 @@ var CreateCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Print(render.Tables4Folder([]*models.Folder{obj}))
+		fmt.Println(render.Tables4Folder([]*models.Folder{obj}))
 	},
 }

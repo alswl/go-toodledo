@@ -21,5 +21,6 @@ var SuperSet = wire.NewSet(
 	//services.NewFolderService,
 	services.NewFolderService,
 	services.NewFolderCachedService,
+	services.NewContextService,
 	app.NewToodledoCliApp,
 )

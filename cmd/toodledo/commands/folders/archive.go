@@ -26,12 +26,12 @@ var ArchiveCmd = &cobra.Command{
 			return
 		}
 
-		newF, err := app.FolderSvc.ArchiveFolder(int(f.ID), false)
+		newF, err := app.FolderSvc.Archive(int(f.ID), false)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
 
-		fmt.Print(render.Tables4Folder([]*models.Folder{newF}))
+		fmt.Println(render.Tables4Folder([]*models.Folder{newF}))
 	},
 }

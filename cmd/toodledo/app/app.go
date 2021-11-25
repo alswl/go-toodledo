@@ -7,13 +7,13 @@ import (
 
 type ToodledoCliApp struct {
 	// TODO service here
-	Auth    runtime.ClientAuthInfoWriter
-	TaskSvc services.TaskService
-	//FolderSvc  services.FolderService
+	Auth       runtime.ClientAuthInfoWriter
+	TaskSvc    services.TaskService
 	FolderSvc  services.FolderCachedService
+	ContextSvc services.ContextService
 	AccountSvc services.AccountService
 }
 
-func NewToodledoCliApp(auth runtime.ClientAuthInfoWriter, taskSvc services.TaskService, folderSvc services.FolderCachedService, accountSvc services.AccountService) *ToodledoCliApp {
-	return &ToodledoCliApp{Auth: auth, TaskSvc: taskSvc, FolderSvc: folderSvc, AccountSvc: accountSvc}
+func NewToodledoCliApp(auth runtime.ClientAuthInfoWriter, taskSvc services.TaskService, folderSvc services.FolderCachedService, contextSvc services.ContextService, accountSvc services.AccountService) *ToodledoCliApp {
+	return &ToodledoCliApp{Auth: auth, TaskSvc: taskSvc, FolderSvc: folderSvc, ContextSvc: contextSvc, AccountSvc: accountSvc}
 }
