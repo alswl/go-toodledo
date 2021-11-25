@@ -84,7 +84,9 @@ generate-code: generate-code-enum generate-code-mockery
 
 generate-code-enum:
 	@echo generate stringer for enums
+	# TODO using ls
 	@(cd pkg/models/enums/taskstatus/; go generate)
+	@(cd pkg/models/enums/taskpriorities/; go generate)
 
 generate-code-swagger:
 	@(cd pkg; rm client/zz_generated_*.go;rm client/*/zz_generated_*.go; rm models/zz_generated_*.go; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override -C ../api/config.yaml)
@@ -102,11 +104,13 @@ generate-code-wire:
 	@echo copy injector.go to itinjector.go for testing
 	@mkdir -p test/suites/itinjector
 	@cp cmd/toodledo/injector/injector.go test/suites/itinjector/itinjector.go
-	@cp cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go
+	@#cp cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go
 	@gsed -i 's/package injector/package itinjector/g' test/suites/itinjector/itinjector.go
 	@gsed -i 's/SuperSet/IntegrationTestSet/g' test/suites/itinjector/itinjector.go
-	@gsed -i 's/package injector/package itinjector/g' test/suites/itinjector/sets.go
-	@gsed -i 's/SuperSet/IntegrationTestSet/g' test/suites/itinjector/sets.go
+	@#gsed -i 's/package injector/package itinjector/g' test/suites/itinjector/sets.go
+	@#gsed -i 's/SuperSet/IntegrationTestSet/g' test/suites/itinjector/sets.go
+	@echo diff cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go
+	diff cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go || true
 	@(cd test/suites/itinjector; $$GOPATH/bin/wire)
 
 build: fmt

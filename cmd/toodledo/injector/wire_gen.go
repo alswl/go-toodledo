@@ -10,6 +10,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/common"
+	"github.com/alswl/go-toodledo/pkg/dao"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/runtime"
 )
@@ -17,7 +18,7 @@ import (
 // Injectors from injector.go:
 
 func InitAuth() (runtime.ClientAuthInfoWriter, error) {
-	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
+	clientAuthInfoWriter, err := client.NewAuthFromViper()
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +40,7 @@ func NewToodledoCli() (*client.Toodledo, error) {
 
 func InitFolderService() (services.FolderService, error) {
 	toodledo := client.NewToodledoCli()
-	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
+	clientAuthInfoWriter, err := client.NewAuthFromViper()
 	if err != nil {
 		return nil, err
 	}
@@ -47,9 +48,61 @@ func InitFolderService() (services.FolderService, error) {
 	return folderService, nil
 }
 
+func InitFolderCachedService() (services.FolderCachedService, error) {
+	toodledo := client.NewToodledoCli()
+	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	if err != nil {
+		return nil, err
+	}
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
+	configs, err := common.NewConfigsFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig := common.NewToodledoConfig(configs)
+	backend, err := dao.NewBoltDB(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
+	return folderCachedService, nil
+}
+
+func InitContextService() (services.ContextService, error) {
+	toodledo := client.NewToodledoCli()
+	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	if err != nil {
+		return nil, err
+	}
+	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
+	return contextService, nil
+}
+
+func InitContextCachedService() (services.ContextCachedService, error) {
+	toodledo := client.NewToodledoCli()
+	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	if err != nil {
+		return nil, err
+	}
+	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
+	configs, err := common.NewConfigsFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig := common.NewToodledoConfig(configs)
+	backend, err := dao.NewBoltDB(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
+	return contextCachedService, nil
+}
+
 func InitTaskService() (services.TaskService, error) {
 	toodledo := client.NewToodledoCli()
-	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
+	clientAuthInfoWriter, err := client.NewAuthFromViper()
 	if err != nil {
 		return nil, err
 	}
@@ -58,12 +111,26 @@ func InitTaskService() (services.TaskService, error) {
 }
 
 func InitApp() (*app.ToodledoCliApp, error) {
-	clientAuthInfoWriter, err := client.ProvideSimpleAuth()
+	clientAuthInfoWriter, err := client.NewAuthFromViper()
 	if err != nil {
 		return nil, err
 	}
 	toodledo := client.NewToodledoCli()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
-	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService)
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
+	configs, err := common.NewConfigsFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig := common.NewToodledoConfig(configs)
+	backend, err := dao.NewBoltDB(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
+	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
+	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
+	toodledoCliApp := app.NewToodledoCliApp(clientAuthInfoWriter, taskService, folderCachedService, contextCachedService, accountService)
 	return toodledoCliApp, nil
 }

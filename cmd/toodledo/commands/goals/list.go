@@ -13,7 +13,7 @@ import (
 var ListCmd = &cobra.Command{
 	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := client.ProvideSimpleAuth()
+		auth, err := client.NewAuthFromViper()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
@@ -25,6 +25,6 @@ var ListCmd = &cobra.Command{
 			logrus.Error(err)
 			return
 		}
-		fmt.Print(render.Tables4Goal(res.Payload))
+		fmt.Println(render.Tables4Goal(res.Payload))
 	},
 }

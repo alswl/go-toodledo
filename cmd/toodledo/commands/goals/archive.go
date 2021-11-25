@@ -14,7 +14,7 @@ var ArchiveCmd = &cobra.Command{
 	Use:  "archive",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := client.ProvideSimpleAuth()
+		auth, err := client.NewAuthFromViper()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
@@ -33,6 +33,6 @@ var ArchiveCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Print(render.Tables4Goal([]*models.Goal{newF}))
+		fmt.Println(render.Tables4Goal([]*models.Goal{newF}))
 	},
 }
