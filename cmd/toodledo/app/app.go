@@ -12,6 +12,7 @@ type ToodledoCliApp struct {
 	FolderSvc  services.FolderCachedService
 	ContextSvc services.ContextCachedService
 	AccountSvc services.AccountService
+	// TODO add Current account
 }
 
 func NewToodledoCliApp(auth runtime.ClientAuthInfoWriter, taskSvc services.TaskService, folderSvc services.FolderCachedService, contextSvc services.ContextCachedService, accountSvc services.AccountService) *ToodledoCliApp {

@@ -94,6 +94,9 @@ type Task struct {
 	//
 	Priority int64 `json:"priority,omitempty"`
 
+	// A read-only field that contains the id number of the task that this task is a reference to. This is useful for tasks that are created from another task.
+	Ref string `json:"ref,omitempty"`
+
 	// An integer that represents the number of minutes prior to the duedate/time that a reminder will be sent. Set it to 0 for no reminder. Values will be constrained to this list of valid numbers (0, 1, 15, 30, 45, 60, 90, 120, 180, 240, 1440, 2880, 4320, 5760, 7200, 8640, 10080, 20160, 43200). Additionally, if the user does not have a Subscription, the only valid numbers are 0,60. If you submit an invalid number, it will be rounded up or down to a valid non zero value.
 	Remind int64 `json:"remind,omitempty"`
 
