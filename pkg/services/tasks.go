@@ -14,6 +14,7 @@ type TaskService interface {
 	FindById(id int64) (*models.Task, error)
 	QueryAll() ([]*models.Task, *models.PaginatedInfo, error)
 	QueryModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error)
+	Create(name string, options map[string]interface{}) (*models.Task, error)
 }
 
 type taskService struct {
@@ -75,4 +76,24 @@ func (s *taskService) QueryAll() ([]*models.Task, *models.PaginatedInfo, error) 
 
 func (s *taskService) QueryModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error) {
 	panic("implement me")
+}
+
+func (s *taskService) Create(title string, options map[string]interface{}) (*models.Task, error) {
+	t := models.Task{
+		Title: title,
+	}
+	// TODO options
+	//for opt range options {
+	//	opt(t)
+	//}
+	bytes, _ := json.Marshal([]models.Task{t})
+	bytesS := (string)(bytes)
+	p := task.NewPostTasksAddPhpParams()
+	p.Tasks = &bytesS
+	resp, err := s.cli.Task.PostTasksAddPhp(p, s.auth)
+	if err != nil {
+		return nil, err
+	}
+	// FIXME index
+	return resp.Payload[0], err
 }
