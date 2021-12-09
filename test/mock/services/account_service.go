@@ -12,8 +12,8 @@ type AccountService struct {
 	mock.Mock
 }
 
-// FindMe provides a mock function with given fields:
-func (_m *AccountService) FindMe() (*models.Account, error) {
+// Me provides a mock function with given fields:
+func (_m *AccountService) Me() (*models.Account, error) {
 	ret := _m.Called()
 
 	var r0 *models.Account

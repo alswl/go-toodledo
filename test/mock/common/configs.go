@@ -3,7 +3,7 @@
 package mockcommon
 
 import (
-	common "github.com/alswl/go-toodledo/pkg/common"
+	"github.com/alswl/go-toodledo/pkg/models"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,15 +13,15 @@ type Configs struct {
 }
 
 // Get provides a mock function with given fields:
-func (_m *Configs) Get() *common.ToodledoConfig {
+func (_m *Configs) Get() *models.ToodledoCliConfig {
 	ret := _m.Called()
 
-	var r0 *common.ToodledoConfig
-	if rf, ok := ret.Get(0).(func() *common.ToodledoConfig); ok {
+	var r0 *models.ToodledoCliConfig
+	if rf, ok := ret.Get(0).(func() *models.ToodledoCliConfig); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*common.ToodledoConfig)
+			r0 = ret.Get(0).(*models.ToodledoCliConfig)
 		}
 	}
 

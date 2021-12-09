@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"github.com/alswl/go-toodledo/pkg/common"
+	"github.com/alswl/go-toodledo/pkg/models"
 	"sync"
 	"time"
 
@@ -16,7 +16,7 @@ type bolt struct {
 }
 
 // NewBolt is used to make bolt metadata store instance.
-func NewBoltDB(config common.ToodledoConfig) (Backend, error) {
+func NewBoltDB(config models.ToodledoCliConfig) (Backend, error) {
 	opt := &boltdb.Options{
 		Timeout: time.Second * 10,
 	}

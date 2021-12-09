@@ -1,6 +1,7 @@
 package common
 
 import (
+	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -8,17 +9,18 @@ import (
 
 type Configs interface {
 	// TODO using this instead of viper
-	Get() *ToodledoConfig
+	Get() *models.ToodledoCliConfig
 }
 
+// FIXME delete
 type configs struct {
-	conf *ToodledoConfig
+	conf *models.ToodledoCliConfig
 }
 
 // NewConfigsFromViper build Configs from viper
 // XXX decoupling from viper
 func NewConfigsFromViper() (Configs, error) {
-	var conf ToodledoConfig
+	var conf models.ToodledoCliConfig
 	err := viper.Unmarshal(&conf)
 	if err != nil {
 		return nil, err
@@ -39,7 +41,7 @@ func NewConfigsForTesting() (Configs, error) {
 	if err != nil {
 		return nil, err
 	}
-	var conf ToodledoConfig
+	var conf models.ToodledoCliConfig
 	err = yaml.Unmarshal(bytes, &conf)
 	if err != nil {
 		return nil, err
@@ -47,6 +49,6 @@ func NewConfigsForTesting() (Configs, error) {
 	return &configs{&conf}, nil
 }
 
-func (c *configs) Get() *ToodledoConfig {
+func (c *configs) Get() *models.ToodledoCliConfig {
 	return c.conf
 }

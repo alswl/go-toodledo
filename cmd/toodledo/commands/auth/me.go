@@ -18,7 +18,7 @@ var meCmd = &cobra.Command{
 			return
 		}
 
-		me, err := app.AccountSvc.FindMe()
+		me, err := app.AccountSvc.Me()
 		if err != nil {
 			logrus.Error(err)
 			return

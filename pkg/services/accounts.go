@@ -8,8 +8,12 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
+func CurrentUser(svc AccountService) (*models.Account, error) {
+	return svc.Me()
+}
+
 type AccountService interface {
-	FindMe() (*models.Account, error)
+	Me() (*models.Account, error)
 }
 
 type accountService struct {
@@ -21,7 +25,7 @@ func NewAccountService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) 
 	return &accountService{cli: cli, auth: auth}
 }
 
-func (s *accountService) FindMe() (*models.Account, error) {
+func (s *accountService) Me() (*models.Account, error) {
 	cli := client.NewHTTPClient(strfmt.NewFormats())
 	p := account.NewGetAccountGetPhpParams()
 	resp, err := cli.Account.GetAccountGetPhp(p, s.auth)

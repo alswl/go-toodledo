@@ -57,7 +57,7 @@ func (s *contextCachedService) contextIsExpired() bool {
 	c, err := s.db.Get("auth", "me")
 	if err == dao.ErrObjectNotFound {
 		// missing
-		me, err := s.accountSvc.FindMe()
+		me, err := s.accountSvc.Me()
 		c, _ = json.Marshal(me)
 		s.db.Put("auth", "me", c)
 		// FIXME save to cache

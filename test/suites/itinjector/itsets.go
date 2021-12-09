@@ -12,15 +12,19 @@ import (
 var IntegrationTestSet = wire.NewSet(
 	common.NewConfigsForTesting,
 	common.NewToodledoConfig,
+
 	dao.NewBoltDB,
 	client.NewToodledoCli,
 	client.NewAuthFromConfigs,
 	client.NewOAuth2ConfigFromConfigs,
+
+	services.CurrentUser,
 	services.NewAccountService,
 	services.NewTaskService,
 	services.NewFolderService,
 	services.NewFolderCachedService,
 	services.NewContextService,
 	services.NewContextCachedService,
+
 	app.NewToodledoCliApp,
 )
