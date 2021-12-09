@@ -18,23 +18,19 @@ import (
 // Injectors from itinjector.go:
 
 func InitAuth() (runtime.ClientAuthInfoWriter, error) {
-	configs, err := common.NewConfigsForTesting()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
 	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
 	return clientAuthInfoWriter, nil
-}
-
-func NewConfigs() (common.Configs, error) {
-	configs, err := common.NewConfigsForTesting()
-	if err != nil {
-		return nil, err
-	}
-	return configs, nil
 }
 
 func NewToodledoCli() (*client.Toodledo, error) {
@@ -44,11 +40,15 @@ func NewToodledoCli() (*client.Toodledo, error) {
 
 func InitFolderService() (services.FolderService, error) {
 	toodledo := client.NewToodledoCli()
-	configs, err := common.NewConfigsForTesting()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
 	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -58,18 +58,21 @@ func InitFolderService() (services.FolderService, error) {
 
 func InitFolderCachedService() (services.FolderCachedService, error) {
 	toodledo := client.NewToodledoCli()
-	configs, err := common.NewConfigsForTesting()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
 	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	toodledoConfig := common.NewToodledoConfig(configs)
-	backend, err := dao.NewBoltDB(toodledoConfig)
+	backend, err := dao.NewBoltDB(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -79,11 +82,15 @@ func InitFolderCachedService() (services.FolderCachedService, error) {
 
 func InitContextService() (services.ContextService, error) {
 	toodledo := client.NewToodledoCli()
-	configs, err := common.NewConfigsForTesting()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
 	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -93,18 +100,21 @@ func InitContextService() (services.ContextService, error) {
 
 func InitContextCachedService() (services.ContextCachedService, error) {
 	toodledo := client.NewToodledoCli()
-	configs, err := common.NewConfigsForTesting()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
 	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	toodledoConfig := common.NewToodledoConfig(configs)
-	backend, err := dao.NewBoltDB(toodledoConfig)
+	backend, err := dao.NewBoltDB(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -114,11 +124,15 @@ func InitContextCachedService() (services.ContextCachedService, error) {
 
 func InitTaskService() (services.TaskService, error) {
 	toodledo := client.NewToodledoCli()
-	configs, err := common.NewConfigsForTesting()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
 	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -127,11 +141,15 @@ func InitTaskService() (services.TaskService, error) {
 }
 
 func InitApp() (*app.ToodledoCliApp, error) {
-	configs, err := common.NewConfigsForTesting()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
 	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfigs(configs)
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfigs(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -139,8 +157,7 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	toodledoConfig := common.NewToodledoConfig(configs)
-	backend, err := dao.NewBoltDB(toodledoConfig)
+	backend, err := dao.NewBoltDB(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}

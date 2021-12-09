@@ -18,26 +18,32 @@ type TaskService interface {
 
 type taskService Service
 
+// GetById ...
 func (t *taskService) GetById(ctx context.Context, id int) (models.Task, Response, error) {
 	panic("implement me")
 }
 
+// Query ...
 func (t *taskService) Query(ctx context.Context, query models.TaskQuery) ([]models.Task, Response, error) {
 	panic("implement me")
 }
 
+// GetDeleted ...
 func (t *taskService) GetDeleted(ctx context.Context) ([]models.Task, Response, error) {
 	panic("implement me")
 }
 
+// Add ...
 func (t *taskService) Add(ctx context.Context, taskAdds []models.TaskAdd) (models.Task, Response, error) {
 	panic("implement me")
 }
 
+// Edit ...
 func (t *taskService) Edit(ctx context.Context, id int, name string, private bool) (models.Task, Response, error) {
 	panic("implement me")
 }
 
+// Delete ...
 func (t *taskService) Delete(ctx context.Context, after time.Time) (Response, error) {
 	panic("implement me")
 }

@@ -19,6 +19,7 @@ const _TaskPriority_name = "NegativeLowMediumHighTop"
 
 var _TaskPriority_index = [...]uint8{0, 8, 11, 17, 21, 24}
 
+// String ...
 func (i TaskPriority) String() string {
 	i -= -1
 	if i < 0 || i >= TaskPriority(len(_TaskPriority_index)-1) {

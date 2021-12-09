@@ -1,5 +1,6 @@
 package dao
 
+// Cache ...
 type Cache interface {
 	ListAll() ([][]byte, error)
 	Find(identity string) (interface{}, error)
@@ -12,46 +13,28 @@ type cache struct {
 	bucket string
 }
 
+// NewCache ...
 func NewCache(db Backend, bucket string) Cache {
 	return &cache{db: db, bucket: bucket}
 }
 
+// ListAll ...
 func (c *cache) ListAll() ([][]byte, error) {
 	list, err := c.db.List(c.bucket)
 	return list, err
 }
 
-//func (c *cache) ListAll(objs interface{}) (err error) {
-//	switch reflect.TypeOf(objs).Kind() {
-//	case reflect.Slice:
-//		rv := reflect.ValueOf(objs)
-//		var out []interface{}
-//		list, _ := c.db.List(c.bucket)
-//		for i := 0; i < rv.Len(); i++ {
-//			out = append(out, rv.Index(i).Interface())
-//		}
-//		objs = out
-//
-//		for _, item := range list {
-//			var f interface{}
-//			_ = json.Unmarshal(item, &f)
-//			rv = append(rv, &f)
-//		}
-//	default:
-//		return errors.New("only slice support")
-//	}
-//
-//	return nil
-//}
-
+// Find ...
 func (c *cache) Find(identity string) (interface{}, error) {
 	panic("implement me")
 }
 
+// Invalid ...
 func (c *cache) Invalid() error {
 	panic("implement me")
 }
 
+// IsExpired ...
 func (c *cache) IsExpired() bool {
 	panic("implement me")
 }

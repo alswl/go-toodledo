@@ -11,8 +11,7 @@ import (
 	"strconv"
 )
 
-// TODO using service
-
+// FindGoalByName ...
 func FindGoalByName(auth runtime.ClientAuthInfoWriter, name string) (*models.Goal, error) {
 	cli := client.NewHTTPClient(strfmt.NewFormats())
 	ts, err := cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), auth)
@@ -29,6 +28,7 @@ func FindGoalByName(auth runtime.ClientAuthInfoWriter, name string) (*models.Goa
 	return f, nil
 }
 
+// ArchiveGoal ...
 func ArchiveGoal(auth runtime.ClientAuthInfoWriter, id int, isArchived bool) (*models.Goal, error) {
 	cli := client.NewHTTPClient(strfmt.NewFormats())
 	p := goal.NewPostGoalsEditPhpParams()

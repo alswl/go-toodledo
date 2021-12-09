@@ -67,9 +67,12 @@ type PostFoldersDeletePhpOK struct {
 	Payload *PostFoldersDeletePhpOKBody
 }
 
+// Error ...
 func (o *PostFoldersDeletePhpOK) Error() string {
 	return fmt.Sprintf("[POST /folders/delete.php][%d] postFoldersDeletePhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersDeletePhpOK) GetPayload() *PostFoldersDeletePhpOKBody {
 	return o.Payload
 }
@@ -99,9 +102,12 @@ type PostFoldersDeletePhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostFoldersDeletePhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /folders/delete.php][%d] postFoldersDeletePhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersDeletePhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -131,9 +137,12 @@ type PostFoldersDeletePhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostFoldersDeletePhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /folders/delete.php][%d] postFoldersDeletePhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersDeletePhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -163,9 +172,12 @@ type PostFoldersDeletePhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostFoldersDeletePhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /folders/delete.php][%d] postFoldersDeletePhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersDeletePhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

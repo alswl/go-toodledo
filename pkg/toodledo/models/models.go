@@ -1,5 +1,6 @@
 package models
 
+// Account ...
 type Account struct {
 	Userid           string `json:"userid"`
 	Alias            string `json:"alias"`
@@ -23,6 +24,7 @@ type Account struct {
 	LasteditOutline  int    `json:"lastedit_outline"`
 }
 
+// Folder ...
 type Folder struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
@@ -31,14 +33,17 @@ type Folder struct {
 	Ord      int    `json:"ord"`
 }
 
+// Context ...
 type Context struct {
 	ID      int    `json:"id"`
 	Name    string `json:"name"`
 	Private int    `json:"private"`
 }
 
+// GoalLevel ...
 type GoalLevel int
 
+// Goal ...
 type Goal struct {
 	ID    int       `json:"id"`
 	Name  string    `json:"name"`
@@ -49,6 +54,7 @@ type Goal struct {
 	Note        string `json:"note"`
 }
 
+// GoalAdd ...
 type GoalAdd struct {
 	// required
 	Name  string `validate:"required"`
@@ -60,6 +66,7 @@ type GoalAdd struct {
 	Note    *string
 }
 
+// GoalEdit ...
 type GoalEdit struct {
 	GoalAdd
 }
@@ -75,6 +82,7 @@ type Task struct {
 	Ref       string `json:"ref,omitempty"`
 }
 
+// TaskQuery ...
 type TaskQuery struct {
 	before int64
 	after  int64
@@ -84,6 +92,7 @@ type TaskQuery struct {
 	fields string
 }
 
+// TaskAdd ...
 type TaskAdd struct {
 	ID        int    `json:"id,omitempty"`
 	Title     string `json:"title,omitempty"`
@@ -95,6 +104,7 @@ type TaskAdd struct {
 	// folder, context, goal, location, priority, status,star, duration, remind, starttime, duetime, completed, duedatemod, repeat, tag, duedate, startdate, note, parent, meta
 }
 
+// Collaborators ...
 type Collaborators struct {
 	ID           string `json:"id"`
 	Name         string `json:"name"`
@@ -102,6 +112,7 @@ type Collaborators struct {
 	Sharable     int    `json:"sharable"`
 }
 
+// SavedSearch ...
 type SavedSearch struct {
 	ID     int    `json:"id"`
 	Name   string `json:"name"`
@@ -120,6 +131,7 @@ type SavedSearch struct {
 	} `json:"search"`
 }
 
+// Note ...
 type Note struct {
 	Num      int    `json:"num,omitempty"`
 	Total    int    `json:"total,omitempty"`

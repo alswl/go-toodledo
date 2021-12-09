@@ -65,9 +65,12 @@ type PostFoldersAddPhpOK struct {
 	Payload []*models.Folder
 }
 
+// Error ...
 func (o *PostFoldersAddPhpOK) Error() string {
 	return fmt.Sprintf("[POST /folders/add.php][%d] postFoldersAddPhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersAddPhpOK) GetPayload() []*models.Folder {
 	return o.Payload
 }
@@ -95,9 +98,12 @@ type PostFoldersAddPhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostFoldersAddPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /folders/add.php][%d] postFoldersAddPhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersAddPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -127,9 +133,12 @@ type PostFoldersAddPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostFoldersAddPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /folders/add.php][%d] postFoldersAddPhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersAddPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -159,9 +168,12 @@ type PostFoldersAddPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostFoldersAddPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /folders/add.php][%d] postFoldersAddPhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersAddPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

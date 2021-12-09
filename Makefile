@@ -14,11 +14,12 @@
 #
 # Tweak the variables based on your project.
 #
+SHELL := /bin/bash
+NOW_SHORT := $(shell date +%Y%m%d%H%M)
 
 PROJECT := go-toodledo
 # Target binaries. You can build multiple binaries for a single project.
 TARGETS := toodledo
-NOW_SHORT := $(shell date +%Y%m%d%H%M)
 
 # Container registries.
 REGISTRIES ?= ""
@@ -77,10 +78,11 @@ lint:
 	@echo "gofmt ensure"
 	@test $$(gofmt -l ./pkg/ ./test/ ./cmd/ | wc -l) -eq 0
 
-	@echo "ensure integration test with integration tags"
+	@echo "ensure integration test with // +build integration tags"
 	@test $$(find test -name '*_test.go' | wc -l) -eq $$(cat $$(find test -name '*_test.go') | grep -E '// ?\+build integration' | wc -l)
 
-generate-code: generate-code-enum generate-code-mockery
+generate-code:
+	@echo -n ''
 
 generate-code-enum:
 	@echo generate stringer for enums
@@ -104,13 +106,10 @@ generate-code-wire:
 	@echo copy injector.go to itinjector.go for testing
 	@mkdir -p test/suites/itinjector
 	@cp cmd/toodledo/injector/injector.go test/suites/itinjector/itinjector.go
-	@#cp cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go
 	@gsed -i 's/package injector/package itinjector/g' test/suites/itinjector/itinjector.go
 	@gsed -i 's/SuperSet/IntegrationTestSet/g' test/suites/itinjector/itinjector.go
-	@#gsed -i 's/package injector/package itinjector/g' test/suites/itinjector/sets.go
-	@#gsed -i 's/SuperSet/IntegrationTestSet/g' test/suites/itinjector/sets.go
-	@echo diff cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go
-	diff cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go || true
+	#@echo diff cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go
+	#diff cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go || true
 	@(cd test/suites/itinjector; $$GOPATH/bin/wire)
 
 build: fmt

@@ -65,9 +65,12 @@ type GetTasksGetPhpOK struct {
 	Payload models.PaginatedAPIResponse
 }
 
+// Error ...
 func (o *GetTasksGetPhpOK) Error() string {
 	return fmt.Sprintf("[GET /tasks/get.php][%d] getTasksGetPhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetTasksGetPhpOK) GetPayload() models.PaginatedAPIResponse {
 	return o.Payload
 }
@@ -95,9 +98,12 @@ type GetTasksGetPhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetTasksGetPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /tasks/get.php][%d] getTasksGetPhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetTasksGetPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -127,9 +133,12 @@ type GetTasksGetPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetTasksGetPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[GET /tasks/get.php][%d] getTasksGetPhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetTasksGetPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -159,9 +168,12 @@ type GetTasksGetPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetTasksGetPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[GET /tasks/get.php][%d] getTasksGetPhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetTasksGetPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

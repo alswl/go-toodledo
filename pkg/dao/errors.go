@@ -6,6 +6,7 @@ const (
 	bucketNotFound
 )
 
+// ErrObjectNotFound ...
 var (
 	// ErrObjectNotFound is returned when there is no object found.
 	ErrObjectNotFound = Error{objNotFound, "Object not found"}

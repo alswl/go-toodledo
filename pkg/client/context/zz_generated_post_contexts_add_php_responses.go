@@ -65,9 +65,12 @@ type PostContextsAddPhpOK struct {
 	Payload []*models.Context
 }
 
+// Error ...
 func (o *PostContextsAddPhpOK) Error() string {
 	return fmt.Sprintf("[POST /contexts/add.php][%d] postContextsAddPhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostContextsAddPhpOK) GetPayload() []*models.Context {
 	return o.Payload
 }
@@ -95,9 +98,12 @@ type PostContextsAddPhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostContextsAddPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /contexts/add.php][%d] postContextsAddPhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostContextsAddPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -127,9 +133,12 @@ type PostContextsAddPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostContextsAddPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /contexts/add.php][%d] postContextsAddPhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostContextsAddPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -159,9 +168,12 @@ type PostContextsAddPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostContextsAddPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /contexts/add.php][%d] postContextsAddPhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostContextsAddPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

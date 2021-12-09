@@ -65,9 +65,12 @@ type PostGoalsEditPhpOK struct {
 	Payload []*models.Goal
 }
 
+// Error ...
 func (o *PostGoalsEditPhpOK) Error() string {
 	return fmt.Sprintf("[POST /goals/edit.php][%d] postGoalsEditPhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsEditPhpOK) GetPayload() []*models.Goal {
 	return o.Payload
 }
@@ -95,9 +98,12 @@ type PostGoalsEditPhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostGoalsEditPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /goals/edit.php][%d] postGoalsEditPhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsEditPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -127,9 +133,12 @@ type PostGoalsEditPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostGoalsEditPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /goals/edit.php][%d] postGoalsEditPhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsEditPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -159,9 +168,12 @@ type PostGoalsEditPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostGoalsEditPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /goals/edit.php][%d] postGoalsEditPhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsEditPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

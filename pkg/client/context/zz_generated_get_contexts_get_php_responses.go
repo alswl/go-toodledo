@@ -65,9 +65,12 @@ type GetContextsGetPhpOK struct {
 	Payload []*models.Context
 }
 
+// Error ...
 func (o *GetContextsGetPhpOK) Error() string {
 	return fmt.Sprintf("[GET /contexts/get.php][%d] getContextsGetPhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetContextsGetPhpOK) GetPayload() []*models.Context {
 	return o.Payload
 }
@@ -95,9 +98,12 @@ type GetContextsGetPhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetContextsGetPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /contexts/get.php][%d] getContextsGetPhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetContextsGetPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -127,9 +133,12 @@ type GetContextsGetPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetContextsGetPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[GET /contexts/get.php][%d] getContextsGetPhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetContextsGetPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -159,9 +168,12 @@ type GetContextsGetPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetContextsGetPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[GET /contexts/get.php][%d] getContextsGetPhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetContextsGetPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

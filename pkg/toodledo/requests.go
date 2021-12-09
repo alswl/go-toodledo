@@ -8,10 +8,12 @@ import (
 	"time"
 )
 
+// Requests ...
 type Requests struct {
 	gorequest.SuperAgent
 }
 
+// Auth ...
 func (r *Requests) Auth(accessToken string) *Requests {
 	r.Param("access_token", accessToken)
 	return r
@@ -38,8 +40,6 @@ func (r *Requests) EndStructWithTError(v interface{}, callback ...func(response 
 	}
 	return resp, body, errs
 }
-
-// wrapper >>>
 
 // Returns a copy of this superagent. Useful if you want to reuse the client/settings
 // concurrently.
@@ -73,6 +73,7 @@ func (r *Requests) SetDoNotClearRequests(enable bool) *Requests {
 	return r
 }
 
+// SetLogger ...
 func (r *Requests) SetLogger(logger gorequest.Logger) *Requests {
 	r.SuperAgent.SetLogger(logger)
 	return r
@@ -84,36 +85,43 @@ func (r *Requests) CustomMethod(method, targetUrl string) *Requests {
 	return r
 }
 
+// Get ...
 func (r *Requests) Get(targetUrl string) *Requests {
 	r.SuperAgent.Get(targetUrl)
 	return r
 }
 
+// Post ...
 func (r *Requests) Post(targetUrl string) *Requests {
 	r.SuperAgent.Post(targetUrl)
 	return r
 }
 
+// Head ...
 func (r *Requests) Head(targetUrl string) *Requests {
 	r.SuperAgent.Head(targetUrl)
 	return r
 }
 
+// Put ...
 func (r *Requests) Put(targetUrl string) *Requests {
 	r.SuperAgent.Put(targetUrl)
 	return r
 }
 
+// Delete ...
 func (r *Requests) Delete(targetUrl string) *Requests {
 	r.SuperAgent.Delete(targetUrl)
 	return r
 }
 
+// Patch ...
 func (r *Requests) Patch(targetUrl string) *Requests {
 	r.SuperAgent.Patch(targetUrl)
 	return r
 }
 
+// Options ...
 func (r *Requests) Options(targetUrl string) *Requests {
 	r.SuperAgent.Options(targetUrl)
 	return r
@@ -144,11 +152,6 @@ func (r *Requests) AppendHeader(param string, value string) *Requests {
 	r.SuperAgent.AppendHeader(param, value)
 	return r
 }
-
-// Retryable is used for setting a Retryer policy
-// Example. To set Retryer policy with 5 seconds between each attempt.
-//          3 max attempt.
-//          And StatusBadRequest and StatusInternalServerError as RetryableStatus
 
 //    gorequest.New().
 //      Post("/gamelist").
@@ -354,6 +357,7 @@ func (r *Requests) SendSlice(content []interface{}) *Requests {
 	return r
 }
 
+// SendMap ...
 func (r *Requests) SendMap(content interface{}) *Requests {
 	r.SuperAgent.SendMap(content)
 	return r
@@ -426,8 +430,7 @@ func (r *Requests) SendFile(file interface{}, args ...string) *Requests {
 	return r
 }
 
-// wrapper <<<
-
+// NewRequests ...
 func NewRequests() *Requests {
 	agent := gorequest.New()
 	return &Requests{*agent}

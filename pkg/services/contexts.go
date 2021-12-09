@@ -14,6 +14,7 @@ import (
 	"strconv"
 )
 
+// ContextService ...
 type ContextService interface {
 	Find(name string) (*models.Context, error)
 	ListAll() ([]*models.Context, error)
@@ -27,10 +28,12 @@ type contextservice struct {
 	auth runtime.ClientAuthInfoWriter
 }
 
+// NewContextService ...
 func NewContextService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) ContextService {
 	return &contextservice{cli: cli, auth: auth}
 }
 
+// Create ...
 func (s *contextservice) Create(name string) (*models.Context, error) {
 	params := context.NewPostContextsAddPhpParams()
 	params.SetName(name)
@@ -42,6 +45,7 @@ func (s *contextservice) Create(name string) (*models.Context, error) {
 	return resp.Payload[0], nil
 }
 
+// Delete ...
 func (s *contextservice) Delete(name string) error {
 	f, err := s.Find(name)
 	if err != nil {
@@ -58,6 +62,7 @@ func (s *contextservice) Delete(name string) error {
 	return nil
 }
 
+// Rename ...
 func (s *contextservice) Rename(name string, newName string) (*models.Context, error) {
 	if name == newName {
 		logrus.Error("not changed")
@@ -81,6 +86,7 @@ func (s *contextservice) Rename(name string, newName string) (*models.Context, e
 	return resp.Payload[0], nil
 }
 
+// Find ...
 func (s *contextservice) Find(name string) (*models.Context, error) {
 	fs, err := s.ListAll()
 	if err != nil {
@@ -97,6 +103,7 @@ func (s *contextservice) Find(name string) (*models.Context, error) {
 	return f, nil
 }
 
+// ListAll ...
 func (s *contextservice) ListAll() ([]*models.Context, error) {
 	cli := client.NewHTTPClient(strfmt.NewFormats())
 	ts, err := cli.Context.GetContextsGetPhp(context.NewGetContextsGetPhpParams(), s.auth)

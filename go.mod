@@ -14,7 +14,9 @@ require (
 	github.com/google/wire v0.5.0
 	github.com/jedib0t/go-pretty/v6 v6.2.4
 	github.com/leodido/go-urn v1.2.0 // indirect
+	github.com/mitchellh/go-homedir v1.0.0
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0

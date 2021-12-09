@@ -6,7 +6,7 @@ import (
 )
 
 type ToodledoCliApp struct {
-	// TODO service here
+	// TODO service remove
 	Auth       runtime.ClientAuthInfoWriter
 	TaskSvc    services.TaskService
 	FolderSvc  services.FolderCachedService

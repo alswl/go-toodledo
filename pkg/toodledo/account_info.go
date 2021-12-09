@@ -5,8 +5,10 @@ import (
 	"github.com/alswl/go-toodledo/pkg/toodledo/models"
 )
 
+// AccountService ...
 type AccountService Service
 
+// Get ...
 func (s *AccountService) Get(ctx context.Context) (*models.Account, *Response, error) {
 	path := "/3/account/get.php"
 

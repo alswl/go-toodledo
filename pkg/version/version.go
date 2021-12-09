@@ -5,6 +5,7 @@ import (
 	"runtime"
 )
 
+// Version ...
 var (
 	Version   = "0.0.0"
 	Commit    = "UNKNOWN"
@@ -13,6 +14,7 @@ var (
 	GoVersion = runtime.Version()
 )
 
+// Message ...
 func Message() string {
 	const format = `toodledo:   %s (Revision: %s)
 package:    %s

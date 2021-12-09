@@ -13,6 +13,7 @@ import (
 	"strconv"
 )
 
+// FolderService ...
 type FolderService interface {
 	Find(name string) (*models.Folder, error)
 	ListAll() ([]*models.Folder, error)
@@ -27,10 +28,12 @@ type folderService struct {
 	auth runtime.ClientAuthInfoWriter
 }
 
+// NewFolderService ...
 func NewFolderService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) FolderService {
 	return &folderService{cli: cli, auth: auth}
 }
 
+// Create ...
 func (s *folderService) Create(name string) (*models.Folder, error) {
 	params := folder.NewPostFoldersAddPhpParams()
 	params.SetName(name)
@@ -42,6 +45,7 @@ func (s *folderService) Create(name string) (*models.Folder, error) {
 	return resp.Payload[0], nil
 }
 
+// Delete ...
 func (s *folderService) Delete(name string) error {
 	f, err := s.Find(name)
 	if err != nil {
@@ -58,6 +62,7 @@ func (s *folderService) Delete(name string) error {
 	return nil
 }
 
+// Rename ...
 func (s *folderService) Rename(name string, newName string) (*models.Folder, error) {
 	if name == newName {
 		logrus.Error("not changed")
@@ -81,6 +86,7 @@ func (s *folderService) Rename(name string, newName string) (*models.Folder, err
 	return resp.Payload[0], nil
 }
 
+// Find ...
 func (s *folderService) Find(name string) (*models.Folder, error) {
 	fs, err := s.ListAll()
 	if err != nil {
@@ -97,6 +103,7 @@ func (s *folderService) Find(name string) (*models.Folder, error) {
 	return f, nil
 }
 
+// ListAll ...
 func (s *folderService) ListAll() ([]*models.Folder, error) {
 	cli := client.NewHTTPClient(strfmt.NewFormats())
 	ts, err := cli.Folder.GetFoldersGetPhp(folder.NewGetFoldersGetPhpParams(), s.auth)
@@ -106,6 +113,7 @@ func (s *folderService) ListAll() ([]*models.Folder, error) {
 	return ts.Payload, nil
 }
 
+// Archive ...
 func (s *folderService) Archive(id int, isArchived bool) (*models.Folder, error) {
 	// TODO test
 	cli := client.NewHTTPClient(strfmt.NewFormats())

@@ -11,13 +11,10 @@ ENV GOFLAGS=""
 COPY Makefile .
 COPY go.mod .
 COPY go.sum .
-# TODO forget why using git init TODO try to delete this
-RUN git init
 RUN make download
 
 COPY . .
 RUN make build GOOS=linux GOARCH=amd64
-#RUN make compress
 
 FROM golang:1.16.5-buster
 RUN sed -i "s@http://.*.debian.org@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
