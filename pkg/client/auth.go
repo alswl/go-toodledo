@@ -16,6 +16,7 @@ import (
 	"time"
 )
 
+// SimpleAuth ...
 type SimpleAuth struct {
 	accessToken string
 }
@@ -54,6 +55,7 @@ func NewAuthFromViper() (runtime.ClientAuthInfoWriter, error) {
 	return NewAuth(clientId, clientSecret, accessToken, rt, at, SaveTokenWithViper)
 }
 
+// NewAuthFromConfigs ...
 func NewAuthFromConfigs(cfg models.ToodledoConfig) (runtime.ClientAuthInfoWriter, error) {
 	accessToken := cfg.AccessToken
 	rt := cfg.RefreshToken
@@ -73,6 +75,7 @@ func NewAuthFromConfigs(cfg models.ToodledoConfig) (runtime.ClientAuthInfoWriter
 	return NewAuth(cfg.ClientId, cfg.ClientSecret, accessToken, rt, at, noOps)
 }
 
+// NewAuth ...
 func NewAuth(clientId, clientSecret, accessToken, refreshToken string, expiredAt time.Time, saveFn func(newToken *oauth2.Token) error) (runtime.ClientAuthInfoWriter, error) {
 	token := oauth2.Token{
 		AccessToken:  accessToken,
@@ -107,6 +110,7 @@ func NewAuth(clientId, clientSecret, accessToken, refreshToken string, expiredAt
 	return NewSimpleAuth(accessToken), nil
 }
 
+// NewToodledoCli ...
 func NewToodledoCli() *Toodledo {
 	debug := os.Getenv("DEBUG") != "" || os.Getenv("SWAGGER_DEBUG") != ""
 
@@ -115,11 +119,13 @@ func NewToodledoCli() *Toodledo {
 	return New(transportConfig, strfmt.Default)
 }
 
+// AuthenticateRequest ...
 func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry strfmt.Registry) error {
 	request.SetQueryParam("access_token", a.accessToken)
 	return nil
 }
 
+// NewOAuth2ConfigFromConfigs ...
 func NewOAuth2ConfigFromConfigs(cfg models.ToodledoConfig) (*oauth2.Config, error) {
 	// TODO remove viper
 	clientId := cfg.ClientId
@@ -137,6 +143,7 @@ func NewOAuth2ConfigFromConfigs(cfg models.ToodledoConfig) (*oauth2.Config, erro
 	return conf, nil
 }
 
+// ProvideOAuth2ConfigFromViper ...
 func ProvideOAuth2ConfigFromViper() (*oauth2.Config, error) {
 	// TODO delete, 3 usage left
 	clientId := viper.GetString("auth.client_id")

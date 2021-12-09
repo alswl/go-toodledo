@@ -157,6 +157,7 @@ func (b *bolt) List(bucket string) ([][]byte, error) {
 	return values, err
 }
 
+// Truncate ...
 func (b *bolt) Truncate(bucket string) error {
 	b.Lock()
 	err := b.db.Update(func(tx *boltdb.Tx) error {

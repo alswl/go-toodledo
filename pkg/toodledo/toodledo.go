@@ -13,10 +13,12 @@ import (
 	"sync"
 )
 
+// DefaultBaseUrl ...
 const (
 	DefaultBaseUrl = "https://api.toodledo.com"
 )
 
+// Client ...
 type Client struct {
 	clientMu sync.Mutex
 	client   *http.Client
@@ -34,22 +36,24 @@ type Client struct {
 	GoalService    *GoalService
 	TaskService    *TaskService
 	ContextService ContextService
-
-	// TODO
 }
 
+// NewRequest ...
 func (c *Client) NewRequest(method, urlStr string) (*http.Request, error) {
 	return c.NewRequestWithParamsAndForm(method, urlStr, map[string]string{}, url.Values{})
 }
 
+// NewRequestWithParams ...
 func (c *Client) NewRequestWithParams(method, urlStr string, params map[string]string) (*http.Request, error) {
 	return c.NewRequestWithParamsAndForm(method, urlStr, params, url.Values{})
 }
 
+// NewRequestWithForm ...
 func (c *Client) NewRequestWithForm(method, urlStr string, form url.Values) (*http.Request, error) {
 	return c.NewRequestWithParamsAndForm(method, urlStr, map[string]string{}, form)
 }
 
+// NewRequestWithParamsAndForm ...
 func (c *Client) NewRequestWithParamsAndForm(method, urlStr string, params map[string]string, form url.Values) (*http.Request, error) {
 	u, err := c.BaseURL.Parse(urlStr)
 	if err != nil {
@@ -142,6 +146,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	return response, nil
 }
 
+// ApiError ...
 type ApiError struct {
 	ErrorResponse
 	// TODO remove Response
@@ -149,10 +154,12 @@ type ApiError struct {
 	Body     string
 }
 
+// Error ...
 func (e ApiError) Error() string {
 	return fmt.Sprintf("API Error, code %v, desc: %v", e.ErrorCode, e.ErrorDesc)
 }
 
+// CheckResponseStatus ...
 func CheckResponseStatus(r *http.Response) error {
 	if c := r.StatusCode; 200 <= c && c <= 299 {
 		return nil
@@ -178,10 +185,12 @@ func CheckToodledoResponse(body string) (ErrorResponse, bool) {
 	return ErrorResponse{}, true
 }
 
+// Service ...
 type Service struct {
 	client *Client
 }
 
+// NewClient ...
 func NewClient(accessToken string) *Client {
 	httpClient := http.DefaultClient
 	baseURL, _ := url.Parse(DefaultBaseUrl)

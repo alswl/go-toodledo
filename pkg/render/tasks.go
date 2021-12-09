@@ -8,6 +8,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
+// Tables4Task ...
 func Tables4Task(tasks []*models.Task) string {
 	var output string
 	buf := bytes.NewBufferString(output)

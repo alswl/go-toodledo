@@ -65,9 +65,12 @@ type PostGoalsAddPhpOK struct {
 	Payload []*models.Goal
 }
 
+// Error ...
 func (o *PostGoalsAddPhpOK) Error() string {
 	return fmt.Sprintf("[POST /goals/add.php][%d] postGoalsAddPhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsAddPhpOK) GetPayload() []*models.Goal {
 	return o.Payload
 }
@@ -95,9 +98,12 @@ type PostGoalsAddPhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostGoalsAddPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /goals/add.php][%d] postGoalsAddPhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsAddPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -127,9 +133,12 @@ type PostGoalsAddPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostGoalsAddPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /goals/add.php][%d] postGoalsAddPhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsAddPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -159,9 +168,12 @@ type PostGoalsAddPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostGoalsAddPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /goals/add.php][%d] postGoalsAddPhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsAddPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

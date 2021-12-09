@@ -2,8 +2,10 @@
 
 package taskstatus
 
+// TaskStatus ...
 type TaskStatus int
 
+// None ...
 const (
 	None       TaskStatus = 0
 	NextAction TaskStatus = 1
@@ -18,6 +20,7 @@ const (
 	Reference  TaskStatus = 10
 )
 
+// All ...
 var All = []TaskStatus{
 	None,
 	NextAction,
@@ -32,6 +35,7 @@ var All = []TaskStatus{
 	Reference,
 }
 
+// Value2Type ...
 func Value2Type(input int64) TaskStatus {
 	for _, x := range All {
 		if x == TaskStatus(input) {

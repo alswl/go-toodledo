@@ -9,6 +9,7 @@ import (
 	"github.com/thoas/go-funk"
 )
 
+// ContextCachedService ...
 type ContextCachedService interface {
 	Invalidate() error
 
@@ -26,6 +27,7 @@ type contextCachedService struct {
 	accountSvc AccountService
 }
 
+// NewContextCachedService ...
 func NewContextCachedService(contextsvc ContextService, accountSvc AccountService, db dao.Backend) ContextCachedService {
 	s := contextCachedService{
 		svc:        contextsvc,
@@ -36,16 +38,19 @@ func NewContextCachedService(contextsvc ContextService, accountSvc AccountServic
 	return &s
 }
 
+// Rename ...
 func (s *contextCachedService) Rename(name string, newName string) (*models.Context, error) {
 	s.Invalidate()
 	return s.svc.Rename(name, newName)
 }
 
+// Delete ...
 func (s *contextCachedService) Delete(name string) error {
 	s.Invalidate()
 	return s.svc.Delete(name)
 }
 
+// Create ...
 func (s *contextCachedService) Create(name string) (*models.Context, error) {
 	s.Invalidate()
 	return s.svc.Create(name)
@@ -98,6 +103,7 @@ func (s *contextCachedService) sync() error {
 	return nil
 }
 
+// ListAll ...
 func (s *contextCachedService) ListAll() ([]*models.Context, error) {
 	fs := make([]*models.Context, 0)
 	all, err := s.cache.ListAll()
@@ -119,6 +125,7 @@ func (s *contextCachedService) ListAll() ([]*models.Context, error) {
 	return fs, nil
 }
 
+// Find ...
 func (s *contextCachedService) Find(name string) (*models.Context, error) {
 	fs, err := s.ListAll()
 	if err != nil {
@@ -135,6 +142,7 @@ func (s *contextCachedService) Find(name string) (*models.Context, error) {
 	return f, nil
 }
 
+// Invalidate ...
 func (s *contextCachedService) Invalidate() error {
 	err := s.db.Truncate("contexts")
 	if err != nil {

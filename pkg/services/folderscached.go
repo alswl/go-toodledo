@@ -9,6 +9,7 @@ import (
 	"github.com/thoas/go-funk"
 )
 
+// FolderCachedService ...
 type FolderCachedService interface {
 	Invalidate() error
 
@@ -27,6 +28,7 @@ type folderCachedService struct {
 	accountSvc AccountService
 }
 
+// NewFolderCachedService ...
 func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService, db dao.Backend) FolderCachedService {
 	s := folderCachedService{
 		svc:        folderSvc,
@@ -37,21 +39,25 @@ func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService, 
 	return &s
 }
 
+// Rename ...
 func (s *folderCachedService) Rename(name string, newName string) (*models.Folder, error) {
 	s.Invalidate()
 	return s.svc.Rename(name, newName)
 }
 
+// Archive ...
 func (s *folderCachedService) Archive(id int, isArchived bool) (*models.Folder, error) {
 	s.Invalidate()
 	return s.svc.Archive(id, isArchived)
 }
 
+// Delete ...
 func (s *folderCachedService) Delete(name string) error {
 	s.Invalidate()
 	return s.svc.Delete(name)
 }
 
+// Create ...
 func (s *folderCachedService) Create(name string) (*models.Folder, error) {
 	s.Invalidate()
 	return s.svc.Create(name)
@@ -104,6 +110,7 @@ func (s *folderCachedService) sync() error {
 	return nil
 }
 
+// ListAll ...
 func (s *folderCachedService) ListAll() ([]*models.Folder, error) {
 	fs := make([]*models.Folder, 0)
 	all, err := s.cache.ListAll()
@@ -125,6 +132,7 @@ func (s *folderCachedService) ListAll() ([]*models.Folder, error) {
 	return fs, nil
 }
 
+// Find ...
 func (s *folderCachedService) Find(name string) (*models.Folder, error) {
 	fs, err := s.ListAll()
 	if err != nil {
@@ -141,6 +149,7 @@ func (s *folderCachedService) Find(name string) (*models.Folder, error) {
 	return f, nil
 }
 
+// Invalidate ...
 func (s *folderCachedService) Invalidate() error {
 	err := s.db.Truncate("folders")
 	if err != nil {

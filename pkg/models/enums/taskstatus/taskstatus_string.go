@@ -25,6 +25,7 @@ const _TaskStatus_name = "NoneNextActionActivePlanningDelegatedWaitingHoldPostpo
 
 var _TaskStatus_index = [...]uint8{0, 4, 14, 20, 28, 37, 44, 48, 57, 64, 72, 81}
 
+// String ...
 func (i TaskStatus) String() string {
 	if i < 0 || i >= TaskStatus(len(_TaskStatus_index)-1) {
 		return "TaskStatus(" + strconv.FormatInt(int64(i), 10) + ")"

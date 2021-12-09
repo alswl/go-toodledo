@@ -65,9 +65,12 @@ type GetFoldersGetPhpOK struct {
 	Payload []*models.Folder
 }
 
+// Error ...
 func (o *GetFoldersGetPhpOK) Error() string {
 	return fmt.Sprintf("[GET /folders/get.php][%d] getFoldersGetPhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetFoldersGetPhpOK) GetPayload() []*models.Folder {
 	return o.Payload
 }
@@ -95,9 +98,12 @@ type GetFoldersGetPhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetFoldersGetPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /folders/get.php][%d] getFoldersGetPhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetFoldersGetPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -127,9 +133,12 @@ type GetFoldersGetPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetFoldersGetPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[GET /folders/get.php][%d] getFoldersGetPhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetFoldersGetPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -159,9 +168,12 @@ type GetFoldersGetPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetFoldersGetPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[GET /folders/get.php][%d] getFoldersGetPhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetFoldersGetPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

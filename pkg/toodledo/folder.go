@@ -9,8 +9,10 @@ import (
 	"strconv"
 )
 
+// FolderService ...
 type FolderService Service
 
+// Get ...
 func (s *FolderService) Get(ctx context.Context) ([]*models.Folder, *Response, error) {
 	path := "/3/folders/get.php"
 
@@ -28,6 +30,7 @@ func (s *FolderService) Get(ctx context.Context) ([]*models.Folder, *Response, e
 	return folders, resp, nil
 }
 
+// Add ...
 func (s *FolderService) Add(ctx context.Context, name string) (*models.Folder, *Response, error) {
 	path := "/3/folders/add.php"
 
@@ -48,11 +51,13 @@ func (s *FolderService) Add(ctx context.Context, name string) (*models.Folder, *
 	return folders[0], resp, nil
 }
 
+// Edit ...
 func (s *FolderService) Edit(ctx context.Context, id int, name string) (*models.Folder, *Response, error) {
 	return s.EditWithPrivate(ctx, id, name, -1)
 
 }
 
+// EditWithPrivate ...
 func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string, private int) (*models.Folder, *Response, error) {
 	path := "/3/folders/edit.php"
 
@@ -78,6 +83,7 @@ func (s *FolderService) EditWithPrivate(ctx context.Context, id int, name string
 	return folders[0], resp, nil
 }
 
+// Delete ...
 func (s *FolderService) Delete(ctx context.Context, id int) (*Response, error) {
 	path := "/3/folders/delete.php"
 

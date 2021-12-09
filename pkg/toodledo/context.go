@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+// ContextService ...
 type ContextService interface {
 	// Get return all contexts
 	Get() ([]models.Context, *http.Response, string, error)
@@ -28,6 +29,7 @@ type ContextService interface {
 
 type contextService Service
 
+// Get ...
 func (c *contextService) Get() ([]models.Context, *http.Response, string, error) {
 	path := "/3/contexts/get.php"
 	var contexts []models.Context
@@ -39,6 +41,7 @@ func (c *contextService) Get() ([]models.Context, *http.Response, string, error)
 	return contexts, resp, string(body), nil
 }
 
+// AddExtend ...
 func (c *contextService) AddExtend(name string, private bool) (models.Context, *http.Response, string, error) {
 	path := "/3/contexts/add.php"
 	var contexts []models.Context
@@ -57,14 +60,17 @@ func (c *contextService) AddExtend(name string, private bool) (models.Context, *
 	return contexts[0], resp, string(body), nil
 }
 
+// Add ...
 func (c *contextService) Add(name string) (models.Context, *http.Response, string, error) {
 	return c.AddExtend(name, false)
 }
 
+// Edit ...
 func (c *contextService) Edit(id int, name string) (models.Context, *http.Response, string, error) {
 	return c.EditExtend(id, name, false)
 }
 
+// EditExtend ...
 func (c *contextService) EditExtend(id int, name string, private bool) (models.Context, *http.Response, string, error) {
 	path := "/3/contexts/edit.php"
 	var contexts []models.Context
@@ -84,6 +90,7 @@ func (c *contextService) EditExtend(id int, name string, private bool) (models.C
 	return contexts[0], resp, string(body), nil
 }
 
+// Delete ...
 func (c *contextService) Delete(id int) (*http.Response, string, error) {
 	path := "/3/contexts/delete.php"
 	var contexts []models.Context

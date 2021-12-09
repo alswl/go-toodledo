@@ -65,9 +65,12 @@ type PostContextsEditPhpOK struct {
 	Payload []*models.Context
 }
 
+// Error ...
 func (o *PostContextsEditPhpOK) Error() string {
 	return fmt.Sprintf("[POST /contexts/edit.php][%d] postContextsEditPhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostContextsEditPhpOK) GetPayload() []*models.Context {
 	return o.Payload
 }
@@ -95,9 +98,12 @@ type PostContextsEditPhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostContextsEditPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /contexts/edit.php][%d] postContextsEditPhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostContextsEditPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -127,9 +133,12 @@ type PostContextsEditPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostContextsEditPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /contexts/edit.php][%d] postContextsEditPhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostContextsEditPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -159,9 +168,12 @@ type PostContextsEditPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostContextsEditPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /contexts/edit.php][%d] postContextsEditPhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostContextsEditPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

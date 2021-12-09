@@ -18,6 +18,7 @@ type ToodledoConfig struct {
 	RefreshToken string `mapstructure:"refresh_token" yaml:"refresh_token"`
 }
 
+// ToodledoCliConfig ...
 type ToodledoCliConfig struct {
 	Auth           ToodledoConfig                        `mapstructure:"auth" yaml:"auth"`
 	Database       ToodledoConfigDatabase                `mapstructure:"database" yaml:"database"`
@@ -25,6 +26,7 @@ type ToodledoCliConfig struct {
 	DefaultContext string                                `mapstructure:"default-environment"`
 }
 
+// ToodledoConfigDatabase ...
 type ToodledoConfigDatabase struct {
 	DataFile string   `mapstructure:"data_file" yaml:"data_file"`
 	Buckets  []string `mapstructure:"buckets" yaml:"buckets"`

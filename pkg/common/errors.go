@@ -1,5 +1,6 @@
 package common
 
+// ErrNotFound ...
 var (
 	ErrNotFound = Error{404, "Not found"}
 )

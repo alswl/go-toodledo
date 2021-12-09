@@ -8,6 +8,7 @@ import (
 	"path"
 )
 
+// NewConfigCliConfig ...
 func NewConfigCliConfig(cfg models.ToodledoCliConfig) (models.ToodledoConfig, error) {
 	return cfg.Auth, nil
 }
@@ -22,6 +23,7 @@ func NewCliConfigFromViper() (models.ToodledoCliConfig, error) {
 	return conf, nil
 }
 
+// NewCliConfigForTesting ...
 func NewCliConfigForTesting() (models.ToodledoCliConfig, error) {
 	home, err := homedir.Dir()
 	cobra.CheckErr(err)

@@ -6,6 +6,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
+// RenderEnvironments ...
 func RenderEnvironments(cks []*models.EnvironmentWithKey) string {
 	buf := new(bytes.Buffer)
 	table := tablewriter.NewWriter(buf)

@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// TaskService ...
 type TaskService interface {
 	FindById(id int64) (*models.Task, error)
 	QueryAll() ([]*models.Task, *models.PaginatedInfo, error)
@@ -22,6 +23,7 @@ type taskService struct {
 	auth runtime.ClientAuthInfoWriter
 }
 
+// NewTaskService ...
 func NewTaskService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) TaskService {
 	return &taskService{
 		cli:  cli,
@@ -29,6 +31,7 @@ func NewTaskService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) Tas
 	}
 }
 
+// FindById ...
 func (s *taskService) FindById(id int64) (*models.Task, error) {
 	p := task.NewGetTasksGetPhpParams()
 	fields := enums.TaskFields2String(enums.GeneralTaskFields)
@@ -48,6 +51,7 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 	return &t, nil
 }
 
+// QueryAll ...
 func (s *taskService) QueryAll() ([]*models.Task, *models.PaginatedInfo, error) {
 	// TODO using TaskQuery
 	p := task.NewGetTasksGetPhpParams()
@@ -74,10 +78,12 @@ func (s *taskService) QueryAll() ([]*models.Task, *models.PaginatedInfo, error) 
 	return tasks, &paging, nil
 }
 
+// QueryModifiedTimeIn ...
 func (s *taskService) QueryModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error) {
 	panic("implement me")
 }
 
+// Create ...
 func (s *taskService) Create(title string, options map[string]interface{}) (*models.Task, error) {
 	t := models.Task{
 		Title: title,

@@ -65,9 +65,12 @@ type GetAccountGetPhpOK struct {
 	Payload *models.Account
 }
 
+// Error ...
 func (o *GetAccountGetPhpOK) Error() string {
 	return fmt.Sprintf("[GET /account/get.php][%d] getAccountGetPhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetAccountGetPhpOK) GetPayload() *models.Account {
 	return o.Payload
 }
@@ -97,9 +100,12 @@ type GetAccountGetPhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetAccountGetPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /account/get.php][%d] getAccountGetPhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetAccountGetPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -129,9 +135,12 @@ type GetAccountGetPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetAccountGetPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[GET /account/get.php][%d] getAccountGetPhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetAccountGetPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -161,9 +170,12 @@ type GetAccountGetPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *GetAccountGetPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[GET /account/get.php][%d] getAccountGetPhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *GetAccountGetPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

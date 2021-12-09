@@ -2,8 +2,10 @@ package enums
 
 import "strings"
 
+// TaskField ...
 type TaskField string
 
+// TASK_FIELD_ID ...
 const (
 	TASK_FIELD_ID                TaskField = "id"
 	TASK_FIELD_TITLE             TaskField = "title"
@@ -48,6 +50,7 @@ var DefaultTaskFields = []TaskField{
 	TASK_FIELD_MODIFIED,
 }
 
+// TinyTaskFields ...
 var TinyTaskFields = []TaskField{
 	TASK_FIELD_FOLDER,
 	TASK_FIELD_CONTEXT,
@@ -62,6 +65,7 @@ var TinyTaskFields = []TaskField{
 	TASK_FIELD_CHILDREN,
 }
 
+// GeneralTaskFields ...
 var GeneralTaskFields = append(TinyTaskFields,
 	TASK_FIELD_LOCATION,
 	TASK_FIELD_TAG,
@@ -82,10 +86,12 @@ var GeneralTaskFields = append(TinyTaskFields,
 	TASK_FIELD_VIA,
 )
 
+// FullTaskFields ...
 var FullTaskFields = append(GeneralTaskFields,
 	TASK_FIELD_ATTACHMENTS,
 )
 
+// TaskFields2String ...
 func TaskFields2String(fields []TaskField) string {
 	var fs []string
 	for _, f := range fields {

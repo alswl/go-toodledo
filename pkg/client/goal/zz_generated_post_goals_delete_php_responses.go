@@ -67,9 +67,12 @@ type PostGoalsDeletePhpOK struct {
 	Payload *PostGoalsDeletePhpOKBody
 }
 
+// Error ...
 func (o *PostGoalsDeletePhpOK) Error() string {
 	return fmt.Sprintf("[POST /goals/delete.php][%d] postGoalsDeletePhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsDeletePhpOK) GetPayload() *PostGoalsDeletePhpOKBody {
 	return o.Payload
 }
@@ -99,9 +102,12 @@ type PostGoalsDeletePhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostGoalsDeletePhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /goals/delete.php][%d] postGoalsDeletePhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsDeletePhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -131,9 +137,12 @@ type PostGoalsDeletePhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostGoalsDeletePhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /goals/delete.php][%d] postGoalsDeletePhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsDeletePhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -163,9 +172,12 @@ type PostGoalsDeletePhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostGoalsDeletePhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /goals/delete.php][%d] postGoalsDeletePhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostGoalsDeletePhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

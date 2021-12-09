@@ -1,5 +1,6 @@
 package toodledo
 
+// ErrorResponse ...
 type ErrorResponse struct {
 	ErrorCode int    `json:"errorCode"`
 	ErrorDesc string `json:"errorDesc"`
@@ -8,8 +9,7 @@ type ErrorResponse struct {
 // api doc: https://api.toodledo.com/3/error_codes.php
 type ErrorCode int32
 
-// TODO @alswl use these error code in response
-
+// UNKNOWN_ERROR ...
 const (
 	// General
 	UNKNOWN_ERROR                                       ErrorCode = 0

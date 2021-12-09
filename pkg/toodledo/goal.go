@@ -10,10 +10,10 @@ import (
 	"strconv"
 )
 
-// TODO @jingchao interface
-
+// GoalService ...
 type GoalService Service
 
+// GOAL_LEVEL_LIFE_TIME ...
 const (
 	GOAL_LEVEL_LIFE_TIME  int = 0
 	GOAL_LEVEL_LONG_TERM  int = 1
@@ -22,6 +22,7 @@ const (
 
 var validate *validator.Validate
 
+// Get ...
 func (s *GoalService) Get(ctx context.Context) ([]*models.Goal, *Response, error) {
 	path := "/3/goals/get.php"
 
@@ -39,6 +40,7 @@ func (s *GoalService) Get(ctx context.Context) ([]*models.Goal, *Response, error
 	return goals, resp, nil
 }
 
+// Add ...
 func (s *GoalService) Add(ctx context.Context, goalAdd models.GoalAdd) (*models.Goal, *Response, error) {
 	path := "/3/goals/add.php"
 
@@ -79,11 +81,13 @@ func (s *GoalService) Add(ctx context.Context, goalAdd models.GoalAdd) (*models.
 	return goals[0], resp, nil
 }
 
+// Edit ...
 func (s *GoalService) Edit(ctx context.Context, goalEdit models.GoalEdit) (models.Goal, Response, error) {
 	// TODO @alswl
 	panic("not impl")
 }
 
+// Delete ...
 func (s *GoalService) Delete(ctx context.Context, id int) (*Response, error) {
 	path := "/3/goals/delete.php"
 

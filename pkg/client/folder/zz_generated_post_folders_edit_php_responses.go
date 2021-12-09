@@ -65,9 +65,12 @@ type PostFoldersEditPhpOK struct {
 	Payload []*models.Folder
 }
 
+// Error ...
 func (o *PostFoldersEditPhpOK) Error() string {
 	return fmt.Sprintf("[POST /folders/edit.php][%d] postFoldersEditPhpOK  %+v", 200, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersEditPhpOK) GetPayload() []*models.Folder {
 	return o.Payload
 }
@@ -95,9 +98,12 @@ type PostFoldersEditPhpUnauthorized struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostFoldersEditPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /folders/edit.php][%d] postFoldersEditPhpUnauthorized  %+v", 401, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersEditPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -127,9 +133,12 @@ type PostFoldersEditPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostFoldersEditPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /folders/edit.php][%d] postFoldersEditPhpTooManyRequests  %+v", 429, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersEditPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -159,9 +168,12 @@ type PostFoldersEditPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
+// Error ...
 func (o *PostFoldersEditPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /folders/edit.php][%d] postFoldersEditPhpServiceUnavailable  %+v", 503, o.Payload)
 }
+
+// GetPayload ...
 func (o *PostFoldersEditPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }
