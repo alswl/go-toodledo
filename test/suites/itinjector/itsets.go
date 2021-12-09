@@ -10,8 +10,8 @@ import (
 )
 
 var IntegrationTestSet = wire.NewSet(
-	common.NewConfigsForTesting,
-	common.NewToodledoConfig,
+	common.NewCliConfigForTesting,
+	common.NewConfigCliConfig,
 
 	dao.NewBoltDB,
 	client.NewToodledoCli,

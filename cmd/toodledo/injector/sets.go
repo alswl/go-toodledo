@@ -10,8 +10,8 @@ import (
 )
 
 var SuperSet = wire.NewSet(
-	common.NewConfigsFromViper,
-	common.NewToodledoConfig,
+	common.NewCliConfigFromViper,
+	common.NewConfigCliConfig,
 
 	dao.NewBoltDB,
 	client.NewToodledoCli,

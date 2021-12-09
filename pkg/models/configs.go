@@ -25,7 +25,6 @@ type ToodledoCliConfig struct {
 	DefaultContext string                                `mapstructure:"default-environment"`
 }
 
-// old
 type ToodledoConfigDatabase struct {
 	DataFile string   `mapstructure:"data_file" yaml:"data_file"`
 	Buckets  []string `mapstructure:"buckets" yaml:"buckets"`

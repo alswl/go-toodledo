@@ -25,14 +25,6 @@ func InitAuth() (runtime.ClientAuthInfoWriter, error) {
 	return clientAuthInfoWriter, nil
 }
 
-func NewConfigs() (common.Configs, error) {
-	configs, err := common.NewConfigsFromViper()
-	if err != nil {
-		return nil, err
-	}
-	return configs, nil
-}
-
 func NewToodledoCli() (*client.Toodledo, error) {
 	toodledo := client.NewToodledoCli()
 	return toodledo, nil
@@ -56,12 +48,11 @@ func InitFolderCachedService() (services.FolderCachedService, error) {
 	}
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	configs, err := common.NewConfigsFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
 	if err != nil {
 		return nil, err
 	}
-	toodledoConfig := common.NewToodledoConfig(configs)
-	backend, err := dao.NewBoltDB(toodledoConfig)
+	backend, err := dao.NewBoltDB(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -87,12 +78,11 @@ func InitContextCachedService() (services.ContextCachedService, error) {
 	}
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	configs, err := common.NewConfigsFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
 	if err != nil {
 		return nil, err
 	}
-	toodledoConfig := common.NewToodledoConfig(configs)
-	backend, err := dao.NewBoltDB(toodledoConfig)
+	backend, err := dao.NewBoltDB(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -119,12 +109,11 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	configs, err := common.NewConfigsFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
 	if err != nil {
 		return nil, err
 	}
-	toodledoConfig := common.NewToodledoConfig(configs)
-	backend, err := dao.NewBoltDB(toodledoConfig)
+	backend, err := dao.NewBoltDB(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}

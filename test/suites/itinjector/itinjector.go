@@ -6,7 +6,6 @@ package itinjector
 import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/runtime"
 	"github.com/google/wire"
@@ -15,11 +14,6 @@ import (
 func InitAuth() (runtime.ClientAuthInfoWriter, error) {
 	wire.Build(IntegrationTestSet)
 	return &client.SimpleAuth{}, nil
-}
-
-func NewConfigs() (common.Configs, error) {
-	wire.Build(IntegrationTestSet)
-	return nil, nil
 }
 
 func NewToodledoCli() (*client.Toodledo, error) {

@@ -2,53 +2,44 @@ package common
 
 import (
 	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v3"
-	"os"
+	"path"
 )
 
-type Configs interface {
-	// TODO using this instead of viper
-	Get() *models.ToodledoCliConfig
+func NewConfigCliConfig(cfg models.ToodledoCliConfig) (models.ToodledoConfig, error) {
+	return cfg.Auth, nil
 }
 
-// FIXME delete
-type configs struct {
-	conf *models.ToodledoCliConfig
-}
-
-// NewConfigsFromViper build Configs from viper
-// XXX decoupling from viper
-func NewConfigsFromViper() (Configs, error) {
+// NewCliConfigFromViper build Configs from viper
+func NewCliConfigFromViper() (models.ToodledoCliConfig, error) {
 	var conf models.ToodledoCliConfig
 	err := viper.Unmarshal(&conf)
 	if err != nil {
-		return nil, err
+		return models.ToodledoCliConfig{}, err
 	}
-	return &configs{&conf}, nil
+	return conf, nil
 }
 
-func NewConfigsForTesting() (Configs, error) {
-	path := os.Getenv("TOODLEDO_CONFIG")
-	if path == "" {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return nil, err
-		}
-		path = home + "/" + ".toodledo-test.yaml"
+func NewCliConfigForTesting() (models.ToodledoCliConfig, error) {
+	home, err := homedir.Dir()
+	cobra.CheckErr(err)
+	viper.AddConfigPath(path.Join(home, ".config"))
+	viper.SetConfigName("toodledo-test")
+	viper.AutomaticEnv()
+	if err := viper.ReadInConfig(); err != nil {
+		panic(err)
 	}
-	bytes, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	var conf models.ToodledoCliConfig
-	err = yaml.Unmarshal(bytes, &conf)
-	if err != nil {
-		return nil, err
-	}
-	return &configs{&conf}, nil
+	return NewCliConfigFromViper()
 }
 
-func (c *configs) Get() *models.ToodledoCliConfig {
-	return c.conf
+// NewCliConfigMockForTesting ...
+func NewCliConfigMockForTesting() (models.ToodledoCliConfig, error) {
+	var conf = models.ToodledoCliConfig{
+		Auth:           models.ToodledoConfig{},
+		Environment:    map[string]*models.ToodledoConfigEnvironment{},
+		DefaultContext: "default",
+	}
+	return conf, nil
 }

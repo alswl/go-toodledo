@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/common"
+	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/go-openapi/runtime"
 	openapiclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -54,14 +54,14 @@ func NewAuthFromViper() (runtime.ClientAuthInfoWriter, error) {
 	return NewAuth(clientId, clientSecret, accessToken, rt, at, SaveTokenWithViper)
 }
 
-func NewAuthFromConfigs(configs common.Configs) (runtime.ClientAuthInfoWriter, error) {
-	accessToken := configs.Get().Auth.AccessToken
-	rt := configs.Get().Auth.RefreshToken
+func NewAuthFromConfigs(cfg models.ToodledoConfig) (runtime.ClientAuthInfoWriter, error) {
+	accessToken := cfg.AccessToken
+	rt := cfg.RefreshToken
 	if accessToken == "" {
 		logrus.Error("auth.access_token is empty")
 		return nil, errors.New("auth.access_token is empty")
 	}
-	expiredAt := configs.Get().Auth.ExpiredAt
+	expiredAt := cfg.ExpiredAt
 	if expiredAt == "" {
 		return nil, errors.New("auth.expired_at is empty")
 	}
@@ -70,7 +70,7 @@ func NewAuthFromConfigs(configs common.Configs) (runtime.ClientAuthInfoWriter, e
 		return nil, errors.New("auth.expired_at parse error")
 	}
 
-	return NewAuth(configs.Get().Auth.ClientId, configs.Get().Auth.ClientSecret, accessToken, rt, at, noOps)
+	return NewAuth(cfg.ClientId, cfg.ClientSecret, accessToken, rt, at, noOps)
 }
 
 func NewAuth(clientId, clientSecret, accessToken, refreshToken string, expiredAt time.Time, saveFn func(newToken *oauth2.Token) error) (runtime.ClientAuthInfoWriter, error) {
@@ -120,10 +120,10 @@ func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry
 	return nil
 }
 
-func NewOAuth2ConfigFromConfigs(configs common.Configs) (*oauth2.Config, error) {
+func NewOAuth2ConfigFromConfigs(cfg models.ToodledoConfig) (*oauth2.Config, error) {
 	// TODO remove viper
-	clientId := configs.Get().Auth.ClientId
-	clientSecret := configs.Get().Auth.ClientSecret
+	clientId := cfg.ClientId
+	clientSecret := cfg.ClientSecret
 	scopes := []string{"basic", "tasks", "write"}
 	conf := &oauth2.Config{
 		ClientID:     clientId,
