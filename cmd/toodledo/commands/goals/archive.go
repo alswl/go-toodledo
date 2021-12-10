@@ -25,13 +25,13 @@ var ArchiveCmd = &cobra.Command{
 		}
 		name := args[0]
 
-		f, err := svc.FindGoalByName(name)
+		f, err := svc.FindByName(name)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
 
-		newF, err := svc.ArchiveGoal(int(f.ID), true)
+		newF, err := svc.Archive(int(f.ID), true)
 		if err != nil {
 			logrus.Error(err)
 			return

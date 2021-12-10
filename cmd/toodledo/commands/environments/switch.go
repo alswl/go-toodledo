@@ -17,7 +17,7 @@ var switchCmd = &cobra.Command{
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		}
 		cSrv := services.NewEnvironmentService()
-		keys, err := cSrv.QueryAllKeys()
+		keys, err := cSrv.ListAllKeys()
 		if err != nil {
 			logrus.Warn(err)
 			return nil, cobra.ShellCompDirectiveNoFileComp

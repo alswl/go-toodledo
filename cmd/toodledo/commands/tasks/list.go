@@ -22,7 +22,7 @@ var ListCmd = &cobra.Command{
 			return
 		}
 
-		tasks, paging, err := svc.QueryAll()
+		tasks, paging, err := svc.ListAll()
 		if err != nil {
 			logrus.Error(err)
 			return

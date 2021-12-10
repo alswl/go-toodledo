@@ -23,7 +23,7 @@ var DeleteCmd = &cobra.Command{
 		}
 		name := args[0]
 
-		f, err := svc.FindGoalByName(name)
+		f, err := svc.FindByName(name)
 		if err != nil {
 			logrus.Error(err)
 			return

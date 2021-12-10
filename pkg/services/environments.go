@@ -9,9 +9,8 @@ import (
 
 // EnvironmentService ...
 type EnvironmentService interface {
-	QueryAll() ([]*models.EnvironmentWithKey, error)
-
-	QueryAllKeys() ([]string, error)
+	ListAll() ([]*models.EnvironmentWithKey, error)
+	ListAllKeys() ([]string, error)
 }
 
 type environmentService struct {
@@ -22,8 +21,8 @@ func NewEnvironmentService() EnvironmentService {
 	return &environmentService{}
 }
 
-// QueryAll ...
-func (s *environmentService) QueryAll() ([]*models.EnvironmentWithKey, error) {
+// ListAll ...
+func (s *environmentService) ListAll() ([]*models.EnvironmentWithKey, error) {
 	var cks []*models.EnvironmentWithKey
 	var cs map[string]models.Environment
 	err := viper.UnmarshalKey("environments", &cs)
@@ -41,8 +40,8 @@ func (s *environmentService) QueryAll() ([]*models.EnvironmentWithKey, error) {
 }
 
 // QueryAllKeys ...
-func (s *environmentService) QueryAllKeys() ([]string, error) {
-	cks, err := s.QueryAll()
+func (s *environmentService) ListAllKeys() ([]string, error) {
+	cks, err := s.ListAll()
 	if err != nil {
 		return []string{}, err
 	}

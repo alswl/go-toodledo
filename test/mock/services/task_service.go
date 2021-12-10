@@ -63,7 +63,7 @@ func (_m *TaskService) FindById(id int64) (*models.Task, error) {
 }
 
 // QueryAll provides a mock function with given fields:
-func (_m *TaskService) QueryAll() ([]*models.Task, *models.PaginatedInfo, error) {
+func (_m *TaskService) ListAll() ([]*models.Task, *models.PaginatedInfo, error) {
 	ret := _m.Called()
 
 	var r0 []*models.Task
@@ -95,7 +95,7 @@ func (_m *TaskService) QueryAll() ([]*models.Task, *models.PaginatedInfo, error)
 }
 
 // QueryModifiedTimeIn provides a mock function with given fields: before, after, start, limit, fields
-func (_m *TaskService) QueryModifiedTimeIn(before time.Time, after time.Time, start int, limit int, fields []enums.TaskField) ([]*models.Task, int, error) {
+func (_m *TaskService) ListModifiedTimeIn(before time.Time, after time.Time, start int, limit int, fields []enums.TaskField) ([]*models.Task, int, error) {
 	ret := _m.Called(before, after, start, limit, fields)
 
 	var r0 []*models.Task

@@ -13,8 +13,9 @@ import (
 // TaskService ...
 type TaskService interface {
 	FindById(id int64) (*models.Task, error)
-	QueryAll() ([]*models.Task, *models.PaginatedInfo, error)
-	QueryModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error)
+	ListAll() ([]*models.Task, *models.PaginatedInfo, error)
+	ListModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error)
+	// TODO using opt
 	Create(name string, options map[string]interface{}) (*models.Task, error)
 }
 
@@ -52,7 +53,7 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 }
 
 // QueryAll ...
-func (s *taskService) QueryAll() ([]*models.Task, *models.PaginatedInfo, error) {
+func (s *taskService) ListAll() ([]*models.Task, *models.PaginatedInfo, error) {
 	// TODO using TaskQuery
 	p := task.NewGetTasksGetPhpParams()
 	fields := enums.TaskFields2String(enums.GeneralTaskFields)
@@ -79,7 +80,7 @@ func (s *taskService) QueryAll() ([]*models.Task, *models.PaginatedInfo, error) 
 }
 
 // QueryModifiedTimeIn ...
-func (s *taskService) QueryModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error) {
+func (s *taskService) ListModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error) {
 	panic("implement me")
 }
 

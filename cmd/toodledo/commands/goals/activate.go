@@ -25,13 +25,13 @@ var ActivateCmd = &cobra.Command{
 		}
 		name := args[0]
 
-		g, err := svc.FindGoalByName(name)
+		g, err := svc.FindByName(name)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
 
-		newG, err := svc.ArchiveGoal(int(g.ID), false)
+		newG, err := svc.Archive(int(g.ID), false)
 		if err != nil {
 			logrus.Error(err)
 			return

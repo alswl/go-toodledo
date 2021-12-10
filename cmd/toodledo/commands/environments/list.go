@@ -13,7 +13,7 @@ var listCmd = &cobra.Command{
 	Aliases: []string{"ls"},
 	Run: func(cmd *cobra.Command, args []string) {
 		cSrv := services.NewEnvironmentService()
-		cks, err := cSrv.QueryAll()
+		cks, err := cSrv.ListAll()
 		if err != nil {
 			logrus.Error(err)
 			return

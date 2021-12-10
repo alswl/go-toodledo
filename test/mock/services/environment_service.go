@@ -12,8 +12,8 @@ type EnvironmentService struct {
 	mock.Mock
 }
 
-// QueryAll provides a mock function with given fields:
-func (_m *EnvironmentService) QueryAll() ([]*models.EnvironmentWithKey, error) {
+// ListAll provides a mock function with given fields:
+func (_m *EnvironmentService) ListAll() ([]*models.EnvironmentWithKey, error) {
 	ret := _m.Called()
 
 	var r0 []*models.EnvironmentWithKey
@@ -36,7 +36,7 @@ func (_m *EnvironmentService) QueryAll() ([]*models.EnvironmentWithKey, error) {
 }
 
 // QueryAllKeys provides a mock function with given fields:
-func (_m *EnvironmentService) QueryAllKeys() ([]string, error) {
+func (_m *EnvironmentService) ListAllKeys() ([]string, error) {
 	ret := _m.Called()
 
 	var r0 []string
