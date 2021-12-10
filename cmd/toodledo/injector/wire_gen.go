@@ -18,7 +18,15 @@ import (
 // Injectors from injector.go:
 
 func InitAuth() (runtime.ClientAuthInfoWriter, error) {
-	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +40,15 @@ func NewToodledoCli() (*client.Toodledo, error) {
 
 func InitFolderService() (services.FolderService, error) {
 	toodledo := client.NewToodledoCli()
-	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -42,16 +58,20 @@ func InitFolderService() (services.FolderService, error) {
 
 func InitFolderCachedService() (services.FolderCachedService, error) {
 	toodledo := client.NewToodledoCli()
-	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	toodledoCliConfig, err := common.NewCliConfigFromViper()
-	if err != nil {
-		return nil, err
-	}
 	backend, err := dao.NewBoltDB(toodledoCliConfig)
 	if err != nil {
 		return nil, err
@@ -62,7 +82,15 @@ func InitFolderCachedService() (services.FolderCachedService, error) {
 
 func InitContextService() (services.ContextService, error) {
 	toodledo := client.NewToodledoCli()
-	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -72,16 +100,20 @@ func InitContextService() (services.ContextService, error) {
 
 func InitContextCachedService() (services.ContextCachedService, error) {
 	toodledo := client.NewToodledoCli()
-	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	toodledoCliConfig, err := common.NewCliConfigFromViper()
-	if err != nil {
-		return nil, err
-	}
 	backend, err := dao.NewBoltDB(toodledoCliConfig)
 	if err != nil {
 		return nil, err
@@ -92,7 +124,15 @@ func InitContextCachedService() (services.ContextCachedService, error) {
 
 func InitTaskService() (services.TaskService, error) {
 	toodledo := client.NewToodledoCli()
-	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +142,15 @@ func InitTaskService() (services.TaskService, error) {
 
 func InitGoalsService() (services.GoalService, error) {
 	toodledo := client.NewToodledoCli()
-	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +159,15 @@ func InitGoalsService() (services.GoalService, error) {
 }
 
 func InitApp() (*app.ToodledoCliApp, error) {
-	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -119,10 +175,6 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	toodledoCliConfig, err := common.NewCliConfigFromViper()
-	if err != nil {
-		return nil, err
-	}
 	backend, err := dao.NewBoltDB(toodledoCliConfig)
 	if err != nil {
 		return nil, err

@@ -15,6 +15,7 @@ var IntegrationTestSet = wire.NewSet(
 
 	dao.NewBoltDB,
 	client.NewToodledoCli,
+	//client.NewAuthFromConfig,
 	client.NewAuthFromConfig,
 	client.NewOAuth2ConfigFromConfigs,
 

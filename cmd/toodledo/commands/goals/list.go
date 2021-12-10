@@ -2,10 +2,8 @@ package goals
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/goal"
+	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/render"
-	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -13,18 +11,22 @@ import (
 var ListCmd = &cobra.Command{
 	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := client.NewAuthFromViper()
+		_, err := injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-
-		cli := client.NewHTTPClient(strfmt.NewFormats())
-		res, err := cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), auth)
+		svc, err := injector.InitGoalsService()
 		if err != nil {
-			logrus.Error(err)
+			logrus.WithError(err).Fatal("failed to init goals service")
 			return
 		}
-		fmt.Println(render.Tables4Goal(res.Payload))
+		all, err := svc.ListAll()
+		if err != nil {
+			logrus.WithError(err).Fatal("failed to list goals")
+			return
+		}
+
+		fmt.Println(render.Tables4Goal(all))
 	},
 }

@@ -16,6 +16,8 @@ type GoalService interface {
 	ArchiveGoal(id int, isArchived bool) (*models.Goal, error)
 	Delete(id int64) error
 	Rename(id int64, newName string) (*models.Goal, error)
+	Create(name string) (*models.Goal, error)
+	ListAll() ([]*models.Goal, error)
 }
 
 type goalService struct {
@@ -58,6 +60,17 @@ func (h *goalService) ArchiveGoal(id int, isArchived bool) (*models.Goal, error)
 	return res.Payload[0], nil
 }
 
+func (h *goalService) Create(name string) (*models.Goal, error) {
+	params := goal.NewPostGoalsAddPhpParams()
+	params.SetName(name)
+	res, err := h.cli.Goal.PostGoalsAddPhp(params, h.auth)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	return res.Payload[0], nil
+}
+
 func (h *goalService) Delete(id int64) error {
 	params := goal.NewPostGoalsDeletePhpParams()
 	params.SetID(id)
@@ -79,4 +92,13 @@ func (h *goalService) Rename(id int64, newName string) (*models.Goal, error) {
 		return nil, err
 	}
 	return res.Payload[0], nil
+}
+
+func (h *goalService) ListAll() ([]*models.Goal, error) {
+	res, err := h.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), h.auth)
+	if err != nil {
+		logrus.WithField("resp", res).WithError(err).Error("request failed")
+		return nil, err
+	}
+	return res.Payload, nil
 }

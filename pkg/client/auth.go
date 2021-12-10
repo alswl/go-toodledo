@@ -21,7 +21,6 @@ type SimpleAuth struct {
 	accessToken string
 }
 
-// TODO remove this, using configs instead of accessToken
 func NewSimpleAuth(accessToken string) runtime.ClientAuthInfoWriter {
 	return &SimpleAuth{accessToken: accessToken}
 }
@@ -30,35 +29,6 @@ func NewSimpleAuth(accessToken string) runtime.ClientAuthInfoWriter {
 func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry strfmt.Registry) error {
 	request.SetQueryParam("access_token", a.accessToken)
 	return nil
-}
-
-// NewAuthFromViper provides auth from viper
-// XXX decoupling from viper
-func NewAuthFromViper() (runtime.ClientAuthInfoWriter, error) {
-	clientId := viper.GetString("auth.client_id")
-	if clientId == "" {
-		return nil, errors.New("auth.client_id is not set")
-	}
-	clientSecret := viper.GetString("auth.client_secret")
-	if clientSecret == "" {
-		return nil, errors.New("auth.client_secret is not set")
-	}
-	accessToken := viper.GetString("auth.access_token")
-	rt := viper.GetString("auth.refresh_token")
-	if accessToken == "" {
-		logrus.Error("auth.access_token is empty")
-		return nil, errors.New("auth.access_token is empty")
-	}
-	expiredAt := viper.GetString("auth.expired_at")
-	if expiredAt == "" {
-		return nil, errors.New("auth.expired_at is empty")
-	}
-	at, err := time.Parse(time.RFC3339, expiredAt)
-	if err != nil {
-		return nil, errors.New("auth.expired_at parse error")
-	}
-
-	return NewAuth(clientId, clientSecret, accessToken, rt, at, SaveTokenWithViper)
 }
 
 // NewAuthFromConfig create auth writer from ToodledoConfig
