@@ -2,10 +2,7 @@ package goals
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/goal"
-	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/go-openapi/strfmt"
+	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -14,25 +11,26 @@ var DeleteCmd = &cobra.Command{
 	Use:  "delete",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := client.NewAuthFromViper()
+		_, err := injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
+		svc, err := injector.InitGoalsService()
+		if err != nil {
+			logrus.WithError(err).Fatal("failed to init goals service")
+			return
+		}
 		name := args[0]
 
-		f, err := services.FindGoalByName(auth, name)
+		f, err := svc.FindGoalByName(name)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-
-		cli := client.NewHTTPClient(strfmt.NewFormats())
-		params := goal.NewPostGoalsDeletePhpParams()
-		params.SetID(f.ID)
-		resp, err := cli.Goal.PostGoalsDeletePhp(params, auth)
+		err = svc.Delete(f.ID)
 		if err != nil {
-			logrus.WithField("resp", resp).Error(err)
+			logrus.WithError(err).Error("failed to delete goal")
 			return
 		}
 		fmt.Println("done")

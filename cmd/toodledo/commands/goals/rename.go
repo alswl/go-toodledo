@@ -2,27 +2,27 @@ package goals
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/goal"
+	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/render"
-	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 var RenameCmd = &cobra.Command{
 	Use:  "rename",
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		auth, err := client.NewAuthFromViper()
+		_, err := injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		cli := client.NewHTTPClient(strfmt.NewFormats())
-
+		svc, err := injector.InitGoalsService()
+		if err != nil {
+			logrus.WithError(err).Fatal("failed to init goals service")
+			return
+		}
 		name := args[0]
 		newName := args[1]
 		if name == newName {
@@ -30,20 +30,12 @@ var RenameCmd = &cobra.Command{
 			return
 		}
 
-		f, err := services.FindGoalByName(auth, name)
+		g, err := svc.FindGoalByName(name)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-
-		p := goal.NewPostGoalsEditPhpParams()
-		p.SetID(strconv.Itoa(int(f.ID)))
-		p.SetName(&newName)
-		res, err := cli.Goal.PostGoalsEditPhp(p, auth)
-		if err != nil {
-			logrus.Error(err)
-			return
-		}
-		fmt.Print(render.Tables4Goal(res.Payload))
+		renamed, err := svc.Rename(g.ID, newName)
+		fmt.Print(render.Tables4Goal([]*models.Goal{renamed}))
 	},
 }

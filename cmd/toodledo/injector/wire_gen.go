@@ -100,6 +100,16 @@ func InitTaskService() (services.TaskService, error) {
 	return taskService, nil
 }
 
+func InitGoalsService() (services.GoalService, error) {
+	toodledo := client.NewToodledoCli()
+	clientAuthInfoWriter, err := client.NewAuthFromViper()
+	if err != nil {
+		return nil, err
+	}
+	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
+	return goalService, nil
+}
+
 func InitApp() (*app.ToodledoCliApp, error) {
 	clientAuthInfoWriter, err := client.NewAuthFromViper()
 	if err != nil {

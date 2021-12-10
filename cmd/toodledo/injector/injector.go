@@ -46,6 +46,11 @@ func InitTaskService() (services.TaskService, error) {
 	return nil, nil
 }
 
+func InitGoalsService() (services.GoalService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
 func InitApp() (*app.ToodledoCliApp, error) {
 	wire.Build(SuperSet)
 	return nil, nil

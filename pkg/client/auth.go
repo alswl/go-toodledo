@@ -26,6 +26,12 @@ func NewSimpleAuth(accessToken string) runtime.ClientAuthInfoWriter {
 	return &SimpleAuth{accessToken: accessToken}
 }
 
+// AuthenticateRequest ...
+func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry strfmt.Registry) error {
+	request.SetQueryParam("access_token", a.accessToken)
+	return nil
+}
+
 // NewAuthFromViper provides auth from viper
 // XXX decoupling from viper
 func NewAuthFromViper() (runtime.ClientAuthInfoWriter, error) {
@@ -55,8 +61,8 @@ func NewAuthFromViper() (runtime.ClientAuthInfoWriter, error) {
 	return NewAuth(clientId, clientSecret, accessToken, rt, at, SaveTokenWithViper)
 }
 
-// NewAuthFromConfigs ...
-func NewAuthFromConfigs(cfg models.ToodledoConfig) (runtime.ClientAuthInfoWriter, error) {
+// NewAuthFromConfig create auth writer from ToodledoConfig
+func NewAuthFromConfig(cfg models.ToodledoConfig) (runtime.ClientAuthInfoWriter, error) {
 	accessToken := cfg.AccessToken
 	rt := cfg.RefreshToken
 	if accessToken == "" {
@@ -75,7 +81,7 @@ func NewAuthFromConfigs(cfg models.ToodledoConfig) (runtime.ClientAuthInfoWriter
 	return NewAuth(cfg.ClientId, cfg.ClientSecret, accessToken, rt, at, noOps)
 }
 
-// NewAuth ...
+// NewAuth create auth writer by access token and refresh token, it will automatically refresh
 func NewAuth(clientId, clientSecret, accessToken, refreshToken string, expiredAt time.Time, saveFn func(newToken *oauth2.Token) error) (runtime.ClientAuthInfoWriter, error) {
 	token := oauth2.Token{
 		AccessToken:  accessToken,
@@ -93,6 +99,7 @@ func NewAuth(clientId, clientSecret, accessToken, refreshToken string, expiredAt
 		},
 	}
 
+	// refresh access token by refresh token
 	if token.Expiry.Before(time.Now()) {
 		if refreshToken == "" {
 			return nil, errors.New("auth.refresh_token is empty")
@@ -117,12 +124,6 @@ func NewToodledoCli() *Toodledo {
 	transportConfig := openapiclient.New(DefaultHost, DefaultBasePath, []string{"https"})
 	transportConfig.Debug = debug
 	return New(transportConfig, strfmt.Default)
-}
-
-// AuthenticateRequest ...
-func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry strfmt.Registry) error {
-	request.SetQueryParam("access_token", a.accessToken)
-	return nil
 }
 
 // NewOAuth2ConfigFromConfigs ...
