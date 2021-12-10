@@ -10,9 +10,11 @@ import (
 )
 
 func TestTaskServiceFindById(t *testing.T) {
-	app, err := itinjector.InitApp()
+	_, err := itinjector.InitApp()
+	assert.NotNil(t, err)
+	svc, err := itinjector.InitTaskService()
+	assert.NotNil(t, err)
 
-	svc := app.TaskSvc
 	task, err := svc.FindById(273321713)
 	assert.NoError(t, err)
 	assert.NotNil(t, task)

@@ -11,13 +11,18 @@ import (
 var ListCmd = &cobra.Command{
 	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
-		app, err := injector.InitApp()
+		_, err := injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
+		svc, err := injector.InitContextService()
+		if err != nil {
+			logrus.Fatal(err)
+			return
+		}
 
-		all, err := app.ContextSvc.ListAll()
+		all, err := svc.ListAll()
 		if err != nil {
 			logrus.Error(err)
 			return

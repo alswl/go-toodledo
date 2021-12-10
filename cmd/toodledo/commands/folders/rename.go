@@ -13,14 +13,19 @@ var RenameCmd = &cobra.Command{
 	Use:  "rename",
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		app, err := injector.InitApp()
+		_, err := injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
+		svc, err := injector.InitFolderService()
+		if err != nil {
+			logrus.Fatal(err)
+			return
+		}
 		name := args[0]
 		newName := args[1]
-		f, err := app.FolderSvc.Rename(name, newName)
+		f, err := svc.Rename(name, newName)
 		if err != nil {
 			logrus.WithError(err).Fatal("rename failed")
 			return

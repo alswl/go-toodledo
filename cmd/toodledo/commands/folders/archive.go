@@ -13,20 +13,24 @@ var ArchiveCmd = &cobra.Command{
 	Use:  "archive",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		app, err := injector.InitApp()
+		_, err := injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
+		svc, err := injector.InitFolderService()
+		if err != nil {
+			logrus.Fatal(err)
+			return
+		}
 		name := args[0]
 
-		f, err := app.FolderSvc.Find(name)
+		f, err := svc.Find(name)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-
-		newF, err := app.FolderSvc.Archive(int(f.ID), false)
+		newF, err := svc.Archive(int(f.ID), false)
 		if err != nil {
 			logrus.Error(err)
 			return

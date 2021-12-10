@@ -12,13 +12,18 @@ var meCmd = &cobra.Command{
 	Use:   "me",
 	Short: "Who am i?",
 	Run: func(cmd *cobra.Command, args []string) {
-		app, err := injector.InitApp()
+		_, err := injector.InitApp()
 		if err != nil {
-			logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
+			logrus.Fatal("login required, using `toodledo auth login` to login.")
+			return
+		}
+		svc, err := injector.InitAccountSvc()
+		if err != nil {
+			logrus.Fatal(err)
 			return
 		}
 
-		me, err := app.AccountSvc.Me()
+		me, err := svc.Me()
 		if err != nil {
 			logrus.Error(err)
 			return

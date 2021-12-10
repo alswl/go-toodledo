@@ -13,14 +13,19 @@ var CreateCmd = &cobra.Command{
 	Use:  "create",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		app, err := injector.InitApp()
+		_, err := injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
+		svc, err := injector.InitContextService()
+		if err != nil {
+			logrus.Fatal(err)
+			return
+		}
 		name := args[0]
 
-		created, err := app.ContextSvc.Create(name)
+		created, err := svc.Create(name)
 		if err != nil {
 			logrus.Error(err)
 			return
