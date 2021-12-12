@@ -52,7 +52,6 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 	return &t, nil
 }
 
-// QueryAll ...
 func (s *taskService) ListAll() ([]*models.Task, *models.PaginatedInfo, error) {
 	// TODO using TaskQuery
 	p := task.NewGetTasksGetPhpParams()
