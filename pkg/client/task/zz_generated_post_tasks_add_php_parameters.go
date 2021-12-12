@@ -67,7 +67,7 @@ type PostTasksAddPhpParams struct {
 
 	/* Tasks.
 
-	   Array of tasks
+	   Array of tasks, should be put json string
 	*/
 	Tasks *string
 

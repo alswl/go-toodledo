@@ -21,6 +21,7 @@ type SimpleAuth struct {
 	accessToken string
 }
 
+// NewSimpleAuth ...
 func NewSimpleAuth(accessToken string) runtime.ClientAuthInfoWriter {
 	return &SimpleAuth{accessToken: accessToken}
 }

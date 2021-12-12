@@ -11,6 +11,7 @@ import (
 	"strconv"
 )
 
+// GoalService ...
 type GoalService interface {
 	FindByName(name string) (*models.Goal, error)
 	Archive(id int, isArchived bool) (*models.Goal, error)
@@ -26,10 +27,12 @@ type goalService struct {
 	//log  *logrus.Logger
 }
 
+// NewGoalService ...
 func NewGoalService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) GoalService {
 	return &goalService{cli: cli, auth: auth}
 }
 
+// FindByName ...
 func (h *goalService) FindByName(name string) (*models.Goal, error) {
 	ts, err := h.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), h.auth)
 	if err != nil {
@@ -45,6 +48,7 @@ func (h *goalService) FindByName(name string) (*models.Goal, error) {
 	return f, nil
 }
 
+// Archive ...
 func (h *goalService) Archive(id int, isArchived bool) (*models.Goal, error) {
 	p := goal.NewPostGoalsEditPhpParams()
 	p.SetID(strconv.Itoa(id))
@@ -60,6 +64,7 @@ func (h *goalService) Archive(id int, isArchived bool) (*models.Goal, error) {
 	return res.Payload[0], nil
 }
 
+// Create ...
 func (h *goalService) Create(name string) (*models.Goal, error) {
 	params := goal.NewPostGoalsAddPhpParams()
 	params.SetName(name)
@@ -71,6 +76,7 @@ func (h *goalService) Create(name string) (*models.Goal, error) {
 	return res.Payload[0], nil
 }
 
+// Delete ...
 func (h *goalService) Delete(id int64) error {
 	params := goal.NewPostGoalsDeletePhpParams()
 	params.SetID(id)
@@ -82,6 +88,7 @@ func (h *goalService) Delete(id int64) error {
 	return nil
 }
 
+// Rename ...
 func (h *goalService) Rename(id int64, newName string) (*models.Goal, error) {
 	p := goal.NewPostGoalsEditPhpParams()
 	p.SetID(strconv.Itoa(int(id)))
@@ -94,6 +101,7 @@ func (h *goalService) Rename(id int64, newName string) (*models.Goal, error) {
 	return res.Payload[0], nil
 }
 
+// ListAll ...
 func (h *goalService) ListAll() ([]*models.Goal, error) {
 	res, err := h.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), h.auth)
 	if err != nil {

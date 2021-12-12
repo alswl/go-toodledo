@@ -644,6 +644,43 @@ paths:
           description: ServiceUnavailable
           schema:
             $ref: '#/definitions/Error'
+  /tasks/delete.php:
+    post:
+      tags:
+        - task
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - application/json
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: tasks
+          description: Array of tasks, should be put json string
+      responses:
+        '200':
+          description: ok
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskDeleteItem'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   Error:
     type: object
@@ -1130,3 +1167,23 @@ definitions:
     type: array
     items:
       type: object
+  TaskDeleteItem:
+    type: object
+    properties:
+      id:
+        type: integer
+      errorCode:
+        type: integer
+        description: >-
+          The error code for the delete operation. This will be 0 if the
+          delete was successful.
+      errorDesc:
+        type: string
+        description: >-
+          The error description for the delete operation. This will be empty if
+          the delete was successful.
+      ref:
+        type: string
+        description: >-
+          A read-only field that contains the id number of the task that this
+          task is a reference to. This is useful for tasks that are deleted failed.
