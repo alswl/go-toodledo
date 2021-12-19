@@ -14,7 +14,7 @@ var SuperSet = wire.NewSet(
 	common.NewConfigCliConfig,
 
 	dao.NewBoltDB,
-	client.NewToodledoCli,
+	client.NewToodledo,
 	//client.NewAuthFromViper,
 	client.NewAuthFromConfig,
 	client.ProvideOAuth2ConfigFromViper,

@@ -34,12 +34,12 @@ func InitAuth() (runtime.ClientAuthInfoWriter, error) {
 }
 
 func NewToodledoCli() (*client.Toodledo, error) {
-	toodledo := client.NewToodledoCli()
+	toodledo := client.NewToodledo()
 	return toodledo, nil
 }
 
 func InitFolderService() (services.FolderService, error) {
-	toodledo := client.NewToodledoCli()
+	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func InitFolderService() (services.FolderService, error) {
 }
 
 func InitFolderCachedService() (services.FolderCachedService, error) {
-	toodledo := client.NewToodledoCli()
+	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func InitFolderCachedService() (services.FolderCachedService, error) {
 }
 
 func InitContextService() (services.ContextService, error) {
-	toodledo := client.NewToodledoCli()
+	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func InitContextService() (services.ContextService, error) {
 }
 
 func InitContextCachedService() (services.ContextCachedService, error) {
-	toodledo := client.NewToodledoCli()
+	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func InitContextCachedService() (services.ContextCachedService, error) {
 }
 
 func InitTaskService() (services.TaskService, error) {
-	toodledo := client.NewToodledoCli()
+	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
@@ -141,7 +141,7 @@ func InitTaskService() (services.TaskService, error) {
 }
 
 func InitGoalsService() (services.GoalService, error) {
-	toodledo := client.NewToodledoCli()
+	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
@@ -159,7 +159,7 @@ func InitGoalsService() (services.GoalService, error) {
 }
 
 func InitAccountSvc() (services.AccountService, error) {
-	toodledo := client.NewToodledoCli()
+	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err
@@ -177,7 +177,7 @@ func InitAccountSvc() (services.AccountService, error) {
 }
 
 func InitApp() (*app.ToodledoCliApp, error) {
-	toodledo := client.NewToodledoCli()
+	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
 		return nil, err

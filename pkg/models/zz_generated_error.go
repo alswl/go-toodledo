@@ -7,6 +7,7 @@ package models
 
 import (
 	ccontext "context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"

@@ -21,7 +21,8 @@ type SimpleAuth struct {
 	accessToken string
 }
 
-func NewSimpleAuth(accessToken string) runtime.ClientAuthInfoWriter {
+// NewAuthByToken is simple runtime.ClientAuthInfoWriter with accessToken
+func NewAuthByToken(accessToken string) runtime.ClientAuthInfoWriter {
 	return &SimpleAuth{accessToken: accessToken}
 }
 
@@ -48,11 +49,12 @@ func NewAuthFromConfig(cfg models.ToodledoConfig) (runtime.ClientAuthInfoWriter,
 		return nil, errors.New("auth.expired_at parse error")
 	}
 
-	return NewAuth(cfg.ClientId, cfg.ClientSecret, accessToken, rt, at, noOps)
+	return NewAuthWithRefresh(cfg.ClientId, cfg.ClientSecret, accessToken, rt, at, SaveTokenWithViper)
 }
 
-// NewAuth create auth writer by access token and refresh token, it will automatically refresh
-func NewAuth(clientId, clientSecret, accessToken, refreshToken string, expiredAt time.Time, saveFn func(newToken *oauth2.Token) error) (runtime.ClientAuthInfoWriter, error) {
+// NewAuthWithRefresh create auth writer by access token and refresh token, it will automatically refresh
+func NewAuthWithRefresh(clientId, clientSecret, accessToken, refreshToken string, expiredAt time.Time,
+	saveFn func(newToken *oauth2.Token) error) (runtime.ClientAuthInfoWriter, error) {
 	token := oauth2.Token{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
@@ -70,25 +72,27 @@ func NewAuth(clientId, clientSecret, accessToken, refreshToken string, expiredAt
 	}
 
 	// refresh access token by refresh token
-	if token.Expiry.Before(time.Now()) {
-		if refreshToken == "" {
-			return nil, errors.New("auth.refresh_token is empty")
-		}
-		newToken, err := regenerate(conf, &token)
-		if err != nil {
-			return nil, err
-		}
-		err = saveFn(newToken)
-		if err != nil {
-			return nil, err
-		}
-		return NewSimpleAuth(newToken.AccessToken), nil
+	if !token.Expiry.Before(time.Now()) {
+		logrus.WithField("expired_at", token.Expiry).Debug("not expired, using token from config")
+		return NewAuthByToken(token.AccessToken), nil
 	}
-	return NewSimpleAuth(accessToken), nil
+
+	if refreshToken == "" {
+		return nil, errors.New("auth.refresh_token is empty")
+	}
+	newToken, err := regenerate(conf, &token)
+	if err != nil {
+		return nil, err
+	}
+	err = saveFn(newToken)
+	if err != nil {
+		return nil, err
+	}
+	return NewAuthByToken(newToken.AccessToken), nil
 }
 
-// NewToodledoCli ...
-func NewToodledoCli() *Toodledo {
+// NewToodledo ...
+func NewToodledo() *Toodledo {
 	debug := os.Getenv("DEBUG") != "" || os.Getenv("SWAGGER_DEBUG") != ""
 
 	transportConfig := openapiclient.New(DefaultHost, DefaultBasePath, []string{"https"})
@@ -142,6 +146,7 @@ func regenerate(conf *oauth2.Config, oldToken *oauth2.Token) (*oauth2.Token, err
 	src := conf.TokenSource(context.TODO(), oldToken)
 	newToken, err := src.Token()
 	if err != nil {
+		logrus.WithField("err", err).Error("regenerate token failed")
 		return nil, fmt.Errorf("failed to get new token: %s", err)
 	}
 	return newToken, nil
