@@ -23,6 +23,7 @@ type TaskService interface {
 	Create(name string, options map[string]interface{}) (*models.Task, error)
 	Delete(id int64) error
 	DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error)
+	Edit(id int, t *models.Task) (*models.Task, error)
 }
 
 type taskService struct {
@@ -151,4 +152,9 @@ func (s *taskService) Delete(id int64) error {
 		return fmt.Errorf("failed to delete task %d", id)
 	}
 	return nil
+}
+
+func (s *taskService) Edit(id int, t *models.Task) (*models.Task, error) {
+	//TODO implement me
+	panic("implement me")
 }
