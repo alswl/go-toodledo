@@ -681,6 +681,52 @@ paths:
           description: ServiceUnavailable
           schema:
             $ref: '#/definitions/Error'
+  /tasks/edit.php:
+    post:
+      tags:
+        - task
+      security:
+        - OAuth2:
+            - read
+            - write
+      consumes:
+        - application/json
+      produces:
+        - application/xml
+        - application/json
+      parameters:
+        - in: query
+          type: string
+          name: tasks
+          description: >-
+            Array of tasks, should be put json string, id is required
+            reschedule field is optional, set to "1" if you want Toodledo to automatically reschedule the repeating task for you.
+        - in: query
+          type: string
+          name: fields
+          description: >-
+            A comma separated list of optional fields that you want returned.
+            For efficiency, you should omit fields that you don't use. This will
+            make downloading, parsing and syncing go much faster.
+      responses:
+        '200':
+          description: ok
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Task'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   Error:
     type: object

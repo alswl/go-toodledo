@@ -23,6 +23,9 @@ type TaskService interface {
 	Create(name string, options map[string]interface{}) (*models.Task, error)
 	Delete(id int64) error
 	DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error)
+	Edit(id int64, t *models.Task) (*models.Task, error)
+	Complete(id int64) (*models.Task, error)
+	UnComplete(id int64) (*models.Task, error)
 }
 
 type taskService struct {
@@ -151,4 +154,40 @@ func (s *taskService) Delete(id int64) error {
 		return fmt.Errorf("failed to delete task %d", id)
 	}
 	return nil
+}
+
+// Edit ...
+func (s *taskService) Edit(id int64, t *models.Task) (*models.Task, error) {
+	bytes, _ := json.Marshal([]models.Task{*t})
+	bytesS := (string)(bytes)
+	p := task.NewPostTasksEditPhpParams()
+	p.Tasks = &bytesS
+	resp, err := s.cli.Task.PostTasksEditPhp(p, s.auth)
+	if err != nil {
+		return nil, err
+	}
+	// FIXME index
+	return resp.Payload[0], err
+}
+
+func (s *taskService) Complete(id int64) (*models.Task, error) {
+	t, err := s.FindById(id)
+	if err != nil {
+		return nil, err
+	}
+	return s.Edit(id, &models.Task{
+		ID:        t.ID,
+		Completed: time.Now().Unix(),
+	})
+}
+
+func (s *taskService) UnComplete(id int64) (*models.Task, error) {
+	t, err := s.FindById(id)
+	if err != nil {
+		return nil, err
+	}
+	return s.Edit(id, &models.Task{
+		ID:        t.ID,
+		Completed: 0,
+	})
 }

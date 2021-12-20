@@ -9,5 +9,8 @@ var TaskCmd = &cobra.Command{
 }
 
 func init() {
-	TaskCmd.AddCommand(ListCmd, ViewCmd, CreateCmd, DeleteCmd)
+	// FIXME
+	EditCmd.Flags().StringP("id", "i", "", "task id")
+
+	TaskCmd.AddCommand(ListCmd, ViewCmd, CreateCmd, DeleteCmd, EditCmd, CompleteCmd, UnCompleteCmd)
 }
