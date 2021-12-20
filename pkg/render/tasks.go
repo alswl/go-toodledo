@@ -23,7 +23,7 @@ func Tables4Task(tasks []*models.Task) string {
 	var rows []table.Row
 	for _, x := range tasks {
 		completed := "[ ]"
-		if x.Completed == 1 {
+		if x.Completed > 0 {
 			completed = "[X]"
 		}
 		context := "Not Set"

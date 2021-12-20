@@ -12,5 +12,5 @@ func init() {
 	// FIXME
 	EditCmd.Flags().StringP("id", "i", "", "task id")
 
-	TaskCmd.AddCommand(ListCmd, ViewCmd, CreateCmd, DeleteCmd, EditCmd)
+	TaskCmd.AddCommand(ListCmd, ViewCmd, CreateCmd, DeleteCmd, EditCmd, CompleteCmd, UnCompleteCmd)
 }

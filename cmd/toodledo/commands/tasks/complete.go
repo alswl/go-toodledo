@@ -5,15 +5,14 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/render"
-	"github.com/jinzhu/copier"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strconv"
 )
 
-var EditCmd = &cobra.Command{
-	Use:  "edit",
-	Args: cobra.ExactArgs(2),
+var CompleteCmd = &cobra.Command{
+	Use:  "complete",
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		_, err := injector.InitApp()
 		if err != nil {
@@ -27,18 +26,9 @@ var EditCmd = &cobra.Command{
 		}
 
 		id, _ := strconv.Atoi(args[0])
-		t, err := svc.FindById(int64(id))
+		newTReturned, err := svc.Complete(int64(id))
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to find task")
-			return
-		}
-		newT := models.Task{}
-		copier.Copy(&newT, t)
-		newT.Title = args[1]
-		//TODO to fields, with opt()
-		newTReturned, err := svc.Edit(int64(id), &newT)
-		if err != nil {
-			logrus.WithField("id", id).WithError(err).Fatal("failed to edit task")
+			logrus.WithField("id", id).WithError(err).Fatal("failed to complete task")
 			return
 		}
 		fmt.Println(render.Tables4Task([]*models.Task{newTReturned}))
