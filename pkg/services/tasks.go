@@ -154,7 +154,16 @@ func (s *taskService) Delete(id int64) error {
 	return nil
 }
 
+// Edit ...
 func (s *taskService) Edit(id int, t *models.Task) (*models.Task, error) {
-	//TODO implement me
-	panic("implement me")
+	bytes, _ := json.Marshal([]models.Task{*t})
+	bytesS := (string)(bytes)
+	p := task.NewPostTasksEditPhpParams()
+	p.Tasks = &bytesS
+	resp, err := s.cli.Task.PostTasksEditPhp(p, s.auth)
+	if err != nil {
+		return nil, err
+	}
+	// FIXME index
+	return resp.Payload[0], err
 }

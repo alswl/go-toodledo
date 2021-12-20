@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/render"
+	"github.com/jinzhu/copier"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"strconv"
@@ -11,26 +13,34 @@ import (
 
 var EditCmd = &cobra.Command{
 	Use:  "edit",
-	Args: cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		_, err := injector.InitApp()
 		if err != nil {
-			logrus.Fatal("login required, using `toodledo auth login` to login.")
+			logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
 		svc, err := injector.InitTaskService()
 		if err != nil {
-			logrus.Fatal(err)
+			logrus.WithError(err).Fatal("failed to init task service")
 			return
 		}
 
 		id, _ := strconv.Atoi(args[0])
-		newT, err := svc.Edit(id, &models.Task{})
+		t, err := svc.FindById(int64(id))
 		if err != nil {
-			logrus.Fatal(err)
+			logrus.WithError(err).Fatal("failed to find task")
 			return
 		}
-		// FIXME
-		fmt.Println(newT)
+		newT := models.Task{}
+		copier.Copy(&newT, t)
+		newT.Title = args[1]
+		//TODO to fields, with opt()
+		newTReturned, err := svc.Edit(id, &newT)
+		if err != nil {
+			logrus.WithField("id", id).WithError(err).Fatal("failed to edit task")
+			return
+		}
+		fmt.Println(render.Tables4Task([]*models.Task{newTReturned}))
 	},
 }
