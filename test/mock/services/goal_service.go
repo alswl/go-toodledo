@@ -12,7 +12,7 @@ type GoalService struct {
 	mock.Mock
 }
 
-// ArchiveGoal provides a mock function with given fields: id, isArchived
+// Archive provides a mock function with given fields: id, isArchived
 func (_m *GoalService) Archive(id int, isArchived bool) (*models.Goal, error) {
 	ret := _m.Called(id, isArchived)
 
@@ -72,7 +72,7 @@ func (_m *GoalService) Delete(id int64) error {
 	return r0
 }
 
-// FindGoalByName provides a mock function with given fields: name
+// FindByName provides a mock function with given fields: name
 func (_m *GoalService) FindByName(name string) (*models.Goal, error) {
 	ret := _m.Called(name)
 

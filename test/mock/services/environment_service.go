@@ -35,7 +35,7 @@ func (_m *EnvironmentService) ListAll() ([]*models.EnvironmentWithKey, error) {
 	return r0, r1
 }
 
-// QueryAllKeys provides a mock function with given fields:
+// ListAllKeys provides a mock function with given fields:
 func (_m *EnvironmentService) ListAllKeys() ([]string, error) {
 	ret := _m.Called()
 
