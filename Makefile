@@ -87,8 +87,7 @@ generate-code:
 generate-code-enum:
 	@echo generate stringer for enums
 	# TODO using ls
-	@(cd pkg/models/enums/taskstatus/; go generate)
-	@(cd pkg/models/enums/taskpriorities/; go generate)
+	@(cd pkg/models/enums/tasks/; go generate)
 
 generate-code-swagger:
 	@(cd pkg; rm client/zz_generated_*.go;rm client/*/zz_generated_*.go; rm models/zz_generated_*.go; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override -C ../api/config.yaml)
