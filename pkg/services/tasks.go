@@ -7,6 +7,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/client/task"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/enums"
+	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/go-openapi/runtime"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
@@ -21,6 +22,7 @@ type TaskService interface {
 	ListModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error)
 	// TODO using opt
 	Create(name string, options map[string]interface{}) (*models.Task, error)
+	CreateWithQuery(query *queries.TaskCreateQuery) (*models.Task, error)
 	Delete(id int64) error
 	DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error)
 	Edit(id int64, t *models.Task) (*models.Task, error)
@@ -88,6 +90,10 @@ func (s *taskService) ListAll() ([]*models.Task, *models.PaginatedInfo, error) {
 
 // QueryModifiedTimeIn ...
 func (s *taskService) ListModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error) {
+	panic("implement me")
+}
+
+func (s *taskService) CreateWithQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
 	panic("implement me")
 }
 
@@ -191,3 +197,28 @@ func (s *taskService) UnComplete(id int64) (*models.Task, error) {
 		Completed: 0,
 	})
 }
+
+//if b.folder != "" && query.FolderID == 0 {
+//	folder, err := b.folderSvc.Find(b.folder)
+//	if err != nil {
+//		return errors.Wrap(err, "failed to find folder")
+//	}
+//	query.FolderID = folder.ID
+//}
+//
+//if b.context != "" && query.ContextID == 0 {
+//	context, err := b.contextSvc.Find(b.context)
+//	if err != nil {
+//		return errors.Wrap(err, "failed to find context")
+//	}
+//	query.ContextID = context.ID
+//}
+//if b.goal != "" && query.GoalID == 0 {
+//	goal, err := b.goalSvc.Find(b.goal)
+//	if err != nil {
+//		return errors.Wrap(err, "failed to find goal")
+//	}
+//	query.GoalID = goal.ID
+//}
+//
+//return nil
