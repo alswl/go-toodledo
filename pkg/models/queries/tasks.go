@@ -9,7 +9,7 @@ import (
 
 // TaskCreateQuery is query model of Task
 type TaskCreateQuery struct {
-	Title     string
+	Title     string `description:"" validate:"required"`
 	ContextID int64
 	FolderID  int64
 	GoalID    int64

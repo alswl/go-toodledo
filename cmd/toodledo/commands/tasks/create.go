@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/pkg"
 	"github.com/alswl/go-toodledo/pkg/models/enums"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
@@ -25,8 +26,16 @@ import (
 
 var CreateCmd = &cobra.Command{
 	Use:  "create",
-	Args: cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
+		q := queries.TaskCreateQuery{}
+		err := pkg.FillQueryByStructuredCmd(cmd, &q)
+		// XXX
+		//validate q
+		if err != nil {
+			logrus.WithError(err).Fatal("failed")
+		}
+
 		qb := queries.NewTaskCreateQueryBuilder()
 
 		// filled qb with corba arguments
@@ -76,4 +85,12 @@ var CreateCmd = &cobra.Command{
 
 		//fmt.Println(render.Tables4Task([]*models.Task{t}))
 	},
+}
+
+func init() {
+	err := pkg.GenerateFlagsByStructure(CreateCmd, queries.TaskCreateQuery{})
+	if err != nil {
+		panic(err)
+	}
+	//CreateCmd.Flags().String("title", "", "title of the task")
 }

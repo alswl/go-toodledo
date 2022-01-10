@@ -30,7 +30,7 @@ var RenameCmd = &cobra.Command{
 			return
 		}
 
-		g, err := svc.FindByName(name)
+		g, err := svc.Find(name)
 		if err != nil {
 			logrus.Error(err)
 			return

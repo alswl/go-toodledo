@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -9,12 +8,12 @@ import (
 )
 
 type Q struct {
-	s   string
-	i64 int64
-	i   int
-	t   time.Time
-	srt tasks.DueDateMode
-	b   bool
+	S   string
+	I64 int64
+	I   int
+	T   time.Time
+	B   bool
+	SS  []string
 }
 
 func TestGenerateFlagsByStructure(t *testing.T) {
@@ -25,11 +24,35 @@ func TestGenerateFlagsByStructure(t *testing.T) {
 	assert.Equal(t, `Usage:
 
 Flags:
-      --b          b
-      --i int      i
-      --i64 int    i64
-      --s string   s
-      --srt int    srt
-      --t string   t
+      --b            b
+      --i int        i
+      --i64 int      i64
+      --s string     s
+      --ss strings   ss
+      --t string     t
 `, cmd.UsageString())
+}
+
+func TestFillQueryByStructuredCmd(t *testing.T) {
+	cmd := cobra.Command{}
+	err := GenerateFlagsByStructure(&cmd, Q{})
+	assert.NoError(t, err)
+
+	q := Q{}
+	cmd.Flags().Set("s", "test")
+	cmd.Flags().Set("i", "1")
+	cmd.Flags().Set("i64", "2")
+	cmd.Flags().Set("t", "2018-01-01")
+	cmd.Flags().Set("b", "true")
+	cmd.Flags().Set("ss", "a")
+	cmd.Flags().Set("ss", "b")
+
+	err = FillQueryByStructuredCmd(&cmd, &q)
+	assert.NoError(t, err)
+	assert.Equal(t, "test", q.S)
+	assert.Equal(t, 1, q.I)
+	assert.Equal(t, int64(2), q.I64)
+	assert.Equal(t, time.Date(2018, 1, 1, 0, 0, 0, 0, time.Local), q.T)
+	assert.Equal(t, true, q.B)
+	assert.Equal(t, []string{"a", "b"}, q.SS)
 }
