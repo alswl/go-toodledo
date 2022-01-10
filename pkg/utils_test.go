@@ -16,9 +16,9 @@ type Q struct {
 	SS  []string
 }
 
-func TestGenerateFlagsByStructure(t *testing.T) {
+func TestGenerateFlagsByQuery(t *testing.T) {
 	cmd := cobra.Command{}
-	err := GenerateFlagsByStructure(&cmd, Q{})
+	err := GenerateFlagsByQuery(&cmd, Q{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, `Usage:
@@ -33,9 +33,9 @@ Flags:
 `, cmd.UsageString())
 }
 
-func TestFillQueryByStructuredCmd(t *testing.T) {
+func TestFillQueryByFlags(t *testing.T) {
 	cmd := cobra.Command{}
-	err := GenerateFlagsByStructure(&cmd, Q{})
+	err := GenerateFlagsByQuery(&cmd, Q{})
 	assert.NoError(t, err)
 
 	q := Q{}
@@ -47,7 +47,7 @@ func TestFillQueryByStructuredCmd(t *testing.T) {
 	cmd.Flags().Set("ss", "a")
 	cmd.Flags().Set("ss", "b")
 
-	err = FillQueryByStructuredCmd(&cmd, &q)
+	err = FillQueryByFlags(&cmd, &q)
 	assert.NoError(t, err)
 	assert.Equal(t, "test", q.S)
 	assert.Equal(t, 1, q.I)

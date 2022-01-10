@@ -9,6 +9,7 @@ import (
 
 // TaskCreateQuery is query model of Task
 type TaskCreateQuery struct {
+	// TODO fields missing
 	Title     string `description:"" validate:"required"`
 	ContextID int64
 	FolderID  int64

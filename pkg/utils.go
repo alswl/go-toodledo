@@ -47,53 +47,57 @@ func OpenBrowser(url string) {
 	}
 }
 
-func GenerateFlagsByStructure(cmd *cobra.Command, obj interface{}) error {
-	t := reflect.TypeOf(obj)
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		name := stringy.New(field.Name).SnakeCase().ToLower()
-		desc := field.Tag.Get("description")
+func GenerateFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
+	if reflect.ValueOf(obj).Type().Kind() != reflect.Struct {
+		return fmt.Errorf("%s is not a struct", reflect.ValueOf(obj).Type().Kind())
+	}
+	getType := reflect.TypeOf(obj)
+	for i := 0; i < getType.NumField(); i++ {
+		f := getType.Field(i)
+		name := stringy.New(f.Name).SnakeCase().ToLower()
+		desc := f.Tag.Get("description")
 		if desc == "" {
 			desc = name
 		}
-		switch field.Type.Kind() {
+
+		switch f.Type.Kind() {
 		case reflect.Struct:
-			if field.Type == reflect.TypeOf(time.Time{}) {
+			if f.Type == reflect.TypeOf(time.Time{}) {
 				cmd.Flags().StringP(name, "", "", desc)
 			} else {
 				return fmt.Errorf("%s is a struct", name)
 			}
 		case reflect.Bool:
-			cmd.Flags().BoolP(name, field.Tag.Get("short"), false, desc)
+			cmd.Flags().BoolP(name, f.Tag.Get("short"), false, desc)
 		case reflect.Int:
-			cmd.Flags().IntP(name, field.Tag.Get("short"), 0, desc)
+			cmd.Flags().IntP(name, f.Tag.Get("short"), 0, desc)
 		case reflect.String:
-			cmd.Flags().StringP(name, field.Tag.Get("short"), "", desc)
+			cmd.Flags().StringP(name, f.Tag.Get("short"), "", desc)
 		case reflect.Int32:
-			cmd.Flags().Int32P(name, field.Tag.Get("short"), 0, desc)
+			cmd.Flags().Int32P(name, f.Tag.Get("short"), 0, desc)
 		case reflect.Int64:
-			cmd.Flags().Int64P(name, field.Tag.Get("short"), 0, desc)
+			cmd.Flags().Int64P(name, f.Tag.Get("short"), 0, desc)
 		case reflect.Slice:
-			switch field.Type.Elem().Kind() {
+			switch f.Type.Elem().Kind() {
 			case reflect.String:
-				cmd.Flags().StringSliceP(name, field.Tag.Get("short"), []string{}, desc)
+				cmd.Flags().StringSliceP(name, f.Tag.Get("short"), []string{}, desc)
 			case reflect.Int:
-				cmd.Flags().IntSliceP(name, field.Tag.Get("short"), []int{}, desc)
+				cmd.Flags().IntSliceP(name, f.Tag.Get("short"), []int{}, desc)
 			case reflect.Int32:
-				cmd.Flags().Int32SliceP(name, field.Tag.Get("short"), []int32{}, desc)
+				cmd.Flags().Int32SliceP(name, f.Tag.Get("short"), []int32{}, desc)
 			case reflect.Int64:
-				cmd.Flags().Int64SliceP(name, field.Tag.Get("short"), []int64{}, desc)
+				cmd.Flags().Int64SliceP(name, f.Tag.Get("short"), []int64{}, desc)
 			default:
-				return fmt.Errorf("%s is a slice of %s, not supported", name, field.Type.Elem().Kind())
+				return fmt.Errorf("%s is a slice of %s, not supported", name, f.Type.Elem().Kind())
 			}
 		default:
-			return fmt.Errorf("%s is a %s, not supported", name, field.Type.Kind())
+			return fmt.Errorf("%s is a %s, not supported", name, f.Type.Kind())
 		}
 	}
 	return nil
 }
 
-func FillQueryByStructuredCmd(cmd *cobra.Command, obj interface{}) error {
+func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 	if reflect.ValueOf(obj).Type().Kind() != reflect.Ptr {
 		return fmt.Errorf("%s is not a pointer", reflect.ValueOf(obj).Type().Kind())
 	}

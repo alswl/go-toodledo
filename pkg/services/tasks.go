@@ -94,6 +94,7 @@ func (s *taskService) ListModifiedTimeIn(before, after time.Time, start, limit i
 }
 
 func (s *taskService) CreateWithQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
+	// XXX
 	panic("implement me")
 }
 
