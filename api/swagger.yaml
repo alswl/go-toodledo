@@ -730,7 +730,7 @@ paths:
   /tasks/search.php:
     get:
       tags:
-        - task
+        - saved search
       security:
         - OAuth2:
             - read
@@ -741,7 +741,9 @@ paths:
         '200':
           description: ok
           schema:
-            $ref: '#/definitions/SavedSearch'
+            type: object
+            additionalProperties:
+              $ref: '#/definitions/SavedSearch'
         '401':
           description: Unauthorized
           schema:
@@ -1276,8 +1278,8 @@ definitions:
         additionalProperties:
           $ref: '#/definitions/SearchGroup'
   SearchGroup:
-    type: array
-    items:
+    type: object
+    additionalProperties:
       $ref: '#/definitions/SearchGroupItem'
   SearchGroupItem:
     type: object

@@ -11,7 +11,6 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // SavedSearch saved search
@@ -53,17 +52,10 @@ func (m *SavedSearch) validateSearch(formats strfmt.Registry) error {
 
 	for k := range m.Search {
 
-		if err := validate.Required("search"+"."+k, "body", m.Search[k]); err != nil {
-			return err
-		}
-
-		if err := m.Search[k].Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("search" + "." + k)
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("search" + "." + k)
+		if val, ok := m.Search[k]; ok {
+			if err := val.Validate(formats); err != nil {
+				return err
 			}
-			return err
 		}
 
 	}
@@ -89,13 +81,10 @@ func (m *SavedSearch) contextValidateSearch(ctx context.Context, formats strfmt.
 
 	for k := range m.Search {
 
-		if err := m.Search[k].ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("search" + "." + k)
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("search" + "." + k)
+		if val, ok := m.Search[k]; ok {
+			if err := val.ContextValidate(ctx, formats); err != nil {
+				return err
 			}
-			return err
 		}
 
 	}

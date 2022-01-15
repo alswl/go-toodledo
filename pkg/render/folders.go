@@ -64,3 +64,20 @@ func Tables4Goal(goals []*models.Goal) string {
 	t.Render()
 	return buf.String()
 }
+
+func Tables4SavedSearches(searches []*models.SavedSearch) string {
+	var output string
+	buf := bytes.NewBufferString(output)
+	t := table.NewWriter()
+	t.SetOutputMirror(buf)
+	t.SetStyle(table.StyleLight)
+	t.Style().Options.DrawBorder = false
+	t.AppendHeader(table.Row{"#", "Name", "Query"})
+	var rows []table.Row
+	for _, x := range searches {
+		rows = append(rows, table.Row{x.ID, x.Name})
+	}
+	t.AppendRows(rows)
+	t.Render()
+	return buf.String()
+}

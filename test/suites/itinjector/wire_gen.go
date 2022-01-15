@@ -176,6 +176,24 @@ func InitAccountSvc() (services.AccountService, error) {
 	return accountService, nil
 }
 
+func InitSavedSearchService() (services.SavedSearchService, error) {
+	toodledo := client.NewToodledo()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	savedSearchService := services.NewSavedSearchService(toodledo, clientAuthInfoWriter)
+	return savedSearchService, nil
+}
+
 func InitApp() (*app.ToodledoCliApp, error) {
 	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
