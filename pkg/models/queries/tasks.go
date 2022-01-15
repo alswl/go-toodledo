@@ -15,9 +15,11 @@ type TaskCreateQuery struct {
 	FolderID  int64
 	GoalID    int64
 
+	// TODO fields using go type
 	DueDate     time.Time
 	DueDateMode tasks.DueDateMode
-	DueTime     int64
+	// TODO fields using go type
+	DueTime int64
 
 	Length int64
 	//Location     int64

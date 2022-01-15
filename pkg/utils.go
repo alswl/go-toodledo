@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -47,17 +48,21 @@ func OpenBrowser(url string) {
 	}
 }
 
-func GenerateFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
+func BindFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
 	if reflect.ValueOf(obj).Type().Kind() != reflect.Struct {
 		return fmt.Errorf("%s is not a struct", reflect.ValueOf(obj).Type().Kind())
 	}
 	getType := reflect.TypeOf(obj)
 	for i := 0; i < getType.NumField(); i++ {
 		f := getType.Field(i)
-		name := stringy.New(f.Name).SnakeCase().ToLower()
+		name := stringy.New(f.Name).KebabCase().ToLower()
 		desc := f.Tag.Get("description")
 		if desc == "" {
 			desc = name
+		}
+		validateTags := f.Tag.Get("validate")
+		if validateTags != "" {
+			desc = fmt.Sprintf("%s (%s)", desc, validateTags)
 		}
 
 		switch f.Type.Kind() {
@@ -93,6 +98,10 @@ func GenerateFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
 		default:
 			return fmt.Errorf("%s is a %s, not supported", name, f.Type.Kind())
 		}
+
+		if strings.Contains(validateTags, "required") {
+			cmd.MarkFlagRequired(name)
+		}
 	}
 	return nil
 }
@@ -107,7 +116,7 @@ func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 	for i := 0; i < getType.NumField(); i++ {
 		f := getType.Field(i)
 		v := getValue.Field(i)
-		name := stringy.New(f.Name).SnakeCase().ToLower()
+		name := stringy.New(f.Name).KebabCase().ToLower()
 		desc := f.Tag.Get("description")
 		if desc == "" {
 			desc = name

@@ -16,10 +16,10 @@ import (
 // cmdQuery holds the query parameters for the command
 // parse query with cmd
 type cmdQuery struct {
-	Title     string `json:"title,omitempty" validate:"required"`
-	ContextID int64  `json:"context_id,omitempty"`
-	FolderID  int64  `json:"folder_id,omitempty"`
-	GoalID    int64  `json:"goal_id,omitempty"`
+	Title     string `validate:"required"`
+	ContextID int64
+	FolderID  int64
+	GoalID    int64
 
 	DueDate time.Time `json:"due_date"`
 }
@@ -41,66 +41,32 @@ var CreateCmd = &cobra.Command{
 	Use:  "create",
 	Args: cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		//q := queries.TaskCreateQuery{}
-		q := cmdQuery{}
-		err := pkg.FillQueryByFlags(cmd, &q)
-		//validate q
+		cmdQ := cmdQuery{}
+		err := pkg.FillQueryByFlags(cmd, &cmdQ)
 		if err != nil {
 			logrus.WithError(err).Fatal("failed")
 		}
-
-		//qb := queries.NewTaskCreateQueryBuilder()
-		// filled qb with corba arguments
-		//s, err := cmd.Flags().GetString(string(enums.TASK_FIELD_TITLE))
-		//qb.WithTitle(s)
-		// TODO
-		//s, err = cmd.Flags().GetString(string(enums.TASK_FIELD_FOLDER))
-		//qb.WithFolder(s)
-		//s, err = cmd.Flags().GetString(string(enums.TASK_FIELD_CONTEXT))
-		//qb.WithContext(s)
-		//b, err := cmd.Flags().GetBool(string(enums.TASK_FIELD_STAR))
-		//qb.WithStar(b)
-		//i, err := cmd.Flags().GetInt64(string(enums.TASK_FIELD_PRIORITY))
-		//qb.WithPriority(tasks.PriorityValue2Type(i))
-		//s, err = cmd.Flags().GetString(string(enums.TASK_FIELD_DUE_DATE))
-		//t, err := time.Parse("2006-01-02", s)
-		//qb.WithDueDate(t)
-		// TODO layout to day and hour
-		//s, err = cmd.Flags().GetString(string(enums.TASK_FIELD_DUE_TIME))
-		//splits := strings.SplitN(s, ":", 2)
-		//h, _ := strconv.Atoi(splits[0])
-		//m, _ := strconv.Atoi(splits[1])
-		//d := time.Date(1970, 1, 1, h, m, 0, 0, time.UTC)
-		//qb.WithDueTime(d.Unix())
+		// TODO validate by validator
 
 		_, err = injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-
 		svc, err := injector.InitTaskService()
 		if err != nil {
 			logrus.Fatal(err)
 			return
 		}
-		//q2 := qb.WithTitle(q.Title).
-		//	WithContextID(q.ContextID).
-		//	WithFolderID(q.FolderID).
-		//	WithGoalID(q.GoalID).
-		//	WithDueDate(q.DueDate).
-		//	//WithPriority(tasks.PriorityValue2Type(i)).
-		//	//WithStar(b)
-		//	Build()
-		//validate
-		q2, err := q.ToQuery()
+		q, err := cmdQ.ToQuery()
 		if err != nil {
 			logrus.WithError(err).Fatal("parse query failed")
 		}
 
-		t, err := svc.CreateWithQuery(q2)
+		// TODO simple worked
+		t, err := svc.CreateWithQuery(q)
 		if err != nil {
-			logrus.Fatal(err)
+			logrus.WithError(err).Fatal("create task failed")
 			return
 		}
 
@@ -109,7 +75,7 @@ var CreateCmd = &cobra.Command{
 }
 
 func init() {
-	err := pkg.GenerateFlagsByQuery(CreateCmd, queries.TaskCreateQuery{})
+	err := pkg.BindFlagsByQuery(CreateCmd, cmdQuery{})
 	if err != nil {
 		panic(errors.Wrapf(err, "failed to generate flags for command %s", CreateCmd.Use))
 	}

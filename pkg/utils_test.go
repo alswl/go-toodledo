@@ -18,7 +18,7 @@ type Q struct {
 
 func TestGenerateFlagsByQuery(t *testing.T) {
 	cmd := cobra.Command{}
-	err := GenerateFlagsByQuery(&cmd, Q{})
+	err := BindFlagsByQuery(&cmd, Q{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, `Usage:
@@ -35,7 +35,7 @@ Flags:
 
 func TestFillQueryByFlags(t *testing.T) {
 	cmd := cobra.Command{}
-	err := GenerateFlagsByQuery(&cmd, Q{})
+	err := BindFlagsByQuery(&cmd, Q{})
 	assert.NoError(t, err)
 
 	q := Q{}

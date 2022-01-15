@@ -94,8 +94,16 @@ func (s *taskService) ListModifiedTimeIn(before, after time.Time, start, limit i
 }
 
 func (s *taskService) CreateWithQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
-	// XXX
-	panic("implement me")
+	t := []models.Task{*query.ToModel()}
+	bytes, _ := json.Marshal(t)
+	bytesS := (string)(bytes)
+	p := task.NewPostTasksAddPhpParams()
+	p.Tasks = &bytesS
+	resp, err := s.cli.Task.PostTasksAddPhp(p, s.auth)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Payload[0], err
 }
 
 // Create ...
