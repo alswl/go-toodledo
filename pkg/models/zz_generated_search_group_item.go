@@ -17,13 +17,36 @@ import (
 // swagger:model SearchGroupItem
 type SearchGroupItem struct {
 
-	// field
+	// The name of the field being inspected.
 	Field string `json:"field,omitempty"`
 
-	// type
+	// The type of search being performed.
+	// - contains : Matches a string if it contains this substring
+	// - yes : Boolean true
+	// - is : Exact value match
+	// - begins with : Matches a string if it starts with this substring
+	// - ends with : Matches a string if it ends with this substring
+	// - does not contain : Matches a string if it does not contain this substring
+	// - no : Boolean false
+	// - is not : Exact value mismatch
+	// - is after : Matches a date if it comes after this value
+	// - is more than : Matches a number if it comes after this value
+	// - is before : Matches a date if it comes before this value
+	// - is less than : Matches a number if it comes before this value
+	// - was in the last : Matches a date if it was in the last X days
+	// - was not in the last : Matches a date if it was not in the last X days
+	// - is in the next : Matches a date if it is in the next X days
+	// - is not in the next : Matches a date if it is not in the next X days
+	// - is in : Matches a date if it is in exactly X days
+	// - is not in : Matches a date if it is not in exactly X days
+	// - was : Matches a date if it was exactly X days ago
+	// - was not : Matches a date if it was not exactly X days ago
+	// - exists : Matches if the field has a non-zero value
+	// - does not exist : Matches if the field is empty or zero
+	//
 	Type string `json:"type,omitempty"`
 
-	// value
+	// The value to search with.
 	Value string `json:"value,omitempty"`
 }
 

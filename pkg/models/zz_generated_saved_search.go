@@ -18,16 +18,16 @@ import (
 // swagger:model SavedSearch
 type SavedSearch struct {
 
-	// bool
+	// Indicates the state of the "Match" option for a search. There are two possible values. "All" means that all the root rules and groups must match (The outer boolean will be AND and the inner boolean will be OR). "Any" means that only one of the root rules or groups must match (The outer boolean will be OR and the inner boolean will be AND).
 	Bool string `json:"bool,omitempty"`
 
-	// id
-	ID int32 `json:"id,omitempty"`
+	// The id number of the saved search. This is unique per user, but two different users may have different searches with the same id.
+	ID int64 `json:"id,omitempty"`
 
-	// name
+	// The display name for the saved search, up to 32 characters.
 	Name string `json:"name,omitempty"`
 
-	// search
+	// In the JSON return format, this contains the nested rules for the saved search. Each group will have a numerical index (which may or may not be consecutive). Order does not matter.
 	Search map[string]SearchGroup `json:"search,omitempty"`
 }
 
