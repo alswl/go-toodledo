@@ -1,29 +1,29 @@
 # go-toodledo
 
-Go Client and library for Toodledo.
+Go library and Cli for Toodledo.
 
 Status: WIP
 
 ## Usage
 
 ```sh
-$ toodledo
 Usage:
   toodledo [command]
 
 Available Commands:
-  auth        Manage authentication
-  completion  Generate completion script
-  config      Manage config
-  context     Manage toodledo contexts
-  folder      Manage toodledo folders
-  goal        Manage toodledo goals
-  help        Help about any command
-  task        Manage toodledo tasks
+  auth         Manage authentication
+  completion   Generate completion script
+  config       Manage config
+  context      Manage toodledo contexts
+  folder       Manage toodledo folders
+  goal         Manage toodledo goals
+  help         Help about any command
+  saved-search Manage toodledo saved search
+  task         Manage toodledo tasks
 
 Flags:
       --access_token string
-      --config string         config file (default is $HOME/.cobra.yaml)
+      --config string         config file (default is $HOME/.toodledo.yaml)
   -h, --help                  help for toodledo
   -v, --version               version for toodledo
 
