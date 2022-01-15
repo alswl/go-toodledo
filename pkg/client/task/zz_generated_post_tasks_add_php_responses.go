@@ -65,12 +65,9 @@ type PostTasksAddPhpOK struct {
 	Payload []*models.Task
 }
 
-// Error ...
 func (o *PostTasksAddPhpOK) Error() string {
 	return fmt.Sprintf("[POST /tasks/add.php][%d] postTasksAddPhpOK  %+v", 200, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksAddPhpOK) GetPayload() []*models.Task {
 	return o.Payload
 }
@@ -98,12 +95,9 @@ type PostTasksAddPhpUnauthorized struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostTasksAddPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /tasks/add.php][%d] postTasksAddPhpUnauthorized  %+v", 401, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksAddPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -133,12 +127,9 @@ type PostTasksAddPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostTasksAddPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /tasks/add.php][%d] postTasksAddPhpTooManyRequests  %+v", 429, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksAddPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -168,12 +159,9 @@ type PostTasksAddPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostTasksAddPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /tasks/add.php][%d] postTasksAddPhpServiceUnavailable  %+v", 503, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksAddPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

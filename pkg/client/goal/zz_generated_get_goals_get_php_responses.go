@@ -65,12 +65,9 @@ type GetGoalsGetPhpOK struct {
 	Payload []*models.Goal
 }
 
-// Error ...
 func (o *GetGoalsGetPhpOK) Error() string {
 	return fmt.Sprintf("[GET /goals/get.php][%d] getGoalsGetPhpOK  %+v", 200, o.Payload)
 }
-
-// GetPayload ...
 func (o *GetGoalsGetPhpOK) GetPayload() []*models.Goal {
 	return o.Payload
 }
@@ -98,12 +95,9 @@ type GetGoalsGetPhpUnauthorized struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *GetGoalsGetPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /goals/get.php][%d] getGoalsGetPhpUnauthorized  %+v", 401, o.Payload)
 }
-
-// GetPayload ...
 func (o *GetGoalsGetPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -133,12 +127,9 @@ type GetGoalsGetPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *GetGoalsGetPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[GET /goals/get.php][%d] getGoalsGetPhpTooManyRequests  %+v", 429, o.Payload)
 }
-
-// GetPayload ...
 func (o *GetGoalsGetPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -168,12 +159,9 @@ type GetGoalsGetPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *GetGoalsGetPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[GET /goals/get.php][%d] getGoalsGetPhpServiceUnavailable  %+v", 503, o.Payload)
 }
-
-// GetPayload ...
 func (o *GetGoalsGetPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

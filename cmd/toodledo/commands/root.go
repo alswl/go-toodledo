@@ -7,6 +7,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/contexts"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/folders"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/goals"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/savedsearches"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/tasks"
 	"github.com/alswl/go-toodledo/pkg/version"
 	"github.com/sirupsen/logrus"
@@ -36,6 +37,7 @@ func init() {
 	viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 
 	rootCmd.AddCommand(tasks.TaskCmd, folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd,
+		savedsearches.SavedSearchCmd,
 		auth.AuthCmd, configs.ConfigCmd, completionCmd)
 }
 

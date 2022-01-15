@@ -727,6 +727,36 @@ paths:
           description: ServiceUnavailable
           schema:
             $ref: '#/definitions/Error'
+  /tasks/search.php:
+    get:
+      tags:
+        - saved search
+      security:
+        - OAuth2:
+            - read
+            - write
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: ok
+          schema:
+            type: object
+            additionalProperties:
+              $ref: '#/definitions/SavedSearch'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+
 definitions:
   Error:
     type: object
@@ -1233,3 +1263,60 @@ definitions:
         description: >-
           A read-only field that contains the id number of the task that this
           task is a reference to. This is useful for tasks that are deleted failed.
+  SavedSearch:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: The id number of the saved search. This is unique per user, but two different users may have different searches with the same id.
+      name:
+        type: string
+        description: The display name for the saved search, up to 32 characters.
+      bool:
+        type: string
+        description: Indicates the state of the "Match" option for a search. There are two possible values. "All" means that all the root rules and groups must match (The outer boolean will be AND and the inner boolean will be OR). "Any" means that only one of the root rules or groups must match (The outer boolean will be OR and the inner boolean will be AND).
+      search:
+        type: object
+        description: In the JSON return format, this contains the nested rules for the saved search. Each group will have a numerical index (which may or may not be consecutive). Order does not matter.
+        additionalProperties:
+          $ref: '#/definitions/SearchGroup'
+  SearchGroup:
+    type: object
+    additionalProperties:
+      $ref: '#/definitions/SearchGroupItem'
+  SearchGroupItem:
+    type: object
+    properties:
+      field:
+        type: string
+        description: The name of the field being inspected.
+      type:
+        type: string
+        description: |
+          The type of search being performed.
+          - contains : Matches a string if it contains this substring
+          - yes : Boolean true
+          - is : Exact value match
+          - begins with : Matches a string if it starts with this substring
+          - ends with : Matches a string if it ends with this substring
+          - does not contain : Matches a string if it does not contain this substring
+          - no : Boolean false
+          - is not : Exact value mismatch
+          - is after : Matches a date if it comes after this value
+          - is more than : Matches a number if it comes after this value
+          - is before : Matches a date if it comes before this value
+          - is less than : Matches a number if it comes before this value
+          - was in the last : Matches a date if it was in the last X days
+          - was not in the last : Matches a date if it was not in the last X days
+          - is in the next : Matches a date if it is in the next X days
+          - is not in the next : Matches a date if it is not in the next X days
+          - is in : Matches a date if it is in exactly X days
+          - is not in : Matches a date if it is not in exactly X days
+          - was : Matches a date if it was exactly X days ago
+          - was not : Matches a date if it was not exactly X days ago
+          - exists : Matches if the field has a non-zero value
+          - does not exist : Matches if the field is empty or zero
+      value:
+        type: string
+        description: The value to search with.

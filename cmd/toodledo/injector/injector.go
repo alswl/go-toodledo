@@ -56,6 +56,11 @@ func InitAccountSvc() (services.AccountService, error) {
 	return nil, nil
 }
 
+func InitSavedSearchService() (services.SavedSearchService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
 func InitApp() (*app.ToodledoCliApp, error) {
 	wire.Build(SuperSet)
 	return nil, nil

@@ -67,12 +67,9 @@ type PostContextsDeletePhpOK struct {
 	Payload *PostContextsDeletePhpOKBody
 }
 
-// Error ...
 func (o *PostContextsDeletePhpOK) Error() string {
 	return fmt.Sprintf("[POST /contexts/delete.php][%d] postContextsDeletePhpOK  %+v", 200, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostContextsDeletePhpOK) GetPayload() *PostContextsDeletePhpOKBody {
 	return o.Payload
 }
@@ -102,12 +99,9 @@ type PostContextsDeletePhpUnauthorized struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostContextsDeletePhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /contexts/delete.php][%d] postContextsDeletePhpUnauthorized  %+v", 401, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostContextsDeletePhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -137,12 +131,9 @@ type PostContextsDeletePhpTooManyRequests struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostContextsDeletePhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /contexts/delete.php][%d] postContextsDeletePhpTooManyRequests  %+v", 429, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostContextsDeletePhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -172,12 +163,9 @@ type PostContextsDeletePhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostContextsDeletePhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /contexts/delete.php][%d] postContextsDeletePhpServiceUnavailable  %+v", 503, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostContextsDeletePhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

@@ -65,12 +65,9 @@ type PostTasksEditPhpOK struct {
 	Payload []*models.Task
 }
 
-// Error ...
 func (o *PostTasksEditPhpOK) Error() string {
 	return fmt.Sprintf("[POST /tasks/edit.php][%d] postTasksEditPhpOK  %+v", 200, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksEditPhpOK) GetPayload() []*models.Task {
 	return o.Payload
 }
@@ -98,12 +95,9 @@ type PostTasksEditPhpUnauthorized struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostTasksEditPhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /tasks/edit.php][%d] postTasksEditPhpUnauthorized  %+v", 401, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksEditPhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -133,12 +127,9 @@ type PostTasksEditPhpTooManyRequests struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostTasksEditPhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /tasks/edit.php][%d] postTasksEditPhpTooManyRequests  %+v", 429, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksEditPhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -168,12 +159,9 @@ type PostTasksEditPhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostTasksEditPhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /tasks/edit.php][%d] postTasksEditPhpServiceUnavailable  %+v", 503, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksEditPhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }
