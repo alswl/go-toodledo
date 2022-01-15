@@ -25,7 +25,7 @@ var ArchiveCmd = &cobra.Command{
 		}
 		name := args[0]
 
-		f, err := svc.FindByName(name)
+		f, err := svc.Find(name)
 		if err != nil {
 			logrus.Error(err)
 			return

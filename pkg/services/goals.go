@@ -13,7 +13,7 @@ import (
 
 // GoalService ...
 type GoalService interface {
-	FindByName(name string) (*models.Goal, error)
+	Find(name string) (*models.Goal, error)
 	Archive(id int, isArchived bool) (*models.Goal, error)
 	Delete(id int64) error
 	Rename(id int64, newName string) (*models.Goal, error)
@@ -32,8 +32,8 @@ func NewGoalService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) Goa
 	return &goalService{cli: cli, auth: auth}
 }
 
-// FindByName ...
-func (h *goalService) FindByName(name string) (*models.Goal, error) {
+// Find ...
+func (h *goalService) Find(name string) (*models.Goal, error) {
 	ts, err := h.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), h.auth)
 	if err != nil {
 		return nil, err

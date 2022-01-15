@@ -11,6 +11,7 @@ require (
 	github.com/go-openapi/validate v0.20.2
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/gobeam/stringy v0.0.5 // indirect
 	github.com/google/wire v0.5.0
 	github.com/jedib0t/go-pretty/v6 v6.2.4
 	github.com/jinzhu/copier v0.3.4 // indirect

@@ -25,7 +25,7 @@ var ActivateCmd = &cobra.Command{
 		}
 		name := args[0]
 
-		g, err := svc.FindByName(name)
+		g, err := svc.Find(name)
 		if err != nil {
 			logrus.Error(err)
 			return

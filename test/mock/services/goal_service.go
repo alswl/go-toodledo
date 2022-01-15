@@ -73,7 +73,7 @@ func (_m *GoalService) Delete(id int64) error {
 }
 
 // FindByName provides a mock function with given fields: name
-func (_m *GoalService) FindByName(name string) (*models.Goal, error) {
+func (_m *GoalService) Find(name string) (*models.Goal, error) {
 	ret := _m.Called(name)
 
 	var r0 *models.Goal
