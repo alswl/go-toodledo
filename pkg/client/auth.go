@@ -165,8 +165,3 @@ func SaveTokenWithViper(tok *oauth2.Token) error {
 	}
 	return nil
 }
-
-func noOps(newToken *oauth2.Token) error {
-	// XXX no ops
-	return nil
-}

@@ -50,7 +50,7 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 	s.cli.Task.GetTasksGetPhp(p, s.auth)
 
 	res, err := s.cli.Task.GetTasksGetPhp(p, s.auth)
-	// XXX using multiple kind of payload item
+	// TODO using multiple kind of payload item
 	if err != nil || len(res.Payload) == 1 {
 		return nil, err
 	}
