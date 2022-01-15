@@ -20,7 +20,6 @@ import (
 // Default toodledo HTTP client.
 var Default = NewHTTPClient(nil)
 
-// DefaultHost ...
 const (
 	// DefaultHost is the default Host
 	// found in Meta (info) section of spec file

@@ -727,6 +727,34 @@ paths:
           description: ServiceUnavailable
           schema:
             $ref: '#/definitions/Error'
+  /tasks/search.php:
+    get:
+      tags:
+        - task
+      security:
+        - OAuth2:
+            - read
+            - write
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: ok
+          schema:
+            $ref: '#/definitions/SavedSearch'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '429':
+          description: TooManyRequests
+          schema:
+            $ref: '#/definitions/Error'
+        '503':
+          description: ServiceUnavailable
+          schema:
+            $ref: '#/definitions/Error'
+
 definitions:
   Error:
     type: object
@@ -1233,3 +1261,30 @@ definitions:
         description: >-
           A read-only field that contains the id number of the task that this
           task is a reference to. This is useful for tasks that are deleted failed.
+  SavedSearch:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+      name:
+        type: string
+      bool:
+        type: string
+      search:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/SearchGroup'
+  SearchGroup:
+    type: array
+    items:
+      $ref: '#/definitions/SearchGroupItem'
+  SearchGroupItem:
+    type: object
+    properties:
+      field:
+        type: string
+      type:
+        type: string
+      value:
+        type: string

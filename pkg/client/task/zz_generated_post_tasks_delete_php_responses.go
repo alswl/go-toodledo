@@ -65,12 +65,9 @@ type PostTasksDeletePhpOK struct {
 	Payload []*models.TaskDeleteItem
 }
 
-// Error ...
 func (o *PostTasksDeletePhpOK) Error() string {
 	return fmt.Sprintf("[POST /tasks/delete.php][%d] postTasksDeletePhpOK  %+v", 200, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksDeletePhpOK) GetPayload() []*models.TaskDeleteItem {
 	return o.Payload
 }
@@ -98,12 +95,9 @@ type PostTasksDeletePhpUnauthorized struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostTasksDeletePhpUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /tasks/delete.php][%d] postTasksDeletePhpUnauthorized  %+v", 401, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksDeletePhpUnauthorized) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -133,12 +127,9 @@ type PostTasksDeletePhpTooManyRequests struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostTasksDeletePhpTooManyRequests) Error() string {
 	return fmt.Sprintf("[POST /tasks/delete.php][%d] postTasksDeletePhpTooManyRequests  %+v", 429, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksDeletePhpTooManyRequests) GetPayload() *models.Error {
 	return o.Payload
 }
@@ -168,12 +159,9 @@ type PostTasksDeletePhpServiceUnavailable struct {
 	Payload *models.Error
 }
 
-// Error ...
 func (o *PostTasksDeletePhpServiceUnavailable) Error() string {
 	return fmt.Sprintf("[POST /tasks/delete.php][%d] postTasksDeletePhpServiceUnavailable  %+v", 503, o.Payload)
 }
-
-// GetPayload ...
 func (o *PostTasksDeletePhpServiceUnavailable) GetPayload() *models.Error {
 	return o.Payload
 }

@@ -4,7 +4,7 @@
 package suites
 
 import (
-	"fmt"
+	"github.com/alswl/go-toodledo/test/suites/itinjector"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -13,39 +13,38 @@ import (
 func Test_contextService_Get(t *testing.T) {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	client := ClientForTest()
+	svc, _ := itinjector.InitContextService()
 
-	contexts, _, body, err := client.ContextService.Get()
+	contexts, err := svc.ListAll()
 	assert.NoError(t, err)
-	assert.Greater(t, len(contexts), 0, fmt.Sprintf("resp: %s", body))
+	assert.Greater(t, len(contexts), 0)
 }
 
 func Test_contextService_Add(t *testing.T) {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	client := ClientForTest()
+	svc, _ := itinjector.InitContextService()
 
-	context, _, body, err := client.ContextService.Add("test-123")
+	context, err := svc.Create("test-123")
 	assert.NoError(t, err)
-	assert.NotNil(t, context, fmt.Sprintf("resp: %s", body))
+	assert.NotNil(t, context)
 }
 
 func Test_contextService_Edit(t *testing.T) {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	client := ClientForTest()
+	svc, _ := itinjector.InitContextService()
 
-	context, _, body, err := client.ContextService.Edit(1292681, "test-5")
+	context, err := svc.Rename("test-123", "test-5")
 	assert.NoError(t, err)
-	assert.NotNil(t, context, fmt.Sprintf("resp: %s", body))
+	assert.NotNil(t, context)
 }
 
 func Test_contextService_Delete(t *testing.T) {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	client := ClientForTest()
+	svc, _ := itinjector.InitContextService()
 
-	context, body, err := client.ContextService.Delete(1297923)
+	err := svc.Delete("test-5")
 	assert.NoError(t, err)
-	assert.NotNil(t, context, fmt.Sprintf("resp: %s", body))
 }
