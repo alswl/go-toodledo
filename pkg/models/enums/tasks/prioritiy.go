@@ -2,6 +2,8 @@
 
 package tasks
 
+import "strings"
+
 // Priority ...
 type Priority int
 
@@ -22,11 +24,28 @@ var PriorityAll = []Priority{
 	PriorityTop,
 }
 
+var PriorityMap = map[string]Priority{
+	"negative": PriorityNegative,
+	"low":      PriorityLow,
+	"medium":   PriorityMedium,
+	"high":     PriorityHigh,
+	"top":      PriorityTop,
+}
+
 // PriorityValue2Type ...
 func PriorityValue2Type(input int64) Priority {
 	for _, x := range PriorityAll {
 		if x == Priority(input) {
 			return x
+		}
+	}
+	return PriorityMedium
+}
+
+func PriorityString2Type(input string) Priority {
+	for k, v := range PriorityMap {
+		if k == strings.ToLower(input) {
+			return v
 		}
 	}
 	return PriorityMedium
