@@ -15,6 +15,8 @@ import (
 	"time"
 )
 
+var DefaultFieldsInResponse = "folder,star,context,tag,goal,repeat,startdate,starttime,duedate,duetime,priority,length"
+
 // TaskService ...
 type TaskService interface {
 	FindById(id int64) (*models.Task, error)
@@ -94,11 +96,12 @@ func (s *taskService) ListModifiedTimeIn(before, after time.Time, start, limit i
 }
 
 func (s *taskService) CreateWithQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
-	t := []models.Task{*query.ToModel()}
-	bytes, _ := json.Marshal(t)
+	ts := []models.Task{*query.ToModel()}
+	bytes, _ := json.Marshal(ts)
 	bytesS := (string)(bytes)
 	p := task.NewPostTasksAddPhpParams()
 	p.Tasks = &bytesS
+	p.Fields = &DefaultFieldsInResponse
 	resp, err := s.cli.Task.PostTasksAddPhp(p, s.auth)
 	if err != nil {
 		return nil, err
