@@ -16,7 +16,7 @@ type TaskCreateQuery struct {
 	GoalID    int64
 
 	// TODO fields using go type
-	DueDate     time.Time
+	DueDate     string
 	DueDateMode tasks.DueDateMode
 	// TODO fields using go type
 	DueTime int64
@@ -44,7 +44,6 @@ func (q *TaskCreateQuery) ToModel() *models.Task {
 		Folder:  q.FolderID,
 		Goal:    q.GoalID,
 
-		Duedate:    q.DueDate.Unix(),
 		Duedatemod: int64(q.DueDateMode),
 
 		Length: q.Length,
@@ -57,6 +56,13 @@ func (q *TaskCreateQuery) ToModel() *models.Task {
 		Status: int64(q.Status),
 		Timer:  q.Timer,
 		//Via:        q.Via,
+	}
+	if q.DueDate != "" {
+		dueDate, err := time.Parse("2006-01-02", q.DueDate)
+		if err != nil {
+			return nil
+		}
+		t.Duedate = dueDate.Unix()
 	}
 	if q.DueTime != 0 {
 		t.Duetime = q.DueTime
@@ -108,7 +114,7 @@ func (b *TaskCreateQueryBuilder) WithGoalID(goalID int64) *TaskCreateQueryBuilde
 }
 
 // WithDueDate sets DueDate
-func (b *TaskCreateQueryBuilder) WithDueDate(dueDate time.Time) *TaskCreateQueryBuilder {
+func (b *TaskCreateQueryBuilder) WithDueDate(dueDate string) *TaskCreateQueryBuilder {
 	b.query.DueDate = dueDate
 	return b
 }

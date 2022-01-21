@@ -4,7 +4,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"reflect"
 	"testing"
-	"time"
 )
 
 func TestCreateWithGenerator(t *testing.T) {
@@ -17,7 +16,7 @@ func Test_cmdQuery_ToQuery(t *testing.T) {
 		FolderID  int64
 		GoalID    int64
 		Priority  string
-		DueDate   time.Time
+		DueDate   string
 	}
 	tests := []struct {
 		name    string
@@ -32,14 +31,14 @@ func Test_cmdQuery_ToQuery(t *testing.T) {
 				FolderID:  2,
 				GoalID:    3,
 				Priority:  "high",
-				DueDate:   time.Time{},
+				DueDate:   "2022-01-01",
 			},
 			want: &queries.TaskCreateQuery{
 				ContextID: 1,
 				FolderID:  2,
 				GoalID:    3,
 				Priority:  2,
-				DueDate:   time.Time{},
+				DueDate:   "2022-01-01",
 			},
 			wantErr: false,
 		},
@@ -50,10 +49,11 @@ func Test_cmdQuery_ToQuery(t *testing.T) {
 				FolderID:  0,
 				GoalID:    0,
 				Priority:  "",
-				DueDate:   time.Time{},
+				DueDate:   "2022-01-01",
 			},
 			want: &queries.TaskCreateQuery{
 				Priority: 1,
+				DueDate:  "2022-01-01",
 			},
 			wantErr: false,
 		},

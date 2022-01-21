@@ -12,7 +12,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"time"
 )
 
 // cmdQuery present the parameters for the command
@@ -21,11 +20,10 @@ type cmdQuery struct {
 	ContextID int64
 	FolderID  int64
 	GoalID    int64
-	// XXX
-	Priority string `validate:"oneof=Top High Medium Low Negative"`
+	Priority  string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
 
-	DueDate time.Time `json:"due_date"`
-	// XXX
+	DueDate string `validate:"datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
+	// TODO
 	// Tags
 }
 

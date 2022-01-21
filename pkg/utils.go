@@ -65,6 +65,7 @@ func BindFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
 			desc = fmt.Sprintf("%s (%s)", desc, validateTags)
 		}
 
+		short := f.Tag.Get("short")
 		switch f.Type.Kind() {
 		case reflect.Struct:
 			if f.Type == reflect.TypeOf(time.Time{}) {
@@ -73,25 +74,25 @@ func BindFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
 				return fmt.Errorf("%s is a struct", name)
 			}
 		case reflect.Bool:
-			cmd.Flags().BoolP(name, f.Tag.Get("short"), false, desc)
+			cmd.Flags().BoolP(name, short, false, desc)
 		case reflect.Int:
-			cmd.Flags().IntP(name, f.Tag.Get("short"), 0, desc)
+			cmd.Flags().IntP(name, short, 0, desc)
 		case reflect.String:
-			cmd.Flags().StringP(name, f.Tag.Get("short"), "", desc)
+			cmd.Flags().StringP(name, short, "", desc)
 		case reflect.Int32:
-			cmd.Flags().Int32P(name, f.Tag.Get("short"), 0, desc)
+			cmd.Flags().Int32P(name, short, 0, desc)
 		case reflect.Int64:
-			cmd.Flags().Int64P(name, f.Tag.Get("short"), 0, desc)
+			cmd.Flags().Int64P(name, short, 0, desc)
 		case reflect.Slice:
 			switch f.Type.Elem().Kind() {
 			case reflect.String:
-				cmd.Flags().StringSliceP(name, f.Tag.Get("short"), []string{}, desc)
+				cmd.Flags().StringSliceP(name, short, []string{}, desc)
 			case reflect.Int:
-				cmd.Flags().IntSliceP(name, f.Tag.Get("short"), []int{}, desc)
+				cmd.Flags().IntSliceP(name, short, []int{}, desc)
 			case reflect.Int32:
-				cmd.Flags().Int32SliceP(name, f.Tag.Get("short"), []int32{}, desc)
+				cmd.Flags().Int32SliceP(name, short, []int32{}, desc)
 			case reflect.Int64:
-				cmd.Flags().Int64SliceP(name, f.Tag.Get("short"), []int64{}, desc)
+				cmd.Flags().Int64SliceP(name, short, []int64{}, desc)
 			default:
 				return fmt.Errorf("%s is a slice of %s, not supported", name, f.Type.Elem().Kind())
 			}
