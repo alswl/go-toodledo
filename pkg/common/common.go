@@ -20,6 +20,7 @@ func NewCliConfigFromViper() (models.ToodledoCliConfig, error) {
 	if err != nil {
 		return models.ToodledoCliConfig{}, err
 	}
+	conf.Database.Buckets = models.DefaultBuckets
 	return conf, nil
 }
 
@@ -42,6 +43,10 @@ func NewCliConfigMockForTesting() (models.ToodledoCliConfig, error) {
 		Auth:           models.ToodledoConfig{},
 		Environment:    map[string]*models.ToodledoConfigEnvironment{},
 		DefaultContext: "default",
+		Database: models.ToodledoConfigDatabase{
+			DataFile: "tmp.db",
+			Buckets:  nil,
+		},
 	}
 	return conf, nil
 }

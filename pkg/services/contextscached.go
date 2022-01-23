@@ -3,7 +3,7 @@ package services
 import (
 	"encoding/json"
 	"github.com/alswl/go-toodledo/pkg/common"
-	"github.com/alswl/go-toodledo/pkg/dao"
+	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
@@ -11,7 +11,7 @@ import (
 
 // ContextCachedService ...
 type ContextCachedService interface {
-	Invalidate() error
+	LocalTruncate() error
 
 	Find(name string) (*models.Context, error)
 	ListAll() ([]*models.Context, error)
@@ -22,16 +22,16 @@ type ContextCachedService interface {
 
 type contextCachedService struct {
 	svc        ContextService
-	cache      dao.Cache
-	db         dao.Backend
+	cache      dal.Cache
+	db         dal.Backend
 	accountSvc AccountService
 }
 
 // NewContextCachedService ...
-func NewContextCachedService(contextsvc ContextService, accountSvc AccountService, db dao.Backend) ContextCachedService {
+func NewContextCachedService(contextsvc ContextService, accountSvc AccountService, db dal.Backend) ContextCachedService {
 	s := contextCachedService{
 		svc:        contextsvc,
-		cache:      dao.NewCache(db, "contexts"),
+		cache:      dal.NewCache(db, "contexts"),
 		db:         db,
 		accountSvc: accountSvc,
 	}
@@ -40,19 +40,19 @@ func NewContextCachedService(contextsvc ContextService, accountSvc AccountServic
 
 // Rename ...
 func (s *contextCachedService) Rename(name string, newName string) (*models.Context, error) {
-	s.Invalidate()
+	s.LocalTruncate()
 	return s.svc.Rename(name, newName)
 }
 
 // Delete ...
 func (s *contextCachedService) Delete(name string) error {
-	s.Invalidate()
+	s.LocalTruncate()
 	return s.svc.Delete(name)
 }
 
 // Create ...
 func (s *contextCachedService) Create(name string) (*models.Context, error) {
-	s.Invalidate()
+	s.LocalTruncate()
 	return s.svc.Create(name)
 }
 
@@ -60,7 +60,7 @@ func (s *contextCachedService) contextIsExpired() bool {
 	var meCached models.Account
 	// FIXME userService
 	c, err := s.db.Get("auth", "me")
-	if err == dao.ErrObjectNotFound {
+	if err == dal.ErrObjectNotFound {
 		// missing
 		me, err := s.accountSvc.Me()
 		c, _ = json.Marshal(me)
@@ -92,7 +92,7 @@ func (s *contextCachedService) sync() error {
 	if err != nil {
 		return err
 	}
-	err = s.Invalidate()
+	err = s.LocalTruncate()
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func (s *contextCachedService) Find(name string) (*models.Context, error) {
 }
 
 // Invalidate ...
-func (s *contextCachedService) Invalidate() error {
+func (s *contextCachedService) LocalTruncate() error {
 	err := s.db.Truncate("contexts")
 	if err != nil {
 		return err

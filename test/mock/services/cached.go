@@ -9,8 +9,8 @@ type Cached struct {
 	mock.Mock
 }
 
-// Invalidate provides a mock function with given fields:
-func (_m *Cached) Invalidate() error {
+// LocalTruncate provides a mock function with given fields:
+func (_m *Cached) LocalTruncate() error {
 	ret := _m.Called()
 
 	var r0 error

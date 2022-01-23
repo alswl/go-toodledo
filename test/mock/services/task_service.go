@@ -8,6 +8,8 @@ import (
 
 	models "github.com/alswl/go-toodledo/pkg/models"
 
+	queries "github.com/alswl/go-toodledo/pkg/models/queries"
+
 	time "time"
 )
 
@@ -55,6 +57,29 @@ func (_m *TaskService) Create(name string, options map[string]interface{}) (*mod
 	var r1 error
 	if rf, ok := ret.Get(1).(func(string, map[string]interface{}) error); ok {
 		r1 = rf(name, options)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// CreateByQuery provides a mock function with given fields: query
+func (_m *TaskService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
+	ret := _m.Called(query)
+
+	var r0 *models.Task
+	if rf, ok := ret.Get(0).(func(*queries.TaskCreateQuery) *models.Task); ok {
+		r0 = rf(query)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Task)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*queries.TaskCreateQuery) error); ok {
+		r1 = rf(query)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -179,6 +204,38 @@ func (_m *TaskService) ListAll() ([]*models.Task, *models.PaginatedInfo, error) 
 	var r2 error
 	if rf, ok := ret.Get(2).(func() error); ok {
 		r2 = rf()
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// ListByQuery provides a mock function with given fields: query
+func (_m *TaskService) ListByQuery(query *queries.TaskSearchQuery) ([]*models.Task, *models.PaginatedInfo, error) {
+	ret := _m.Called(query)
+
+	var r0 []*models.Task
+	if rf, ok := ret.Get(0).(func(*queries.TaskSearchQuery) []*models.Task); ok {
+		r0 = rf(query)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Task)
+		}
+	}
+
+	var r1 *models.PaginatedInfo
+	if rf, ok := ret.Get(1).(func(*queries.TaskSearchQuery) *models.PaginatedInfo); ok {
+		r1 = rf(query)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*models.PaginatedInfo)
+		}
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(*queries.TaskSearchQuery) error); ok {
+		r2 = rf(query)
 	} else {
 		r2 = ret.Error(2)
 	}

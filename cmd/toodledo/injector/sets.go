@@ -4,8 +4,9 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/common"
-	"github.com/alswl/go-toodledo/pkg/dao"
+	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/services"
+	"github.com/alswl/go-toodledo/pkg/syncer"
 	"github.com/google/wire"
 )
 
@@ -13,7 +14,7 @@ var SuperSet = wire.NewSet(
 	common.NewCliConfigFromViper,
 	common.NewConfigCliConfig,
 
-	dao.NewBoltDB,
+	dal.ProvideBackend,
 	client.NewToodledo,
 	//client.NewAuthFromViper,
 	client.NewAuthFromConfig,
@@ -28,6 +29,8 @@ var SuperSet = wire.NewSet(
 	services.NewContextCachedService,
 	services.NewGoalService,
 	services.NewSavedSearchService,
+
+	syncer.NewToodledoSyncer,
 
 	app.NewToodledoCliApp,
 )

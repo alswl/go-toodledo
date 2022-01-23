@@ -95,20 +95,6 @@ func (_m *FolderCachedService) Find(name string) (*models.Folder, error) {
 	return r0, r1
 }
 
-// Invalidate provides a mock function with given fields:
-func (_m *FolderCachedService) Invalidate() error {
-	ret := _m.Called()
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func() error); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 // ListAll provides a mock function with given fields:
 func (_m *FolderCachedService) ListAll() ([]*models.Folder, error) {
 	ret := _m.Called()
@@ -132,6 +118,20 @@ func (_m *FolderCachedService) ListAll() ([]*models.Folder, error) {
 	return r0, r1
 }
 
+// LocalTruncate provides a mock function with given fields:
+func (_m *FolderCachedService) LocalTruncate() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Rename provides a mock function with given fields: name, newName
 func (_m *FolderCachedService) Rename(name string, newName string) (*models.Folder, error) {
 	ret := _m.Called(name, newName)
@@ -153,4 +153,18 @@ func (_m *FolderCachedService) Rename(name string, newName string) (*models.Fold
 	}
 
 	return r0, r1
+}
+
+// Sync provides a mock function with given fields:
+func (_m *FolderCachedService) Sync() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }

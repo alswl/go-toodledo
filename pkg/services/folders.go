@@ -23,6 +23,7 @@ type FolderService interface {
 	Create(name string) (*models.Folder, error)
 }
 
+// folderService query folder with remote api
 type folderService struct {
 	cli  *client.Toodledo
 	auth runtime.ClientAuthInfoWriter

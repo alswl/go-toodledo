@@ -72,20 +72,6 @@ func (_m *ContextCachedService) Find(name string) (*models.Context, error) {
 	return r0, r1
 }
 
-// Invalidate provides a mock function with given fields:
-func (_m *ContextCachedService) Invalidate() error {
-	ret := _m.Called()
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func() error); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 // ListAll provides a mock function with given fields:
 func (_m *ContextCachedService) ListAll() ([]*models.Context, error) {
 	ret := _m.Called()
@@ -107,6 +93,20 @@ func (_m *ContextCachedService) ListAll() ([]*models.Context, error) {
 	}
 
 	return r0, r1
+}
+
+// LocalTruncate provides a mock function with given fields:
+func (_m *ContextCachedService) LocalTruncate() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // Rename provides a mock function with given fields: name, newName

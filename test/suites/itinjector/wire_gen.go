@@ -10,8 +10,9 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/common"
-	"github.com/alswl/go-toodledo/pkg/dao"
+	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/services"
+	"github.com/alswl/go-toodledo/pkg/syncer"
 	"github.com/go-openapi/runtime"
 )
 
@@ -72,7 +73,7 @@ func InitFolderCachedService() (services.FolderCachedService, error) {
 	}
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	backend, err := dao.NewBoltDB(toodledoCliConfig)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +115,7 @@ func InitContextCachedService() (services.ContextCachedService, error) {
 	}
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	backend, err := dao.NewBoltDB(toodledoCliConfig)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -192,6 +193,31 @@ func InitSavedSearchService() (services.SavedSearchService, error) {
 	}
 	savedSearchService := services.NewSavedSearchService(toodledo, clientAuthInfoWriter)
 	return savedSearchService, nil
+}
+
+func InitSyncer() (syncer.ToodledoSyncer, error) {
+	toodledo := client.NewToodledo()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
+	toodledoSyncer := syncer.NewToodledoSyncer(folderCachedService, accountService)
+	return toodledoSyncer, nil
 }
 
 func InitApp() (*app.ToodledoCliApp, error) {

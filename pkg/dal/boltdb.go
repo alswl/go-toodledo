@@ -1,46 +1,15 @@
-package dao
+package dal
 
 import (
-	"github.com/alswl/go-toodledo/pkg/models"
-	"sync"
-	"time"
-
 	"github.com/pkg/errors"
 	boltdb "go.etcd.io/bbolt"
+	"sync"
 )
 
 // bolt is port from https://github.com/alibaba/pouch/blob/master/pkg/meta/boltdb.go
 type bolt struct {
 	db *boltdb.DB
 	sync.Mutex
-}
-
-// NewBolt is used to make bolt metadata store instance.
-func NewBoltDB(config models.ToodledoCliConfig) (Backend, error) {
-	opt := &boltdb.Options{
-		Timeout: time.Second * 10,
-	}
-
-	//if _, err := os.Stat(cfg.BaseDir); err != nil && os.IsNotExist(err) {
-	//	if err := os.MkdirAll(path.Dir(cfg.BaseDir), 0755); err != nil {
-	//		return nil, errors.Wrap(err, "failed to create metadata path")
-	//	}
-	//}
-
-	b := &bolt{}
-
-	db, err := boltdb.Open(config.Database.DataFile, 0644, opt)
-	if err != nil {
-		return nil, err
-	}
-	for _, bucket := range config.Database.Buckets {
-		if err := b.prepare(db, []byte(bucket)); err != nil {
-			return nil, err
-		}
-	}
-	b.db = db
-
-	return b, nil
 }
 
 func (b *bolt) prepare(db *boltdb.DB, bucket []byte) error {

@@ -7,6 +7,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/services"
+	"github.com/alswl/go-toodledo/pkg/syncer"
 	"github.com/go-openapi/runtime"
 	"github.com/google/wire"
 )
@@ -57,6 +58,11 @@ func InitAccountSvc() (services.AccountService, error) {
 }
 
 func InitSavedSearchService() (services.SavedSearchService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
+func InitSyncer() (syncer.ToodledoSyncer, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }
