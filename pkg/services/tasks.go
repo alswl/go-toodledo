@@ -20,11 +20,8 @@ var DefaultFieldsInResponse = "folder,star,context,tag,goal,repeat,startdate,sta
 // TaskService ...
 type TaskService interface {
 	FindById(id int64) (*models.Task, error)
-	ListAll() ([]*models.Task, *models.PaginatedInfo, error)
-	ListByQuery(query *queries.TaskSearchQuery) ([]*models.Task, *models.PaginatedInfo, error)
-	ListModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error)
-	// TODO using opt
-	Create(name string, options map[string]interface{}) (*models.Task, error)
+	List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error)
+	Create(name string) (*models.Task, error)
 	CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error)
 	Delete(id int64) error
 	DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error)
@@ -65,15 +62,17 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 }
 
 // ListAll ...
-func (s *taskService) ListAll() ([]*models.Task, *models.PaginatedInfo, error) {
-	// TODO using TaskQuery
+func (s *taskService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+	// TODO using TaskQuery,before, after,start,limit
 	p := task.NewGetTasksGetPhpParams()
 	fields := enums.TaskFields2String(enums.GeneralTaskFields)
 	p.SetFields(&fields)
 	comp := int64(0)
 	p.SetComp(&comp)
-	num := int64(10)
+	num := limit
 	p.SetNum(&num)
+	start_ := &start
+	p.SetStart(start_)
 
 	s.cli.Task.GetTasksGetPhp(p, s.auth)
 
@@ -91,16 +90,6 @@ func (s *taskService) ListAll() ([]*models.Task, *models.PaginatedInfo, error) {
 	return tasks, &paging, nil
 }
 
-func (s *taskService) ListByQuery(query *queries.TaskSearchQuery) ([]*models.Task, *models.PaginatedInfo, error) {
-	// TODO api server did not support query, we must keep local storage.
-	return []*models.Task{}, nil, nil
-}
-
-// QueryModifiedTimeIn ...
-func (s *taskService) ListModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error) {
-	panic("implement me")
-}
-
 func (s *taskService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
 	ts := []models.Task{*query.ToModel()}
 	bytes, _ := json.Marshal(ts)
@@ -116,14 +105,10 @@ func (s *taskService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Tas
 }
 
 // Create ...
-func (s *taskService) Create(title string, options map[string]interface{}) (*models.Task, error) {
+func (s *taskService) Create(title string) (*models.Task, error) {
 	t := models.Task{
 		Title: title,
 	}
-	// TODO options
-	//for opt range options {
-	//	opt(t)
-	//}
 	bytes, _ := json.Marshal([]models.Task{t})
 	bytesS := (string)(bytes)
 	p := task.NewPostTasksAddPhpParams()

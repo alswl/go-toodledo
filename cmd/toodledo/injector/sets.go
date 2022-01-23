@@ -23,6 +23,7 @@ var SuperSet = wire.NewSet(
 	services.CurrentUser,
 	services.NewAccountService,
 	services.NewTaskService,
+	services.NewTaskCachedService,
 	services.NewFolderService,
 	services.NewFolderCachedService,
 	services.NewContextService,

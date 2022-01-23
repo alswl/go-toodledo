@@ -22,8 +22,10 @@ type FolderCachedService interface {
 	Create(name string) (*models.Folder, error)
 }
 
+var FolderBucket = "folders"
+
 type folderCachedService struct {
-	syncLock sync.Mutex
+	syncLock *sync.Mutex
 
 	svc        FolderService
 	cache      dal.Cache
@@ -35,7 +37,7 @@ type folderCachedService struct {
 func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService, db dal.Backend) FolderCachedService {
 	s := folderCachedService{
 		svc:        folderSvc,
-		cache:      dal.NewCache(db, "folders"),
+		cache:      dal.NewCache(db, FolderBucket),
 		db:         db,
 		accountSvc: accountSvc,
 	}
@@ -55,7 +57,7 @@ func (s *folderCachedService) Sync() error {
 	}
 	for _, f := range all {
 		bytes, _ := json.Marshal(f)
-		s.db.Put("folders", f.Name, bytes)
+		s.db.Put(FolderBucket, f.Name, bytes)
 	}
 	return nil
 }
@@ -117,7 +119,7 @@ func (s *folderCachedService) Find(name string) (*models.Folder, error) {
 }
 
 func (s *folderCachedService) LocalClear() error {
-	err := s.db.Truncate("folders")
+	err := s.db.Truncate(FolderBucket)
 	if err != nil {
 		return err
 	}

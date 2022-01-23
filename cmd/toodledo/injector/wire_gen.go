@@ -141,6 +141,30 @@ func InitTaskService() (services.TaskService, error) {
 	return taskService, nil
 }
 
+func InitTaskCachedService() (*services.TaskCachedService, error) {
+	toodledo := client.NewToodledo()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
+	return taskCachedService, nil
+}
+
 func InitGoalsService() (services.GoalService, error) {
 	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigFromViper()
