@@ -5,15 +5,13 @@ import (
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
 	"sync"
 )
 
 // FolderCachedService ...
-// TODO remove this, using syncer
 type FolderCachedService interface {
-	LocalTruncate() error
+	LocalClear() error
 	Sync() error
 
 	Find(name string) (*models.Folder, error)
@@ -44,51 +42,6 @@ func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService, 
 	return &s
 }
 
-// Rename ...
-func (s *folderCachedService) Rename(name string, newName string) (*models.Folder, error) {
-	s.LocalTruncate()
-	return s.svc.Rename(name, newName)
-}
-
-// Archive ...
-func (s *folderCachedService) Archive(id int, isArchived bool) (*models.Folder, error) {
-	s.LocalTruncate()
-	return s.svc.Archive(id, isArchived)
-}
-
-// Delete ...
-func (s *folderCachedService) Delete(name string) error {
-	s.LocalTruncate()
-	return s.svc.Delete(name)
-}
-
-// Create ...
-func (s *folderCachedService) Create(name string) (*models.Folder, error) {
-	s.LocalTruncate()
-	return s.svc.Create(name)
-}
-
-func (s *folderCachedService) folderIsExpired() bool {
-	var meCached models.Account
-	// FIXME userService
-	c, err := s.db.Get("auth", "me")
-	if err == dal.ErrObjectNotFound {
-		// missing
-		me, err := s.accountSvc.Me()
-		c, _ = json.Marshal(me)
-		s.db.Put("auth", "me", c)
-		// FIXME save to cache
-		if err != nil {
-			logrus.WithField("me", me).WithError(err).Error("request failed")
-			return true
-		}
-
-	}
-	_ = json.Unmarshal(c, &meCached)
-
-	return meCached.LasteditFolder <= meCached.LasteditFolder
-}
-
 func (s *folderCachedService) Sync() error {
 	all, err := s.svc.ListAll()
 	if err != nil {
@@ -96,7 +49,7 @@ func (s *folderCachedService) Sync() error {
 	}
 	s.syncLock.Lock()
 	defer s.syncLock.Unlock()
-	err = s.LocalTruncate()
+	err = s.LocalClear()
 	if err != nil {
 		return err
 	}
@@ -105,6 +58,30 @@ func (s *folderCachedService) Sync() error {
 		s.db.Put("folders", f.Name, bytes)
 	}
 	return nil
+}
+
+// Rename ...
+func (s *folderCachedService) Rename(name string, newName string) (*models.Folder, error) {
+	s.LocalClear()
+	return s.svc.Rename(name, newName)
+}
+
+// Archive ...
+func (s *folderCachedService) Archive(id int, isArchived bool) (*models.Folder, error) {
+	s.LocalClear()
+	return s.svc.Archive(id, isArchived)
+}
+
+// Delete ...
+func (s *folderCachedService) Delete(name string) error {
+	s.LocalClear()
+	return s.svc.Delete(name)
+}
+
+// Create ...
+func (s *folderCachedService) Create(name string) (*models.Folder, error) {
+	s.LocalClear()
+	return s.svc.Create(name)
 }
 
 // ListAll ...
@@ -139,7 +116,7 @@ func (s *folderCachedService) Find(name string) (*models.Folder, error) {
 	return f, nil
 }
 
-func (s *folderCachedService) LocalTruncate() error {
+func (s *folderCachedService) LocalClear() error {
 	err := s.db.Truncate("folders")
 	if err != nil {
 		return err

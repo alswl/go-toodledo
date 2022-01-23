@@ -119,7 +119,7 @@ func (_m *FolderCachedService) ListAll() ([]*models.Folder, error) {
 }
 
 // LocalTruncate provides a mock function with given fields:
-func (_m *FolderCachedService) LocalTruncate() error {
+func (_m *FolderCachedService) LocalClear() error {
 	ret := _m.Called()
 
 	var r0 error

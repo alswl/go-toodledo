@@ -11,7 +11,7 @@ import (
 
 // ContextCachedService ...
 type ContextCachedService interface {
-	LocalTruncate() error
+	LocalClear() error
 
 	Find(name string) (*models.Context, error)
 	ListAll() ([]*models.Context, error)
@@ -40,19 +40,19 @@ func NewContextCachedService(contextsvc ContextService, accountSvc AccountServic
 
 // Rename ...
 func (s *contextCachedService) Rename(name string, newName string) (*models.Context, error) {
-	s.LocalTruncate()
+	s.LocalClear()
 	return s.svc.Rename(name, newName)
 }
 
 // Delete ...
 func (s *contextCachedService) Delete(name string) error {
-	s.LocalTruncate()
+	s.LocalClear()
 	return s.svc.Delete(name)
 }
 
 // Create ...
 func (s *contextCachedService) Create(name string) (*models.Context, error) {
-	s.LocalTruncate()
+	s.LocalClear()
 	return s.svc.Create(name)
 }
 
@@ -92,7 +92,7 @@ func (s *contextCachedService) sync() error {
 	if err != nil {
 		return err
 	}
-	err = s.LocalTruncate()
+	err = s.LocalClear()
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func (s *contextCachedService) Find(name string) (*models.Context, error) {
 }
 
 // Invalidate ...
-func (s *contextCachedService) LocalTruncate() error {
+func (s *contextCachedService) LocalClear() error {
 	err := s.db.Truncate("contexts")
 	if err != nil {
 		return err

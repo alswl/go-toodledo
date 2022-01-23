@@ -96,7 +96,7 @@ func (_m *ContextCachedService) ListAll() ([]*models.Context, error) {
 }
 
 // LocalTruncate provides a mock function with given fields:
-func (_m *ContextCachedService) LocalTruncate() error {
+func (_m *ContextCachedService) LocalClear() error {
 	ret := _m.Called()
 
 	var r0 error

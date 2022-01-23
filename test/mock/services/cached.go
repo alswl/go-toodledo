@@ -10,7 +10,7 @@ type Cached struct {
 }
 
 // LocalTruncate provides a mock function with given fields:
-func (_m *Cached) LocalTruncate() error {
+func (_m *Cached) LocalClear() error {
 	ret := _m.Called()
 
 	var r0 error
