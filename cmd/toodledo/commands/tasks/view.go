@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-var ViewCmd = &cobra.Command{
+var viewCmd = &cobra.Command{
 	Use:  "view",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

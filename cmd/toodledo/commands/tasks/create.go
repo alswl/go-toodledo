@@ -5,8 +5,6 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg"
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
-	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
@@ -14,33 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// cmdQuery present the parameters for the command
-// parse query with cmd
-type cmdQuery struct {
-	ContextID int64
-	FolderID  int64
-	GoalID    int64
-	Priority  string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
-
-	DueDate string `validate:"datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
-	// TODO
-	// Tags
-}
-
-func (q *cmdQuery) ToQuery() (*queries.TaskCreateQuery, error) {
-	var err error
-	var query queries.TaskCreateQuery
-
-	query.ContextID = q.ContextID
-	query.FolderID = q.FolderID
-	query.GoalID = q.GoalID
-	query.DueDate = q.DueDate
-	query.Priority = tasks.PriorityString2Type(q.Priority)
-
-	return &query, err
-}
-
-var CreateCmd = &cobra.Command{
+var createCmd = &cobra.Command{
 	Use:     "create",
 	Short:   "Create a task",
 	Example: "toodledo tasks create --context=1 --folder=2 --goal=3 --priority=High --due_date=2020-01-01 title",
@@ -85,9 +57,9 @@ var CreateCmd = &cobra.Command{
 }
 
 func init() {
-	err := pkg.BindFlagsByQuery(CreateCmd, cmdQuery{})
+	err := pkg.BindFlagsByQuery(createCmd, cmdQuery{})
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to generate flags for command %s", CreateCmd.Use))
+		panic(errors.Wrapf(err, "failed to generate flags for command %s", createCmd.Use))
 	}
-	//CreateCmd.Flags().String("title", "", "title of the task")
+	//createCmd.Flags().String("title", "", "title of the task")
 }

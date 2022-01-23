@@ -8,8 +8,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var ListCmd = &cobra.Command{
-	Use: "list",
+var listCmd = &cobra.Command{
+	Use:  "list",
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		_, err := injector.InitApp()
 		if err != nil {
@@ -31,4 +32,11 @@ var ListCmd = &cobra.Command{
 		fmt.Println(paging)
 		fmt.Println(render.Tables4Task(tasks))
 	},
+}
+
+func init() {
+	//err := pkg.BindFlagsByQuery(listCmd, cmdQuery{})
+	//if err != nil {
+	//	panic(errors.Wrapf(err, "failed to generate flags for command %s", listCmd.Use))
+	//}
 }

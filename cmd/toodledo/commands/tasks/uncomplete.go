@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-var UnCompleteCmd = &cobra.Command{
+var uncompleteCmd = &cobra.Command{
 	Use:  "uncomplete",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
