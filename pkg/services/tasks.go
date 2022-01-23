@@ -21,10 +21,11 @@ var DefaultFieldsInResponse = "folder,star,context,tag,goal,repeat,startdate,sta
 type TaskService interface {
 	FindById(id int64) (*models.Task, error)
 	ListAll() ([]*models.Task, *models.PaginatedInfo, error)
+	ListByQuery(query *queries.TaskSearchQuery) ([]*models.Task, *models.PaginatedInfo, error)
 	ListModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error)
 	// TODO using opt
 	Create(name string, options map[string]interface{}) (*models.Task, error)
-	CreateWithQuery(query *queries.TaskCreateQuery) (*models.Task, error)
+	CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error)
 	Delete(id int64) error
 	DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error)
 	Edit(id int64, t *models.Task) (*models.Task, error)
@@ -90,12 +91,17 @@ func (s *taskService) ListAll() ([]*models.Task, *models.PaginatedInfo, error) {
 	return tasks, &paging, nil
 }
 
+func (s *taskService) ListByQuery(query *queries.TaskSearchQuery) ([]*models.Task, *models.PaginatedInfo, error) {
+	// TODO api server did not support query, we must keep local storage.
+	return []*models.Task{}, nil, nil
+}
+
 // QueryModifiedTimeIn ...
 func (s *taskService) ListModifiedTimeIn(before, after time.Time, start, limit int, fields []enums.TaskField) ([]*models.Task, int, error) {
 	panic("implement me")
 }
 
-func (s *taskService) CreateWithQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
+func (s *taskService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
 	ts := []models.Task{*query.ToModel()}
 	bytes, _ := json.Marshal(ts)
 	bytesS := (string)(bytes)

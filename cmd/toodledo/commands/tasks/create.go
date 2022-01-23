@@ -5,6 +5,8 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg"
 	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
+	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
@@ -12,13 +14,42 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// cmdCreateQuery present the parameters for the command
+// parse query with cmd
+type cmdCreateQuery struct {
+	// TODO name
+	ContextID int64
+	// TODO name
+	FolderID int64
+	// TODO name
+	GoalID   int64
+	Priority string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
+
+	DueDate string `validate:"datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
+	// TODO
+	// Tags
+}
+
+func (q *cmdCreateQuery) ToQuery() (*queries.TaskCreateQuery, error) {
+	var err error
+	var query queries.TaskCreateQuery
+
+	query.ContextID = q.ContextID
+	query.FolderID = q.FolderID
+	query.GoalID = q.GoalID
+	query.DueDate = q.DueDate
+	query.Priority = tasks.PriorityString2Type(q.Priority)
+
+	return &query, err
+}
+
 var createCmd = &cobra.Command{
 	Use:     "create",
 	Short:   "Create a task",
 	Example: "toodledo tasks create --context=1 --folder=2 --goal=3 --priority=High --due_date=2020-01-01 title",
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		cmdQ := cmdQuery{}
+		cmdQ := cmdCreateQuery{}
 		err := pkg.FillQueryByFlags(cmd, &cmdQ)
 		if err != nil {
 			logrus.WithError(err).Fatal("failed")
@@ -46,7 +77,7 @@ var createCmd = &cobra.Command{
 		q.Title = args[0]
 
 		// TODO simple worked
-		t, err := svc.CreateWithQuery(q)
+		t, err := svc.CreateByQuery(q)
 		if err != nil {
 			logrus.WithError(err).Fatal("create task failed")
 			return
@@ -57,7 +88,7 @@ var createCmd = &cobra.Command{
 }
 
 func init() {
-	err := pkg.BindFlagsByQuery(createCmd, cmdQuery{})
+	err := pkg.BindFlagsByQuery(createCmd, cmdCreateQuery{})
 	if err != nil {
 		panic(errors.Wrapf(err, "failed to generate flags for command %s", createCmd.Use))
 	}

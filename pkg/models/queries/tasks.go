@@ -7,6 +7,15 @@ import (
 	"time"
 )
 
+type TaskSearchQuery struct {
+	Title     string
+	ContextID int64
+	FolderID  int64
+	GoalID    int64
+	DueDate   string
+	Priority  tasks.Priority
+}
+
 // TaskCreateQuery is query model of Task
 type TaskCreateQuery struct {
 	// TODO fields missing

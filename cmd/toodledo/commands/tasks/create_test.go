@@ -60,7 +60,7 @@ func Test_cmdQuery_ToQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			q := &cmdQuery{
+			q := &cmdCreateQuery{
 				ContextID: tt.fields.ContextID,
 				FolderID:  tt.fields.FolderID,
 				GoalID:    tt.fields.GoalID,
