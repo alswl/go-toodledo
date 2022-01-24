@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"fmt"
-
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
@@ -65,6 +64,12 @@ var listCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("failed to init task service")
 			return
 		}
+		syncer, err := injector.InitSyncer()
+		if err != nil {
+			logrus.WithError(err).Fatal("init syncer failed")
+			return
+		}
+		err = syncer.SyncOnce()
 		//q, err := cmdQ.ToQuery()
 		//if err != nil {
 		//	logrus.WithError(err).Fatal("parse query failed")

@@ -14,7 +14,7 @@ type TaskCachedService struct {
 	remoteSvc  TaskService
 	accountSvc AccountService
 
-	syncLock *sync.Mutex
+	syncLock sync.Mutex
 	db       dal.Backend
 }
 
@@ -23,6 +23,7 @@ func NewTaskCachedService(remoteSvc TaskService, accountSvc AccountService, db d
 }
 
 var TaskBucket = "tasks"
+var MaxNumPerRequest = int64(1000)
 
 func (s *TaskCachedService) LocalClear() error {
 	err := s.db.Truncate(TaskBucket)
@@ -34,7 +35,7 @@ func (s *TaskCachedService) LocalClear() error {
 
 func (s *TaskCachedService) Sync() error {
 	// TODO using pagination
-	all, err := s.ListAll()
+	all, err := s.ListAllRemote()
 	if err != nil {
 		return err
 	}
@@ -52,8 +53,8 @@ func (s *TaskCachedService) Sync() error {
 	return nil
 }
 
-func (s TaskCachedService) FindById(id int64) (*models.Task, error) {
-	all, err := s.ListAll()
+func (s *TaskCachedService) FindById(id int64) (*models.Task, error) {
+	all, err := s.ListAllRemote()
 	if err != nil {
 		return nil, err
 	}
@@ -64,13 +65,14 @@ func (s TaskCachedService) FindById(id int64) (*models.Task, error) {
 	return head, nil
 }
 
-func (s TaskCachedService) ListAll() ([]*models.Task, error) {
+func (s *TaskCachedService) ListAllRemote() ([]*models.Task, error) {
 	var ts, all []*models.Task
 	var err error
 	var pagination *models.PaginatedInfo
 	var start = int64(0)
-	var limit = int64(2)
+	var limit = MaxNumPerRequest
 
+	// TODO query from local data
 	for {
 		ts, pagination, err = s.remoteSvc.List(start, limit)
 		if err != nil {
@@ -86,16 +88,34 @@ func (s TaskCachedService) ListAll() ([]*models.Task, error) {
 	return all, nil
 }
 
-func (s TaskCachedService) ListByQuery(query *queries.TaskSearchQuery) ([]*models.Task, *models.PaginatedInfo, error) {
+func (s *TaskCachedService) ListAll() ([]*models.Task, error) {
+	all, err := s.db.List(TaskBucket)
+	if err != nil {
+		return nil, err
+	}
+	var tasks []*models.Task
+	for _, v := range all {
+		var t models.Task
+		err = json.Unmarshal(v, &t)
+		if err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, &t)
+	}
+	return tasks, nil
+}
+
+func (s *TaskCachedService) ListByQuery(query *queries.TaskSearchQuery) ([]*models.Task, *models.PaginatedInfo, error) {
 	// FIXME api server did not support query, we must keep local storage.
 	return []*models.Task{}, nil, nil
 }
 
-func (s TaskCachedService) Create(name string) (*models.Task, error) {
+func (s *TaskCachedService) Create(name string) (*models.Task, error) {
 	created, err := s.remoteSvc.Create(name)
 	if err != nil {
 		return nil, err
 	}
+	// FIXME, using reconcile instead of cleanup
 	err = s.LocalClear()
 	if err != nil {
 		return nil, err
@@ -103,11 +123,12 @@ func (s TaskCachedService) Create(name string) (*models.Task, error) {
 	return created, nil
 }
 
-func (s TaskCachedService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
+func (s *TaskCachedService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
 	created, err := s.remoteSvc.CreateByQuery(query)
 	if err != nil {
 		return nil, err
 	}
+	// FIXME, using reconcile instead of cleanup
 	err = s.LocalClear()
 	if err != nil {
 		return nil, err
@@ -115,11 +136,12 @@ func (s TaskCachedService) CreateByQuery(query *queries.TaskCreateQuery) (*model
 	return created, nil
 }
 
-func (s TaskCachedService) Delete(id int64) error {
+func (s *TaskCachedService) Delete(id int64) error {
 	err := s.remoteSvc.Delete(id)
 	if err != nil {
 		return err
 	}
+	// FIXME, using reconcile instead of cleanup
 	err = s.LocalClear()
 	if err != nil {
 		return err
@@ -127,11 +149,12 @@ func (s TaskCachedService) Delete(id int64) error {
 	return nil
 }
 
-func (s TaskCachedService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error) {
+func (s *TaskCachedService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error) {
 	batch, items, err := s.remoteSvc.DeleteBatch(ids)
 	if err != nil {
 		return nil, nil, err
 	}
+	// FIXME, using reconcile instead of cleanup
 	err = s.LocalClear()
 	if err != nil {
 		return nil, nil, err
@@ -139,11 +162,12 @@ func (s TaskCachedService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDele
 	return batch, items, nil
 }
 
-func (s TaskCachedService) Edit(id int64, t *models.Task) (*models.Task, error) {
+func (s *TaskCachedService) Edit(id int64, t *models.Task) (*models.Task, error) {
 	edited, err := s.remoteSvc.Edit(id, t)
 	if err != nil {
 		return nil, err
 	}
+	// FIXME, using reconcile instead of cleanup
 	err = s.LocalClear()
 	if err != nil {
 		return nil, err
@@ -151,11 +175,12 @@ func (s TaskCachedService) Edit(id int64, t *models.Task) (*models.Task, error) 
 	return edited, nil
 }
 
-func (s TaskCachedService) Complete(id int64) (*models.Task, error) {
+func (s *TaskCachedService) Complete(id int64) (*models.Task, error) {
 	completed, err := s.remoteSvc.Complete(id)
 	if err != nil {
 		return nil, err
 	}
+	// FIXME, using reconcile instead of cleanup
 	err = s.LocalClear()
 	if err != nil {
 		return nil, err
@@ -163,11 +188,12 @@ func (s TaskCachedService) Complete(id int64) (*models.Task, error) {
 	return completed, nil
 }
 
-func (s TaskCachedService) UnComplete(id int64) (*models.Task, error) {
+func (s *TaskCachedService) UnComplete(id int64) (*models.Task, error) {
 	unCompleted, err := s.remoteSvc.UnComplete(id)
 	if err != nil {
 		return nil, err
 	}
+	// FIXME, using reconcile instead of cleanup
 	err = s.LocalClear()
 	if err != nil {
 		return nil, err

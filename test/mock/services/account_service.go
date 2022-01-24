@@ -12,6 +12,36 @@ type AccountService struct {
 	mock.Mock
 }
 
+// CachedMe provides a mock function with given fields:
+func (_m *AccountService) CachedMe() (*models.Account, bool, error) {
+	ret := _m.Called()
+
+	var r0 *models.Account
+	if rf, ok := ret.Get(0).(func() *models.Account); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Account)
+		}
+	}
+
+	var r1 bool
+	if rf, ok := ret.Get(1).(func() bool); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Get(1).(bool)
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func() error); ok {
+		r2 = rf()
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 // Me provides a mock function with given fields:
 func (_m *AccountService) Me() (*models.Account, error) {
 	ret := _m.Called()

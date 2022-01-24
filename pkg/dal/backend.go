@@ -49,7 +49,7 @@ func NewBoltDB(config models.ToodledoCliConfig) (Backend, error) {
 	baseDir := filepath.Base(config.Database.DataFile)
 	if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
 		if err := os.MkdirAll(path.Dir(baseDir), 0755); err != nil {
-			return nil, errors.Wrap(err, "failed to create metadata path")
+			return nil, errors.Wrapf(err, "failed to create metadata path, %s", baseDir)
 		}
 	}
 
@@ -57,7 +57,7 @@ func NewBoltDB(config models.ToodledoCliConfig) (Backend, error) {
 
 	db, err := boltdb.Open(config.Database.DataFile, 0644, opt)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to open boltdb, %s", config.Database.DataFile)
 	}
 	for _, bucket := range config.Database.Buckets {
 		if err := b.prepare(db, []byte(bucket)); err != nil {

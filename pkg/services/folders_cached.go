@@ -25,7 +25,7 @@ type FolderCachedService interface {
 var FolderBucket = "folders"
 
 type folderCachedService struct {
-	syncLock *sync.Mutex
+	syncLock sync.Mutex
 
 	svc        FolderService
 	cache      dal.Cache

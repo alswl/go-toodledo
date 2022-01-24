@@ -61,7 +61,7 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 	return &t, nil
 }
 
-// ListAll ...
+// ListAllRemote ...
 func (s *taskService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
 	// TODO using TaskQuery,before, after,start,limit
 	p := task.NewGetTasksGetPhpParams()

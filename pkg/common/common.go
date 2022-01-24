@@ -21,6 +21,13 @@ func NewCliConfigFromViper() (models.ToodledoCliConfig, error) {
 		return models.ToodledoCliConfig{}, err
 	}
 	conf.Database.Buckets = models.DefaultBuckets
+	if conf.Database.DataFile == "" {
+		dir, err := homedir.Dir()
+		if err != nil {
+			return models.ToodledoCliConfig{}, err
+		}
+		conf.Database.DataFile = path.Join(dir, ".toodledo", "data", "data.db")
+	}
 	return conf, nil
 }
 
