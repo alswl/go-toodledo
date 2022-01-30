@@ -9,10 +9,11 @@ type Priority int
 
 const (
 	PriorityNegative Priority = -1
-	PriorityLow      Priority = 0
-	PriorityMedium   Priority = 1
-	PriorityHigh     Priority = 2
-	PriorityTop      Priority = 3
+	// FIXME low is 0, 0 is zero value
+	PriorityLow    Priority = 0
+	PriorityMedium Priority = 1
+	PriorityHigh   Priority = 2
+	PriorityTop    Priority = 3
 )
 
 // PriorityAll ...

@@ -13,7 +13,10 @@ type TaskSearchQuery struct {
 	FolderID  int64
 	GoalID    int64
 	DueDate   string
-	Priority  tasks.Priority
+	// Priority, low is zero, is default value, Priority should be pointer
+	Priority *tasks.Priority
+	// XXX add Status
+	// Status
 }
 
 // TaskCreateQuery is query model of Task

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/thoas/go-funk"
 	"strconv"
@@ -105,9 +106,26 @@ func (s *TaskCachedService) ListAll() ([]*models.Task, error) {
 	return tasks, nil
 }
 
-func (s *TaskCachedService) ListByQuery(query *queries.TaskSearchQuery) ([]*models.Task, *models.PaginatedInfo, error) {
-	// FIXME api server did not support query, we must keep local storage.
-	return []*models.Task{}, nil, nil
+func (s *TaskCachedService) ListAllByQuery(query *queries.TaskSearchQuery) ([]*models.Task, error) {
+	all, err := s.db.List(TaskBucket)
+	if err != nil {
+		return nil, err
+	}
+	var ts []*models.Task
+	for _, v := range all {
+		var t models.Task
+		err = json.Unmarshal(v, &t)
+		if err != nil {
+			return nil, err
+		}
+		ts = append(ts, &t)
+	}
+	if query.Priority != nil {
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			return tasks.PriorityValue2Type(t.Priority) == *query.Priority
+		}).([]*models.Task)
+	}
+	return ts, nil
 }
 
 func (s *TaskCachedService) Create(name string) (*models.Task, error) {

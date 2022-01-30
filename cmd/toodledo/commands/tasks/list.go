@@ -34,7 +34,10 @@ func (q *cmdSearchQuery) ToQuery() (*queries.TaskSearchQuery, error) {
 	query.FolderID = q.FolderID
 	query.GoalID = q.GoalID
 	query.DueDate = q.DueDate
-	query.Priority = tasks.PriorityString2Type(q.Priority)
+	if q.Priority != "" {
+		p := tasks.PriorityString2Type(q.Priority)
+		query.Priority = &p
+	}
 
 	return query, nil
 }
@@ -70,13 +73,17 @@ var listCmd = &cobra.Command{
 			return
 		}
 		err = syncer.SyncOnce()
-		//q, err := cmdQ.ToQuery()
-		//if err != nil {
-		//	logrus.WithError(err).Fatal("parse query failed")
-		//}
+		if err != nil {
+			logrus.WithError(err).Fatal("sync failed")
+			return
+		}
+		q, err := cmdQ.ToQuery()
+		if err != nil {
+			logrus.WithError(err).Fatal("parse query failed")
+		}
 
 		// TODO sync all data first
-		tasks, err := svc.ListAll()
+		tasks, err := svc.ListAllByQuery(q)
 		if err != nil {
 			logrus.Error(err)
 			return
