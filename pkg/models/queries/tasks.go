@@ -15,6 +15,7 @@ type TaskSearchQuery struct {
 	DueDate   string
 	// Priority, low is zero, is default value, Priority should be pointer
 	Priority *tasks.Priority
+	Status   *tasks.Status
 	// XXX add Status
 	// Status
 }

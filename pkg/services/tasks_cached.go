@@ -125,6 +125,11 @@ func (s *TaskCachedService) ListAllByQuery(query *queries.TaskSearchQuery) ([]*m
 			return tasks.PriorityValue2Type(t.Priority) == *query.Priority
 		}).([]*models.Task)
 	}
+	if query.Status != nil {
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			return tasks.StatusValue2Type(t.Status) == *query.Status
+		}).([]*models.Task)
+	}
 	return ts, nil
 }
 

@@ -35,11 +35,35 @@ var StatusAll = []Status{
 	StatusReference,
 }
 
+var StatusMap = map[string]Status{
+	"none":        StatusNone,
+	"next_action": StatusNextAction,
+	"nextaction":  StatusNextAction,
+	"active":      StatusActive,
+	"planning":    StatusPlanning,
+	"delegated":   StatusDelegated,
+	"waiting":     StatusWaiting,
+	"hold":        StatusHold,
+	"postponed":   StatusPostponed,
+	"someday":     StatusSomeday,
+	"canceled":    StatusCanceled,
+	"reference":   StatusReference,
+}
+
 // StatusValue2Type ...
 func StatusValue2Type(input int64) Status {
 	for _, x := range StatusAll {
 		if x == Status(input) {
 			return x
+		}
+	}
+	return StatusNone
+}
+
+func StatusString2Type(input string) Status {
+	for k, v := range StatusMap {
+		if k == input {
+			return v
 		}
 	}
 	return StatusNone

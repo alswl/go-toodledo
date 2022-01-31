@@ -21,6 +21,8 @@ var BucketAccount = "account"
 type AccountService interface {
 	Me() (*models.Account, error)
 	CachedMe() (*models.Account, bool, error)
+	GetLastSyncInfo() (*models.Account, error)
+	SetLastSyncInfo(account *models.Account) error
 }
 
 type accountService struct {
@@ -44,8 +46,37 @@ func (s *accountService) Me() (*models.Account, error) {
 	return resp.Payload, nil
 }
 
-func (s *accountService) CachedMe() (*models.Account, bool, error) {
-	bytes, err := s.db.Get(BucketAccount, "me")
+var key = "lastSyncInfo"
+
+func (s *accountService) GetLastSyncInfo() (*models.Account, error) {
+	bytes, err := s.db.Get(BucketAccount, key)
+	if err == dal.ErrObjectNotFound {
+		return nil, nil
+	} else if err != nil {
+		return nil, errors.Wrap(err, "failed to get last sync info")
+	}
+	u := models.Account{}
+	err = json.Unmarshal(bytes, &u)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal last sync info")
+	}
+	return &u, nil
+}
+
+func (s *accountService) SetLastSyncInfo(account *models.Account) error {
+	bytes, err := json.Marshal(account)
+	if err != nil {
+		return errors.Wrap(err, "failed to marshal last sync info")
+	}
+	err = s.db.Put(BucketAccount, key, bytes)
+	if err != nil {
+		return errors.Wrap(err, "failed to set last sync info")
+	}
+	return nil
+}
+
+func (s *accountService) cachedMe(key string) (*models.Account, bool, error) {
+	bytes, err := s.db.Get(BucketAccount, key)
 	u := models.Account{}
 	if err == dal.ErrObjectNotFound {
 		me, err := s.Me()
@@ -56,7 +87,7 @@ func (s *accountService) CachedMe() (*models.Account, bool, error) {
 		if err != nil {
 			return nil, false, errors.Wrapf(err, "marshal account failed")
 		}
-		s.db.Put(BucketAccount, "me", bytes)
+		s.db.Put(BucketAccount, key, bytes)
 		return me, false, nil
 	} else if err != nil {
 		return nil, false, errors.Wrapf(err, "get account in db failed")
@@ -67,4 +98,8 @@ func (s *accountService) CachedMe() (*models.Account, bool, error) {
 		}
 		return &u, true, nil
 	}
+}
+
+func (s *accountService) CachedMe() (*models.Account, bool, error) {
+	return s.cachedMe("me")
 }

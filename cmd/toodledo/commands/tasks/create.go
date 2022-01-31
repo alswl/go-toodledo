@@ -24,6 +24,7 @@ type cmdCreateQuery struct {
 	// TODO name
 	GoalID   int64
 	Priority string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
+	Status   string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`
 
 	DueDate string `validate:"datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
 	// TODO

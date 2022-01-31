@@ -14,13 +14,14 @@ import (
 )
 
 type cmdSearchQuery struct {
-	// TODO name
+	// FIXME name
 	ContextID int64
-	// TODO name
+	// FIXME name
 	FolderID int64
-	// TODO name
+	// FIXME name
 	GoalID   int64
 	Priority string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
+	Status   string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`
 
 	DueDate string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
 	// TODO
@@ -37,6 +38,10 @@ func (q *cmdSearchQuery) ToQuery() (*queries.TaskSearchQuery, error) {
 	if q.Priority != "" {
 		p := tasks.PriorityString2Type(q.Priority)
 		query.Priority = &p
+	}
+	if q.Status != "" {
+		s := tasks.StatusString2Type(q.Status)
+		query.Status = &s
 	}
 
 	return query, nil
@@ -94,7 +99,7 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
-	err := pkg.BindFlagsByQuery(listCmd, cmdCreateQuery{})
+	err := pkg.BindFlagsByQuery(listCmd, cmdSearchQuery{})
 	if err != nil {
 		panic(errors.Wrapf(err, "failed to generate flags for command %s", listCmd.Use))
 	}
