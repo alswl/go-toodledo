@@ -246,7 +246,9 @@ func InitSyncer() (syncer.ToodledoSyncer, error) {
 	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
 	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
-	toodledoSyncer, err := syncer.NewToodledoSyncer(folderCachedService, accountService, taskCachedService, backend)
+	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
+	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
+	toodledoSyncer, err := syncer.NewToodledoSyncer(folderCachedService, accountService, taskCachedService, contextCachedService, backend)
 	if err != nil {
 		return nil, err
 	}

@@ -13,9 +13,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type cmdSearchQuery struct {
-	// FIXME name
+type cmdListQuery struct {
 	ContextID int64
+	Context   string
 	// FIXME name
 	FolderID int64
 	// FIXME name
@@ -28,8 +28,23 @@ type cmdSearchQuery struct {
 	// Tags
 }
 
-func (q *cmdSearchQuery) ToQuery() (*queries.TaskSearchQuery, error) {
-	var query = &queries.TaskSearchQuery{}
+func (q *cmdListQuery) PrepareIDs() error {
+	if q.Context != "" {
+		svc, err := injector.InitContextCachedService()
+		if err != nil {
+			return errors.Wrap(err, "failed to init folder service")
+		}
+		c, err := svc.Find(q.Context)
+		if err != nil {
+			return errors.Wrap(err, "failed to get context by name")
+		}
+		q.ContextID = c.ID
+	}
+	return nil
+}
+
+func (q *cmdListQuery) ToQuery() (*queries.TaskListQuery, error) {
+	var query = &queries.TaskListQuery{}
 
 	query.ContextID = q.ContextID
 	query.FolderID = q.FolderID
@@ -51,7 +66,7 @@ var listCmd = &cobra.Command{
 	Use:  "list",
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		cmdQ := cmdSearchQuery{}
+		cmdQ := cmdListQuery{}
 		err := pkg.FillQueryByFlags(cmd, &cmdQ)
 		if err != nil {
 			logrus.WithError(err).Fatal("failed")
@@ -82,6 +97,11 @@ var listCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("sync failed")
 			return
 		}
+		err = cmdQ.PrepareIDs()
+		if err != nil {
+			logrus.WithError(err).Fatal("prepare ids failed")
+			return
+		}
 		q, err := cmdQ.ToQuery()
 		if err != nil {
 			logrus.WithError(err).Fatal("parse query failed")
@@ -99,7 +119,7 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
-	err := pkg.BindFlagsByQuery(listCmd, cmdSearchQuery{})
+	err := pkg.BindFlagsByQuery(listCmd, cmdListQuery{})
 	if err != nil {
 		panic(errors.Wrapf(err, "failed to generate flags for command %s", listCmd.Use))
 	}

@@ -106,7 +106,7 @@ func (s *TaskCachedService) ListAll() ([]*models.Task, error) {
 	return tasks, nil
 }
 
-func (s *TaskCachedService) ListAllByQuery(query *queries.TaskSearchQuery) ([]*models.Task, error) {
+func (s *TaskCachedService) ListAllByQuery(query *queries.TaskListQuery) ([]*models.Task, error) {
 	all, err := s.db.List(TaskBucket)
 	if err != nil {
 		return nil, err
@@ -128,6 +128,11 @@ func (s *TaskCachedService) ListAllByQuery(query *queries.TaskSearchQuery) ([]*m
 	if query.Status != nil {
 		ts = funk.Filter(ts, func(t *models.Task) bool {
 			return tasks.StatusValue2Type(t.Status) == *query.Status
+		}).([]*models.Task)
+	}
+	if query.ContextID != 0 {
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			return t.Context == query.ContextID
 		}).([]*models.Task)
 	}
 	return ts, nil

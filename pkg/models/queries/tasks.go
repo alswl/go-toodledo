@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type TaskSearchQuery struct {
+type TaskListQuery struct {
 	Title     string
 	ContextID int64
 	FolderID  int64
@@ -16,8 +16,6 @@ type TaskSearchQuery struct {
 	// Priority, low is zero, is default value, Priority should be pointer
 	Priority *tasks.Priority
 	Status   *tasks.Status
-	// XXX add Status
-	// Status
 }
 
 // TaskCreateQuery is query model of Task

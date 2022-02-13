@@ -20,6 +20,7 @@ type toodledoSyncer struct {
 	log *logrus.Logger
 
 	folderSvc  services.FolderCachedService
+	contextSvc services.ContextCachedService
 	accountSvc services.AccountService
 	taskSvc    *services.TaskCachedService
 	backend    dal.Backend
@@ -27,10 +28,12 @@ type toodledoSyncer struct {
 
 func NewToodledoSyncer(folderSvc services.FolderCachedService, accountSvc services.AccountService,
 	taskSvc *services.TaskCachedService,
+	contextSvc services.ContextCachedService,
 	backend dal.Backend) (ToodledoSyncer, error) {
 	ts := toodledoSyncer{
 		log:        logrus.New(),
 		folderSvc:  folderSvc,
+		contextSvc: contextSvc,
 		accountSvc: accountSvc,
 		taskSvc:    taskSvc,
 	}
@@ -61,7 +64,13 @@ func (s *toodledoSyncer) sync() error {
 			s.log.WithError(err).Error("Failed to sync folders")
 		}
 	}
-
+	if lastSyncInfo == nil || me.LasteditContext > lastSyncInfo.LasteditContext {
+		s.log.Info("Syncing contexts")
+		err = s.contextSvc.Sync()
+		if err != nil {
+			s.log.WithError(err).Error("Failed to sync contexts")
+		}
+	}
 	if lastSyncInfo == nil || me.LasteditTask > lastSyncInfo.LasteditTask {
 		s.log.Info("Syncing tasks")
 		err = s.taskSvc.Sync()
@@ -69,6 +78,7 @@ func (s *toodledoSyncer) sync() error {
 			s.log.WithError(err).Error("Failed to sync tasks")
 		}
 	}
+
 	err = s.accountSvc.SetLastSyncInfo(me)
 	if err != nil {
 		s.log.WithError(err).Error("Failed to set last sync info")
