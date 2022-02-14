@@ -47,12 +47,17 @@ func InitTaskService() (services.TaskService, error) {
 	return nil, nil
 }
 
-func InitTaskCachedService() (*services.TaskCachedService, error) {
+func InitTaskCachedService() (services.TaskCachedService, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }
 
-func InitGoalsService() (services.GoalService, error) {
+func InitGoalService() (services.GoalService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
+func InitGoalCachedService() (services.GoalCachedService, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }
@@ -63,6 +68,11 @@ func InitAccountSvc() (services.AccountService, error) {
 }
 
 func InitSavedSearchService() (services.SavedSearchService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
+func InitTaskRichService() (services.TaskRichService, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }

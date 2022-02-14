@@ -29,7 +29,10 @@ var SuperSet = wire.NewSet(
 	services.NewContextService,
 	services.NewContextCachedService,
 	services.NewGoalService,
+	services.NewGoalCachedService,
 	services.NewSavedSearchService,
+
+	services.NewTaskRichService,
 
 	syncer.NewToodledoSyncer,
 

@@ -17,6 +17,7 @@ import (
 // ContextService ...
 type ContextService interface {
 	Find(name string) (*models.Context, error)
+	FindByID(id int64) (*models.Context, error)
 	ListAll() ([]*models.Context, error)
 	Rename(name string, newName string) (*models.Context, error)
 	Delete(name string) error
@@ -88,6 +89,7 @@ func (s *contextservice) Rename(name string, newName string) (*models.Context, e
 
 // Find ...
 func (s *contextservice) Find(name string) (*models.Context, error) {
+	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
 	fs, err := s.ListAll()
 	if err != nil {
 		return nil, err
@@ -95,6 +97,23 @@ func (s *contextservice) Find(name string) (*models.Context, error) {
 
 	filtered := funk.Filter(fs, func(x *models.Context) bool {
 		return x.Name == name
+	}).([]*models.Context)
+	if len(filtered) == 0 {
+		return nil, common.ErrNotFound
+	}
+	f := filtered[0]
+	return f, nil
+}
+
+func (s *contextservice) FindByID(id int64) (*models.Context, error) {
+	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
+	fs, err := s.ListAll()
+	if err != nil {
+		return nil, err
+	}
+
+	filtered := funk.Filter(fs, func(x *models.Context) bool {
+		return x.ID == id
 	}).([]*models.Context)
 	if len(filtered) == 0 {
 		return nil, common.ErrNotFound

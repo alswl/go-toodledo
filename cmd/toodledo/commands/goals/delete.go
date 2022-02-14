@@ -16,19 +16,14 @@ var DeleteCmd = &cobra.Command{
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		svc, err := injector.InitGoalsService()
+		svc, err := injector.InitGoalService()
 		if err != nil {
 			logrus.WithError(err).Fatal("failed to init goals service")
 			return
 		}
 		name := args[0]
 
-		f, err := svc.Find(name)
-		if err != nil {
-			logrus.Error(err)
-			return
-		}
-		err = svc.Delete(f.ID)
+		err = svc.Delete(name)
 		if err != nil {
 			logrus.WithError(err).Error("failed to delete goal")
 			return

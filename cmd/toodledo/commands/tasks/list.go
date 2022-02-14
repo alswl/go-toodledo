@@ -34,6 +34,7 @@ func (q *cmdListQuery) PrepareIDs() error {
 		if err != nil {
 			return errors.Wrap(err, "failed to init folder service")
 		}
+		// TODO case sensitive
 		c, err := svc.Find(q.Context)
 		if err != nil {
 			return errors.Wrap(err, "failed to get context by name")
@@ -92,6 +93,11 @@ var listCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("init syncer failed")
 			return
 		}
+		taskRichSvc, err := injector.InitTaskRichService()
+		if err != nil {
+			logrus.WithError(err).Fatal("init task rich service failed")
+			return
+		}
 		err = syncer.SyncOnce()
 		if err != nil {
 			logrus.WithError(err).Fatal("sync failed")
@@ -107,14 +113,13 @@ var listCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("parse query failed")
 		}
 
-		// TODO sync all data first
 		tasks, err := svc.ListAllByQuery(q)
 		if err != nil {
 			logrus.Error(err)
 			return
 		}
-
-		fmt.Println(render.Tables4Task(tasks))
+		rts, err := taskRichSvc.RichThem(tasks)
+		fmt.Println(render.Tables4RichTasks(rts))
 	},
 }
 

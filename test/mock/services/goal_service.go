@@ -58,13 +58,13 @@ func (_m *GoalService) Create(name string) (*models.Goal, error) {
 	return r0, r1
 }
 
-// Delete provides a mock function with given fields: id
-func (_m *GoalService) Delete(id int64) error {
-	ret := _m.Called(id)
+// Delete provides a mock function with given fields: name
+func (_m *GoalService) Delete(name string) error {
+	ret := _m.Called(name)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(int64) error); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(name)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -95,6 +95,29 @@ func (_m *GoalService) Find(name string) (*models.Goal, error) {
 	return r0, r1
 }
 
+// FindByID provides a mock function with given fields: id
+func (_m *GoalService) FindByID(id int64) (*models.Goal, error) {
+	ret := _m.Called(id)
+
+	var r0 *models.Goal
+	if rf, ok := ret.Get(0).(func(int64) *models.Goal); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Goal)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListAll provides a mock function with given fields:
 func (_m *GoalService) ListAll() ([]*models.Goal, error) {
 	ret := _m.Called()
@@ -118,13 +141,13 @@ func (_m *GoalService) ListAll() ([]*models.Goal, error) {
 	return r0, r1
 }
 
-// Rename provides a mock function with given fields: id, newName
-func (_m *GoalService) Rename(id int64, newName string) (*models.Goal, error) {
-	ret := _m.Called(id, newName)
+// Rename provides a mock function with given fields: name, newName
+func (_m *GoalService) Rename(name string, newName string) (*models.Goal, error) {
+	ret := _m.Called(name, newName)
 
 	var r0 *models.Goal
-	if rf, ok := ret.Get(0).(func(int64, string) *models.Goal); ok {
-		r0 = rf(id, newName)
+	if rf, ok := ret.Get(0).(func(string, string) *models.Goal); ok {
+		r0 = rf(name, newName)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Goal)
@@ -132,8 +155,8 @@ func (_m *GoalService) Rename(id int64, newName string) (*models.Goal, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(int64, string) error); ok {
-		r1 = rf(id, newName)
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(name, newName)
 	} else {
 		r1 = ret.Error(1)
 	}

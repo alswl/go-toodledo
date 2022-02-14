@@ -21,19 +21,24 @@ type toodledoSyncer struct {
 
 	folderSvc  services.FolderCachedService
 	contextSvc services.ContextCachedService
+	goalSvc    services.GoalCachedService
+	taskSvc    services.TaskCachedService
 	accountSvc services.AccountService
-	taskSvc    *services.TaskCachedService
 	backend    dal.Backend
 }
 
-func NewToodledoSyncer(folderSvc services.FolderCachedService, accountSvc services.AccountService,
-	taskSvc *services.TaskCachedService,
+func NewToodledoSyncer(
+	folderSvc services.FolderCachedService,
+	accountSvc services.AccountService,
+	goalSvc services.GoalCachedService,
+	taskSvc services.TaskCachedService,
 	contextSvc services.ContextCachedService,
 	backend dal.Backend) (ToodledoSyncer, error) {
 	ts := toodledoSyncer{
 		log:        logrus.New(),
 		folderSvc:  folderSvc,
 		contextSvc: contextSvc,
+		goalSvc:    goalSvc,
 		accountSvc: accountSvc,
 		taskSvc:    taskSvc,
 	}
@@ -69,6 +74,13 @@ func (s *toodledoSyncer) sync() error {
 		err = s.contextSvc.Sync()
 		if err != nil {
 			s.log.WithError(err).Error("Failed to sync contexts")
+		}
+	}
+	if lastSyncInfo == nil || me.LasteditGoal > lastSyncInfo.LasteditGoal {
+		s.log.Info("Syncing goals")
+		err = s.goalSvc.Sync()
+		if err != nil {
+			s.log.WithError(err).Error("Failed to sync goals")
 		}
 	}
 	if lastSyncInfo == nil || me.LasteditTask > lastSyncInfo.LasteditTask {

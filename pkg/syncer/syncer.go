@@ -7,6 +7,7 @@ import (
 )
 
 type Syncer interface {
+	// TODO using ch to stop
 	Start(context.Context)
 	Stop()
 	sync() error

@@ -16,6 +16,7 @@ import (
 // FolderService ...
 type FolderService interface {
 	Find(name string) (*models.Folder, error)
+	FindByID(id int64) (*models.Folder, error)
 	ListAll() ([]*models.Folder, error)
 	Rename(name string, newName string) (*models.Folder, error)
 	Archive(id int, isArchived bool) (*models.Folder, error)
@@ -89,6 +90,7 @@ func (s *folderService) Rename(name string, newName string) (*models.Folder, err
 
 // Find ...
 func (s *folderService) Find(name string) (*models.Folder, error) {
+	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
 	fs, err := s.ListAll()
 	if err != nil {
 		return nil, err
@@ -96,6 +98,23 @@ func (s *folderService) Find(name string) (*models.Folder, error) {
 
 	filtered := funk.Filter(fs, func(x *models.Folder) bool {
 		return x.Name == name
+	}).([]*models.Folder)
+	if len(filtered) == 0 {
+		return nil, common.ErrNotFound
+	}
+	f := filtered[0]
+	return f, nil
+}
+
+func (s *folderService) FindByID(id int64) (*models.Folder, error) {
+	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
+	fs, err := s.ListAll()
+	if err != nil {
+		return nil, err
+	}
+
+	filtered := funk.Filter(fs, func(x *models.Folder) bool {
+		return x.ID == id
 	}).([]*models.Folder)
 	if len(filtered) == 0 {
 		return nil, common.ErrNotFound

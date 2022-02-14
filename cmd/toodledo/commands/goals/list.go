@@ -16,7 +16,7 @@ var ListCmd = &cobra.Command{
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		svc, err := injector.InitGoalsService()
+		svc, err := injector.InitGoalService()
 		if err != nil {
 			logrus.WithError(err).Fatal("failed to init goals service")
 			return

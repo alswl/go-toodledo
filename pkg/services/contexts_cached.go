@@ -11,15 +11,8 @@ import (
 
 // ContextCachedService ...
 type ContextCachedService interface {
-	LocalClear() error
-	Sync() error
-
-	Find(name string) (*models.Context, error)
-	ListAll() ([]*models.Context, error)
-	Rename(name string, newName string) (*models.Context, error)
-	Archive(id int, isArchived bool) (*models.Context, error)
-	Delete(name string) error
-	Create(name string) (*models.Context, error)
+	Cached
+	ContextService
 }
 
 var ContextBucket = "contexts"
@@ -28,7 +21,6 @@ type contextCachedService struct {
 	syncLock sync.Mutex
 
 	svc        ContextService
-	cache      dal.Cache
 	db         dal.Backend
 	accountSvc AccountService
 }
@@ -37,7 +29,6 @@ type contextCachedService struct {
 func NewContextCachedService(contextsvc ContextService, accountSvc AccountService, db dal.Backend) ContextCachedService {
 	s := contextCachedService{
 		svc:        contextsvc,
-		cache:      dal.NewCache(db, ContextBucket),
 		db:         db,
 		accountSvc: accountSvc,
 	}
@@ -88,7 +79,7 @@ func (s *contextCachedService) Create(name string) (*models.Context, error) {
 // ListAll ...
 func (s *contextCachedService) ListAll() ([]*models.Context, error) {
 	fs := make([]*models.Context, 0)
-	all, err := s.cache.ListAll()
+	all, err := s.db.List(ContextBucket)
 	if err != nil {
 		return nil, err
 	}
@@ -98,6 +89,22 @@ func (s *contextCachedService) ListAll() ([]*models.Context, error) {
 		fs = append(fs, f)
 	}
 	return fs, nil
+}
+
+func (s *contextCachedService) FindByID(id int64) (*models.Context, error) {
+	fs, err := s.ListAll()
+	if err != nil {
+		return nil, err
+	}
+
+	filtered := funk.Filter(fs, func(x *models.Context) bool {
+		return x.ID == id
+	}).([]*models.Context)
+	if len(filtered) == 0 {
+		return nil, common.ErrNotFound
+	}
+	f := filtered[0]
+	return f, nil
 }
 
 // Find ...
@@ -117,7 +124,7 @@ func (s *contextCachedService) Find(name string) (*models.Context, error) {
 	return f, nil
 }
 
-// Invalidate ...
+// LocalClear ...
 func (s *contextCachedService) LocalClear() error {
 	err := s.db.Truncate(ContextBucket)
 	if err != nil {
