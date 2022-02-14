@@ -3,7 +3,8 @@ package render
 import (
 	"bytes"
 	"github.com/alswl/go-toodledo/pkg/models"
-	etasks "github.com/alswl/go-toodledo/pkg/models/enums/tasks"
+	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
+	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
@@ -44,9 +45,9 @@ func Tables4Task(tasks []*models.Task) string {
 			x.ID,
 			completed,
 			x.Title,
-			etasks.StatusValue2Type(x.Status),
+			tstatus.StatusValue2Type(x.Status),
 			context,
-			etasks.PriorityValue2Type(x.Priority),
+			tpriority.PriorityValue2Type(x.Priority),
 			folder,
 			goal,
 			x.Duedate,
@@ -94,9 +95,9 @@ func Tables4RichTasks(tasks []*models.RichTask) string {
 			x.ID,
 			completed,
 			x.Title,
-			etasks.StatusValue2Type(x.Status),
+			tstatus.StatusValue2Type(x.Status),
 			context,
-			etasks.PriorityValue2Type(x.Priority),
+			tpriority.PriorityValue2Type(x.Priority),
 			folder,
 			goal,
 			x.Duedate,

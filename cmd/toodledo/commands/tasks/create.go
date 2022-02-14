@@ -5,7 +5,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg"
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
+	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/go-playground/validator/v10"
@@ -39,7 +39,7 @@ func (q *cmdCreateQuery) ToQuery() (*queries.TaskCreateQuery, error) {
 	query.FolderID = q.FolderID
 	query.GoalID = q.GoalID
 	query.DueDate = q.DueDate
-	query.Priority = tasks.PriorityString2Type(q.Priority)
+	query.Priority = tpriority.PriorityString2Type(q.Priority)
 
 	return &query, err
 }

@@ -1,36 +1,37 @@
 //go:generate stringer -type=Priority
+package priority
 
-package tasks
-
-import "strings"
+import (
+	"strings"
+)
 
 // Priority ...
 type Priority int
 
 const (
-	PriorityNegative Priority = -1
+	Negative Priority = -1
 	// TODO low is 0, 0 is zero value
-	PriorityLow    Priority = 0
-	PriorityMedium Priority = 1
-	PriorityHigh   Priority = 2
-	PriorityTop    Priority = 3
+	Low    Priority = 0
+	Medium Priority = 1
+	High   Priority = 2
+	Top    Priority = 3
 )
 
 // PriorityAll ...
 var PriorityAll = []Priority{
-	PriorityNegative,
-	PriorityLow,
-	PriorityMedium,
-	PriorityHigh,
-	PriorityTop,
+	Negative,
+	Low,
+	Medium,
+	High,
+	Top,
 }
 
 var PriorityMap = map[string]Priority{
-	"negative": PriorityNegative,
-	"low":      PriorityLow,
-	"medium":   PriorityMedium,
-	"high":     PriorityHigh,
-	"top":      PriorityTop,
+	"negative": Negative,
+	"low":      Low,
+	"medium":   Medium,
+	"high":     High,
+	"top":      Top,
 }
 
 // PriorityValue2Type ...
@@ -40,7 +41,7 @@ func PriorityValue2Type(input int64) Priority {
 			return x
 		}
 	}
-	return PriorityMedium
+	return Medium
 }
 
 func PriorityString2Type(input string) Priority {
@@ -49,5 +50,5 @@ func PriorityString2Type(input string) Priority {
 			return v
 		}
 	}
-	return PriorityMedium
+	return Medium
 }

@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
+	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
+	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/thoas/go-funk"
 	"strconv"
@@ -147,12 +148,12 @@ func (s *taskCachedService) ListAllByQuery(query *queries.TaskListQuery) ([]*mod
 	}
 	if query.Priority != nil {
 		ts = funk.Filter(ts, func(t *models.Task) bool {
-			return tasks.PriorityValue2Type(t.Priority) == *query.Priority
+			return tpriority.PriorityValue2Type(t.Priority) == *query.Priority
 		}).([]*models.Task)
 	}
 	if query.Status != nil {
 		ts = funk.Filter(ts, func(t *models.Task) bool {
-			return tasks.StatusValue2Type(t.Status) == *query.Status
+			return tstatus.StatusValue2Type(t.Status) == *query.Status
 		}).([]*models.Task)
 	}
 	if query.ContextID != 0 {

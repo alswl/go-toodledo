@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg"
-	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
+	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
+	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/go-playground/validator/v10"
@@ -52,11 +53,11 @@ func (q *cmdListQuery) ToQuery() (*queries.TaskListQuery, error) {
 	query.GoalID = q.GoalID
 	query.DueDate = q.DueDate
 	if q.Priority != "" {
-		p := tasks.PriorityString2Type(q.Priority)
+		p := tpriority.PriorityString2Type(q.Priority)
 		query.Priority = &p
 	}
 	if q.Status != "" {
-		s := tasks.StatusString2Type(q.Status)
+		s := tstatus.StatusString2Type(q.Status)
 		query.Status = &s
 	}
 
