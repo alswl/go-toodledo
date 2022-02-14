@@ -43,8 +43,7 @@ func (s *taskCachedService) LocalClear() error {
 }
 
 func (s *taskCachedService) Sync() error {
-	// TODO using pagination
-	all, err := s.ListAllRemote()
+	all, err := s.listAllRemote()
 	if err != nil {
 		return err
 	}
@@ -63,7 +62,7 @@ func (s *taskCachedService) Sync() error {
 }
 
 func (s *taskCachedService) FindById(id int64) (*models.Task, error) {
-	all, err := s.ListAllRemote()
+	all, err := s.ListAll()
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +73,7 @@ func (s *taskCachedService) FindById(id int64) (*models.Task, error) {
 	return head, nil
 }
 
-func (s *taskCachedService) ListAllRemote() ([]*models.Task, error) {
+func (s *taskCachedService) listAllRemote() ([]*models.Task, error) {
 	var ts, all []*models.Task
 	var err error
 	var pagination *models.PaginatedInfo
@@ -102,16 +101,16 @@ func (s *taskCachedService) ListAll() ([]*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	var tasks []*models.Task
+	var ts []*models.Task
 	for _, v := range all {
 		var t models.Task
 		err = json.Unmarshal(v, &t)
 		if err != nil {
 			return nil, err
 		}
-		tasks = append(tasks, &t)
+		ts = append(ts, &t)
 	}
-	return tasks, nil
+	return ts, nil
 }
 
 func (s *taskCachedService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
