@@ -7,6 +7,7 @@ Status: WIP
 ## Usage
 
 ```sh
+> toodledo help
 Usage:
   toodledo [command]
 
@@ -28,9 +29,39 @@ Flags:
   -v, --version               version for toodledo
 
 Use "toodledo [command] --help" for more information about a command.
+
+> toodledo task --help
+Manage toodledo tasks
+
+Usage:
+  toodledo task [command]
+
+Available Commands:
+  complete
+  create      Create a task
+  delete
+  edit
+  list
+  uncomplete
+  view
+
+Flags:
+  -h, --help   help for task
+
+Global Flags:
+      --access_token string
+      --config string         config file (default is $HOME/.toodledo.yaml)
+
+Use "toodledo task [command] --help" for more information about a command.
+
+> toodledo task list --context home --status nextaction
+         # │ [X] │ TITLE            │     STATUS │ CONTEXT │ PRIORITY │ FOLDER  │ GOAL │        DUE │ REPEAT      │ LENGTH │ TIMER
+───────────┼─────┼──────────────────┼────────────┼─────────┼──────────┼─────────┼──────┼────────────┼─────────────┼────────┼───────
+ 327077755 │ [ ] │ next-action item │ NextAction │ home    │     High │ to-0128 │ b    │ 1645704000 │ FREQ=WEEKLY │     60 │  1200
+ 327078471 │ [ ] │ abc2x            │ NextAction │ home    │     High │         │ c    │          0 │             │      0 │     0
 ```
 
-### Auth
+### Login
 
 ```sh
 # login
