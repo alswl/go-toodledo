@@ -5,7 +5,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg"
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
+	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/go-playground/validator/v10"
@@ -14,20 +14,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// cmdQuery present the parameters for the command
+// cmdCreateQuery present the parameters for the command
 // parse query with cmd
-type cmdQuery struct {
+type cmdCreateQuery struct {
+	// TODO name
 	ContextID int64
-	FolderID  int64
-	GoalID    int64
-	Priority  string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
+	// TODO name
+	FolderID int64
+	// TODO name
+	GoalID   int64
+	Priority string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
+	Status   string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`
 
 	DueDate string `validate:"datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
 	// TODO
 	// Tags
 }
 
-func (q *cmdQuery) ToQuery() (*queries.TaskCreateQuery, error) {
+func (q *cmdCreateQuery) ToQuery() (*queries.TaskCreateQuery, error) {
 	var err error
 	var query queries.TaskCreateQuery
 
@@ -35,18 +39,18 @@ func (q *cmdQuery) ToQuery() (*queries.TaskCreateQuery, error) {
 	query.FolderID = q.FolderID
 	query.GoalID = q.GoalID
 	query.DueDate = q.DueDate
-	query.Priority = tasks.PriorityString2Type(q.Priority)
+	query.Priority = tpriority.PriorityString2Type(q.Priority)
 
 	return &query, err
 }
 
-var CreateCmd = &cobra.Command{
+var createCmd = &cobra.Command{
 	Use:     "create",
 	Short:   "Create a task",
 	Example: "toodledo tasks create --context=1 --folder=2 --goal=3 --priority=High --due_date=2020-01-01 title",
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		cmdQ := cmdQuery{}
+		cmdQ := cmdCreateQuery{}
 		err := pkg.FillQueryByFlags(cmd, &cmdQ)
 		if err != nil {
 			logrus.WithError(err).Fatal("failed")
@@ -74,7 +78,7 @@ var CreateCmd = &cobra.Command{
 		q.Title = args[0]
 
 		// TODO simple worked
-		t, err := svc.CreateWithQuery(q)
+		t, err := svc.CreateByQuery(q)
 		if err != nil {
 			logrus.WithError(err).Fatal("create task failed")
 			return
@@ -85,9 +89,9 @@ var CreateCmd = &cobra.Command{
 }
 
 func init() {
-	err := pkg.BindFlagsByQuery(CreateCmd, cmdQuery{})
+	err := pkg.BindFlagsByQuery(createCmd, cmdCreateQuery{})
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to generate flags for command %s", CreateCmd.Use))
+		panic(errors.Wrapf(err, "failed to generate flags for command %s", createCmd.Use))
 	}
-	//CreateCmd.Flags().String("title", "", "title of the task")
+	//createCmd.Flags().String("title", "", "title of the task")
 }

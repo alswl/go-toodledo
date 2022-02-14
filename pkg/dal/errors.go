@@ -1,4 +1,4 @@
-package dao
+package dal
 
 const (
 	objNotFound = iota

@@ -13,7 +13,7 @@ import (
 )
 
 func TestGoalService_Get(t *testing.T) {
-	svc, _ := itinjector.InitGoalsService()
+	svc, _ := itinjector.InitGoalService()
 	all, err := svc.ListAll()
 
 	assert.NoError(t, err)
@@ -26,7 +26,7 @@ func TestGoalService_Get(t *testing.T) {
 func TestGoalService_Add(t *testing.T) {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	svc, _ := itinjector.InitGoalsService()
+	svc, _ := itinjector.InitGoalService()
 
 	elem, err := svc.Create("abc")
 
@@ -38,7 +38,7 @@ func TestGoalService_Add(t *testing.T) {
 func TestGoalService_Delete(t *testing.T) {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	svc, _ := itinjector.InitGoalsService()
+	svc, _ := itinjector.InitGoalService()
 	now := time.Now()
 	nowString := now.Format("20060102150405")
 	// TODO test

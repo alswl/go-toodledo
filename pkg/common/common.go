@@ -20,6 +20,14 @@ func NewCliConfigFromViper() (models.ToodledoCliConfig, error) {
 	if err != nil {
 		return models.ToodledoCliConfig{}, err
 	}
+	conf.Database.Buckets = models.DefaultBuckets
+	if conf.Database.DataFile == "" {
+		dir, err := homedir.Dir()
+		if err != nil {
+			return models.ToodledoCliConfig{}, err
+		}
+		conf.Database.DataFile = path.Join(dir, ".toodledo", "data", "data.db")
+	}
 	return conf, nil
 }
 
@@ -42,6 +50,10 @@ func NewCliConfigMockForTesting() (models.ToodledoCliConfig, error) {
 		Auth:           models.ToodledoConfig{},
 		Environment:    map[string]*models.ToodledoConfigEnvironment{},
 		DefaultContext: "default",
+		Database: models.ToodledoConfigDatabase{
+			DataFile: "tmp.db",
+			Buckets:  nil,
+		},
 	}
 	return conf, nil
 }

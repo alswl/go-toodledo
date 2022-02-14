@@ -3,9 +3,22 @@ package queries
 import (
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
+	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
+	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"strings"
 	"time"
 )
+
+type TaskListQuery struct {
+	Title     string
+	ContextID int64
+	FolderID  int64
+	GoalID    int64
+	DueDate   string
+	// Priority, low is zero, is default value, Priority should be pointer
+	Priority *priority.Priority
+	Status   *status.Status
+}
 
 // TaskCreateQuery is query model of Task
 type TaskCreateQuery struct {
@@ -25,11 +38,11 @@ type TaskCreateQuery struct {
 	//Location     int64
 	Note     string
 	Parent   int64
-	Priority tasks.Priority
+	Priority priority.Priority
 	//Remind
 	//Repeat iCal RRULE
 	Star     bool
-	Status   tasks.Status
+	Status   status.Status
 	Tag      []string
 	Timer    int64
 	TimerOne time.Time
@@ -150,7 +163,7 @@ func (b *TaskCreateQueryBuilder) WithParent(parent int64) *TaskCreateQueryBuilde
 }
 
 // WithPriority sets Priority
-func (b *TaskCreateQueryBuilder) WithPriority(priority tasks.Priority) *TaskCreateQueryBuilder {
+func (b *TaskCreateQueryBuilder) WithPriority(priority priority.Priority) *TaskCreateQueryBuilder {
 	b.query.Priority = priority
 	return b
 }
@@ -162,7 +175,7 @@ func (b *TaskCreateQueryBuilder) WithStar(star bool) *TaskCreateQueryBuilder {
 }
 
 // WithStatus sets Status
-func (b *TaskCreateQueryBuilder) WithStatus(status tasks.Status) *TaskCreateQueryBuilder {
+func (b *TaskCreateQueryBuilder) WithStatus(status status.Status) *TaskCreateQueryBuilder {
 	b.query.Status = status
 	return b
 }

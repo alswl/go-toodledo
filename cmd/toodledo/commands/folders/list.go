@@ -16,9 +16,20 @@ var ListCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		svc, err := injector.InitFolderService()
+		svc, err := injector.InitFolderCachedService()
 		if err != nil {
-			logrus.Fatal(err)
+			logrus.WithError(err).Fatal("failed to init folder service")
+			return
+		}
+		syncer, err := injector.InitSyncer()
+		if err != nil {
+			logrus.WithError(err).Fatal("init syncer failed")
+			return
+		}
+		//syncer.Start(context.Background())
+		err = syncer.SyncOnce()
+		if err != nil {
+			logrus.WithError(err).Fatal("sync failed")
 			return
 		}
 

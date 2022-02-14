@@ -3,7 +3,8 @@ package render
 import (
 	"bytes"
 	"github.com/alswl/go-toodledo/pkg/models"
-	etasks "github.com/alswl/go-toodledo/pkg/models/enums/tasks"
+	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
+	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
@@ -44,9 +45,59 @@ func Tables4Task(tasks []*models.Task) string {
 			x.ID,
 			completed,
 			x.Title,
-			etasks.StatusValue2Type(x.Status),
+			tstatus.StatusValue2Type(x.Status),
 			context,
-			etasks.PriorityValue2Type(x.Priority),
+			tpriority.PriorityValue2Type(x.Priority),
+			folder,
+			goal,
+			x.Duedate,
+			x.Repeat,
+			x.Length,
+			x.Timer,
+		})
+	}
+	t.AppendRows(rows)
+	t.Render()
+	return buf.String()
+}
+
+func Tables4RichTasks(tasks []*models.RichTask) string {
+	// TODO delete
+	var output string
+	buf := bytes.NewBufferString(output)
+	t := table.NewWriter()
+	t.SetOutputMirror(buf)
+	// TODO Color
+	//t.SetStyle(table.StyleColoredBright)
+	t.SetStyle(table.StyleLight)
+	t.Style().Options.DrawBorder = false
+	t.AppendHeader(table.Row{"#", "[X]", "Title", "Status", "Context", "Priority", "Folder", "Goal",
+		"Due", "Repeat", "Length", "Timer"})
+	var rows []table.Row
+	for _, x := range tasks {
+		completed := "[ ]"
+		if x.Completed > 0 {
+			completed = "[X]"
+		}
+		context := ""
+		if x.TheContext != nil {
+			context = x.TheContext.Name
+		}
+		folder := ""
+		if x.TheFolder != nil {
+			folder = x.TheFolder.Name
+		}
+		goal := ""
+		if x.TheGoal != nil {
+			goal = x.TheGoal.Name
+		}
+		rows = append(rows, table.Row{
+			x.ID,
+			completed,
+			x.Title,
+			tstatus.StatusValue2Type(x.Status),
+			context,
+			tpriority.PriorityValue2Type(x.Priority),
 			folder,
 			goal,
 			x.Duedate,

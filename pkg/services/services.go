@@ -2,5 +2,6 @@ package services
 
 // Cached ...
 type Cached interface {
-	Invalidate() error
+	LocalClear() error
+	Sync() error
 }

@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-var DeleteCmd = &cobra.Command{
+var deleteCmd = &cobra.Command{
 	Use:  "delete",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

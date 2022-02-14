@@ -10,8 +10,9 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/common"
-	"github.com/alswl/go-toodledo/pkg/dao"
+	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/services"
+	"github.com/alswl/go-toodledo/pkg/syncer"
 	"github.com/go-openapi/runtime"
 )
 
@@ -71,11 +72,11 @@ func InitFolderCachedService() (services.FolderCachedService, error) {
 		return nil, err
 	}
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	backend, err := dao.NewBoltDB(toodledoCliConfig)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
 	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
 	return folderCachedService, nil
 }
@@ -113,11 +114,11 @@ func InitContextCachedService() (services.ContextCachedService, error) {
 		return nil, err
 	}
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
-	backend, err := dao.NewBoltDB(toodledoCliConfig)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
 	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
 	return contextCachedService, nil
 }
@@ -140,7 +141,31 @@ func InitTaskService() (services.TaskService, error) {
 	return taskService, nil
 }
 
-func InitGoalsService() (services.GoalService, error) {
+func InitTaskCachedService() (services.TaskCachedService, error) {
+	toodledo := client.NewToodledo()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
+	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
+	return taskCachedService, nil
+}
+
+func InitGoalService() (services.GoalService, error) {
 	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
 	if err != nil {
@@ -158,6 +183,30 @@ func InitGoalsService() (services.GoalService, error) {
 	return goalService, nil
 }
 
+func InitGoalCachedService() (services.GoalCachedService, error) {
+	toodledo := client.NewToodledo()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
+	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
+	return goalCachedService, nil
+}
+
 func InitAccountSvc() (services.AccountService, error) {
 	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
@@ -172,7 +221,11 @@ func InitAccountSvc() (services.AccountService, error) {
 	if err != nil {
 		return nil, err
 	}
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
 	return accountService, nil
 }
 
@@ -194,6 +247,71 @@ func InitSavedSearchService() (services.SavedSearchService, error) {
 	return savedSearchService, nil
 }
 
+func InitTaskRichService() (services.TaskRichService, error) {
+	toodledo := client.NewToodledo()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
+	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
+	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
+	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
+	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
+	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
+	taskRichService := services.NewTaskRichService(taskCachedService, folderCachedService, contextCachedService, goalCachedService)
+	return taskRichService, nil
+}
+
+func InitSyncer() (syncer.ToodledoSyncer, error) {
+	toodledo := client.NewToodledo()
+	toodledoCliConfig, err := common.NewCliConfigForTesting()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
+	if err != nil {
+		return nil, err
+	}
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
+	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
+	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
+	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
+	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
+	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
+	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
+	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
+	toodledoSyncer, err := syncer.NewToodledoSyncer(folderCachedService, accountService, goalCachedService, taskCachedService, contextCachedService, backend)
+	if err != nil {
+		return nil, err
+	}
+	return toodledoSyncer, nil
+}
+
 func InitApp() (*app.ToodledoCliApp, error) {
 	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigForTesting()
@@ -208,7 +326,11 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	if err != nil {
 		return nil, err
 	}
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
 	account, err := services.CurrentUser(accountService)
 	if err != nil {
 		return nil, err

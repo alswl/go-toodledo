@@ -7,6 +7,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/services"
+	"github.com/alswl/go-toodledo/pkg/syncer"
 	"github.com/go-openapi/runtime"
 	"github.com/google/wire"
 )
@@ -46,7 +47,17 @@ func InitTaskService() (services.TaskService, error) {
 	return nil, nil
 }
 
-func InitGoalsService() (services.GoalService, error) {
+func InitTaskCachedService() (services.TaskCachedService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
+func InitGoalService() (services.GoalService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
+func InitGoalCachedService() (services.GoalCachedService, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }
@@ -57,6 +68,16 @@ func InitAccountSvc() (services.AccountService, error) {
 }
 
 func InitSavedSearchService() (services.SavedSearchService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
+func InitTaskRichService() (services.TaskRichService, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
+func InitSyncer() (syncer.ToodledoSyncer, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }

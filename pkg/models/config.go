@@ -26,8 +26,11 @@ type ToodledoCliConfig struct {
 	DefaultContext string                                `mapstructure:"default-environment"`
 }
 
+// TODO delete auth
+var DefaultBuckets = []string{"folders", "contexts", "tasks", "auth", "account"}
+
 // ToodledoConfigDatabase ...
 type ToodledoConfigDatabase struct {
 	DataFile string   `mapstructure:"data_file" yaml:"data_file"`
-	Buckets  []string `mapstructure:"buckets" yaml:"buckets"`
+	Buckets  []string `mapstructure:"-" yaml:"-"`
 }

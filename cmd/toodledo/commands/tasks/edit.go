@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-var EditCmd = &cobra.Command{
+var editCmd = &cobra.Command{
 	Use:  "edit",
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -43,4 +43,9 @@ var EditCmd = &cobra.Command{
 		}
 		fmt.Println(render.Tables4Task([]*models.Task{newTReturned}))
 	},
+}
+
+func init() {
+	// FIXME
+	editCmd.Flags().StringP("id", "i", "", "task id")
 }

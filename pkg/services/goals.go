@@ -2,8 +2,10 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/goal"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/go-openapi/runtime"
 	"github.com/sirupsen/logrus"
@@ -14,9 +16,10 @@ import (
 // GoalService ...
 type GoalService interface {
 	Find(name string) (*models.Goal, error)
+	FindByID(id int64) (*models.Goal, error)
 	Archive(id int, isArchived bool) (*models.Goal, error)
-	Delete(id int64) error
-	Rename(id int64, newName string) (*models.Goal, error)
+	Delete(name string) error
+	Rename(name string, newName string) (*models.Goal, error)
 	Create(name string) (*models.Goal, error)
 	ListAll() ([]*models.Goal, error)
 }
@@ -33,8 +36,9 @@ func NewGoalService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) Goa
 }
 
 // Find ...
-func (h *goalService) Find(name string) (*models.Goal, error) {
-	ts, err := h.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), h.auth)
+func (s *goalService) Find(name string) (*models.Goal, error) {
+	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
+	ts, err := s.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), s.auth)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +52,24 @@ func (h *goalService) Find(name string) (*models.Goal, error) {
 	return f, nil
 }
 
+func (s *goalService) FindByID(id int64) (*models.Goal, error) {
+	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
+	ts, err := s.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), s.auth)
+	if err != nil {
+		return nil, err
+	}
+	filtered := funk.Filter(ts.Payload, func(x *models.Goal) bool {
+		return x.ID == id
+	}).([]*models.Goal)
+	if len(filtered) == 0 {
+		return nil, errors.New("not found")
+	}
+	f := filtered[0]
+	return f, nil
+}
+
 // Archive ...
-func (h *goalService) Archive(id int, isArchived bool) (*models.Goal, error) {
+func (s *goalService) Archive(id int, isArchived bool) (*models.Goal, error) {
 	p := goal.NewPostGoalsEditPhpParams()
 	p.SetID(strconv.Itoa(id))
 	archived := int64(0)
@@ -57,7 +77,7 @@ func (h *goalService) Archive(id int, isArchived bool) (*models.Goal, error) {
 		archived = 1
 	}
 	p.SetArchived(&archived)
-	res, err := h.cli.Goal.PostGoalsEditPhp(p, h.auth)
+	res, err := s.cli.Goal.PostGoalsEditPhp(p, s.auth)
 	if err != nil {
 		return nil, err
 	}
@@ -65,10 +85,10 @@ func (h *goalService) Archive(id int, isArchived bool) (*models.Goal, error) {
 }
 
 // Create ...
-func (h *goalService) Create(name string) (*models.Goal, error) {
+func (s *goalService) Create(name string) (*models.Goal, error) {
 	params := goal.NewPostGoalsAddPhpParams()
 	params.SetName(name)
-	res, err := h.cli.Goal.PostGoalsAddPhp(params, h.auth)
+	res, err := s.cli.Goal.PostGoalsAddPhp(params, s.auth)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -77,10 +97,15 @@ func (h *goalService) Create(name string) (*models.Goal, error) {
 }
 
 // Delete ...
-func (h *goalService) Delete(id int64) error {
+func (s *goalService) Delete(name string) error {
+	g, err := s.Find(name)
+	if err != nil {
+		return err
+	}
+
 	params := goal.NewPostGoalsDeletePhpParams()
-	params.SetID(id)
-	resp, err := h.cli.Goal.PostGoalsDeletePhp(params, h.auth)
+	params.SetID(g.ID)
+	resp, err := s.cli.Goal.PostGoalsDeletePhp(params, s.auth)
 	if err != nil {
 		logrus.WithField("resp", resp).Error(err)
 		return err
@@ -89,11 +114,21 @@ func (h *goalService) Delete(id int64) error {
 }
 
 // Rename ...
-func (h *goalService) Rename(id int64, newName string) (*models.Goal, error) {
+func (s *goalService) Rename(name string, newName string) (*models.Goal, error) {
+	if name == newName {
+		logrus.Error("not changed")
+		return nil, fmt.Errorf("not changed")
+	}
+	g, err := s.Find(name)
+	if err != nil {
+		logrus.Error(err)
+		return nil, common.ErrNotFound
+	}
+
 	p := goal.NewPostGoalsEditPhpParams()
-	p.SetID(strconv.Itoa(int(id)))
+	p.SetID(strconv.Itoa(int(g.ID)))
 	p.SetName(&newName)
-	res, err := h.cli.Goal.PostGoalsEditPhp(p, h.auth)
+	res, err := s.cli.Goal.PostGoalsEditPhp(p, s.auth)
 	if err != nil {
 		logrus.WithField("resp", res).WithError(err).Error("request failed")
 		return nil, err
@@ -102,8 +137,8 @@ func (h *goalService) Rename(id int64, newName string) (*models.Goal, error) {
 }
 
 // ListAll ...
-func (h *goalService) ListAll() ([]*models.Goal, error) {
-	res, err := h.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), h.auth)
+func (s *goalService) ListAll() ([]*models.Goal, error) {
+	res, err := s.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), s.auth)
 	if err != nil {
 		logrus.WithField("resp", res).WithError(err).Error("request failed")
 		return nil, err
