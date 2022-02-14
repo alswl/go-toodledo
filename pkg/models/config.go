@@ -27,7 +27,7 @@ type ToodledoCliConfig struct {
 }
 
 // TODO delete auth
-var DefaultBuckets = []string{"folders", "contexts", "tasks", "auth", "account"}
+var DefaultBuckets = []string{"folders", "contexts", "tasks", "auth", "account", "goals"}
 
 // ToodledoConfigDatabase ...
 type ToodledoConfigDatabase struct {
