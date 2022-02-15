@@ -53,6 +53,10 @@ func (s *folderCachedService) Sync() error {
 	return nil
 }
 
+func (s *folderCachedService) PartialSync(lastEditTime *int32) error {
+	return s.Sync()
+}
+
 // Rename ...
 func (s *folderCachedService) Rename(name string, newName string) (*models.Folder, error) {
 	s.LocalClear()

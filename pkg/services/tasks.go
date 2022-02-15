@@ -21,6 +21,7 @@ var DefaultFieldsInResponse = "folder,star,context,tag,goal,repeat,startdate,sta
 type TaskService interface {
 	FindById(id int64) (*models.Task, error)
 	List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error)
+	ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error)
 	Create(name string) (*models.Task, error)
 	CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error)
 	Delete(id int64) error
@@ -28,6 +29,7 @@ type TaskService interface {
 	Edit(id int64, t *models.Task) (*models.Task, error)
 	Complete(id int64) (*models.Task, error)
 	UnComplete(id int64) (*models.Task, error)
+	ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error)
 }
 
 type taskService struct {
@@ -47,8 +49,6 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 	p.SetFields(&fields)
 	p.SetID(&id)
 
-	s.cli.Task.GetTasksGetPhp(p, s.auth)
-
 	res, err := s.cli.Task.GetTasksGetPhp(p, s.auth)
 	// TODO using multiple kind of payload item
 	if err != nil || len(res.Payload) == 1 {
@@ -63,6 +63,10 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 
 // listAllRemote ...
 func (s *taskService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+	return s.ListWithChanged(nil, start, limit)
+}
+
+func (s *taskService) ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
 	// TODO using TaskQuery,before, after,start,limit
 	p := task.NewGetTasksGetPhpParams()
 	fields := enums.TaskFields2String(enums.GeneralTaskFields)
@@ -73,8 +77,10 @@ func (s *taskService) List(start, limit int64) ([]*models.Task, *models.Paginate
 	p.SetNum(&num)
 	start_ := &start
 	p.SetStart(start_)
-
-	s.cli.Task.GetTasksGetPhp(p, s.auth)
+	if lastEditTime != nil {
+		lastEditTime_ := int64(*lastEditTime)
+		p.After = &lastEditTime_
+	}
 
 	res, err := s.cli.Task.GetTasksGetPhp(p, s.auth)
 	if err != nil {
@@ -88,6 +94,30 @@ func (s *taskService) List(start, limit int64) ([]*models.Task, *models.Paginate
 	bytes, _ = json.Marshal(res.Payload[1:len(res.Payload)])
 	json.Unmarshal(bytes, &tasks)
 	return tasks, &paging, nil
+}
+
+func (s *taskService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
+	// XXX
+	p := task.NewGetTasksDeletedPhpParams()
+	if lastEditTime != nil {
+		lastEditTime_ := int64(*lastEditTime)
+		p.After = &lastEditTime_
+	}
+
+	res, err := s.cli.Task.GetTasksDeletedPhp(p, s.auth)
+	if err != nil {
+		return nil, err
+	}
+	var paging models.PaginatedInfo
+	bytes, _ := json.Marshal(res.Payload[0])
+	json.Unmarshal(bytes, &paging)
+	// fix official API missing total
+	paging.Total = paging.Num
+
+	var tds []*models.TaskDeleted
+	bytes, _ = json.Marshal(res.Payload[1:len(res.Payload)])
+	json.Unmarshal(bytes, &tds)
+	return tds, nil
 }
 
 func (s *taskService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {

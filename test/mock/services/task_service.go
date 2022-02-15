@@ -207,6 +207,61 @@ func (_m *TaskService) List(start int64, limit int64) ([]*models.Task, *models.P
 	return r0, r1, r2
 }
 
+// ListDeleted provides a mock function with given fields: lastEditTime
+func (_m *TaskService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
+	ret := _m.Called(lastEditTime)
+
+	var r0 []*models.TaskDeleted
+	if rf, ok := ret.Get(0).(func(*int32) []*models.TaskDeleted); ok {
+		r0 = rf(lastEditTime)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.TaskDeleted)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*int32) error); ok {
+		r1 = rf(lastEditTime)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListWithChanged provides a mock function with given fields: lastEditTime, start, limit
+func (_m *TaskService) ListWithChanged(lastEditTime *int32, start int64, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+	ret := _m.Called(lastEditTime, start, limit)
+
+	var r0 []*models.Task
+	if rf, ok := ret.Get(0).(func(*int32, int64, int64) []*models.Task); ok {
+		r0 = rf(lastEditTime, start, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Task)
+		}
+	}
+
+	var r1 *models.PaginatedInfo
+	if rf, ok := ret.Get(1).(func(*int32, int64, int64) *models.PaginatedInfo); ok {
+		r1 = rf(lastEditTime, start, limit)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*models.PaginatedInfo)
+		}
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(*int32, int64, int64) error); ok {
+		r2 = rf(lastEditTime, start, limit)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 // UnComplete provides a mock function with given fields: id
 func (_m *TaskService) UnComplete(id int64) (*models.Task, error) {
 	ret := _m.Called(id)

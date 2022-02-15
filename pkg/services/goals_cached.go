@@ -53,6 +53,10 @@ func (s *goalCachedService) Sync() error {
 	return nil
 }
 
+func (s *goalCachedService) PartialSync(lastEditTime *int32) error {
+	return s.Sync()
+}
+
 // Rename ...
 func (s *goalCachedService) Rename(name string, newName string) (*models.Goal, error) {
 	s.LocalClear()
