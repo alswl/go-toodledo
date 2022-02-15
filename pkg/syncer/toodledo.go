@@ -52,6 +52,7 @@ func (s *toodledoSyncer) SyncOnce() error {
 }
 
 func (s *toodledoSyncer) sync() error {
+	// TODO remove duplicated call
 	me, err := s.accountSvc.Me()
 	lastSyncInfo, err := s.accountSvc.GetLastSyncInfo()
 	if err != nil {
@@ -85,7 +86,11 @@ func (s *toodledoSyncer) sync() error {
 	}
 	if lastSyncInfo == nil || me.LasteditTask > lastSyncInfo.LasteditTask {
 		s.log.Info("Syncing tasks")
-		err = s.taskSvc.Sync()
+		var lastEditTime *int32
+		if lastSyncInfo != nil {
+			lastEditTime = &lastSyncInfo.LasteditTask
+		}
+		err = s.taskSvc.PartialSync(lastEditTime)
 		if err != nil {
 			s.log.WithError(err).Error("Failed to sync tasks")
 		}

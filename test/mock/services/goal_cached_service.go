@@ -155,6 +155,20 @@ func (_m *GoalCachedService) LocalClear() error {
 	return r0
 }
 
+// PartialSync provides a mock function with given fields: lastEditTime
+func (_m *GoalCachedService) PartialSync(lastEditTime *int32) error {
+	ret := _m.Called(lastEditTime)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*int32) error); ok {
+		r0 = rf(lastEditTime)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Rename provides a mock function with given fields: name, newName
 func (_m *GoalCachedService) Rename(name string, newName string) (*models.Goal, error) {
 	ret := _m.Called(name, newName)

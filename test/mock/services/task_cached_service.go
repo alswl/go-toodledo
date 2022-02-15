@@ -230,6 +230,61 @@ func (_m *TaskCachedService) ListAllByQuery(query *queries.TaskListQuery) ([]*mo
 	return r0, r1
 }
 
+// ListDeleted provides a mock function with given fields: lastEditTime
+func (_m *TaskCachedService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
+	ret := _m.Called(lastEditTime)
+
+	var r0 []*models.TaskDeleted
+	if rf, ok := ret.Get(0).(func(*int32) []*models.TaskDeleted); ok {
+		r0 = rf(lastEditTime)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.TaskDeleted)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*int32) error); ok {
+		r1 = rf(lastEditTime)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListWithChanged provides a mock function with given fields: lastEditTime, start, limit
+func (_m *TaskCachedService) ListWithChanged(lastEditTime *int32, start int64, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+	ret := _m.Called(lastEditTime, start, limit)
+
+	var r0 []*models.Task
+	if rf, ok := ret.Get(0).(func(*int32, int64, int64) []*models.Task); ok {
+		r0 = rf(lastEditTime, start, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Task)
+		}
+	}
+
+	var r1 *models.PaginatedInfo
+	if rf, ok := ret.Get(1).(func(*int32, int64, int64) *models.PaginatedInfo); ok {
+		r1 = rf(lastEditTime, start, limit)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*models.PaginatedInfo)
+		}
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(*int32, int64, int64) error); ok {
+		r2 = rf(lastEditTime, start, limit)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 // LocalClear provides a mock function with given fields:
 func (_m *TaskCachedService) LocalClear() error {
 	ret := _m.Called()
@@ -237,6 +292,20 @@ func (_m *TaskCachedService) LocalClear() error {
 	var r0 error
 	if rf, ok := ret.Get(0).(func() error); ok {
 		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// PartialSync provides a mock function with given fields: lastEditTime
+func (_m *TaskCachedService) PartialSync(lastEditTime *int32) error {
+	ret := _m.Called(lastEditTime)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*int32) error); ok {
+		r0 = rf(lastEditTime)
 	} else {
 		r0 = ret.Error(0)
 	}

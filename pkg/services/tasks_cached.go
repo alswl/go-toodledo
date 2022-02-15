@@ -43,23 +43,48 @@ func (s *taskCachedService) LocalClear() error {
 	return nil
 }
 
-func (s *taskCachedService) Sync() error {
-	all, err := s.listAllRemote()
+func (s *taskCachedService) ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+	return s.remoteSvc.ListWithChanged(lastEditTime, start, limit)
+}
+
+func (s *taskCachedService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
+	return s.remoteSvc.ListDeleted(lastEditTime)
+}
+
+func (s *taskCachedService) syncWithFn(fnEdited func() ([]*models.Task, error), fnDeleted func() ([]*models.TaskDeleted, error)) error {
+	editedTasks, err := fnEdited()
 	if err != nil {
 		return err
 	}
 	s.syncLock.Lock()
 	defer s.syncLock.Unlock()
 
-	err = s.LocalClear()
 	if err != nil {
 		return err
 	}
-	for _, f := range all {
+	for _, f := range editedTasks {
 		bytes, _ := json.Marshal(f)
 		s.db.Put(TaskBucket, strconv.Itoa(int(f.ID)), bytes)
 	}
+
+	tds, err := fnDeleted()
+	for _, td := range tds {
+		s.db.Remove(TaskBucket, strconv.Itoa(int(td.ID)))
+	}
 	return nil
+}
+
+func (s *taskCachedService) Sync() error {
+	return s.syncWithFn(s.listAllRemote, func() ([]*models.TaskDeleted, error) {
+		return []*models.TaskDeleted{}, nil
+	})
+}
+
+func (s *taskCachedService) PartialSync(lastEditTime *int32) error {
+	return s.syncWithFn(
+		func() ([]*models.Task, error) { return s.listChanged(lastEditTime) },
+		func() ([]*models.TaskDeleted, error) { return s.ListDeleted(lastEditTime) },
+	)
 }
 
 func (s *taskCachedService) FindById(id int64) (*models.Task, error) {
@@ -84,6 +109,29 @@ func (s *taskCachedService) listAllRemote() ([]*models.Task, error) {
 	// TODO query from local data
 	for {
 		ts, pagination, err = s.remoteSvc.List(start, limit)
+		if err != nil {
+			return nil, err
+		}
+		if len(ts) == 0 || pagination.Num == 0 {
+			break
+		}
+		all = append(all, ts...)
+		start = start + limit
+		ts = make([]*models.Task, 0)
+	}
+	return all, nil
+}
+
+func (s *taskCachedService) listChanged(lastEditTime *int32) ([]*models.Task, error) {
+	var ts, all []*models.Task
+	var err error
+	var pagination *models.PaginatedInfo
+	var start = int64(0)
+	var limit = MaxNumPerRequest
+
+	// TODO query from local data
+	for {
+		ts, pagination, err = s.remoteSvc.ListWithChanged(lastEditTime, start, limit)
 		if err != nil {
 			return nil, err
 		}
