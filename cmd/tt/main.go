@@ -2,27 +2,108 @@ package main
 
 import (
 	"fmt"
+	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/pkg/models"
+	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
+	"github.com/alswl/go-toodledo/pkg/models/queries"
+	tealist "github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+var docStyle = lipgloss.NewStyle().Margin(1, 2)
+
 type model struct {
 	choices  []string         // items on the to-do list
 	cursor   int              // which to-do list item our cursor is pointing at
 	selected map[int]struct{} // which to-do items are selected
+	list     tealist.Model
+}
+
+type item struct {
+	models.RichTask
+}
+
+func (i item) Title() string       { return i.RichTask.Title }
+func (i item) Description() string { return tstatus.StatusValue2Type(i.RichTask.Status).String() }
+func (i item) FilterValue() string { return i.RichTask.Title }
+
+func initViper() {
+	// Find home directory.
+	home, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	// Search config in home directory with name ".toodledo" (without extension).
+	viper.AddConfigPath(home)
+	viper.SetConfigType("yaml")
+	viper.SetConfigName(".toodledo")
+
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err == nil {
+		logrus.Debug("config file", viper.ConfigFileUsed())
+	}
+}
+
+func AllTasks() ([]*models.RichTask, error) {
+	_, err := injector.InitApp()
+	if err != nil {
+		logrus.Fatal("login required, using `toodledo auth login` to login.")
+		return nil, err
+	}
+	svc, err := injector.InitTaskCachedService()
+	if err != nil {
+		logrus.WithError(err).Fatal("failed to init task service")
+		return nil, err
+	}
+	syncer, err := injector.InitSyncer()
+	if err != nil {
+		logrus.WithError(err).Fatal("init syncer failed")
+		return nil, err
+	}
+	taskRichSvc, err := injector.InitTaskRichService()
+	if err != nil {
+		logrus.WithError(err).Fatal("init task rich service failed")
+		return nil, err
+	}
+	err = syncer.SyncOnce()
+	if err != nil {
+		logrus.WithError(err).Fatal("sync failed")
+		return nil, err
+	}
+	tasks, err := svc.ListAllByQuery(&queries.TaskListQuery{})
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	rts, err := taskRichSvc.RichThem(tasks)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	return rts, nil
 }
 
 func initialModel() model {
-	return model{
-		// Our shopping list is a grocery list
-		choices: []string{"Buy carrots", "Buy celery", "Buy kohlrabi"},
-
-		// A map which indicates which choices are selected. We're using
-		// the  map like a mathematical set. The keys refer to the indexes
-		// of the `choices` slice, above.
-		selected: make(map[int]struct{}),
+	ts, err := AllTasks()
+	if err != nil {
+		ts = []*models.RichTask{}
 	}
+
+	var items []tealist.Item
+	for _, t := range ts {
+		items = append(items, item{*t})
+	}
+
+	m := model{list: tealist.New(items, tealist.NewDefaultDelegate(), 0, 0)}
+	m.list.Title = "My Tasks"
+	return m
 }
 
 func (m model) Init() tea.Cmd {
@@ -31,79 +112,32 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// main window
 	switch msg := msg.(type) {
-
-	// Is it a key press?
 	case tea.KeyMsg:
-
-		// Cool, what was the actual key pressed?
 		switch msg.String() {
-
 		// These keys should exit the program.
-		case "ctrl+c", "q":
+		case "ctrl+c":
 			return m, tea.Quit
-
-		// The "up" and "k" keys move the cursor up
-		case "up", "k":
-			if m.cursor > 0 {
-				m.cursor--
-			}
-
-		// The "down" and "j" keys move the cursor down
-		case "down", "j":
-			if m.cursor < len(m.choices)-1 {
-				m.cursor++
-			}
-
-		// The "enter" key and the spacebar (a literal space) toggle
-		// the selected state for the item that the cursor is pointing at.
-		case "enter", " ":
-			_, ok := m.selected[m.cursor]
-			if ok {
-				delete(m.selected, m.cursor)
-			} else {
-				m.selected[m.cursor] = struct{}{}
-			}
 		}
+	case tea.WindowSizeMsg:
+		top, right, bottom, left := docStyle.GetMargin()
+		m.list.SetSize(msg.Width-left-right, msg.Height-top-bottom)
 	}
 
-	// Return the updated model to the Bubble Tea runtime for processing.
-	// Note that we're not returning a command.
-	return m, nil
+	// list
+	var cmd tea.Cmd
+	m.list, cmd = m.list.Update(msg)
+	return m, cmd
 }
 
 func (m model) View() string {
-	// The header
-	s := "What should we buy at the market?\n\n"
-
-	// Iterate over our choices
-	for i, choice := range m.choices {
-
-		// Is the cursor pointing at this choice?
-		cursor := " " // no cursor
-		if m.cursor == i {
-			cursor = ">" // cursor!
-		}
-
-		// Is this choice selected?
-		checked := " " // not selected
-		if _, ok := m.selected[i]; ok {
-			checked = "x" // selected!
-		}
-
-		// Render the row
-		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
-	}
-
-	// The footer
-	s += "\nPress q to quit.\n"
-
-	// Send the UI for rendering
-	return s
+	return docStyle.Render(m.list.View())
 }
 
 func main() {
-	p := tea.NewProgram(initialModel())
+	initViper()
+	p := tea.NewProgram(initialModel(), tea.WithAltScreen())
 	if err := p.Start(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)
