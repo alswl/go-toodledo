@@ -91,8 +91,26 @@ func AllTasks() ([]*models.RichTask, error) {
 	return rts, nil
 }
 
+func AllTasksMock() ([]*models.RichTask, error) {
+	return []*models.RichTask{
+		{
+			Task:       &models.Task{Title: "abc"},
+			TheContext: &models.Context{},
+			TheFolder:  &models.Folder{},
+			TheGoal:    nil,
+		},
+		{
+			Task:       &models.Task{Title: "def"},
+			TheContext: &models.Context{},
+			TheFolder:  &models.Folder{},
+			TheGoal:    nil,
+		},
+	}, nil
+}
+
 func initialModel() model {
-	ts, err := AllTasks()
+	//ts, err := AllTasks()
+	ts, err := AllTasksMock()
 	if err != nil {
 		ts = []*models.RichTask{}
 	}
@@ -103,7 +121,7 @@ func initialModel() model {
 	}
 
 	m := model{list: tealist.New(items, tealist.NewDefaultDelegate(), 0, 0)}
-	m.list.Title = "My Tasks"
+	m.list.SetShowTitle(false)
 	return m
 }
 
