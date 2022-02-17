@@ -51,6 +51,7 @@ func initViper() {
 	}
 }
 
+// FIXME using daemon syncer
 func AllTasks() ([]*models.RichTask, error) {
 	_, err := injector.InitApp()
 	if err != nil {
