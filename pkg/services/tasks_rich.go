@@ -23,24 +23,24 @@ func (s *taskRichService) FindByIdRich(id int64) (*models.RichTask, error) {
 	if err != nil {
 		return nil, err
 	}
-	var context *models.Context
+	var context = &models.Context{}
 	if t.Context != 0 {
 		context, _ = s.contextSvc.FindByID(t.Context)
 	}
-	var folder *models.Folder
+	var folder = &models.Folder{}
 	if t.Folder != 0 {
 		folder, _ = s.folderSvc.FindByID(t.Folder)
 	}
-	var goal *models.Goal
+	var goal = &models.Goal{}
 	if t.Goal != 0 {
 		goal, _ = s.goalSvc.FindByID(t.Goal)
 	}
 
 	rt := &models.RichTask{
-		Task:       t,
-		TheContext: context,
-		TheFolder:  folder,
-		TheGoal:    goal,
+		Task:       *t,
+		TheContext: *context,
+		TheFolder:  *folder,
+		TheGoal:    *goal,
 	}
 	return rt, nil
 }
