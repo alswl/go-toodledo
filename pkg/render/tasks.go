@@ -79,27 +79,15 @@ func Tables4RichTasks(tasks []*models.RichTask) string {
 		if x.Completed > 0 {
 			completed = "[X]"
 		}
-		context := ""
-		if x.TheContext != nil {
-			context = x.TheContext.Name
-		}
-		folder := ""
-		if x.TheFolder != nil {
-			folder = x.TheFolder.Name
-		}
-		goal := ""
-		if x.TheGoal != nil {
-			goal = x.TheGoal.Name
-		}
 		rows = append(rows, table.Row{
 			x.ID,
 			completed,
 			x.Title,
 			tstatus.StatusValue2Type(x.Status),
-			context,
+			x.TheContext.Name,
 			tpriority.PriorityValue2Type(x.Priority),
-			folder,
-			goal,
+			x.TheFolder.Name,
+			x.TheGoal.Name,
 			x.Duedate,
 			x.Repeat,
 			x.Length,

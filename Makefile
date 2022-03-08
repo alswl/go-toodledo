@@ -19,7 +19,7 @@ NOW_SHORT := $(shell date +%Y%m%d%H%M)
 
 PROJECT := go-toodledo
 # Target binaries. You can build multiple binaries for a single project.
-TARGETS := toodledo
+TARGETS := toodledo tt
 
 # Container registries.
 REGISTRIES ?= ""
@@ -59,8 +59,6 @@ GOARCH = amd64
 VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
 
 
-# Define all targets. At least the following commands are required:
-#
 
 .PHONY: fmt build container test integration-test push clean lint download generate-code compress
 
