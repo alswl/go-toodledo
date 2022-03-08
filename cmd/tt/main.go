@@ -171,13 +171,13 @@ func initialModel() model {
 	}
 
 	columns := []table.Column{
-		table.NewColumn(columnKeyID, "ID", 15).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
-		table.NewColumn(columnKeyTitle, "Title", 50),
+		table.NewColumn(columnKeyID, "ID", 15).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
+		table.NewColumn(columnKeyTitle, "Title", 50).WithFiltered(true),
 		table.NewColumn(columnKeyContext, "Context", 15),
 		table.NewColumn(columnKeyStatus, "Status", 15),
 	}
 
-	rows := []table.Row{}
+	var rows []table.Row
 	for _, t := range ts {
 		rows = append(rows, table.NewRow(
 			table.RowData{
@@ -199,6 +199,7 @@ func initialModel() model {
 			HeaderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("10")).Bold(true)).
 			SelectableRows(false).
 			Focused(true).
+			Filtered(true).
 			//Border(customBorder).
 			WithKeyMap(keys).
 			WithStaticFooter("Footer!").
