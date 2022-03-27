@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"github.com/alswl/go-toodledo/pkg/models/queries"
+	mockservices "github.com/alswl/go-toodledo/test/mock/services"
 	"reflect"
 	"testing"
 )
@@ -61,13 +62,13 @@ func Test_cmdQuery_ToQuery(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			q := &cmdCreateQuery{
-				ContextID: tt.fields.ContextID,
-				FolderID:  tt.fields.FolderID,
-				GoalID:    tt.fields.GoalID,
-				Priority:  tt.fields.Priority,
-				DueDate:   tt.fields.DueDate,
+				Context:  "c-1",
+				FolderID: tt.fields.FolderID,
+				GoalID:   tt.fields.GoalID,
+				Priority: tt.fields.Priority,
+				DueDate:  tt.fields.DueDate,
 			}
-			got, err := q.ToQuery()
+			got, err := q.ToQuery(&mockservices.ContextService{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ToQuery() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
@@ -92,10 +93,13 @@ func (s *taskCachedService) FindById(id int64) (*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	filtered := funk.Filter(all, func(t *models.Task) bool {
+	filterHeadOpt := funk.Head(funk.Filter(all, func(t *models.Task) bool {
 		return t.ID == id
-	}).([]*models.Task)
-	head := funk.Head(filtered).(*models.Task)
+	}))
+	if filterHeadOpt == nil {
+		return nil, common.ErrNotFound
+	}
+	head := filterHeadOpt.(*models.Task)
 	return head, nil
 }
 

@@ -8,6 +8,7 @@ import (
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
+	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -18,7 +19,9 @@ import (
 // parse query with cmd
 type cmdCreateQuery struct {
 	// TODO name
-	ContextID int64
+	//ContextID int64
+	// XXX
+	Context string
 	// TODO name
 	FolderID int64
 	// TODO name
@@ -26,16 +29,22 @@ type cmdCreateQuery struct {
 	Priority string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
 	Status   string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`
 
-	DueDate string `validate:"datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
+	DueDate string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
 	// TODO
 	// Tags
 }
 
-func (q *cmdCreateQuery) ToQuery() (*queries.TaskCreateQuery, error) {
+func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService) (*queries.TaskCreateQuery, error) {
 	var err error
 	var query queries.TaskCreateQuery
 
-	query.ContextID = q.ContextID
+	if q.Context != "" {
+		context, err := contextSvc.Find(q.Context)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to find context")
+		}
+		query.ContextID = context.ID
+	}
 	query.FolderID = q.FolderID
 	query.GoalID = q.GoalID
 	query.DueDate = q.DueDate
@@ -71,7 +80,18 @@ var createCmd = &cobra.Command{
 			logrus.Fatal(err)
 			return
 		}
-		q, err := cmdQ.ToQuery()
+		taskRichSvc, err := injector.InitTaskRichService()
+		if err != nil {
+			logrus.WithError(err).Fatal("init task rich service failed")
+			return
+		}
+		contextSvc, err := injector.InitContextCachedService()
+		if err != nil {
+			logrus.Fatal(err)
+			return
+		}
+		// XXX test
+		q, err := cmdQ.ToQuery(contextSvc)
 		if err != nil {
 			logrus.WithError(err).Fatal("parse query failed")
 		}
@@ -83,8 +103,8 @@ var createCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("create task failed")
 			return
 		}
-
-		fmt.Println(render.Tables4Task([]*models.Task{t}))
+		rts, err := taskRichSvc.RichThem([]*models.Task{t})
+		fmt.Println(render.Tables4RichTasks(rts))
 	},
 }
 
