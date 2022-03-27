@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/task"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/enums"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
@@ -50,9 +51,12 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 	p.SetID(&id)
 
 	res, err := s.cli.Task.GetTasksGetPhp(p, s.auth)
+	if err != nil {
+		return nil, err
+	}
 	// TODO using multiple kind of payload item
 	if err != nil || len(res.Payload) == 1 {
-		return nil, err
+		return nil, common.ErrNotFound
 	}
 	//_ := res.Payload[0].(models.PaginatedInfo)
 	bytes, _ := json.Marshal(res.Payload[1])
