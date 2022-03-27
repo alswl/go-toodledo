@@ -63,12 +63,12 @@ func Test_cmdQuery_ToQuery(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			q := &cmdCreateQuery{
 				Context:  "c-1",
-				FolderID: tt.fields.FolderID,
-				GoalID:   tt.fields.GoalID,
+				Folder:   "f-1",
+				Goal:     "g-1",
 				Priority: tt.fields.Priority,
 				DueDate:  tt.fields.DueDate,
 			}
-			got, err := q.ToQuery(&mockservices.ContextService{})
+			got, err := q.ToQuery(&mockservices.ContextService{}, &mockservices.FolderService{}, &mockservices.GoalService{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ToQuery() error = %v, wantErr %v", err, tt.wantErr)
 				return

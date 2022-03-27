@@ -18,14 +18,9 @@ import (
 // cmdCreateQuery present the parameters for the command
 // parse query with cmd
 type cmdCreateQuery struct {
-	// TODO name
-	//ContextID int64
-	// XXX
-	Context string
-	// TODO name
-	FolderID int64
-	// TODO name
-	GoalID   int64
+	Context  string
+	Folder   string
+	Goal     string
 	Priority string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
 	Status   string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`
 
@@ -34,7 +29,8 @@ type cmdCreateQuery struct {
 	// Tags
 }
 
-func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService) (*queries.TaskCreateQuery, error) {
+func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService, folderSvc services.FolderService,
+	goalSvc services.GoalService) (*queries.TaskCreateQuery, error) {
 	var err error
 	var query queries.TaskCreateQuery
 
@@ -45,8 +41,20 @@ func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService) (*queries.T
 		}
 		query.ContextID = context.ID
 	}
-	query.FolderID = q.FolderID
-	query.GoalID = q.GoalID
+	if q.Folder != "" {
+		folder, err := folderSvc.Find(q.Folder)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to find folder")
+		}
+		query.FolderID = folder.ID
+	}
+	if q.Goal != "" {
+		goal, err := goalSvc.Find(q.Goal)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to find goal")
+		}
+		query.GoalID = goal.ID
+	}
 	query.DueDate = q.DueDate
 	query.Priority = tpriority.PriorityString2Type(q.Priority)
 
@@ -90,8 +98,17 @@ var createCmd = &cobra.Command{
 			logrus.Fatal(err)
 			return
 		}
-		// XXX test
-		q, err := cmdQ.ToQuery(contextSvc)
+		folderSvc, err := injector.InitFolderCachedService()
+		if err != nil {
+			logrus.Fatal(err)
+			return
+		}
+		goalSvc, err := injector.InitGoalCachedService()
+		if err != nil {
+			logrus.Fatal(err)
+			return
+		}
+		q, err := cmdQ.ToQuery(contextSvc, folderSvc, goalSvc)
 		if err != nil {
 			logrus.WithError(err).Fatal("parse query failed")
 		}
