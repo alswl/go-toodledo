@@ -37,7 +37,7 @@ func TestRichTask_DueDate(t1 *testing.T) {
 				TheFolder:  tt.fields.TheFolder,
 				TheGoal:    tt.fields.TheGoal,
 			}
-			if got := t.DueDate(); !reflect.DeepEqual(got, tt.want) {
+			if got := t.TheDueDate(); !reflect.DeepEqual(got, tt.want) {
 				t1.Errorf("DueDate() = %v, want %v", got, tt.want)
 			}
 		})

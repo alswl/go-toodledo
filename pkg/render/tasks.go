@@ -90,8 +90,8 @@ func Tables4RichTasks(tasks []*models.RichTask) string {
 			x.TheGoal.Name,
 			x.Due(),
 			x.Repeat,
-			x.Length,
-			x.Timer,
+			x.LengthString(),
+			x.TimerString(),
 		})
 	}
 	t.AppendRows(rows)

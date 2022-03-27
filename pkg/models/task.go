@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type RichTask struct {
 	Task
@@ -12,7 +15,7 @@ type RichTask struct {
 	//PreviousTask *Task `json:"previous_task"`
 }
 
-func (t RichTask) DueDate() time.Time {
+func (t RichTask) TheDueDate() time.Time {
 	if t.Duedate == 0 {
 		return time.Time{}
 	}
@@ -20,7 +23,7 @@ func (t RichTask) DueDate() time.Time {
 	return time.Unix(t.Duedate, 0).In(time.Local)
 }
 
-func (t RichTask) DueTime() time.Time {
+func (t RichTask) TheDueTime() time.Time {
 	if t.Duetime == 0 {
 		return time.Time{}
 	}
@@ -30,14 +33,28 @@ func (t RichTask) DueTime() time.Time {
 
 func (t RichTask) Due() string {
 	var output = ""
-	if !t.DueDate().IsZero() {
-		output += t.DueDate().Format("2006-01-02")
+	if !t.TheDueDate().IsZero() {
+		output += t.TheDueDate().Format("2006-01-02")
 	}
-	if !t.DueTime().IsZero() {
+	if !t.TheDueTime().IsZero() {
 		if output != "" {
 			output += " "
 		}
-		output += t.DueTime().Format("15:04")
+		output += t.TheDueTime().Format("15:04")
 	}
 	return output
+}
+
+func (t RichTask) TimerString() string {
+	if t.Timer == 0 {
+		return ""
+	}
+	return fmt.Sprintf("%s", time.Duration(t.Timer*1000*1000*1000))
+}
+
+func (t RichTask) LengthString() string {
+	if t.Length == 0 {
+		return ""
+	}
+	return fmt.Sprintf("%s", time.Duration(t.Length*1000*1000*1000))
 }
