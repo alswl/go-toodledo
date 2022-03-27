@@ -18,8 +18,14 @@ import (
 // cmdCreateQuery present the parameters for the command
 // parse query with cmd
 type cmdCreateQuery struct {
-	Context  string
-	Folder   string
+	// TODO
+	//ContextID int64
+	Context string
+	// TODO
+	//FolderID int64
+	Folder string
+	// TODO
+	//GoalID int64
 	Goal     string
 	Priority string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
 	Status   string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`

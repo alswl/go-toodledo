@@ -213,6 +213,16 @@ func (s *taskCachedService) ListAllByQuery(query *queries.TaskListQuery) ([]*mod
 			return t.Context == query.ContextID
 		}).([]*models.Task)
 	}
+	if query.FolderID != 0 {
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			return t.Folder == query.FolderID
+		}).([]*models.Task)
+	}
+	if query.GoalID != 0 {
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			return t.Goal == query.GoalID
+		}).([]*models.Task)
+	}
 	return ts, nil
 }
 
