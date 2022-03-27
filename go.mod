@@ -1,6 +1,6 @@
 module github.com/alswl/go-toodledo
 
-go 1.17
+go 1.18
 
 require (
 	github.com/charmbracelet/bubbles v0.10.3
@@ -83,3 +83,5 @@ require (
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
+
+//replace github.com/evertras/bubble-table => /Users/alswl/dev/project/bubbletea
