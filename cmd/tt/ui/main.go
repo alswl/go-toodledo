@@ -18,24 +18,16 @@ const (
 	columnKeyStatus  = "status"
 )
 
-func InitialModel() MainModel {
-	//ts, err := AllTasks()
-	// FIXME
-	ts, err := AllTasksMock()
+var DefaultColumns = []table.Column{
+	table.NewColumn(columnKeyID, "ID", 15).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
+	table.NewColumn(columnKeyTitle, "Title", 50).WithFiltered(true),
+	table.NewColumn(columnKeyContext, "Context", 15),
+	table.NewColumn(columnKeyStatus, "Status", 15),
+}
 
-	if err != nil {
-		ts = []*models.RichTask{}
-	}
-
-	columns := []table.Column{
-		table.NewColumn(columnKeyID, "ID", 15).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
-		table.NewColumn(columnKeyTitle, "Title", 50).WithFiltered(true),
-		table.NewColumn(columnKeyContext, "Context", 15),
-		table.NewColumn(columnKeyStatus, "Status", 15),
-	}
-
+func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	var rows []table.Row
-	for _, t := range ts {
+	for _, t := range tasks {
 		rows = append(rows, table.NewRow(
 			table.RowData{
 				columnKeyID:      strconv.Itoa(int(t.ID)),
@@ -45,14 +37,25 @@ func InitialModel() MainModel {
 			},
 		))
 	}
+	return rows
+}
+
+func InitialModel() MainModel {
+	//ts, err := AllTasks()
+	// FIXME
+	ts, err := AllTasksMock()
+
+	if err != nil {
+		ts = []*models.RichTask{}
+	}
 
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
 
 	m := MainModel{
-		tableModel: table.New(columns).
-			WithRows(rows).
+		tableModel: table.New(DefaultColumns).
+			WithRows(TasksRenderRows(ts)).
 			HeaderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("10")).Bold(true)).
 			SelectableRows(false).
 			Focused(true).

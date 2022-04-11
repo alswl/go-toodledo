@@ -88,8 +88,7 @@ func main() {
 	initViper()
 
 	// TODO full screen
-	//p := tea.NewProgram(initialModel(), tea.WithAltScreen())
-	p := tea.NewProgram(ui.InitialModel())
+	p := tea.NewProgram(ui.InitialModel(), tea.WithAltScreen())
 	if err := p.Start(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)
