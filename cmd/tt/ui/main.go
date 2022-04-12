@@ -7,7 +7,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
-	"strings"
 )
 
 type Model struct {
@@ -16,8 +15,8 @@ type Model struct {
 	//config
 	data []*models.RichTask
 
-	tasksModel TasksModel
-	//sidebarViewport viewport.Model
+	tasksModel TasksPane
+	sidebar    Sidebar
 
 	help          help.Model
 	ready         bool
@@ -38,11 +37,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// TODO keymap
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c":
+		case "ctrl+c", "q":
 			return m, tea.Quit
 		default:
 			// bubble event to sub component
-			return m.tasksModel.Update(msg)
+			m.tasksModel, _ = m.tasksModel.Update(msg)
 		}
 	}
 	return m, nil
@@ -56,20 +55,13 @@ func (m Model) View() string {
 	paddedContentStyle := lipgloss.NewStyle().
 		Padding(0, mainContentPadding)
 
-	s := strings.Builder{}
-	//s.WriteString(m.filterWindow.View() + "\n")
-	body := paddedContentStyle.Render(
-		lipgloss.JoinVertical(
+	return paddedContentStyle.Render(
+		lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			//m.renderTableHeader(),
+			m.sidebar.View(),
 			m.tasksModel.View(),
 		),
 	)
-	s.WriteString(body)
-	s.WriteString("\n")
-	// TODO
-	//s.WriteString(m.renderHelp())
-	return s.String()
 }
 
 //func (m Model) renderTableHeader() string {
@@ -101,10 +93,6 @@ func (m Model) View() string {
 //		Render(m.RenderMainViewPort())
 //}
 
-func (m Model) RenderMainViewPort() string {
-	return "\n"
-}
-
 func InitialModel() Model {
 	//ts, err := AllTasks()
 	// FIXME
@@ -119,7 +107,8 @@ func InitialModel() Model {
 	keys.RowUp.SetKeys("k", "up")
 
 	m := Model{
-		tasksModel: InitialTasksModel(),
+		tasksModel: InitialTasksPane(),
+		sidebar:    InitSidebarPane(),
 	}
 
 	return m
