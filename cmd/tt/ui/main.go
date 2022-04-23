@@ -1,9 +1,9 @@
 package ui
 
 import (
+	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
 	"github.com/alswl/go-toodledo/cmd/tt/ui/utils"
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/charmbracelet/bubbles/help"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
@@ -15,10 +15,15 @@ type Model struct {
 	//config
 	data []*models.RichTask
 
-	tasksModel TasksPane
-	sidebar    Sidebar
+	tasksModel   TasksPane
+	sidebarModel SidebarPane
 
-	help          help.Model
+	//activateModel tea.Model
+	activateModel string
+
+	// TODO help pane
+	//help          help.Model
+	// TODO ready check
 	ready         bool
 	isSidebarOpen bool
 	width         int
@@ -39,26 +44,42 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
+		case "tab":
+			// TODO refactor, switch with mod
+			if m.activateModel == "tasks" {
+				m.activateModel = "sidebar"
+				m.sidebarModel.Focus()
+				m.tasksModel.Blur()
+			} else if m.activateModel == "sidebar" {
+				m.activateModel = "tasks"
+				m.tasksModel.Focus()
+				m.sidebarModel.Blur()
+			}
+			return m, nil
 		default:
 			// bubble event to sub component
-			m.tasksModel, _ = m.tasksModel.Update(msg)
+			if m.activateModel == "tasks" {
+				newM, _ := m.tasksModel.Update(msg)
+				m.tasksModel = newM.(TasksPane)
+			} else if m.activateModel == "sidebar" {
+				newM, _ := m.sidebarModel.Update(msg)
+				m.sidebarModel = newM.(SidebarPane)
+			}
 		}
 	}
 	return m, nil
 }
 
 func (m Model) View() string {
+	// TODO error handling
 	if m.err != nil {
 		return m.err.Error()
 	}
 
-	paddedContentStyle := lipgloss.NewStyle().
-		Padding(0, mainContentPadding)
-
-	return paddedContentStyle.Render(
+	return styles.PaddedContentStyle.Render(
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			m.sidebar.View(),
+			m.sidebarModel.View(),
 			m.tasksModel.View(),
 		),
 	)
@@ -107,9 +128,11 @@ func InitialModel() Model {
 	keys.RowUp.SetKeys("k", "up")
 
 	m := Model{
-		tasksModel: InitialTasksPane(),
-		sidebar:    InitSidebarPane(),
+		tasksModel:    InitialTasksPane(),
+		sidebarModel:  InitSidebarPane(),
+		activateModel: "tasks",
 	}
+	m.tasksModel.isFocused = true
 
 	return m
 }

@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -105,6 +106,8 @@ func AllTasksMock() ([]*models.RichTask, error) {
 }
 
 type TasksPane struct {
+	Focusable
+
 	choices    []string         // items on the to-do list
 	cursor     int              // which to-do list item our cursor is pointing at
 	selected   map[int]struct{} // which to-do items are selected
@@ -118,8 +121,6 @@ func (m TasksPane) Init() tea.Cmd {
 }
 
 func (m TasksPane) View() string {
-	borderColor := faintBorder
-	border := lipgloss.NormalBorder()
 	body := strings.Builder{}
 
 	body.WriteString("Press left/right or page up/down to move pages\n")
@@ -143,9 +144,11 @@ func (m TasksPane) View() string {
 			Render(body.String()),
 	)
 
-	return lipgloss.NewStyle().
-		BorderForeground(borderColor).
-		Border(border).
+	style := styles.UnfocusedPaneStyle
+	if m.isFocused {
+		style = styles.PaneStyle
+	}
+	return style.
 		Width(m.viewport.Width).
 		Height(m.viewport.Height).
 		Render(wrap.String(
@@ -153,7 +156,7 @@ func (m TasksPane) View() string {
 		)
 }
 
-func (m TasksPane) Update(msg tea.Msg) (TasksPane, tea.Cmd) {
+func (m TasksPane) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
 		cmds []tea.Cmd
@@ -231,6 +234,7 @@ func InitialTasksPane() TasksPane {
 	}
 
 	m = m.updateFooter()
+	m.isFocused = false
 
 	return m
 }

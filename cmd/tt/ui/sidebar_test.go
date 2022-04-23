@@ -32,8 +32,7 @@ func TestSidebar(t *testing.T) {
 		item{title: "Terrycloth"},
 	}
 
-	m := Sidebar{
-		isFocused:   false,
+	m := SidebarPane{
 		isCollapsed: false,
 		tabs:        []string{"foo", "bar", "baz"},
 		currentTab:  "bar",

@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -21,8 +22,9 @@ func (i item) Title() string       { return i.title }
 func (i item) Description() string { return "" }
 func (i item) FilterValue() string { return i.title }
 
-type Sidebar struct {
-	isFocused   bool
+type SidebarPane struct {
+	Focusable
+
 	isCollapsed bool
 	tabs        []string
 	currentTab  string
@@ -32,11 +34,11 @@ type Sidebar struct {
 	viewport    viewport.Model
 }
 
-func (m Sidebar) Init() tea.Cmd {
+func (m SidebarPane) Init() tea.Cmd {
 	return nil
 }
 
-func (m Sidebar) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m SidebarPane) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
@@ -48,7 +50,7 @@ func (m Sidebar) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m Sidebar) View() string {
+func (m SidebarPane) View() string {
 	tabStyle := lipgloss.NewStyle().
 		PaddingLeft(1).
 		PaddingRight(1).
@@ -61,8 +63,6 @@ func (m Sidebar) View() string {
 
 	tabsRender := lipgloss.JoinHorizontal(lipgloss.Top, tabs...)
 
-	borderColor := faintBorder
-	border := lipgloss.NormalBorder()
 	padding := 0
 	m.viewport.SetContent(
 		lipgloss.NewStyle().
@@ -76,9 +76,11 @@ func (m Sidebar) View() string {
 			),
 			),
 	)
-	return lipgloss.NewStyle().
-		BorderForeground(borderColor).
-		Border(border).
+	style := styles.UnfocusedPaneStyle
+	if m.isFocused {
+		style = styles.PaneStyle
+	}
+	return style.
 		Width(m.viewport.Width).
 		Height(m.viewport.Height).
 		Render(wrap.String(
@@ -86,7 +88,7 @@ func (m Sidebar) View() string {
 		)
 }
 
-func InitSidebarPane() Sidebar {
+func InitSidebarPane() SidebarPane {
 	l := list.New([]list.Item{
 		item{title: "item1"},
 		item{title: "item2"},
@@ -97,8 +99,7 @@ func InitSidebarPane() Sidebar {
 	l.SetShowTitle(false)
 	l.SetShowFilter(false)
 
-	return Sidebar{
-		isFocused:   false,
+	m := SidebarPane{
 		isCollapsed: false,
 		tabs:        []string{"tab1", "tab2"},
 		currentTab:  "",
@@ -107,4 +108,6 @@ func InitSidebarPane() Sidebar {
 		currentItem: "",
 		viewport:    viewport.Model{Width: 30, Height: 20},
 	}
+	m.isFocused = false
+	return m
 }
