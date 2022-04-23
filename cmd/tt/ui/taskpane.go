@@ -5,7 +5,6 @@ import (
 	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
@@ -107,12 +106,12 @@ func AllTasksMock() ([]*models.RichTask, error) {
 
 type TasksPane struct {
 	Focusable
+	Resizable
 
 	choices    []string         // items on the to-do list
 	cursor     int              // which to-do list item our cursor is pointing at
 	selected   map[int]struct{} // which to-do items are selected
 	tableModel table.Model
-	viewport   viewport.Model
 }
 
 func (m TasksPane) Init() tea.Cmd {
@@ -182,13 +181,6 @@ func (m TasksPane) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m TasksPane) Resize(width, height int) {
-	border := lipgloss.NormalBorder()
-
-	m.viewport.Width = width - lipgloss.Width(border.Right+border.Top)
-	m.viewport.Height = height - lipgloss.Width(border.Bottom+border.Top)
-}
-
 func (m TasksPane) updateFooter() TasksPane {
 	highlightedRow := m.tableModel.HighlightedRow()
 
@@ -230,7 +222,7 @@ func InitialTasksPane() TasksPane {
 			WithKeyMap(keys).
 			WithStaticFooter("Footer!").
 			WithPageSize(20),
-		viewport: viewport.Model{Height: 30, Width: 140},
+		//viewport: viewport.Model{Height: 30, Width: 140},
 	}
 
 	m = m.updateFooter()

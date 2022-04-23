@@ -66,6 +66,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.sidebarModel = newM.(SidebarPane)
 			}
 		}
+	case tea.WindowSizeMsg:
+		sideBarWidth := msg.Width / 12 * 3
+		m.sidebarModel.Resize(sideBarWidth, msg.Height)
+		m.tasksModel.Resize(msg.Width-sideBarWidth, msg.Height)
 	}
 	return m, nil
 }
@@ -76,7 +80,7 @@ func (m Model) View() string {
 		return m.err.Error()
 	}
 
-	return styles.PaddedContentStyle.Render(
+	return styles.MainPaneStyle.Render(
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
 			m.sidebarModel.View(),

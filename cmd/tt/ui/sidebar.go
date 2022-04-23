@@ -3,7 +3,6 @@ package ui
 import (
 	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/reflow/wordwrap"
@@ -24,6 +23,7 @@ func (i item) FilterValue() string { return i.title }
 
 type SidebarPane struct {
 	Focusable
+	Resizable
 
 	isCollapsed bool
 	tabs        []string
@@ -31,7 +31,6 @@ type SidebarPane struct {
 	items       []string
 	list        list.Model
 	currentItem string
-	viewport    viewport.Model
 }
 
 func (m SidebarPane) Init() tea.Cmd {
@@ -51,6 +50,7 @@ func (m SidebarPane) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m SidebarPane) View() string {
+	// TODO move to styles
 	tabStyle := lipgloss.NewStyle().
 		PaddingLeft(1).
 		PaddingRight(1).
@@ -106,7 +106,7 @@ func InitSidebarPane() SidebarPane {
 		items:       nil,
 		list:        l,
 		currentItem: "",
-		viewport:    viewport.Model{Width: 30, Height: 20},
+		//viewport:    viewport.Model{Width: 30, Height: 20},
 	}
 	m.isFocused = false
 	return m

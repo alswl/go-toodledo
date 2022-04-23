@@ -118,4 +118,7 @@ var (
 
 	PaddedContentStyle = lipgloss.NewStyle().
 				Padding(0, mainContentPadding)
+
+	MainPaneStyle = lipgloss.NewStyle().
+			Padding(0, 0)
 )
