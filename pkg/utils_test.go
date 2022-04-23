@@ -39,13 +39,13 @@ func TestFillQueryByFlags(t *testing.T) {
 	assert.NoError(t, err)
 
 	q := Q{}
-	cmd.Flags().Set("s", "test")
-	cmd.Flags().Set("i", "1")
-	cmd.Flags().Set("i64", "2")
-	cmd.Flags().Set("t", "2018-01-01")
-	cmd.Flags().Set("b", "true")
-	cmd.Flags().Set("ss", "a")
-	cmd.Flags().Set("ss", "b")
+	_ = cmd.Flags().Set("s", "test")
+	_ = cmd.Flags().Set("i", "1")
+	_ = cmd.Flags().Set("i64", "2")
+	_ = cmd.Flags().Set("t", "2018-01-01")
+	_ = cmd.Flags().Set("b", "true")
+	_ = cmd.Flags().Set("ss", "a")
+	_ = cmd.Flags().Set("ss", "b")
 
 	err = FillQueryByFlags(&cmd, &q)
 	assert.NoError(t, err)

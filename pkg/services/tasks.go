@@ -61,7 +61,7 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 	//_ := res.Payload[0].(models.PaginatedInfo)
 	bytes, _ := json.Marshal(res.Payload[1])
 	var t models.Task
-	json.Unmarshal(bytes, &t)
+	_ = json.Unmarshal(bytes, &t)
 	return &t, nil
 }
 
@@ -92,11 +92,11 @@ func (s *taskService) ListWithChanged(lastEditTime *int32, start, limit int64) (
 	}
 	var paging models.PaginatedInfo
 	bytes, _ := json.Marshal(res.Payload[0])
-	json.Unmarshal(bytes, &paging)
+	_ = json.Unmarshal(bytes, &paging)
 
 	var tasks []*models.Task
 	bytes, _ = json.Marshal(res.Payload[1:len(res.Payload)])
-	json.Unmarshal(bytes, &tasks)
+	_ = json.Unmarshal(bytes, &tasks)
 	return tasks, &paging, nil
 }
 
@@ -114,13 +114,13 @@ func (s *taskService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, e
 	}
 	var paging models.PaginatedInfo
 	bytes, _ := json.Marshal(res.Payload[0])
-	json.Unmarshal(bytes, &paging)
+	_ = json.Unmarshal(bytes, &paging)
 	// fix official API missing total
 	paging.Total = paging.Num
 
 	var tds []*models.TaskDeleted
 	bytes, _ = json.Marshal(res.Payload[1:len(res.Payload)])
-	json.Unmarshal(bytes, &tds)
+	_ = json.Unmarshal(bytes, &tds)
 	return tds, nil
 }
 

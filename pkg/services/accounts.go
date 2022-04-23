@@ -87,7 +87,7 @@ func (s *accountService) cachedMe(key string) (*models.Account, bool, error) {
 		if err != nil {
 			return nil, false, errors.Wrapf(err, "marshal account failed")
 		}
-		s.db.Put(BucketAccount, key, bytes)
+		_ = s.db.Put(BucketAccount, key, bytes)
 		return me, false, nil
 	} else if err != nil {
 		return nil, false, errors.Wrapf(err, "get account in db failed")

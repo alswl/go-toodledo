@@ -126,7 +126,7 @@ var createCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("create task failed")
 			return
 		}
-		rts, err := taskRichSvc.RichThem([]*models.Task{t})
+		rts, _ := taskRichSvc.RichThem([]*models.Task{t})
 		fmt.Println(render.Tables4RichTasks(rts))
 	},
 }

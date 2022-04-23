@@ -48,7 +48,7 @@ func (s *folderCachedService) Sync() error {
 	}
 	for _, f := range all {
 		bytes, _ := json.Marshal(f)
-		s.db.Put(FolderBucket, f.Name, bytes)
+		_ = s.db.Put(FolderBucket, f.Name, bytes)
 	}
 	return nil
 }
@@ -59,25 +59,25 @@ func (s *folderCachedService) PartialSync(lastEditTime *int32) error {
 
 // Rename ...
 func (s *folderCachedService) Rename(name string, newName string) (*models.Folder, error) {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Rename(name, newName)
 }
 
 // Archive ...
 func (s *folderCachedService) Archive(id int, isArchived bool) (*models.Folder, error) {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Archive(id, isArchived)
 }
 
 // Delete ...
 func (s *folderCachedService) Delete(name string) error {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Delete(name)
 }
 
 // Create ...
 func (s *folderCachedService) Create(name string) (*models.Folder, error) {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Create(name)
 }
 
@@ -90,7 +90,7 @@ func (s *folderCachedService) ListAll() ([]*models.Folder, error) {
 	}
 	for _, bytes := range all {
 		f := &models.Folder{}
-		json.Unmarshal(bytes, &f)
+		_ = json.Unmarshal(bytes, &f)
 		fs = append(fs, f)
 	}
 	return fs, nil

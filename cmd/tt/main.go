@@ -8,13 +8,10 @@ import (
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
 )
-
-var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type item struct {
 	models.RichTask
@@ -44,6 +41,7 @@ func initViper() {
 }
 
 // FIXME using daemon syncer
+// nolint:deadcode
 func AllTasks() ([]*models.RichTask, error) {
 	_, err := injector.InitApp()
 	if err != nil {

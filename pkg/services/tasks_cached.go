@@ -65,12 +65,12 @@ func (s *taskCachedService) syncWithFn(fnEdited func() ([]*models.Task, error), 
 	}
 	for _, f := range editedTasks {
 		bytes, _ := json.Marshal(f)
-		s.db.Put(TaskBucket, strconv.Itoa(int(f.ID)), bytes)
+		_ = s.db.Put(TaskBucket, strconv.Itoa(int(f.ID)), bytes)
 	}
 
-	tds, err := fnDeleted()
+	tds, _ := fnDeleted()
 	for _, td := range tds {
-		s.db.Remove(TaskBucket, strconv.Itoa(int(td.ID)))
+		_ = s.db.Remove(TaskBucket, strconv.Itoa(int(td.ID)))
 	}
 	return nil
 }
@@ -121,7 +121,8 @@ func (s *taskCachedService) listAllRemote() ([]*models.Task, error) {
 		}
 		all = append(all, ts...)
 		start = start + limit
-		ts = make([]*models.Task, 0)
+		// TODO validate
+		//ts = make([]*models.Task, 0)
 	}
 	return all, nil
 }
@@ -144,7 +145,8 @@ func (s *taskCachedService) listChanged(lastEditTime *int32) ([]*models.Task, er
 		}
 		all = append(all, ts...)
 		start = start + limit
-		ts = make([]*models.Task, 0)
+		// validate
+		//ts = make([]*models.Task, 0)
 	}
 	return all, nil
 }

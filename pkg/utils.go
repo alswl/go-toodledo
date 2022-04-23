@@ -101,7 +101,7 @@ func BindFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
 		}
 
 		if strings.Contains(validateTags, "required") {
-			cmd.MarkFlagRequired(name)
+			_ = cmd.MarkFlagRequired(name)
 		}
 	}
 	return nil
@@ -118,10 +118,10 @@ func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 		f := getType.Field(i)
 		v := getValue.Field(i)
 		name := stringy.New(f.Name).KebabCase().ToLower()
-		desc := f.Tag.Get("description")
-		if desc == "" {
-			desc = name
-		}
+		//desc := f.Tag.Get("description")
+		//if desc == "" {
+		//	desc = name
+		//}
 		if !v.CanSet() {
 			return fmt.Errorf("%s is not settable, please check the accessor type", name)
 		}

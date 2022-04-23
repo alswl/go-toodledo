@@ -48,7 +48,7 @@ func (s *contextCachedService) Sync() error {
 	}
 	for _, f := range all {
 		bytes, _ := json.Marshal(f)
-		s.db.Put(ContextBucket, f.Name, bytes)
+		_ = s.db.Put(ContextBucket, f.Name, bytes)
 	}
 	return nil
 }
@@ -59,7 +59,7 @@ func (s *contextCachedService) PartialSync(lastEditTime *int32) error {
 
 // Rename ...
 func (s *contextCachedService) Rename(name string, newName string) (*models.Context, error) {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Rename(name, newName)
 }
 
@@ -70,13 +70,13 @@ func (s *contextCachedService) Archive(id int, isArchived bool) (*models.Context
 
 // Delete ...
 func (s *contextCachedService) Delete(name string) error {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Delete(name)
 }
 
 // Create ...
 func (s *contextCachedService) Create(name string) (*models.Context, error) {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Create(name)
 }
 
@@ -89,7 +89,7 @@ func (s *contextCachedService) ListAll() ([]*models.Context, error) {
 	}
 	for _, bytes := range all {
 		f := &models.Context{}
-		json.Unmarshal(bytes, &f)
+		_ = json.Unmarshal(bytes, &f)
 		fs = append(fs, f)
 	}
 	return fs, nil

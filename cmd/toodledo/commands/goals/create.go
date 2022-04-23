@@ -25,7 +25,7 @@ var CreateCmd = &cobra.Command{
 		}
 		name := args[0]
 
-		created, err := svc.Create(name)
+		created, _ := svc.Create(name)
 		fmt.Println(render.Tables4Goal([]*models.Goal{created}))
 	},
 }

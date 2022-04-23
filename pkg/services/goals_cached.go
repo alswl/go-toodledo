@@ -48,7 +48,7 @@ func (s *goalCachedService) Sync() error {
 	}
 	for _, f := range all {
 		bytes, _ := json.Marshal(f)
-		s.db.Put(GoalBucket, f.Name, bytes)
+		_ = s.db.Put(GoalBucket, f.Name, bytes)
 	}
 	return nil
 }
@@ -59,25 +59,25 @@ func (s *goalCachedService) PartialSync(lastEditTime *int32) error {
 
 // Rename ...
 func (s *goalCachedService) Rename(name string, newName string) (*models.Goal, error) {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Rename(name, newName)
 }
 
 // Archive ...
 func (s *goalCachedService) Archive(id int, isArchived bool) (*models.Goal, error) {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Archive(id, isArchived)
 }
 
 // Delete ...
 func (s *goalCachedService) Delete(name string) error {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Delete(name)
 }
 
 // Create ...
 func (s *goalCachedService) Create(name string) (*models.Goal, error) {
-	s.LocalClear()
+	_ = s.LocalClear()
 	return s.svc.Create(name)
 }
 
@@ -90,7 +90,7 @@ func (s *goalCachedService) ListAll() ([]*models.Goal, error) {
 	}
 	for _, bytes := range all {
 		f := &models.Goal{}
-		json.Unmarshal(bytes, &f)
+		_ = json.Unmarshal(bytes, &f)
 		fs = append(fs, f)
 	}
 	return fs, nil

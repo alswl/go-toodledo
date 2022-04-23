@@ -37,7 +37,7 @@ var viewCmd = &cobra.Command{
 			return
 		}
 
-		rts, err := taskRichSvc.RichThem([]*models.Task{task})
+		rts, _ := taskRichSvc.RichThem([]*models.Task{task})
 		fmt.Println(render.Tables4RichTasks(rts))
 	},
 }

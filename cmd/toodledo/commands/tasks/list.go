@@ -148,7 +148,7 @@ var listCmd = &cobra.Command{
 			logrus.Error(err)
 			return
 		}
-		rts, err := taskRichSvc.RichThem(tasks)
+		rts, _ := taskRichSvc.RichThem(tasks)
 		fmt.Println(render.Tables4RichTasks(rts))
 	},
 }
