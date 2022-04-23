@@ -103,13 +103,13 @@ var (
 			Bold(true)
 
 	// My Colors and Styles
-	mainContentPadding = 1
+	mainContentPadding = 0
 
 	borderColor          = lipgloss.AdaptiveColor{Light: "#212F3D", Dark: "#D5D8DC"}
 	unfocusedBorderColor = lipgloss.AdaptiveColor{Light: "#D5D8DC", Dark: "#212F3D"}
 
 	PaneStyle = lipgloss.NewStyle().
-			Padding(0, 2).
+			Padding(0, 0).
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(borderColor)
 

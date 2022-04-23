@@ -11,7 +11,6 @@ import (
 	"github.com/muesli/reflow/wordwrap"
 	"github.com/muesli/reflow/wrap"
 	"strconv"
-	"strings"
 )
 
 const (
@@ -23,7 +22,8 @@ const (
 
 var DefaultColumns = []table.Column{
 	table.NewColumn(columnKeyID, "ID", 15).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
-	table.NewColumn(columnKeyTitle, "Title", 50).WithFiltered(true),
+	table.NewFlexColumn(columnKeyTitle, "Title", 100).WithFiltered(true),
+	//table.NewColumn(columnKeyTitle, "Title", 50).WithFiltered(true),
 	table.NewColumn(columnKeyContext, "Context", 15),
 	table.NewColumn(columnKeyStatus, "Status", 15),
 }
@@ -43,67 +43,6 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	return rows
 }
 
-func AllTasksMock() ([]*models.RichTask, error) {
-	return []*models.RichTask{
-		{
-			Task:       models.Task{Title: "abc"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-			TheGoal:    models.Goal{},
-		},
-		{
-			Task:       models.Task{Title: "abc"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-		},
-		{
-			Task:       models.Task{Title: "abc"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-		},
-		{
-			Task:       models.Task{Title: "abc"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-		},
-		{
-			Task:       models.Task{Title: "abc"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-		},
-		{
-			Task:       models.Task{Title: "abc"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-		},
-		{
-			Task:       models.Task{Title: "abc"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-		},
-		{
-			Task:       models.Task{Title: "abc"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-		},
-		{
-			Task:       models.Task{Title: "abc"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-		},
-		{
-			Task:       models.Task{Title: "abc"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-		},
-		{
-			Task:       models.Task{Title: "def"},
-			TheContext: models.Context{},
-			TheFolder:  models.Folder{},
-		},
-	}, nil
-}
-
 type TasksPane struct {
 	Focusable
 	Resizable
@@ -120,27 +59,12 @@ func (m TasksPane) Init() tea.Cmd {
 }
 
 func (m TasksPane) View() string {
-	body := strings.Builder{}
-
-	body.WriteString("Press left/right or page up/down to move pages\n")
-	body.WriteString("Press space/enter to select a row, q or ctrl+c to quit\n")
-
-	//var selectedIDs []string
-	//for _, row := range m.tableModel.SelectedRows() {
-	//	// Slightly dangerous type assumption but fine for demo
-	//	selectedIDs = append(selectedIDs, row.Data[columnKeyID].(string))
-	//}
-	//body.WriteString(fmt.Sprintf("SelectedIDs: %s\n", strings.Join(selectedIDs, ", ")))
-	body.WriteString(m.tableModel.View())
-	body.WriteString("\n")
-
-	padding := 0
 	m.viewport.SetContent(
 		lipgloss.NewStyle().
 			Width(m.viewport.Width).
 			Height(m.viewport.Height).
-			PaddingLeft(padding).
-			Render(body.String()),
+			PaddingLeft(0).
+			Render(m.tableModel.View()),
 	)
 
 	style := styles.UnfocusedPaneStyle
@@ -195,6 +119,14 @@ func (m TasksPane) updateFooter() TasksPane {
 	return m
 }
 
+func (m *TasksPane) Resize(width, height int) {
+	m.Resizable.Resize(width, height)
+	m.tableModel.WithTargetWidth(width - 2)
+	// FIXME 10 is not accurate
+	// FIXME dynamic set page size is not works
+	//m.tableModel.WithPageSize(height - 5)
+}
+
 func InitialTasksPane() TasksPane {
 	//ts, err := AllTasks()
 	// FIXME
@@ -219,9 +151,12 @@ func InitialTasksPane() TasksPane {
 			Focused(true).
 			Filtered(true).
 			//Border(customBorder).
+			// TODO flex height
+			//WithNoPagination().
+			// TODO set 20 first init,
+			WithPageSize(20).
 			WithKeyMap(keys).
-			WithStaticFooter("Footer!").
-			WithPageSize(20),
+			WithStaticFooter("Footer!"),
 		//viewport: viewport.Model{Height: 30, Width: 140},
 	}
 
