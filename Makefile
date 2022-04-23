@@ -79,6 +79,8 @@ lint:
 	@echo "ensure integration test with // +build integration tags"
 	@test $$(find test -name '*_test.go' | wc -l) -eq $$(cat $$(find test -name '*_test.go') | grep -E '// ?\+build integration' | wc -l)
 
+	golangci-lint run
+
 generate-code:
 	@echo -n ''
 
