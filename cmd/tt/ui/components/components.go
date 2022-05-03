@@ -1,4 +1,4 @@
-package ui
+package components
 
 import (
 	"github.com/charmbracelet/bubbles/viewport"
@@ -18,6 +18,10 @@ func (f *Focusable) Focus() {
 	f.isFocused = true
 }
 
+func (f *Focusable) IsFocused() bool {
+	return f.isFocused
+}
+
 func (f *Focusable) Blur() {
 	f.isFocused = false
 }
@@ -27,12 +31,12 @@ type ResizeInterface interface {
 }
 
 type Resizable struct {
-	viewport viewport.Model
+	Viewport viewport.Model
 }
 
 func (r *Resizable) Resize(width, height int) {
 	border := lipgloss.NormalBorder()
 
-	r.viewport.Width = width - lipgloss.Width(border.Right+border.Top)
-	r.viewport.Height = height - lipgloss.Width(border.Bottom+border.Top)
+	r.Viewport.Width = width - lipgloss.Width(border.Right+border.Top)
+	r.Viewport.Height = height - lipgloss.Width(border.Bottom+border.Top)
 }

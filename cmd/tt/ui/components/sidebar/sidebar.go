@@ -1,6 +1,7 @@
-package ui
+package sidebar
 
 import (
+	"github.com/alswl/go-toodledo/cmd/tt/ui/components"
 	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -21,9 +22,9 @@ func (i item) Title() string       { return i.title }
 func (i item) Description() string { return "" }
 func (i item) FilterValue() string { return i.title }
 
-type SidebarPane struct {
-	Focusable
-	Resizable
+type Model struct {
+	components.Focusable
+	components.Resizable
 
 	isCollapsed bool
 	tabs        []string
@@ -33,11 +34,11 @@ type SidebarPane struct {
 	currentItem string
 }
 
-func (m SidebarPane) Init() tea.Cmd {
+func (m Model) Init() tea.Cmd {
 	return nil
 }
 
-func (m SidebarPane) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
@@ -49,7 +50,7 @@ func (m SidebarPane) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m SidebarPane) View() string {
+func (m Model) View() string {
 	// TODO move to styles
 	tabStyle := lipgloss.NewStyle().
 		PaddingLeft(1).
@@ -64,10 +65,10 @@ func (m SidebarPane) View() string {
 	tabsRender := lipgloss.JoinHorizontal(lipgloss.Top, tabs...)
 
 	padding := 0
-	m.viewport.SetContent(
+	m.Viewport.SetContent(
 		lipgloss.NewStyle().
-			Width(m.viewport.Width).
-			Height(m.viewport.Height).
+			Width(m.Viewport.Width).
+			Height(m.Viewport.Height).
 			PaddingLeft(padding).
 			Render(lipgloss.JoinVertical(
 				lipgloss.Left,
@@ -77,18 +78,18 @@ func (m SidebarPane) View() string {
 			),
 	)
 	style := styles.UnfocusedPaneStyle
-	if m.isFocused {
+	if m.IsFocused() {
 		style = styles.PaneStyle
 	}
 	return style.
-		Width(m.viewport.Width).
-		Height(m.viewport.Height).
+		Width(m.Viewport.Width).
+		Height(m.Viewport.Height).
 		Render(wrap.String(
-			wordwrap.String(m.viewport.View(), m.viewport.Width), m.viewport.Width),
+			wordwrap.String(m.Viewport.View(), m.Viewport.Width), m.Viewport.Width),
 		)
 }
 
-func InitSidebarPane() SidebarPane {
+func InitSidebarPane() Model {
 	l := list.New([]list.Item{
 		item{title: "item1"},
 		item{title: "item2"},
@@ -99,7 +100,7 @@ func InitSidebarPane() SidebarPane {
 	l.SetShowTitle(false)
 	l.SetShowFilter(false)
 
-	m := SidebarPane{
+	m := Model{
 		isCollapsed: false,
 		tabs:        []string{"tab1", "tab2"},
 		currentTab:  "",
@@ -108,6 +109,6 @@ func InitSidebarPane() SidebarPane {
 		currentItem: "",
 		//viewport:    viewport.Model{Width: 30, Height: 20},
 	}
-	m.isFocused = false
+	m.Blur()
 	return m
 }

@@ -1,13 +1,14 @@
-package ui
+package app
 
 import (
+	"github.com/alswl/go-toodledo/cmd/tt/ui/components/taskspane"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestInterfaceEqual(t *testing.T) {
-	tp := TasksPane{}
+	tp := taskspane.Model{}
 	var itf tea.Model = &tp
 	assert.True(t, itf == itf)
 }

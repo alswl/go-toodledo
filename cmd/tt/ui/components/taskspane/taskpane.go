@@ -1,7 +1,8 @@
-package ui
+package taskspane
 
 import (
 	"fmt"
+	"github.com/alswl/go-toodledo/cmd/tt/ui/components"
 	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
@@ -43,9 +44,9 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	return rows
 }
 
-type TasksPane struct {
-	Focusable
-	Resizable
+type Model struct {
+	components.Focusable
+	components.Resizable
 
 	choices    []string         // items on the to-do list
 	cursor     int              // which to-do list item our cursor is pointing at
@@ -53,33 +54,33 @@ type TasksPane struct {
 	tableModel table.Model
 }
 
-func (m TasksPane) Init() tea.Cmd {
+func (m Model) Init() tea.Cmd {
 	// Just return `nil`, which means "no I/O right now, please."
 	return nil
 }
 
-func (m TasksPane) View() string {
-	m.viewport.SetContent(
+func (m Model) View() string {
+	m.Viewport.SetContent(
 		lipgloss.NewStyle().
-			Width(m.viewport.Width).
-			Height(m.viewport.Height).
+			Width(m.Viewport.Width).
+			Height(m.Viewport.Height).
 			PaddingLeft(0).
 			Render(m.tableModel.View()),
 	)
 
 	style := styles.UnfocusedPaneStyle
-	if m.isFocused {
+	if m.IsFocused() {
 		style = styles.PaneStyle
 	}
 	return style.
-		Width(m.viewport.Width).
-		Height(m.viewport.Height).
+		Width(m.Viewport.Width).
+		Height(m.Viewport.Height).
 		Render(wrap.String(
-			wordwrap.String(m.viewport.View(), m.viewport.Width), m.viewport.Width),
+			wordwrap.String(m.Viewport.View(), m.Viewport.Width), m.Viewport.Width),
 		)
 }
 
-func (m TasksPane) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
 		cmds []tea.Cmd
@@ -105,7 +106,7 @@ func (m TasksPane) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m TasksPane) updateFooter() TasksPane {
+func (m Model) updateFooter() Model {
 	highlightedRow := m.tableModel.HighlightedRow()
 
 	footerText := fmt.Sprintf(
@@ -119,7 +120,7 @@ func (m TasksPane) updateFooter() TasksPane {
 	return m
 }
 
-func (m *TasksPane) Resize(width, height int) {
+func (m *Model) Resize(width, height int) {
 	m.Resizable.Resize(width, height)
 	m.tableModel.WithTargetWidth(width - 2)
 	// FIXME 10 is not accurate
@@ -127,25 +128,18 @@ func (m *TasksPane) Resize(width, height int) {
 	//m.tableModel.WithPageSize(height - 5)
 }
 
-func InitialTasksPane() TasksPane {
-	//ts, err := AllTasks()
-	// FIXME
-	ts, err := AllTasksMock()
-
-	if err != nil {
-		ts = []*models.RichTask{}
-	}
+func InitialTasksPane(tasks []*models.RichTask) Model {
 
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
 
-	m := TasksPane{
+	m := Model{
 		choices:  nil,
 		cursor:   0,
 		selected: nil,
 		tableModel: table.New(DefaultColumns).
-			WithRows(TasksRenderRows(ts)).
+			WithRows(TasksRenderRows(tasks)).
 			HeaderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("10")).Bold(true)).
 			SelectableRows(false).
 			Focused(true).
@@ -161,7 +155,7 @@ func InitialTasksPane() TasksPane {
 	}
 
 	m = m.updateFooter()
-	m.isFocused = false
+	m.Blur()
 
 	return m
 }

@@ -1,4 +1,4 @@
-package ui
+package sidebar
 
 import (
 	"github.com/charmbracelet/bubbles/list"
@@ -32,7 +32,7 @@ func TestSidebar(t *testing.T) {
 		item{title: "Terrycloth"},
 	}
 
-	m := SidebarPane{
+	m := Model{
 		isCollapsed: false,
 		tabs:        []string{"foo", "bar", "baz"},
 		currentTab:  "bar",
