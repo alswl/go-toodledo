@@ -31,7 +31,7 @@ func (t RichTask) TheDueTime() time.Time {
 	return time.Unix(t.Duetime, 0).In(time.UTC)
 }
 
-func (t RichTask) Due() string {
+func (t RichTask) DueString() string {
 	var output = ""
 	if !t.TheDueDate().IsZero() {
 		output += t.TheDueDate().Format("2006-01-02")
@@ -43,6 +43,10 @@ func (t RichTask) Due() string {
 		output += t.TheDueTime().Format("15:04")
 	}
 	return output
+}
+
+func (t RichTask) RepeatString() string {
+	return t.Task.Repeat
 }
 
 func (t RichTask) TimerString() string {
@@ -57,4 +61,8 @@ func (t RichTask) LengthString() string {
 		return ""
 	}
 	return fmt.Sprintf("%s", time.Duration(t.Length*1000*1000*1000))
+}
+
+func (t RichTask) TagString() string {
+	return t.Tag
 }

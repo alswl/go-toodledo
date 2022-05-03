@@ -85,8 +85,8 @@ func TestRichTask_Due(t1 *testing.T) {
 				TheFolder:  tt.fields.TheFolder,
 				TheGoal:    tt.fields.TheGoal,
 			}
-			if got := t.Due(); got != tt.want {
-				t1.Errorf("Due() = %v, want %v", got, tt.want)
+			if got := t.DueString(); got != tt.want {
+				t1.Errorf("DueString() = %v, want %v", got, tt.want)
 			}
 		})
 	}

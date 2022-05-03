@@ -88,7 +88,7 @@ func Tables4RichTasks(tasks []*models.RichTask) string {
 			tpriority.PriorityValue2Type(x.Priority),
 			x.TheFolder.Name,
 			x.TheGoal.Name,
-			x.Due(),
+			x.DueString(),
 			x.Repeat,
 			x.LengthString(),
 			x.TimerString(),

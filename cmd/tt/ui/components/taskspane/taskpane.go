@@ -5,28 +5,42 @@ import (
 	"github.com/alswl/go-toodledo/cmd/tt/ui/components"
 	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
+	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
-	"github.com/muesli/reflow/wordwrap"
-	"github.com/muesli/reflow/wrap"
 	"strconv"
 )
 
 const (
-	columnKeyID      = "id"
-	columnKeyTitle   = "title"
-	columnKeyContext = "context"
-	columnKeyStatus  = "status"
+	columnKeyID       = "id"
+	columnKeyTitle    = "title"
+	columnKeyContext  = "context"
+	columnKeyStatus   = "status"
+	columnKeyPriority = "priority"
+	columnKeyGoal     = "goal"
+	columnKeyDue      = "due"
+	columnKeyRepeat   = "repeat"
+	columnKeyLength   = "length"
+	columnKeyTimer    = "timer"
+	columnKeyTag      = "tag"
 )
 
+const DefaultTableWidth = 120
+
 var DefaultColumns = []table.Column{
-	table.NewColumn(columnKeyID, "ID", 15).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
-	table.NewFlexColumn(columnKeyTitle, "Title", 100).WithFiltered(true),
-	//table.NewColumn(columnKeyTitle, "Title", 50).WithFiltered(true),
-	table.NewColumn(columnKeyContext, "Context", 15),
-	table.NewColumn(columnKeyStatus, "Status", 15),
+	table.NewColumn(columnKeyID, "ID", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
+	table.NewFlexColumn(columnKeyTitle, "Title", 0).WithFiltered(true),
+	table.NewColumn(columnKeyContext, "Context", 10),
+	table.NewColumn(columnKeyPriority, "Priority", 10),
+	table.NewColumn(columnKeyStatus, "Status", 10),
+	table.NewColumn(columnKeyGoal, "Goal", 10),
+	table.NewColumn(columnKeyDue, "DueString", 10),
+	table.NewColumn(columnKeyRepeat, "Repeat", 5),
+	table.NewColumn(columnKeyLength, "Length", 5),
+	table.NewColumn(columnKeyTimer, "Timer", 5),
+	table.NewColumn(columnKeyTag, "Tag", 10),
 }
 
 func TasksRenderRows(tasks []*models.RichTask) []table.Row {
@@ -34,10 +48,17 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	for _, t := range tasks {
 		rows = append(rows, table.NewRow(
 			table.RowData{
-				columnKeyID:      strconv.Itoa(int(t.ID)),
-				columnKeyTitle:   t.Title,
-				columnKeyContext: t.TheContext.Name,
-				columnKeyStatus:  tstatus.StatusValue2Type(t.Status),
+				columnKeyID:       strconv.Itoa(int(t.ID)),
+				columnKeyTitle:    t.Title,
+				columnKeyContext:  t.TheContext.Name,
+				columnKeyPriority: tpriority.PriorityValue2Type(t.Priority),
+				columnKeyStatus:   tstatus.StatusValue2Type(t.Status),
+				columnKeyGoal:     t.TheGoal.Name,
+				columnKeyDue:      t.DueString(),
+				columnKeyRepeat:   t.RepeatString(),
+				columnKeyLength:   t.LengthString(),
+				columnKeyTimer:    t.TimerString(),
+				columnKeyTag:      t.TagString(),
 			},
 		))
 	}
@@ -52,6 +73,7 @@ type Model struct {
 	cursor     int              // which to-do list item our cursor is pointing at
 	selected   map[int]struct{} // which to-do items are selected
 	tableModel table.Model
+	tableWidth int
 }
 
 func (m Model) Init() tea.Cmd {
@@ -61,23 +83,20 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) View() string {
 	m.Viewport.SetContent(
-		lipgloss.NewStyle().
-			Width(m.Viewport.Width).
-			Height(m.Viewport.Height).
-			PaddingLeft(0).
-			Render(m.tableModel.View()),
+		m.tableModel.View(),
 	)
 
 	style := styles.UnfocusedPaneStyle
 	if m.IsFocused() {
 		style = styles.PaneStyle
 	}
-	return style.
-		Width(m.Viewport.Width).
-		Height(m.Viewport.Height).
-		Render(wrap.String(
-			wordwrap.String(m.Viewport.View(), m.Viewport.Width), m.Viewport.Width),
-		)
+	//return style.
+	//	//Width(m.Viewport.Width).
+	//	//Height(m.Viewport.Height).
+	//	Render(wrap.String(
+	//		wordwrap.String(m.Viewport.View(), m.Viewport.Width), m.Viewport.Width),
+	//	)
+	return style.Render(m.Viewport.View())
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -97,10 +116,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "esc", "q":
 			cmds = append(cmds, tea.Quit)
+		case "=":
+			m.TableSizeGreater()
+		case "-":
+			m.TableSizeSmall()
 		}
-		//case tea.WindowSizeMsg:
+
+	case tea.WindowSizeMsg:
 		//top, right, bottom, left := docStyle.GetMargin()
-		//m.tableModel.SetSize(msg.Width-left-right, msg.Height-top-bottom)
+		m.Resize(msg.Width, msg.Height)
 	}
 
 	return m, tea.Batch(cmds...)
@@ -123,9 +147,18 @@ func (m Model) updateFooter() Model {
 func (m *Model) Resize(width, height int) {
 	m.Resizable.Resize(width, height)
 
-	m.tableModel = m.tableModel.WithTargetWidth(width - 2)
 	// remove pane border, table header, and table footer
 	m.tableModel = m.tableModel.WithPageSize(height - 2 - 3 - 3)
+}
+
+func (m *Model) TableSizeSmall() {
+	m.tableWidth = m.tableWidth - 10
+	m.tableModel = m.tableModel.WithTargetWidth(m.tableWidth)
+}
+
+func (m *Model) TableSizeGreater() {
+	m.tableWidth = m.tableWidth + 10
+	m.tableModel = m.tableModel.WithTargetWidth(m.tableWidth)
 }
 
 func InitModel(tasks []*models.RichTask) Model {
@@ -148,8 +181,9 @@ func InitModel(tasks []*models.RichTask) Model {
 			//WithNoPagination().
 			WithPageSize(20).
 			//WithNoPagination().
+			WithTargetWidth(DefaultTableWidth).
 			WithKeyMap(keys),
-		//viewport: viewport.Model{Height: 30, Width: 140},
+		tableWidth: DefaultTableWidth,
 	}
 
 	//m = m.updateFooter()

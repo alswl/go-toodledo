@@ -43,9 +43,9 @@ type Task struct {
 	Duedate int64 `json:"duedate,omitempty"`
 
 	// An integer representing the due date modifier.
-	// 0 = Due By
-	// 1 = Due On (=)
-	// 2 = Due After (>)
+	// 0 = DueString By
+	// 1 = DueString On (=)
+	// 2 = DueString After (>)
 	// 3 = Optionally (?)
 	//
 	Duedatemod int64 `json:"duedatemod,omitempty"`
