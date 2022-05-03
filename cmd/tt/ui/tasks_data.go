@@ -7,7 +7,7 @@ import (
 )
 
 func AllTasksMock() ([]*models.RichTask, error) {
-	tasks := make([]models.RichTask, 50)
+	tasks := make([]models.RichTask, 500)
 	faker.FakeData(&tasks)
 
 	ts := funk.Map(tasks, func(x models.RichTask) *models.RichTask {

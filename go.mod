@@ -88,4 +88,4 @@ require (
 
 //replace github.com/evertras/bubble-table => /Users/alswl/dev/project/bubbletea
 
-replace github.com/evertras/bubble-table => /Users/alswl/dev/myproject/bubble-table
+replace github.com/evertras/bubble-table => /Users/alswl/dev/project/bubble-table

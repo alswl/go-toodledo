@@ -67,9 +67,6 @@ func (m Model) View() string {
 			PaddingLeft(0).
 			Render(m.tableModel.View()),
 	)
-	// TODO not works
-	// https://github.com/Evertras/bubble-table/issues/69
-	//m.tableModel.SetPageSize(m.Viewport.Height - 4)
 
 	style := styles.UnfocusedPaneStyle
 	if m.IsFocused() {
@@ -93,7 +90,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds = append(cmds, cmd)
 
 	// We control the footer text, so make sure to update it
-	m.updateFooter()
+	//m = m.updateFooter()
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -125,10 +122,10 @@ func (m Model) updateFooter() Model {
 
 func (m *Model) Resize(width, height int) {
 	m.Resizable.Resize(width, height)
-	m.tableModel.WithTargetWidth(width - 2)
-	// FIXME 10 is not accurate
-	// FIXME dynamic set page size is not works
-	//m.tableModel.WithPageSize(height - 5)
+
+	m.tableModel = m.tableModel.WithTargetWidth(width - 2)
+	// remove pane border, table header, and table footer
+	m.tableModel = m.tableModel.WithPageSize(height - 2 - 3 - 3)
 }
 
 func InitModel(tasks []*models.RichTask) Model {
@@ -149,15 +146,13 @@ func InitModel(tasks []*models.RichTask) Model {
 			//Border(customBorder).
 			// TODO flex height
 			//WithNoPagination().
-			// TODO set page automatic
-			// see https://github.com/Evertras/bubble-table/issues/69
 			WithPageSize(20).
 			//WithNoPagination().
 			WithKeyMap(keys),
 		//viewport: viewport.Model{Height: 30, Width: 140},
 	}
 
-	m = m.updateFooter()
+	//m = m.updateFooter()
 	m.Blur()
 
 	return m
