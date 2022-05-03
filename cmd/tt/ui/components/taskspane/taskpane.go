@@ -67,6 +67,9 @@ func (m Model) View() string {
 			PaddingLeft(0).
 			Render(m.tableModel.View()),
 	)
+	// TODO not works
+	// https://github.com/Evertras/bubble-table/issues/69
+	//m.tableModel.SetPageSize(m.Viewport.Height - 4)
 
 	style := styles.UnfocusedPaneStyle
 	if m.IsFocused() {
@@ -129,7 +132,6 @@ func (m *Model) Resize(width, height int) {
 }
 
 func InitModel(tasks []*models.RichTask) Model {
-
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
@@ -147,10 +149,11 @@ func InitModel(tasks []*models.RichTask) Model {
 			//Border(customBorder).
 			// TODO flex height
 			//WithNoPagination().
-			// TODO set 20 first init,
+			// TODO set page automatic
+			// see https://github.com/Evertras/bubble-table/issues/69
 			WithPageSize(20).
-			WithKeyMap(keys).
-			WithStaticFooter("Footer!"),
+			//WithNoPagination().
+			WithKeyMap(keys),
 		//viewport: viewport.Model{Height: 30, Width: 140},
 	}
 
