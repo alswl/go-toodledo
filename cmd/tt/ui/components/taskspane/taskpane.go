@@ -90,12 +90,6 @@ func (m Model) View() string {
 	if m.IsFocused() {
 		style = styles.PaneStyle
 	}
-	//return style.
-	//	//Width(m.Viewport.Width).
-	//	//Height(m.Viewport.Height).
-	//	Render(wrap.String(
-	//		wordwrap.String(m.Viewport.View(), m.Viewport.Width), m.Viewport.Width),
-	//	)
 	return style.Render(m.Viewport.View())
 }
 

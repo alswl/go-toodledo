@@ -34,6 +34,10 @@ type Resizable struct {
 	Viewport viewport.Model
 }
 
+func NewResizable(width, height int) Resizable {
+	return Resizable{Viewport: viewport.Model{Width: width, Height: height}}
+}
+
 func (r *Resizable) Resize(width, height int) {
 	border := lipgloss.NormalBorder()
 

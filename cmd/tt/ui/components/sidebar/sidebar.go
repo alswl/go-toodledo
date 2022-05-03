@@ -6,8 +6,6 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/muesli/reflow/wordwrap"
-	"github.com/muesli/reflow/wrap"
 	"github.com/thoas/go-funk"
 )
 
@@ -64,29 +62,24 @@ func (m Model) View() string {
 
 	tabsRender := lipgloss.JoinHorizontal(lipgloss.Top, tabs...)
 
-	padding := 0
 	m.Viewport.SetContent(
-		lipgloss.NewStyle().
-			Width(m.Viewport.Width).
-			Height(m.Viewport.Height).
-			PaddingLeft(padding).
-			Render(lipgloss.JoinVertical(
-				lipgloss.Left,
-				tabsRender,
-				docStyle.Render(m.list.View()),
-			),
-			),
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			tabsRender,
+			docStyle.Render(m.list.View()),
+		),
 	)
 	style := styles.UnfocusedPaneStyle
 	if m.IsFocused() {
 		style = styles.PaneStyle
 	}
-	return style.
-		Width(m.Viewport.Width).
-		Height(m.Viewport.Height).
-		Render(wrap.String(
-			wordwrap.String(m.Viewport.View(), m.Viewport.Width), m.Viewport.Width),
-		)
+	//return style.
+	//	Width(m.Viewport.Width).
+	//	Height(m.Viewport.Height).
+	//	Render(wrap.String(
+	//		wordwrap.String(m.Viewport.View(), m.Viewport.Width), m.Viewport.Width),
+	//	)
+	return style.Render(m.Viewport.View())
 }
 
 func InitModel() Model {
@@ -107,7 +100,6 @@ func InitModel() Model {
 		items:       nil,
 		list:        l,
 		currentItem: "",
-		//viewport:    viewport.Model{Width: 30, Height: 20},
 	}
 	m.Blur()
 	return m
