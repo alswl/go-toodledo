@@ -128,7 +128,7 @@ func (m *Model) Resize(width, height int) {
 	//m.tableModel.WithPageSize(height - 5)
 }
 
-func InitialTasksPane(tasks []*models.RichTask) Model {
+func InitModel(tasks []*models.RichTask) Model {
 
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")

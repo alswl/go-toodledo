@@ -16,11 +16,17 @@ import (
 	"os"
 )
 
+type States struct {
+	// Tasks is available tasks
+	Tasks []*models.RichTask
+}
+
 type Model struct {
 	keys utils.KeyMap
 	err  error
 	//config
-	data []*models.RichTask
+	data   []*models.RichTask
+	states *States
 
 	tasksModel   taskspane.Model
 	sidebarModel sidebar.Model
@@ -174,20 +180,22 @@ func InitialModel() Model {
 	} else {
 		tasks, err = AllTasks()
 	}
-
 	if err != nil {
-		_ = []*models.RichTask{}
+		// FIXME
+		panic(err)
 	}
 
+	// FIXME move tables km to model
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
 
 	m := Model{
-		tasksModel:    taskspane.InitialTasksPane(tasks),
-		sidebarModel:  sidebar.InitSidebarPane(),
-		activateModel: "tasks",
+		tasksModel:   taskspane.InitModel(tasks),
+		sidebarModel: sidebar.InitModel(),
 	}
+	// FIXME focus as an method
+	m.activateModel = "tasks"
 	m.tasksModel.Focus()
 
 	return m

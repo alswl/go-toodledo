@@ -89,7 +89,7 @@ func (m Model) View() string {
 		)
 }
 
-func InitSidebarPane() Model {
+func InitModel() Model {
 	l := list.New([]list.Item{
 		item{title: "item1"},
 		item{title: "item2"},
