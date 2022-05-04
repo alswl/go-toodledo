@@ -1,4 +1,4 @@
-package ui
+package mockdata
 
 import (
 	"github.com/alswl/go-toodledo/pkg/models"

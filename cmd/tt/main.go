@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/cmd/tt/ui/app"
+	"github.com/alswl/go-toodledo/cmd/tt/app"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	tea "github.com/charmbracelet/bubbletea"

@@ -2,11 +2,11 @@ package app
 
 import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
-	"github.com/alswl/go-toodledo/cmd/tt/ui"
-	"github.com/alswl/go-toodledo/cmd/tt/ui/components/sidebar"
-	"github.com/alswl/go-toodledo/cmd/tt/ui/components/taskspane"
-	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
-	"github.com/alswl/go-toodledo/cmd/tt/ui/utils"
+	"github.com/alswl/go-toodledo/cmd/tt/components/sidebar"
+	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
+	"github.com/alswl/go-toodledo/cmd/tt/mockdata"
+	"github.com/alswl/go-toodledo/cmd/tt/styles"
+	"github.com/alswl/go-toodledo/cmd/tt/utils"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	tea "github.com/charmbracelet/bubbletea"
@@ -197,7 +197,7 @@ func InitialModel() Model {
 	var err error
 	var tasks []*models.RichTask
 	if os.Getenv("MOCK") == "true" {
-		tasks, err = ui.AllTasksMock()
+		tasks, err = mockdata.AllTasksMock()
 	} else {
 		tasks, err = AllTasks()
 	}

@@ -2,8 +2,8 @@ package taskspane
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/cmd/tt/ui/components"
-	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
+	"github.com/alswl/go-toodledo/cmd/tt/components"
+	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"

@@ -1,8 +1,8 @@
 package sidebar
 
 import (
-	"github.com/alswl/go-toodledo/cmd/tt/ui/components"
-	"github.com/alswl/go-toodledo/cmd/tt/ui/styles"
+	"github.com/alswl/go-toodledo/cmd/tt/components"
+	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
