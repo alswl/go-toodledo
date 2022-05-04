@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/cmd/tt/components/sidebar"
+	"github.com/alswl/go-toodledo/cmd/tt/components/statusbar"
 	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
 	"github.com/alswl/go-toodledo/cmd/tt/mockdata"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
@@ -12,7 +13,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
-	"github.com/knipferrc/teacup/statusbar"
 	"github.com/sirupsen/logrus"
 	"os"
 )
@@ -33,7 +33,7 @@ type Model struct {
 
 	tasksPane taskspane.Model
 	sidebar   sidebar.Model
-	statusbar statusbar.Bubble
+	statusBar statusbar.Model
 
 	//activateModel tea.Model
 	activateModel string
@@ -88,6 +88,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		sideBarWidth := msg.Width / 12 * 3
 		m.sidebar.Resize(sideBarWidth, msg.Height-1)
 		m.tasksPane.Resize(msg.Width-sideBarWidth, msg.Height-1)
+		m.statusBar.SetSize(msg.Width)
 	}
 	return m, nil
 }
@@ -106,7 +107,7 @@ func (m Model) View() string {
 				m.sidebar.View(),
 				m.tasksPane.View(),
 			),
-			m.statusbar.View(),
+			m.statusBar.View(),
 		),
 	)
 }
@@ -211,33 +212,14 @@ func InitialModel() Model {
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
 
-	statusbar := statusbar.New(
-		statusbar.ColorConfig{
-			Background: lipgloss.AdaptiveColor{Light: styles.Colors.White},
-			Foreground: lipgloss.AdaptiveColor{Light: styles.Colors.Pink},
-		},
-		statusbar.ColorConfig{
-			Background: lipgloss.AdaptiveColor{Light: styles.Colors.White},
-			Foreground: lipgloss.AdaptiveColor{Light: styles.Colors.Pink},
-		},
-		statusbar.ColorConfig{
-			Background: lipgloss.AdaptiveColor{Light: styles.Colors.White},
-			Foreground: lipgloss.AdaptiveColor{Light: styles.Colors.Pink},
-		},
-		statusbar.ColorConfig{
-			Background: lipgloss.AdaptiveColor{Light: styles.Colors.White},
-			Foreground: lipgloss.AdaptiveColor{Light: styles.Colors.Pink},
-		},
-	)
-	statusbar.FirstColumn = "tasks"
-	statusbar.SecondColumn = "search"
-	statusbar.ThirdColumn = "1/999"
-	statusbar.FourthColumn = "status"
+	statusbar := statusbar.NewDefault()
+	// XXX
+	statusbar.SetContent("tasks", "a fox jumped over the lazy dog", "1/999", "PAUSE")
 
 	m := Model{
 		tasksPane: taskspane.InitModel(tasks),
 		sidebar:   sidebar.InitModel(),
-		statusbar: statusbar,
+		statusBar: statusbar,
 	}
 	// FIXME focus as an method
 	m.activateModel = "tasks"
