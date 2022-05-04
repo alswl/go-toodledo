@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/components/sidebar"
 	"github.com/alswl/go-toodledo/cmd/tt/components/statusbar"
 	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
@@ -14,6 +15,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
 	"github.com/sirupsen/logrus"
+	"github.com/thoas/go-funk"
 	"os"
 )
 
@@ -31,12 +33,13 @@ type Model struct {
 	data   []*models.RichTask
 	states *States
 
-	tasksPane taskspane.Model
-	sidebar   sidebar.Model
-	statusBar statusbar.Model
+	tasksPane            taskspane.Model
+	sidebar              sidebar.Model
+	statusBar            statusbar.Model
+	focusableModelsIndex []string
 
-	//activateModel tea.Model
-	activateModel string
+	//activateModel string
+	focusedIndex int
 
 	// TODO help pane
 	//help          help.Model
@@ -55,35 +58,52 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
+	// process logics
+	// 1. global keymap
+	// 2. input TODO input is one of focuesd component?
+	// 3. focused component
 
-	// TODO keymap
+	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
-			return m, tea.Quit
-		case "tab":
-			// TODO refactor, switch with mod
-			if m.activateModel == "tasks" {
-				m.activateModel = "sidebar"
-				m.sidebar.Focus()
-				m.tasksPane.Blur()
-			} else if m.activateModel == "sidebar" {
-				m.activateModel = "tasks"
-				m.tasksPane.Focus()
-				m.sidebar.Blur()
-			}
-			return m, nil
-		default:
-			// bubble event to sub component
-			if m.activateModel == "tasks" {
-				newM, _ := m.tasksPane.Update(msg)
-				m.tasksPane = newM.(taskspane.Model)
-			} else if m.activateModel == "sidebar" {
-				newM, _ := m.sidebar.Update(msg)
-				m.sidebar = newM.(sidebar.Model)
+		// TODO keymap
+		// 1. global keymap
+		if funk.ContainsString([]string{"ctrl+c"}, msg.String()) {
+			switch msg.String() {
+			case "ctrl+c":
+				return m, tea.Quit
 			}
 		}
+
+		// 2. app mode
+		if m.isInputting {
+			// XXX
+			//m.Focused().HandleKey(msg)
+			return m, nil
+		} else {
+			switch msg.String() {
+			case "tab":
+				// TODO refactor, switch with keymap
+				// loopFocus change the model fields(isFocused)
+				m.loopFocus()
+				return m, nil
+			}
+		}
+
+		// 3. sub component
+		newM, cmd := m.getFocusedModel().Update(msg)
+		switch newM.(type) {
+		case taskspane.Model:
+			m.tasksPane = newM.(taskspane.Model)
+			return m, cmd
+		case sidebar.Model:
+			m.sidebar = newM.(sidebar.Model)
+			return m, cmd
+		case statusbar.Model:
+			m.statusBar = newM.(statusbar.Model)
+			return m, cmd
+		}
+
+		// normal keypress
 	case tea.WindowSizeMsg:
 		sideBarWidth := msg.Width / 12 * 3
 		m.sidebar.Resize(sideBarWidth, msg.Height-1)
@@ -116,41 +136,46 @@ func (m Model) GetStates() States {
 	return *m.states
 }
 
+func (m *Model) loopFocus() {
+	m.getFocusedModelF().Blur()
+	m.focusedIndex = (m.focusedIndex + 1) % len(m.focusableModelsIndex)
+	m.getFocusedModelF().Focus()
+}
+
+func (m *Model) getFocusedModelF() components.FocusableInterface {
+	name := m.focusableModelsIndex[m.focusedIndex]
+	switch name {
+	case "tasks":
+		return &m.tasksPane
+	case "sidebar":
+		return &m.sidebar
+	case "statusbar":
+		return &m.statusBar
+
+	}
+	panic("unreachable")
+}
+
+func (m *Model) getFocusedModel() tea.Model {
+	name := m.focusableModelsIndex[m.focusedIndex]
+	switch name {
+	case "tasks":
+		return m.tasksPane
+	case "sidebar":
+		return m.sidebar
+	case "statusbar":
+		return m.statusBar
+
+	}
+	panic("unreachable")
+}
+
 //func (m *Model) SetInputting(is bool) {
 //	m.isInputting = is
 //}
 
 //func (m Model) IsInputting() bool {
 //	return m.isInputting
-//}
-
-//func (m Model) renderTableHeader() string {
-//	return headerStyle.
-//		PaddingLeft(mainContentPadding).
-//		PaddingRight(mainContentPadding).
-//		Width(m.mainViewport.model.Width).
-//		MaxWidth(m.mainViewport.model.Width).
-//		Render(
-//			lipgloss.JoinHorizontal(
-//				lipgloss.Left,
-//				//updatedAtCell,
-//				//reviewCell,
-//				//prRepoCell,
-//				//prTitleCell,
-//				//prAuthorCell,
-//				//mergeableCell,
-//				//ciCell,
-//				//linesCell,
-//			),
-//		)
-//}
-
-//func (m Model) renderCurrentSection() string {
-//	return lipgloss.NewStyle().
-//		PaddingLeft(mainContentPadding).
-//		PaddingRight(mainContentPadding).
-//		MaxWidth(m.mainViewport.model.Width).
-//		Render(m.RenderMainViewPort())
 //}
 
 // FIXME using daemon syncer
@@ -212,17 +237,33 @@ func InitialModel() Model {
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
 
-	statusbar := statusbar.NewDefault()
+	statusB := statusbar.NewDefault()
 	// XXX
-	statusbar.SetContent("tasks", "a fox jumped over the lazy dog", "1/999", "PAUSE")
+	statusB.SetContent("tasks", "a fox jumped over the lazy dog", "1/999", "PAUSE")
 
+	tp := taskspane.InitModel(tasks)
+	sb := sidebar.InitModel()
 	m := Model{
-		tasksPane: taskspane.InitModel(tasks),
-		sidebar:   sidebar.InitModel(),
-		statusBar: statusbar,
+		tasksPane: tp,
+		sidebar:   sb,
+		statusBar: statusB,
+		focusableModelsIndex: []string{
+			"tasks",
+			"sidebar",
+			//"statusB",
+		},
+		//allFocusableModels: []components.FocusableInterface{
+		//	&tp,
+		//	&sb,
+		//},
+		//allModels: []tea.Model{
+		//	&tp,
+		//	&sb,
+		//},
 	}
 	// FIXME focus as an method
-	m.activateModel = "tasks"
+	//m.av = "tasks"
+	m.focusedIndex = 0
 	m.tasksPane.Focus()
 
 	return m
