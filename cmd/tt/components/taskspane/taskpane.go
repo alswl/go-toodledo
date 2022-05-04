@@ -7,6 +7,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
@@ -167,33 +168,41 @@ func (m *Model) TableSizeGreater() {
 	m.tableModel = m.tableModel.WithTargetWidth(m.tableWidth)
 }
 
+func (m *Model) Filter(input textinput.Model) {
+	m.tableModel = m.tableModel.WithFilterInput(input)
+}
+
 func InitModel(tasks []*models.RichTask) Model {
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
 
+	tb := table.New(DefaultColumns).
+		WithRows(TasksRenderRows(tasks)).
+		HeaderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("10")).Bold(true)).
+		SelectableRows(false).
+		Focused(true).
+		Filtered(true).
+		// TODO disable filter in table
+		//WithStaticFooter("").
+		//Border(customBorder).
+		// TODO flex height
+		//WithNoPagination().
+		WithPageSize(20).
+		//WithNoPagination().
+		WithNoFooter().
+		WithTargetWidth(DefaultTableWidth).
+		WithKeyMap(keys)
+
 	m := Model{
-		choices:  nil,
-		cursor:   0,
-		selected: nil,
-		tableModel: table.New(DefaultColumns).
-			WithRows(TasksRenderRows(tasks)).
-			HeaderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("10")).Bold(true)).
-			SelectableRows(false).
-			Focused(true).
-			Filtered(false).
-			//Border(customBorder).
-			// TODO flex height
-			//WithNoPagination().
-			WithPageSize(20).
-			//WithNoPagination().
-			WithTargetWidth(DefaultTableWidth).
-			WithKeyMap(keys),
+		choices:    nil,
+		cursor:     0,
+		selected:   nil,
+		tableModel: tb,
 		tableWidth: DefaultTableWidth,
 		//props:      app.GetStates(),
 	}
 
-	//m = m.updateFooter()
 	m.Blur()
 
 	return m

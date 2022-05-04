@@ -33,14 +33,15 @@ type Model struct {
 	data   []*models.RichTask
 	states *States
 
-	tasksPane        taskspane.Model
-	sidebar          sidebar.Model
-	statusBar        statusbar.Model
-	allModels        []string
-	tabSupportModels []string
+	tasksPane taskspane.Model
+	sidebar   sidebar.Model
+	statusBar statusbar.Model
 
-	//activateModel string
-	tabIndex int
+	allModels []string
+	focused   string
+
+	tabSupportModels []string
+	tabIndex         int
 
 	// TODO help pane
 	//help          help.Model
@@ -76,11 +77,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		// 2. app mode
-		if m.isInputting {
-			// XXX
-			//m.Focused().HandleKey(msg)
-			return m, nil
-		} else {
+		if !m.isInputting {
 			switch msg.String() {
 			case "tab":
 				// TODO refactor, switch with keymap
@@ -91,25 +88,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		// 3. sub component
-		newM, cmd := m.getFocusedModel().Update(msg)
-		switch newM.(type) {
-		case taskspane.Model:
-			m.tasksPane = newM.(taskspane.Model)
-			return m, cmd
-		case sidebar.Model:
-			m.sidebar = newM.(sidebar.Model)
-			return m, cmd
-		case statusbar.Model:
-			m.statusBar = newM.(statusbar.Model)
-			return m, cmd
-		}
+		return m.updateFocusedModel(msg)
 
 		// normal keypress
 	case tea.WindowSizeMsg:
 		sideBarWidth := msg.Width / 12 * 3
 		m.sidebar.Resize(sideBarWidth, msg.Height-1)
 		m.tasksPane.Resize(msg.Width-sideBarWidth, msg.Height-1)
-		m.statusBar.SetSize(msg.Width)
+		m.statusBar.Resize(msg.Width, 0)
 	}
 	return m, nil
 }
@@ -138,9 +124,15 @@ func (m Model) GetStates() States {
 }
 
 func (m *Model) loopTabFocus() {
-	m.getFocusedModelF().Blur()
+	if !funk.ContainsString(m.tabSupportModels, m.focused) {
+		return
+	}
+
+	//m.getFocusedModelF().Blur()
+	//old := m.tabSupportModels[m.tabIndex]
 	m.tabIndex = (m.tabIndex + 1) % len(m.tabSupportModels)
-	m.getFocusedModelF().Focus()
+	new := m.tabSupportModels[m.tabIndex]
+	m.focus(new)
 }
 
 func (m *Model) getFocusedModelF() components.FocusableInterface {
@@ -158,8 +150,7 @@ func (m *Model) getFocusedModelF() components.FocusableInterface {
 }
 
 func (m *Model) getFocusedModel() tea.Model {
-	name := m.tabSupportModels[m.tabIndex]
-	switch name {
+	switch m.focused {
 	case "tasks":
 		return m.tasksPane
 	case "sidebar":
@@ -169,6 +160,54 @@ func (m *Model) getFocusedModel() tea.Model {
 
 	}
 	panic("unreachable")
+}
+
+func (m *Model) focus(name string) {
+	m.getFocusedModelF().Blur()
+	m.focused = name
+	m.getFocusedModelF().Focus()
+}
+
+func (m *Model) focusStatusBar() {
+	m.focus("statusbar")
+}
+
+func (m Model) updateFocusedModel(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+	var newM tea.Model
+	var cmd tea.Cmd
+	mm := m.getFocusedModel()
+
+	// post action in main app
+	switch mm.(type) {
+	case taskspane.Model:
+		switch msg.String() {
+		case "/":
+			m.isInputting = true
+			m.focusStatusBar()
+			m.statusBar.FocusFilter()
+		default:
+			newM, cmd = mm.Update(msg)
+			m.tasksPane = newM.(taskspane.Model)
+		}
+		return m, cmd
+	case sidebar.Model:
+		newM, cmd = mm.Update(msg)
+		m.sidebar = newM.(sidebar.Model)
+		return m, cmd
+	case statusbar.Model:
+		newM, cmd = mm.Update(msg)
+		m.statusBar = newM.(statusbar.Model)
+		m.tasksPane.Filter(m.statusBar.GetFilterInput())
+
+		// post action
+		switch msg.String() {
+		case "enter":
+			m.isInputting = false
+			m.focus("tasks")
+		}
+		return m, cmd
+	}
+	return m, cmd
 }
 
 //func (m *Model) SetInputting(is bool) {
@@ -240,7 +279,7 @@ func InitialModel() Model {
 
 	statusB := statusbar.NewDefault()
 	// XXX
-	statusB.SetContent("tasks", "a fox jumped over the lazy dog", "1/999", "PAUSE")
+	//statusB.SetContent("tasks", "a fox jumped over the lazy dog", "1/999", "PAUSE")
 
 	tp := taskspane.InitModel(tasks)
 	sb := sidebar.InitModel()
@@ -256,7 +295,7 @@ func InitialModel() Model {
 		allModels: []string{
 			"tasks",
 			"sidebar",
-			"statusB",
+			"statusbar",
 		},
 		//allFocusableModels: []components.FocusableInterface{
 		//	&tp,
@@ -270,6 +309,7 @@ func InitialModel() Model {
 	// FIXME focus as an method
 	//m.av = "tasks"
 	m.tabIndex = 0
+	m.focused = "tasks"
 	m.tasksPane.Focus()
 
 	return m
