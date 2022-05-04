@@ -12,6 +12,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
+	"github.com/knipferrc/teacup/statusbar"
 	"github.com/sirupsen/logrus"
 	"os"
 )
@@ -19,6 +20,8 @@ import (
 type States struct {
 	// Tasks is available tasks
 	Tasks []*models.RichTask
+	// XXX
+	Filter string
 }
 
 type Model struct {
@@ -28,8 +31,9 @@ type Model struct {
 	data   []*models.RichTask
 	states *States
 
-	tasksModel   taskspane.Model
-	sidebarModel sidebar.Model
+	tasksPane taskspane.Model
+	sidebar   sidebar.Model
+	statusbar statusbar.Bubble
 
 	//activateModel tea.Model
 	activateModel string
@@ -43,6 +47,7 @@ type Model struct {
 	//filterWindow  FilterFormModel
 	//tabs            tabs.Model
 	//context         context.ProgramContext
+	isInputting bool
 }
 
 func (m Model) Init() tea.Cmd {
@@ -61,28 +66,28 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// TODO refactor, switch with mod
 			if m.activateModel == "tasks" {
 				m.activateModel = "sidebar"
-				m.sidebarModel.Focus()
-				m.tasksModel.Blur()
+				m.sidebar.Focus()
+				m.tasksPane.Blur()
 			} else if m.activateModel == "sidebar" {
 				m.activateModel = "tasks"
-				m.tasksModel.Focus()
-				m.sidebarModel.Blur()
+				m.tasksPane.Focus()
+				m.sidebar.Blur()
 			}
 			return m, nil
 		default:
 			// bubble event to sub component
 			if m.activateModel == "tasks" {
-				newM, _ := m.tasksModel.Update(msg)
-				m.tasksModel = newM.(taskspane.Model)
+				newM, _ := m.tasksPane.Update(msg)
+				m.tasksPane = newM.(taskspane.Model)
 			} else if m.activateModel == "sidebar" {
-				newM, _ := m.sidebarModel.Update(msg)
-				m.sidebarModel = newM.(sidebar.Model)
+				newM, _ := m.sidebar.Update(msg)
+				m.sidebar = newM.(sidebar.Model)
 			}
 		}
 	case tea.WindowSizeMsg:
 		sideBarWidth := msg.Width / 12 * 3
-		m.sidebarModel.Resize(sideBarWidth, msg.Height)
-		m.tasksModel.Resize(msg.Width-sideBarWidth, msg.Height)
+		m.sidebar.Resize(sideBarWidth, msg.Height-1)
+		m.tasksPane.Resize(msg.Width-sideBarWidth, msg.Height-1)
 	}
 	return m, nil
 }
@@ -94,13 +99,29 @@ func (m Model) View() string {
 	}
 
 	return styles.MainPaneStyle.Render(
-		lipgloss.JoinHorizontal(
+		lipgloss.JoinVertical(
 			lipgloss.Top,
-			m.sidebarModel.View(),
-			m.tasksModel.View(),
+			lipgloss.JoinHorizontal(
+				lipgloss.Top,
+				m.sidebar.View(),
+				m.tasksPane.View(),
+			),
+			m.statusbar.View(),
 		),
 	)
 }
+
+func (m Model) GetStates() States {
+	return *m.states
+}
+
+//func (m *Model) SetInputting(is bool) {
+//	m.isInputting = is
+//}
+
+//func (m Model) IsInputting() bool {
+//	return m.isInputting
+//}
 
 //func (m Model) renderTableHeader() string {
 //	return headerStyle.
@@ -190,13 +211,37 @@ func InitialModel() Model {
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
 
+	statusbar := statusbar.New(
+		statusbar.ColorConfig{
+			Background: lipgloss.AdaptiveColor{Light: styles.Colors.White},
+			Foreground: lipgloss.AdaptiveColor{Light: styles.Colors.Pink},
+		},
+		statusbar.ColorConfig{
+			Background: lipgloss.AdaptiveColor{Light: styles.Colors.White},
+			Foreground: lipgloss.AdaptiveColor{Light: styles.Colors.Pink},
+		},
+		statusbar.ColorConfig{
+			Background: lipgloss.AdaptiveColor{Light: styles.Colors.White},
+			Foreground: lipgloss.AdaptiveColor{Light: styles.Colors.Pink},
+		},
+		statusbar.ColorConfig{
+			Background: lipgloss.AdaptiveColor{Light: styles.Colors.White},
+			Foreground: lipgloss.AdaptiveColor{Light: styles.Colors.Pink},
+		},
+	)
+	statusbar.FirstColumn = "tasks"
+	statusbar.SecondColumn = "search"
+	statusbar.ThirdColumn = "1/999"
+	statusbar.FourthColumn = "status"
+
 	m := Model{
-		tasksModel:   taskspane.InitModel(tasks),
-		sidebarModel: sidebar.InitModel(),
+		tasksPane: taskspane.InitModel(tasks),
+		sidebar:   sidebar.InitModel(),
+		statusbar: statusbar,
 	}
 	// FIXME focus as an method
 	m.activateModel = "tasks"
-	m.tasksModel.Focus()
+	m.tasksPane.Focus()
 
 	return m
 }

@@ -48,6 +48,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+func (m *Model) Resize(width, height int) {
+	m.Resizable.Resize(width, height)
+}
+
 func (m Model) View() string {
 	// TODO move to styles
 	tabStyle := lipgloss.NewStyle().

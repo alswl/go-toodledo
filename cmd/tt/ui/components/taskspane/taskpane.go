@@ -69,11 +69,16 @@ type Model struct {
 	components.Focusable
 	components.Resizable
 
-	choices    []string         // items on the to-do list
-	cursor     int              // which to-do list item our cursor is pointing at
-	selected   map[int]struct{} // which to-do items are selected
+	//app *app.Model
+
+	choices  []string         // items on the to-do list
+	cursor   int              // which to-do list item our cursor is pointing at
+	selected map[int]struct{} // which to-do items are selected
+
+	// FIXME table should be only view mode (without filter mode)
 	tableModel table.Model
 	tableWidth int
+	//props      app.States
 }
 
 func (m Model) Init() tea.Cmd {
@@ -99,21 +104,26 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds []tea.Cmd
 	)
 
+	// children first, bubble blow up model
 	m.tableModel, cmd = m.tableModel.Update(msg)
+	// FIXME if table acting on event, then we need get the result, and ignore some msg
 	cmds = append(cmds, cmd)
-
-	// We control the footer text, so make sure to update it
-	//m = m.updateFooter()
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "esc", "q":
-			cmds = append(cmds, tea.Quit)
 		case "=":
+			// FIXME if table is key pressing in filter
+			//if !m.app.IsInputting() {
 			m.TableSizeGreater()
+			//	return m, tea.Batch(cmds...)
+			//}
 		case "-":
+			// FIXME if table is key pressing in filter
+			//if !m.app.IsInputting() {
 			m.TableSizeSmall()
+			//	return m, tea.Batch(cmds...)
+			//}
 		}
 
 	case tea.WindowSizeMsg:
@@ -139,9 +149,11 @@ func (m Model) updateFooter() Model {
 }
 
 func (m *Model) Resize(width, height int) {
+	// remove status bar height
 	m.Resizable.Resize(width, height)
 
 	// remove pane border, table header, and table footer
+	// XXX
 	m.tableModel = m.tableModel.WithPageSize(height - 2 - 3 - 3)
 }
 
@@ -169,7 +181,7 @@ func InitModel(tasks []*models.RichTask) Model {
 			HeaderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("10")).Bold(true)).
 			SelectableRows(false).
 			Focused(true).
-			Filtered(true).
+			Filtered(false).
 			//Border(customBorder).
 			// TODO flex height
 			//WithNoPagination().
@@ -178,6 +190,7 @@ func InitModel(tasks []*models.RichTask) Model {
 			WithTargetWidth(DefaultTableWidth).
 			WithKeyMap(keys),
 		tableWidth: DefaultTableWidth,
+		//props:      app.GetStates(),
 	}
 
 	//m = m.updateFooter()
