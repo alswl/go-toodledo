@@ -33,13 +33,14 @@ type Model struct {
 	data   []*models.RichTask
 	states *States
 
-	tasksPane            taskspane.Model
-	sidebar              sidebar.Model
-	statusBar            statusbar.Model
-	focusableModelsIndex []string
+	tasksPane        taskspane.Model
+	sidebar          sidebar.Model
+	statusBar        statusbar.Model
+	allModels        []string
+	tabSupportModels []string
 
 	//activateModel string
-	focusedIndex int
+	tabIndex int
 
 	// TODO help pane
 	//help          help.Model
@@ -83,8 +84,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch msg.String() {
 			case "tab":
 				// TODO refactor, switch with keymap
-				// loopFocus change the model fields(isFocused)
-				m.loopFocus()
+				// loopTabFocus change the model fields(isFocused)
+				m.loopTabFocus()
 				return m, nil
 			}
 		}
@@ -136,14 +137,14 @@ func (m Model) GetStates() States {
 	return *m.states
 }
 
-func (m *Model) loopFocus() {
+func (m *Model) loopTabFocus() {
 	m.getFocusedModelF().Blur()
-	m.focusedIndex = (m.focusedIndex + 1) % len(m.focusableModelsIndex)
+	m.tabIndex = (m.tabIndex + 1) % len(m.tabSupportModels)
 	m.getFocusedModelF().Focus()
 }
 
 func (m *Model) getFocusedModelF() components.FocusableInterface {
-	name := m.focusableModelsIndex[m.focusedIndex]
+	name := m.tabSupportModels[m.tabIndex]
 	switch name {
 	case "tasks":
 		return &m.tasksPane
@@ -157,7 +158,7 @@ func (m *Model) getFocusedModelF() components.FocusableInterface {
 }
 
 func (m *Model) getFocusedModel() tea.Model {
-	name := m.focusableModelsIndex[m.focusedIndex]
+	name := m.tabSupportModels[m.tabIndex]
 	switch name {
 	case "tasks":
 		return m.tasksPane
@@ -247,10 +248,15 @@ func InitialModel() Model {
 		tasksPane: tp,
 		sidebar:   sb,
 		statusBar: statusB,
-		focusableModelsIndex: []string{
+		tabSupportModels: []string{
 			"tasks",
 			"sidebar",
 			//"statusB",
+		},
+		allModels: []string{
+			"tasks",
+			"sidebar",
+			"statusB",
 		},
 		//allFocusableModels: []components.FocusableInterface{
 		//	&tp,
@@ -263,7 +269,7 @@ func InitialModel() Model {
 	}
 	// FIXME focus as an method
 	//m.av = "tasks"
-	m.focusedIndex = 0
+	m.tabIndex = 0
 	m.tasksPane.Focus()
 
 	return m
