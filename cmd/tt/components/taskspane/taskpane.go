@@ -190,7 +190,7 @@ func InitModel(tasks []*models.RichTask) Model {
 		//WithNoPagination().
 		WithPageSize(20).
 		//WithNoPagination().
-		WithNoFooter().
+		WithFooterVisibility(false).
 		WithTargetWidth(DefaultTableWidth).
 		WithKeyMap(keys)
 
