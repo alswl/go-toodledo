@@ -24,10 +24,20 @@ var viewCmd = &cobra.Command{
 			logrus.Fatal(err)
 			return
 		}
+		taskRichSvc, err := injector.InitTaskRichService()
+		if err != nil {
+			logrus.WithError(err).Fatal("init task rich service failed")
+			return
+		}
 
 		id, _ := strconv.Atoi(args[0])
 		task, err := svc.FindById((int64)(id))
+		if err != nil {
+			logrus.WithError(err).Fatal("find task failed")
+			return
+		}
 
-		fmt.Println(render.Tables4Task([]*models.Task{task}))
+		rts, _ := taskRichSvc.RichThem([]*models.Task{task})
+		fmt.Println(render.Tables4RichTasks(rts))
 	},
 }

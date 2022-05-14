@@ -34,7 +34,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("access_token", "", "", "")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.toodledo.yaml)")
 
-	viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
+	_ = viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 
 	rootCmd.AddCommand(tasks.TaskCmd, folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd,
 		savedsearches.SavedSearchCmd,

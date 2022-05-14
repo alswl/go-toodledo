@@ -33,7 +33,7 @@ var editCmd = &cobra.Command{
 			return
 		}
 		newT := models.Task{}
-		copier.Copy(&newT, t)
+		_ = copier.Copy(&newT, t)
 		newT.Title = args[1]
 		//TODO to fields, with opt()
 		newTReturned, err := svc.Edit(int64(id), &newT)

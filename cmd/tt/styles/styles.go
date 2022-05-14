@@ -1,15 +1,14 @@
-package ui
+package styles
 
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	headerHeight       = 6
-	footerHeight       = 2
-	prRowHeight        = 2
-	singleRuneWidth    = 4
-	mainContentPadding = 1
-	pagerHeight        = 2
-	cellPadding        = cellStyle.GetPaddingLeft() + cellStyle.GetPaddingRight()
+	headerHeight    = 6
+	footerHeight    = 2
+	prRowHeight     = 2
+	singleRuneWidth = 4
+	pagerHeight     = 2
+	cellPadding     = cellStyle.GetPaddingLeft() + cellStyle.GetPaddingRight()
 
 	reviewCellWidth    = singleRuneWidth
 	mergeableCellWidth = singleRuneWidth
@@ -25,6 +24,7 @@ var (
 	subtleIndigo       = lipgloss.AdaptiveColor{Light: "#5A57B5", Dark: "#242347"}
 	selectedBackground = lipgloss.AdaptiveColor{Light: subtleIndigo.Light, Dark: subtleIndigo.Dark}
 	border             = lipgloss.AdaptiveColor{Light: indigo.Light, Dark: indigo.Dark}
+	unFocusedBorder    = lipgloss.AdaptiveColor{Light: "#E5E5E5", Dark: "#0F0F0F"}
 	secondaryBorder    = lipgloss.AdaptiveColor{Light: indigo.Light, Dark: "#39386b"}
 	faintBorder        = lipgloss.AdaptiveColor{Light: "#D9DCCF", Dark: "#28283b"}
 	mainText           = lipgloss.AdaptiveColor{Light: "#242347", Dark: "#E2E1ED"}
@@ -98,48 +98,27 @@ var (
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(border)
 
-	sideBarStyle = lipgloss.NewStyle().
-			Padding(0, 2).
-			BorderLeft(true).
-			BorderStyle(lipgloss.Border{
-			Top:         "",
-			Bottom:      "",
-			Left:        "│",
-			Right:       "",
-			TopLeft:     "",
-			TopRight:    "",
-			BottomRight: "",
-			BottomLeft:  "",
-		}).
-		BorderForeground(border)
-
 	mainTextStyle = lipgloss.NewStyle().
 			Foreground(mainText).
 			Bold(true)
 
-	pillStyle = mainTextStyle.Copy().
-			Foreground(subtleIndigo).
-			PaddingLeft(1).
-			PaddingRight(1)
+	// My Colors and Styles
+	mainContentPadding = 0
 
-	pagerStyle = lipgloss.NewStyle().
-			MarginTop(1).
-			Bold(true).
-			Foreground(faintText)
+	borderColor          = lipgloss.AdaptiveColor{Light: "#212F3D", Dark: "#D5D8DC"}
+	unfocusedBorderColor = lipgloss.AdaptiveColor{Light: "#D5D8DC", Dark: "#212F3D"}
+
+	PaneStyle = lipgloss.NewStyle().
+			Padding(0, 0).
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderForeground(borderColor)
+
+	UnfocusedPaneStyle = PaneStyle.Copy().BorderForeground(unfocusedBorderColor)
+	//UnfocusedPaneStyle = PaneStyle.Copy()
+
+	PaddedContentStyle = lipgloss.NewStyle().
+				Padding(0, mainContentPadding)
+
+	MainPaneStyle = lipgloss.NewStyle().
+			Padding(0, 0)
 )
-
-func makeCellStyle(isSelected bool) lipgloss.Style {
-	if isSelected {
-		return selectedCellStyle.Copy()
-	}
-
-	return cellStyle.Copy()
-}
-
-func makeRuneCellStyle(isSelected bool) lipgloss.Style {
-	if isSelected {
-		return selectedSingleRuneCellStyle.Copy()
-	}
-
-	return singleRuneCellStyle.Copy()
-}

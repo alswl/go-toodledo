@@ -7,7 +7,6 @@ import (
 var TaskCmd = &cobra.Command{
 	Use:   "task",
 	Short: "Manage toodledo tasks",
-	Args:  cobra.NoArgs,
 }
 
 func init() {

@@ -18,7 +18,7 @@ var EnvironmentsCmd = &cobra.Command{
 }
 
 func init() {
-	switchCmd.RegisterFlagCompletionFunc(constants.ArgEnvironment, func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+	_ = switchCmd.RegisterFlagCompletionFunc(constants.ArgEnvironment, func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
 		cSrv := services.NewEnvironmentService()
 		cks, err := cSrv.ListAll()
 		if err != nil {

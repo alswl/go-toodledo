@@ -7,7 +7,6 @@ import (
 var FolderCmd = &cobra.Command{
 	Use:   "folder",
 	Short: "Manage toodledo folders",
-	Run:   ListCmd.Run,
 }
 
 func init() {

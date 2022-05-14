@@ -3,11 +3,12 @@ package tasks
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
-	"github.com/alswl/go-toodledo/pkg"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
+	"github.com/alswl/go-toodledo/pkg/services"
+	"github.com/alswl/go-toodledo/pkg/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -17,27 +18,49 @@ import (
 // cmdCreateQuery present the parameters for the command
 // parse query with cmd
 type cmdCreateQuery struct {
-	// TODO name
-	ContextID int64
-	// TODO name
-	FolderID int64
-	// TODO name
-	GoalID   int64
+	// TODO
+	//ContextID int64
+	Context string
+	// TODO
+	//FolderID int64
+	Folder string
+	// TODO
+	//GoalID int64
+	Goal     string
 	Priority string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
 	Status   string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`
 
-	DueDate string `validate:"datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
+	DueDate string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
 	// TODO
 	// Tags
 }
 
-func (q *cmdCreateQuery) ToQuery() (*queries.TaskCreateQuery, error) {
+func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService, folderSvc services.FolderService,
+	goalSvc services.GoalService) (*queries.TaskCreateQuery, error) {
 	var err error
 	var query queries.TaskCreateQuery
 
-	query.ContextID = q.ContextID
-	query.FolderID = q.FolderID
-	query.GoalID = q.GoalID
+	if q.Context != "" {
+		context, err := contextSvc.Find(q.Context)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to find context")
+		}
+		query.ContextID = context.ID
+	}
+	if q.Folder != "" {
+		folder, err := folderSvc.Find(q.Folder)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to find folder")
+		}
+		query.FolderID = folder.ID
+	}
+	if q.Goal != "" {
+		goal, err := goalSvc.Find(q.Goal)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to find goal")
+		}
+		query.GoalID = goal.ID
+	}
 	query.DueDate = q.DueDate
 	query.Priority = tpriority.PriorityString2Type(q.Priority)
 
@@ -51,7 +74,7 @@ var createCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		cmdQ := cmdCreateQuery{}
-		err := pkg.FillQueryByFlags(cmd, &cmdQ)
+		err := utils.FillQueryByFlags(cmd, &cmdQ)
 		if err != nil {
 			logrus.WithError(err).Fatal("failed")
 		}
@@ -71,7 +94,27 @@ var createCmd = &cobra.Command{
 			logrus.Fatal(err)
 			return
 		}
-		q, err := cmdQ.ToQuery()
+		taskRichSvc, err := injector.InitTaskRichService()
+		if err != nil {
+			logrus.WithError(err).Fatal("init task rich service failed")
+			return
+		}
+		contextSvc, err := injector.InitContextCachedService()
+		if err != nil {
+			logrus.Fatal(err)
+			return
+		}
+		folderSvc, err := injector.InitFolderCachedService()
+		if err != nil {
+			logrus.Fatal(err)
+			return
+		}
+		goalSvc, err := injector.InitGoalCachedService()
+		if err != nil {
+			logrus.Fatal(err)
+			return
+		}
+		q, err := cmdQ.ToQuery(contextSvc, folderSvc, goalSvc)
 		if err != nil {
 			logrus.WithError(err).Fatal("parse query failed")
 		}
@@ -83,13 +126,13 @@ var createCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("create task failed")
 			return
 		}
-
-		fmt.Println(render.Tables4Task([]*models.Task{t}))
+		rts, _ := taskRichSvc.RichThem([]*models.Task{t})
+		fmt.Println(render.Tables4RichTasks(rts))
 	},
 }
 
 func init() {
-	err := pkg.BindFlagsByQuery(createCmd, cmdCreateQuery{})
+	err := utils.BindFlagsByQuery(createCmd, cmdCreateQuery{})
 	if err != nil {
 		panic(errors.Wrapf(err, "failed to generate flags for command %s", createCmd.Use))
 	}

@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
@@ -64,12 +65,12 @@ func (s *taskCachedService) syncWithFn(fnEdited func() ([]*models.Task, error), 
 	}
 	for _, f := range editedTasks {
 		bytes, _ := json.Marshal(f)
-		s.db.Put(TaskBucket, strconv.Itoa(int(f.ID)), bytes)
+		_ = s.db.Put(TaskBucket, strconv.Itoa(int(f.ID)), bytes)
 	}
 
-	tds, err := fnDeleted()
+	tds, _ := fnDeleted()
 	for _, td := range tds {
-		s.db.Remove(TaskBucket, strconv.Itoa(int(td.ID)))
+		_ = s.db.Remove(TaskBucket, strconv.Itoa(int(td.ID)))
 	}
 	return nil
 }
@@ -92,10 +93,13 @@ func (s *taskCachedService) FindById(id int64) (*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	filtered := funk.Filter(all, func(t *models.Task) bool {
+	filterHeadOpt := funk.Head(funk.Filter(all, func(t *models.Task) bool {
 		return t.ID == id
-	}).([]*models.Task)
-	head := funk.Head(filtered).(*models.Task)
+	}))
+	if filterHeadOpt == nil {
+		return nil, common.ErrNotFound
+	}
+	head := filterHeadOpt.(*models.Task)
 	return head, nil
 }
 
@@ -117,7 +121,8 @@ func (s *taskCachedService) listAllRemote() ([]*models.Task, error) {
 		}
 		all = append(all, ts...)
 		start = start + limit
-		ts = make([]*models.Task, 0)
+		// TODO validate
+		//ts = make([]*models.Task, 0)
 	}
 	return all, nil
 }
@@ -140,7 +145,8 @@ func (s *taskCachedService) listChanged(lastEditTime *int32) ([]*models.Task, er
 		}
 		all = append(all, ts...)
 		start = start + limit
-		ts = make([]*models.Task, 0)
+		// validate
+		//ts = make([]*models.Task, 0)
 	}
 	return all, nil
 }
@@ -207,6 +213,16 @@ func (s *taskCachedService) ListAllByQuery(query *queries.TaskListQuery) ([]*mod
 	if query.ContextID != 0 {
 		ts = funk.Filter(ts, func(t *models.Task) bool {
 			return t.Context == query.ContextID
+		}).([]*models.Task)
+	}
+	if query.FolderID != 0 {
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			return t.Folder == query.FolderID
+		}).([]*models.Task)
+	}
+	if query.GoalID != 0 {
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			return t.Goal == query.GoalID
 		}).([]*models.Task)
 	}
 	return ts, nil

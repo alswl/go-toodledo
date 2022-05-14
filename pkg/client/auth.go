@@ -28,7 +28,7 @@ func NewAuthByToken(accessToken string) runtime.ClientAuthInfoWriter {
 
 // AuthenticateRequest ...
 func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry strfmt.Registry) error {
-	request.SetQueryParam("access_token", a.accessToken)
+	_ = request.SetQueryParam("access_token", a.accessToken)
 	return nil
 }
 

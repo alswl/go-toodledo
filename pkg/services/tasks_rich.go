@@ -8,13 +8,14 @@ type TaskRichService interface {
 }
 
 type taskRichService struct {
-	taskSvc    TaskCachedService
-	folderSvc  FolderCachedService
-	contextSvc ContextCachedService
-	goalSvc    GoalCachedService
+	taskSvc    TaskService
+	folderSvc  FolderService
+	contextSvc ContextService
+	goalSvc    GoalService
 }
 
-func NewTaskRichService(taskSvc TaskCachedService, folderSvc FolderCachedService, contextSvc ContextCachedService, goalSvc GoalCachedService) TaskRichService {
+// NewTaskRichService create rich service with cached service(except task service)
+func NewTaskRichService(taskSvc TaskService, folderSvc FolderCachedService, contextSvc ContextCachedService, goalSvc GoalCachedService) TaskRichService {
 	return &taskRichService{taskSvc: taskSvc, folderSvc: folderSvc, contextSvc: contextSvc, goalSvc: goalSvc}
 }
 

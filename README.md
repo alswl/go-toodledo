@@ -55,10 +55,10 @@ Global Flags:
 Use "toodledo task [command] --help" for more information about a command.
 
 > toodledo task list --context home --status nextaction
-         # │ [X] │ TITLE            │     STATUS │ CONTEXT │ PRIORITY │ FOLDER  │ GOAL │        DUE │ REPEAT      │ LENGTH │ TIMER
+         # │ [X] │ TITLE            │     STATUS │ CONTEXT │ PRIORITY │ FOLDER  │ GOAL │ DUE        │ REPEAT      │ LENGTH │ TIMER
 ───────────┼─────┼──────────────────┼────────────┼─────────┼──────────┼─────────┼──────┼────────────┼─────────────┼────────┼───────
- 327077755 │ [ ] │ next-action item │ NextAction │ home    │     High │ to-0128 │ b    │ 1645704000 │ FREQ=WEEKLY │     60 │  1200
- 327078471 │ [ ] │ abc2x            │ NextAction │ home    │     High │         │ c    │          0 │             │      0 │     0
+ 327077755 │ [ ] │ next-action item │ NextAction │ home    │     High │ to-0128 │ b    │ 2022-02-24 │ FREQ=WEEKLY │ 1m0s   │ 20m0s
+ 327078471 │ [ ] │ abc2x            │ NextAction │ home    │     High │         │ c    │            │             │        │
 ```
 
 ### Login

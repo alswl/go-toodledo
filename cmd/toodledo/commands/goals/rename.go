@@ -30,7 +30,7 @@ var RenameCmd = &cobra.Command{
 			return
 		}
 
-		renamed, err := svc.Rename(name, newName)
+		renamed, _ := svc.Rename(name, newName)
 		fmt.Print(render.Tables4Goal([]*models.Goal{renamed}))
 	},
 }

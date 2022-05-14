@@ -37,7 +37,7 @@ var switchCmd = &cobra.Command{
 			return
 		}
 		viper.Set(DefaultEnvironmentKey, name)
-		viper.WriteConfig()
+		_ = viper.WriteConfig()
 		fmt.Println("Done")
 	},
 }
