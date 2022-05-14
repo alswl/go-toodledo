@@ -87,6 +87,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-//replace github.com/evertras/bubble-table => /Users/alswl/dev/project/bubbletea
+//replace github.com/evertras/bubble-table => /Users/alswl/dev/project/bubble-table
 
-replace github.com/evertras/bubble-table => /Users/alswl/dev/project/bubble-table
+replace github.com:Evertras/bubble-table.git => github.com/alswl/bubble-table v0.5.1-0.20220514081336-9dc4819f02cb
