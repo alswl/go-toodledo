@@ -201,7 +201,7 @@ func (m Model) updateFocusedModel(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 
 		// post action
 		switch msg.String() {
-		case "enter":
+		case "enter", "esc":
 			m.isInputting = false
 			m.focus("tasks")
 		}

@@ -42,11 +42,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
+	// search mode
 	if m.filterTextInput.Focused() {
 		m.sb.SetContent("Search", m.filterTextInput.View(), "", "")
 		return m.sb.View()
 	}
 
+	// append filter indicator
 	first := m.sb.FirstColumn
 	if m.filterTextInput.Value() != "" {
 		first = fmt.Sprintf("%s /", m.sb.FirstColumn)
@@ -75,9 +77,13 @@ func (m Model) updateFilterTextInput(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		if msg.String() == "enter" {
+		switch msg.String() {
+		case "enter":
 			m.filterTextInput.Blur()
-		} else {
+		case "esc":
+			m.filterTextInput.SetValue("")
+			m.filterTextInput.Blur()
+		default:
 			m.filterTextInput, cmd = m.filterTextInput.Update(msg)
 		}
 	}
