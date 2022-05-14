@@ -89,4 +89,4 @@ require (
 
 //replace github.com/evertras/bubble-table => /Users/alswl/dev/project/bubble-table
 
-replace github.com:Evertras/bubble-table.git => github.com/alswl/bubble-table v0.5.1-0.20220514081336-9dc4819f02cb
+replace github.com/evertras/bubble-table => github.com/alswl/bubble-table v0.5.1-0.20220514081336-9dc4819f02cb
