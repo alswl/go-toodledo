@@ -1,4 +1,4 @@
-package pkg
+package utils
 
 import (
 	"github.com/spf13/cobra"
@@ -52,7 +52,7 @@ func TestFillQueryByFlags(t *testing.T) {
 	assert.Equal(t, "test", q.S)
 	assert.Equal(t, 1, q.I)
 	assert.Equal(t, int64(2), q.I64)
-	assert.Equal(t, time.Date(2018, 1, 1, 0, 0, 0, 0, time.Local), q.T)
+	assert.Equal(t, time.Date(2018, 1, 1, 0, 0, 0, 0, ChinaTimeZone), q.T)
 	assert.Equal(t, true, q.B)
 	assert.Equal(t, []string{"a", "b"}, q.SS)
 }

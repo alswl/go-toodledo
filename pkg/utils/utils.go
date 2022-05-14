@@ -1,4 +1,4 @@
-package pkg
+package utils
 
 import (
 	"fmt"
@@ -13,6 +13,10 @@ import (
 	"strings"
 	"time"
 )
+
+// ChinaTimeZone is timezone of China
+// TODO using configuration time zone
+var ChinaTimeZone = time.FixedZone("CST", 8*3600)
 
 // Bool2int ...
 func Bool2int(input bool) (output int) {
@@ -132,7 +136,7 @@ func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 				if err != nil {
 					return errors.Wrapf(err, "failed to get %s", name)
 				}
-				parsed, err := time.ParseInLocation("2006-01-02", get, time.Local)
+				parsed, err := time.ParseInLocation("2006-01-02", get, ChinaTimeZone)
 				// if err, not set value
 				if err == nil {
 					v.Set(reflect.ValueOf(parsed))

@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"github.com/alswl/go-toodledo/pkg/utils"
 	"time"
 )
 
@@ -20,7 +21,7 @@ func (t RichTask) TheDueDate() time.Time {
 		return time.Time{}
 	}
 	// TODO get timezone from toodledo
-	return time.Unix(t.Duedate, 0).In(time.Local)
+	return time.Unix(t.Duedate, 0).In(utils.ChinaTimeZone)
 }
 
 func (t RichTask) TheDueTime() time.Time {

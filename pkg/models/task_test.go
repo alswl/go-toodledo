@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/alswl/go-toodledo/pkg/utils"
 	"reflect"
 	"testing"
 	"time"
@@ -26,7 +27,7 @@ func TestRichTask_DueDate(t1 *testing.T) {
 				TheFolder:  Folder{},
 				TheGoal:    Goal{},
 			},
-			want: time.Date(2022, 02, 24, 20, 0, 0, 0, time.Local),
+			want: time.Date(2022, 02, 24, 20, 0, 0, 0, utils.ChinaTimeZone),
 		},
 	}
 	for _, tt := range tests {

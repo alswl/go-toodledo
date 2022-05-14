@@ -3,12 +3,12 @@ package tasks
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
-	"github.com/alswl/go-toodledo/pkg"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/alswl/go-toodledo/pkg/services"
+	"github.com/alswl/go-toodledo/pkg/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -83,7 +83,7 @@ var listCmd = &cobra.Command{
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmdQ := cmdListQuery{}
-		err := pkg.FillQueryByFlags(cmd, &cmdQ)
+		err := utils.FillQueryByFlags(cmd, &cmdQ)
 		if err != nil {
 			logrus.WithError(err).Fatal("failed")
 		}
@@ -154,7 +154,7 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
-	err := pkg.BindFlagsByQuery(listCmd, cmdListQuery{})
+	err := utils.BindFlagsByQuery(listCmd, cmdListQuery{})
 	if err != nil {
 		panic(errors.Wrapf(err, "failed to generate flags for command %s", listCmd.Use))
 	}
