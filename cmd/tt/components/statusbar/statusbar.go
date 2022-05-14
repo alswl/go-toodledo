@@ -3,7 +3,6 @@ package statusbar
 import (
 	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
-	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,13 +13,13 @@ type Model struct {
 	sb statusbar.Bubble
 	components.Focusable
 
-	item *models.RichTask
+	//item *models.RichTask
 
 	// in statusBar
 	filterTextInput textinput.Model
 }
 
-func (m *Model) Resize(width, height int) {
+func (m *Model) Resize(width, _ int) {
 	m.sb.SetSize(width)
 }
 
@@ -47,8 +46,8 @@ func (m Model) View() string {
 	return m.sb.View()
 }
 
-func (m *Model) SetItem(item *models.RichTask) {
-	m.item = item
+func (m *Model) SetContent(firstColumn, secondColumn, thirdColumn, fourthColumn string) {
+	m.sb.SetContent(firstColumn, secondColumn, thirdColumn, fourthColumn)
 }
 
 func (m *Model) FocusFilter() {

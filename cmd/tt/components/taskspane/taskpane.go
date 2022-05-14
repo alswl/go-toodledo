@@ -72,9 +72,10 @@ type Model struct {
 
 	//app *app.Model
 
-	choices  []string         // items on the to-do list
-	cursor   int              // which to-do list item our cursor is pointing at
-	selected map[int]struct{} // which to-do items are selected
+	// TODO delete? all states is in app. sub models is ephemeral, Or maybe props is using here?
+	//choices  []string         // items on the to-do list
+	//cursor   int              // which to-do list item our cursor is pointing at
+	//selected map[int]struct{} // which to-do items are selected
 
 	// FIXME table should be only view mode (without filter mode)
 	tableModel table.Model
@@ -195,9 +196,9 @@ func InitModel(tasks []*models.RichTask) Model {
 		WithKeyMap(keys)
 
 	m := Model{
-		choices:    nil,
-		cursor:     0,
-		selected:   nil,
+		//choices:    nil,
+		//cursor:     0,
+		//selected:   nil,
 		tableModel: tb,
 		tableWidth: DefaultTableWidth,
 		//props:      app.GetStates(),

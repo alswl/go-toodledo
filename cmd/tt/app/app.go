@@ -278,9 +278,10 @@ func InitialModel() Model {
 	keys.RowUp.SetKeys("k", "up")
 
 	statusB := statusbar.NewDefault()
-	// XXX
-	//statusB.SetContent("tasks", "a fox jumped over the lazy dog", "1/999", "PAUSE")
+	// XXX ?
+	statusB.SetContent("tasks", "a fox jumped over the lazy dog", "1/999", "PAUSE")
 
+	// FIXME tasks should comes from syncer
 	tp := taskspane.InitModel(tasks)
 	sb := sidebar.InitModel()
 	m := Model{
