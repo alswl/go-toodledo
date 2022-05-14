@@ -1,6 +1,7 @@
 package statusbar
 
 import (
+	"fmt"
 	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -12,11 +13,12 @@ import (
 type Model struct {
 	sb statusbar.Bubble
 	components.Focusable
+	filterTextInput textinput.Model
 
 	//item *models.RichTask
 
 	// in statusBar
-	filterTextInput textinput.Model
+	mainContent string
 }
 
 func (m *Model) Resize(width, _ int) {
@@ -30,7 +32,8 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	if m.filterTextInput.Focused() {
-		return m.updateFilterTextInput(msg)
+		input, cmd := m.updateFilterTextInput(msg)
+		return input, cmd
 	}
 
 	newM, cmd := m.sb.Update(msg)
@@ -40,10 +43,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	if m.filterTextInput.Focused() {
-		m.sb.SetContent("", m.filterTextInput.View(), "", "")
+		m.sb.SetContent("Search", m.filterTextInput.View(), "", "")
+		return m.sb.View()
 	}
 
+	first := m.sb.FirstColumn
+	if m.filterTextInput.Value() != "" {
+		first = fmt.Sprintf("%s /", m.sb.FirstColumn)
+	}
+	m.sb.SetContent(first, m.sb.SecondColumn, m.sb.ThirdColumn, m.sb.FourthColumn)
 	return m.sb.View()
+}
+
+func (m Model) genSecondColumn() string {
+	second := m.mainContent
+	if m.filterTextInput.Value() != "" {
+		second = fmt.Sprintf("%s%s %s", m.filterTextInput.Prompt, m.filterTextInput.Value(), m.sb.SecondColumn)
+	}
+	return second
 }
 
 func (m *Model) SetContent(firstColumn, secondColumn, thirdColumn, fourthColumn string) {
