@@ -5,9 +5,7 @@ import (
 	"github.com/pkg/errors"
 	boltdb "go.etcd.io/bbolt"
 	"os"
-	"path"
 	"path/filepath"
-	"time"
 )
 
 // Backend is an interface which describes what a store should support.
@@ -42,20 +40,20 @@ type Backend interface {
 
 // NewBoltDB is used to make bolt metadata store instance.
 func NewBoltDB(config models.ToodledoCliConfig) (Backend, error) {
-	opt := &boltdb.Options{
-		Timeout: time.Second * 10,
-	}
+	//opt := &boltdb.Options{
+	//	Timeout: time.Second * 10,
+	//}
 
-	baseDir := filepath.Base(config.Database.DataFile)
-	if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
-		if err := os.MkdirAll(path.Dir(baseDir), 0755); err != nil {
-			return nil, errors.Wrapf(err, "failed to create metadata path, %s", baseDir)
+	dir := filepath.Dir(config.Database.DataFile)
+	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return nil, errors.Wrapf(err, "failed to create metadata path, %s", dir)
 		}
 	}
 
 	b := &bolt{}
 
-	db, err := boltdb.Open(config.Database.DataFile, 0644, opt)
+	db, err := boltdb.Open(config.Database.DataFile, 0600, nil)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to open boltdb, %s", config.Database.DataFile)
 	}

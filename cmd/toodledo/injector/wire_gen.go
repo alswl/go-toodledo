@@ -155,7 +155,7 @@ func InitTaskCachedService() (services.TaskCachedService, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
+	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter)
 	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
 		return nil, err
@@ -261,23 +261,24 @@ func InitTaskRichService() (services.TaskRichService, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
-	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter)
 	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
+	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
 	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
 	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
-	taskRichService := services.NewTaskRichService(taskService, folderCachedService, contextCachedService, goalCachedService)
+	taskRichService := services.NewTaskRichService(taskCachedService, folderCachedService, contextCachedService, goalCachedService)
 	return taskRichService, nil
 }
 
-func InitSyncer() (syncer.ToodledoSyncer, error) {
+func InitSyncer() (syncer.ToodledoFetcher, error) {
 	toodledo := client.NewToodledo()
 	toodledoCliConfig, err := common.NewCliConfigFromViper()
 	if err != nil {
@@ -300,15 +301,15 @@ func InitSyncer() (syncer.ToodledoSyncer, error) {
 	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
 	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
 	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
-	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
+	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter)
 	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
-	toodledoSyncer, err := syncer.NewToodledoSyncer(folderCachedService, accountService, goalCachedService, taskCachedService, contextCachedService, backend)
+	toodledoFetcher, err := syncer.NewToodledoSyncer(folderCachedService, accountService, goalCachedService, taskCachedService, contextCachedService, backend)
 	if err != nil {
 		return nil, err
 	}
-	return toodledoSyncer, nil
+	return toodledoFetcher, nil
 }
 
 func InitApp() (*app.ToodledoCliApp, error) {
@@ -336,4 +337,16 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	}
 	toodledoCliApp := app.NewToodledoCliApp(account)
 	return toodledoCliApp, nil
+}
+
+func InitBackend() (dal.Backend, error) {
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return nil, err
+	}
+	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	if err != nil {
+		return nil, err
+	}
+	return backend, nil
 }

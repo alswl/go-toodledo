@@ -18,14 +18,15 @@ import (
 
 var DefaultFieldsInResponse = "folder,star,context,tag,goal,repeat,startdate,starttime,duedate,duetime,priority,length"
 
-// TaskService ...
 type TaskService interface {
 	FindById(id int64) (*models.Task, error)
 	List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error)
-	ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error)
-	Create(name string) (*models.Task, error)
+	ListAll() ([]*models.Task, int, error)
+	// Create is simple create with only title, it was deprecated
+	Create(title string) (*models.Task, error)
 	CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error)
 	Delete(id int64) error
+	// DeleteBatch is batch delete tasks, return success ids, failed items and error
 	DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error)
 	Edit(id int64, t *models.Task) (*models.Task, error)
 	Complete(id int64) (*models.Task, error)
@@ -38,12 +39,19 @@ type taskService struct {
 	auth runtime.ClientAuthInfoWriter
 }
 
-// NewTaskService ...
-func NewTaskService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) TaskService {
+func NewTaskService0(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) *taskService {
 	return &taskService{cli: cli, auth: auth}
 }
 
-// FindById ...
+func NewTaskService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) TaskService {
+	return NewTaskService0(cli, auth)
+}
+
+func (s *taskService) ListAll() ([]*models.Task, int, error) {
+	logrus.Warnf("ListAll is not support, use List instead")
+	return []*models.Task{}, 0, nil
+}
+
 func (s *taskService) FindById(id int64) (*models.Task, error) {
 	p := task.NewGetTasksGetPhpParams()
 	fields := enums.TaskFields2String(enums.GeneralTaskFields)
@@ -65,7 +73,6 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 	return &t, nil
 }
 
-// listAllRemote ...
 func (s *taskService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
 	return s.ListWithChanged(nil, start, limit)
 }

@@ -16,3 +16,9 @@ func AllTasksMock() ([]*models.RichTask, error) {
 
 	return ts, nil
 }
+
+func ListContexts() []models.Context {
+	contexts := make([]models.Context, 10)
+	_ = faker.FakeData(&contexts)
+	return contexts
+}

@@ -17,7 +17,7 @@ var tokenCmd = &cobra.Command{
 			log.WithField("args[0]", code).Error("url format error")
 			return
 		}
-		conf, err := client.ProvideOAuth2ConfigFromViper()
+		conf, err := client.NewOAuth2ConfigFromViper()
 		if err != nil {
 			log.Error(err)
 			return

@@ -18,10 +18,11 @@ var SuperSet = wire.NewSet(
 	client.NewToodledo,
 	//client.NewAuthFromViper,
 	client.NewAuthFromConfig,
-	client.ProvideOAuth2ConfigFromViper,
+	client.NewOAuth2ConfigFromViper,
 
 	services.CurrentUser,
 	services.NewAccountService,
+	services.NewTaskService0,
 	services.NewTaskService,
 	services.NewTaskCachedService,
 	services.NewFolderService,
@@ -32,9 +33,11 @@ var SuperSet = wire.NewSet(
 	services.NewGoalCachedService,
 	services.NewSavedSearchService,
 
+	// wire not support generic now
+	//informers.ProvideTaskInformer,
+
 	services.NewTaskRichService,
 
 	syncer.NewToodledoSyncer,
-
 	app.NewToodledoCliApp,
 )

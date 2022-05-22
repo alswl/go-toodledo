@@ -118,8 +118,8 @@ func NewOAuth2ConfigFromConfigs(cfg models.ToodledoConfig) (*oauth2.Config, erro
 	return conf, nil
 }
 
-// ProvideOAuth2ConfigFromViper ...
-func ProvideOAuth2ConfigFromViper() (*oauth2.Config, error) {
+// NewOAuth2ConfigFromViper ...
+func NewOAuth2ConfigFromViper() (*oauth2.Config, error) {
 	// TODO delete, 3 usage left
 	clientId := viper.GetString("auth.client_id")
 	clientSecret := viper.GetString("auth.client_secret")

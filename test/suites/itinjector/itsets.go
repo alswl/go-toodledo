@@ -22,6 +22,7 @@ var IntegrationTestSet = wire.NewSet(
 
 	services.CurrentUser,
 	services.NewAccountService,
+	services.NewTaskService0,
 	services.NewTaskService,
 	services.NewTaskCachedService,
 	services.NewFolderService,
@@ -32,9 +33,11 @@ var IntegrationTestSet = wire.NewSet(
 	services.NewGoalCachedService,
 	services.NewSavedSearchService,
 
+	// wire not support generic now
+	//informers.ProvideTaskInformer,
+
 	services.NewTaskRichService,
 
 	syncer.NewToodledoSyncer,
-
 	app.NewToodledoCliApp,
 )

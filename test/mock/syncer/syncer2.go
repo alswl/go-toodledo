@@ -4,9 +4,8 @@ package mocksyncer
 
 import (
 	models "github.com/alswl/go-toodledo/pkg/models"
+	syncer "github.com/alswl/go-toodledo/pkg/syncer2"
 	mock "github.com/stretchr/testify/mock"
-
-	syncer "github.com/alswl/go-toodledo/pkg/syncer"
 
 	testing "testing"
 )
@@ -52,25 +51,25 @@ func (_m *Syncer2) Status() (syncer.SyncStatus, error) {
 }
 
 // Sync provides a mock function with given fields: diffs, progress
-func (_m *Syncer2) Sync(diffs []*syncer.SyncItem, progress syncer.Progress) (int, int, []*models.Task, error) {
+func (_m *Syncer2) Sync(diffs []*syncer.SyncEvent, progress syncer.Progress) (int, int, []*models.Task, error) {
 	ret := _m.Called(diffs, progress)
 
 	var r0 int
-	if rf, ok := ret.Get(0).(func([]*syncer.SyncItem, syncer.Progress) int); ok {
+	if rf, ok := ret.Get(0).(func([]*syncer.SyncEvent, syncer.Progress) int); ok {
 		r0 = rf(diffs, progress)
 	} else {
 		r0 = ret.Get(0).(int)
 	}
 
 	var r1 int
-	if rf, ok := ret.Get(1).(func([]*syncer.SyncItem, syncer.Progress) int); ok {
+	if rf, ok := ret.Get(1).(func([]*syncer.SyncEvent, syncer.Progress) int); ok {
 		r1 = rf(diffs, progress)
 	} else {
 		r1 = ret.Get(1).(int)
 	}
 
 	var r2 []*models.Task
-	if rf, ok := ret.Get(2).(func([]*syncer.SyncItem, syncer.Progress) []*models.Task); ok {
+	if rf, ok := ret.Get(2).(func([]*syncer.SyncEvent, syncer.Progress) []*models.Task); ok {
 		r2 = rf(diffs, progress)
 	} else {
 		if ret.Get(2) != nil {
@@ -79,7 +78,7 @@ func (_m *Syncer2) Sync(diffs []*syncer.SyncItem, progress syncer.Progress) (int
 	}
 
 	var r3 error
-	if rf, ok := ret.Get(3).(func([]*syncer.SyncItem, syncer.Progress) error); ok {
+	if rf, ok := ret.Get(3).(func([]*syncer.SyncEvent, syncer.Progress) error); ok {
 		r3 = rf(diffs, progress)
 	} else {
 		r3 = ret.Error(3)

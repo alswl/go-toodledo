@@ -14,6 +14,10 @@ type RichTask struct {
 	//AddedByUser *Account `json:"added_by_user"`
 	//ParentTask *Task `json:"parent_task"`
 	//PreviousTask *Task `json:"previous_task"`
+
+	// Due
+	// Repeat
+	// Tag []string
 }
 
 func (t RichTask) TheDueDate() time.Time {

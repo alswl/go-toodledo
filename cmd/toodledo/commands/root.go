@@ -13,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"path"
 
 	"os"
 )
@@ -53,7 +54,7 @@ func initConfig() {
 		}
 
 		// Search config in home directory with name ".toodledo" (without extension).
-		viper.AddConfigPath(home)
+		viper.AddConfigPath(path.Join(home, ".config", "toodledo"))
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".toodledo")
 	}

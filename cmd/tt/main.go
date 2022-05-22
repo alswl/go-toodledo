@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
+	"path"
 )
 
 type item struct {
@@ -27,7 +28,7 @@ func initViper() {
 	}
 
 	// Search config in home directory with name ".toodledo" (without extension).
-	viper.AddConfigPath(home)
+	viper.AddConfigPath(path.Join(home, ".config", "toodledo"))
 	viper.SetConfigType("yaml")
 	viper.SetConfigName(".toodledo")
 

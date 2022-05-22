@@ -35,8 +35,8 @@ func NewCliConfigFromViper() (models.ToodledoCliConfig, error) {
 func NewCliConfigForTesting() (models.ToodledoCliConfig, error) {
 	home, err := homedir.Dir()
 	cobra.CheckErr(err)
-	viper.AddConfigPath(path.Join(home, ".config"))
-	viper.SetConfigName("toodledo-test")
+	viper.AddConfigPath(path.Join(home, ".config", "toodledo"))
+	viper.SetConfigName(".toodledo-test")
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
 		panic(err)

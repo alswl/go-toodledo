@@ -77,6 +77,10 @@ type Model struct {
 	//cursor   int              // which to-do list item our cursor is pointing at
 	//selected map[int]struct{} // which to-do items are selected
 
+	// properties
+	// TODO
+
+	// view
 	// FIXME table should be only view mode (without filter mode)
 	tableModel table.Model
 	tableWidth int
@@ -98,6 +102,11 @@ func (m Model) View() string {
 		style = styles.PaneStyle
 	}
 	return style.Render(m.Viewport.View())
+}
+
+func (m Model) UpdateX(msg tea.Msg) (Model, tea.Cmd) {
+	newM, cmd := m.Update(msg)
+	return newM.(Model), cmd
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -128,6 +137,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			//}
 		}
 
+	case []*models.RichTask:
+		m.tableModel = m.tableModel.WithRows(TasksRenderRows(msg))
 	case tea.WindowSizeMsg:
 		//top, right, bottom, left := docStyle.GetMargin()
 		m.Resize(msg.Width, msg.Height)

@@ -6,6 +6,7 @@ package injector
 import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
+	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/alswl/go-toodledo/pkg/syncer"
 	"github.com/go-openapi/runtime"
@@ -77,12 +78,22 @@ func InitTaskRichService() (services.TaskRichService, error) {
 	return nil, nil
 }
 
-func InitSyncer() (syncer.ToodledoSyncer, error) {
+func InitSyncer() (syncer.ToodledoFetcher, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }
 
 func InitApp() (*app.ToodledoCliApp, error) {
+	wire.Build(SuperSet)
+	return nil, nil
+}
+
+//func InitTaskInformer() (*informers.TaskInformer, error) {
+//	wire.Build(SuperSet)
+//	return nil, nil
+//}
+
+func InitBackend() (dal.Backend, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }

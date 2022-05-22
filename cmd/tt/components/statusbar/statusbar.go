@@ -13,12 +13,15 @@ import (
 type Model struct {
 	sb statusbar.Bubble
 	components.Focusable
+
+	// states
+	mode   string
+	status string
+	info1  string
+	info2  string
+
+	// view
 	filterTextInput textinput.Model
-
-	//item *models.RichTask
-
-	// in statusBar
-	mainContent string
 }
 
 func (m *Model) Resize(width, _ int) {
@@ -48,25 +51,30 @@ func (m Model) View() string {
 		return m.sb.View()
 	}
 
-	// append filter indicator
-	first := m.sb.FirstColumn
+	// display mode
+	// append filter indicator TODO move mode to update?
+	mode := m.mode
 	if m.filterTextInput.Value() != "" {
-		first = fmt.Sprintf("%s /", m.sb.FirstColumn)
+		mode = fmt.Sprintf("%s /", m.filterTextInput.Value())
 	}
-	m.sb.SetContent(first, m.sb.SecondColumn, m.sb.ThirdColumn, m.sb.FourthColumn)
+	m.sb.SetContent(mode, m.status, m.info1, m.info2)
 	return m.sb.View()
 }
 
-func (m Model) genSecondColumn() string {
-	second := m.mainContent
-	if m.filterTextInput.Value() != "" {
-		second = fmt.Sprintf("%s%s %s", m.filterTextInput.Prompt, m.filterTextInput.Value(), m.sb.SecondColumn)
-	}
-	return second
+func (m *Model) SetMode(mode string) {
+	m.mode = mode
 }
 
-func (m *Model) SetContent(firstColumn, secondColumn, thirdColumn, fourthColumn string) {
-	m.sb.SetContent(firstColumn, secondColumn, thirdColumn, fourthColumn)
+func (m *Model) SetStatus(status string) {
+	m.status = status
+}
+
+func (m *Model) SetInfo1(msg string) {
+	m.info1 = msg
+}
+
+func (m *Model) SetInfo2(msg string) {
+	m.info2 = msg
 }
 
 func (m *Model) FocusFilter() {

@@ -21,14 +21,14 @@ type TaskCachedService interface {
 }
 
 type taskCachedService struct {
-	remoteSvc  TaskService
+	remoteSvc  *taskService
 	accountSvc AccountService
 
 	syncLock sync.Mutex
 	db       dal.Backend
 }
 
-func NewTaskCachedService(remoteSvc TaskService, accountSvc AccountService, db dal.Backend) TaskCachedService {
+func NewTaskCachedService(remoteSvc *taskService, accountSvc AccountService, db dal.Backend) TaskCachedService {
 	return &taskCachedService{remoteSvc: remoteSvc, accountSvc: accountSvc, db: db}
 }
 
@@ -89,7 +89,7 @@ func (s *taskCachedService) PartialSync(lastEditTime *int32) error {
 }
 
 func (s *taskCachedService) FindById(id int64) (*models.Task, error) {
-	all, err := s.ListAll()
+	all, _, err := s.ListAll()
 	if err != nil {
 		return nil, err
 	}
@@ -151,26 +151,26 @@ func (s *taskCachedService) listChanged(lastEditTime *int32) ([]*models.Task, er
 	return all, nil
 }
 
-func (s *taskCachedService) ListAll() ([]*models.Task, error) {
+func (s *taskCachedService) ListAll() ([]*models.Task, int, error) {
 	all, err := s.db.List(TaskBucket)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	var ts []*models.Task
 	for _, v := range all {
 		var t models.Task
 		err = json.Unmarshal(v, &t)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		ts = append(ts, &t)
 	}
-	return ts, nil
+	return ts, len(all), nil
 }
 
 func (s *taskCachedService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
 	// TODO test
-	all, err := s.ListAll()
+	all, _, err := s.ListAll()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -228,8 +228,8 @@ func (s *taskCachedService) ListAllByQuery(query *queries.TaskListQuery) ([]*mod
 	return ts, nil
 }
 
-func (s *taskCachedService) Create(name string) (*models.Task, error) {
-	created, err := s.remoteSvc.Create(name)
+func (s *taskCachedService) Create(title string) (*models.Task, error) {
+	created, err := s.remoteSvc.Create(title)
 	if err != nil {
 		return nil, err
 	}

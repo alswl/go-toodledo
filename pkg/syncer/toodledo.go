@@ -8,14 +8,14 @@ import (
 	"time"
 )
 
-type ToodledoSyncer interface {
+type ToodledoFetcher interface {
 	Start(context.Context)
 	Stop()
 	sync() error
 	SyncOnce() error
 }
 
-type toodledoSyncer struct {
+type toodledoFetcher struct {
 	Syncer
 	log *logrus.Logger
 
@@ -33,8 +33,8 @@ func NewToodledoSyncer(
 	goalSvc services.GoalCachedService,
 	taskSvc services.TaskCachedService,
 	contextSvc services.ContextCachedService,
-	backend dal.Backend) (ToodledoSyncer, error) {
-	ts := toodledoSyncer{
+	backend dal.Backend) (ToodledoFetcher, error) {
+	ts := toodledoFetcher{
 		log:        logrus.New(),
 		folderSvc:  folderSvc,
 		contextSvc: contextSvc,
@@ -47,11 +47,11 @@ func NewToodledoSyncer(
 	return &ts, nil
 }
 
-func (s *toodledoSyncer) SyncOnce() error {
+func (s *toodledoFetcher) SyncOnce() error {
 	return s.sync()
 }
 
-func (s *toodledoSyncer) sync() error {
+func (s *toodledoFetcher) sync() error {
 	// TODO remove duplicated call
 	me, _ := s.accountSvc.Me()
 	lastSyncInfo, err := s.accountSvc.GetLastSyncInfo()

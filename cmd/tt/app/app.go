@@ -1,73 +1,99 @@
 package app
 
 import (
+	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/cmd/tt/components"
-	"github.com/alswl/go-toodledo/cmd/tt/components/sidebar"
-	"github.com/alswl/go-toodledo/cmd/tt/components/statusbar"
+	comsidebar "github.com/alswl/go-toodledo/cmd/tt/components/sidebar"
+	comstatusbar "github.com/alswl/go-toodledo/cmd/tt/components/statusbar"
 	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
 	"github.com/alswl/go-toodledo/cmd/tt/mockdata"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
-	"github.com/alswl/go-toodledo/cmd/tt/utils"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
+	"github.com/alswl/go-toodledo/pkg/utils"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/evertras/bubble-table/table"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
-	"os"
 )
+
+var allModels = []string{
+	"tasks",
+	"sidebar",
+	"statusbar",
+}
+var supportModels = []string{
+	"tasks",
+	"sidebar",
+	//"statusB",
+}
 
 type States struct {
 	// Tasks is available tasks
-	Tasks []*models.RichTask
+	Tasks    []*models.RichTask
+	Contexts []models.Context
 	// XXX
 	Filter string
 }
 
 type Model struct {
-	keys utils.KeyMap
-	err  error
-	//config
-	data   []*models.RichTask
-	states *States
+	// properties
+	// TODO
 
+	// states TODO
+	states   *States
+	err      error
+	focused  string
+	tabIndex int
+	// TODO ready check
+	ready bool
+	//isSidebarOpen bool
+
+	// view
 	tasksPane taskspane.Model
-	sidebar   sidebar.Model
-	statusBar statusbar.Model
-
-	allModels []string
-	focused   string
-
-	tabSupportModels []string
-	tabIndex         int
-
+	sidebar   comsidebar.Model
+	statusBar comstatusbar.Model
 	// TODO help pane
 	//help          help.Model
-	// TODO ready check
-	ready         bool
-	isSidebarOpen bool
-	width         int
-	//filterWindow  FilterFormModel
-	//tabs            tabs.Model
-	//context         context.ProgramContext
 	isInputting bool
 }
 
-func (m Model) Init() tea.Cmd {
+func (m *Model) Init() tea.Cmd {
+	contextSvc, err := injector.InitContextCachedService()
+	if err != nil {
+		m.err = err
+		return nil
+	}
+	cs, err := contextSvc.ListAll()
+	if err != nil {
+		m.err = err
+		return nil
+	}
+	m.states.Contexts = utils.UnwrapListPointer(cs)
+	m.sidebar, _ = m.sidebar.UpdateX(utils.UnwrapListPointer(cs))
+
+	m.initTasks()
+	m.tasksPane, _ = m.tasksPane.UpdateX(m.states.Tasks)
+
 	return nil
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+// Update the Model states, this Model is only one instance and global using
+func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// process logics
 	// 1. global keymap
-	// 2. input TODO input is one of focuesd component?
+	// 2. input TODO input is one of focused component?
 	// 3. focused component
 
+	var cmd tea.Cmd
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		// TODO keymap
+	case tea.WindowSizeMsg:
+		sideBarWidth := msg.Width / 12 * 3
+		m.sidebar.Resize(sideBarWidth, msg.Height-1)
+		m.tasksPane.Resize(msg.Width-sideBarWidth, msg.Height-1)
+		m.statusBar.Resize(msg.Width, 0)
+	case tea.KeyMsg: // handle event bubble
 		// 1. global keymap
 		if funk.ContainsString([]string{"ctrl+c"}, msg.String()) {
 			switch msg.String() {
@@ -76,34 +102,28 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
-		// 2. app mode
+		// 2. main app
 		if !m.isInputting {
 			switch msg.String() {
 			case "tab":
-				// TODO refactor, switch with keymap
-				// loopTabFocus change the model fields(isFocused)
-				m.loopTabFocus()
-				return m, nil
+				// change the model fields(isFocused)
+				m.loopFocus()
+				return m, cmd
 			}
 		}
 
-		// 3. sub component
-		return m.updateFocusedModel(msg)
+		// 3. sub focused component
+		m, cmd = m.updateFocusedModel(msg)
 
 		// normal keypress
-	case tea.WindowSizeMsg:
-		sideBarWidth := msg.Width / 12 * 3
-		m.sidebar.Resize(sideBarWidth, msg.Height-1)
-		m.tasksPane.Resize(msg.Width-sideBarWidth, msg.Height-1)
-		m.statusBar.Resize(msg.Width, 0)
 	}
-	return m, nil
+	return m, cmd
 }
 
-func (m Model) View() string {
-	// TODO error handling
+func (m *Model) View() string {
 	if m.err != nil {
-		return m.err.Error()
+		m.statusBar.SetMode("ERROR")
+		m.statusBar.SetStatus(m.err.Error())
 	}
 
 	return styles.MainPaneStyle.Render(
@@ -119,24 +139,18 @@ func (m Model) View() string {
 	)
 }
 
-func (m Model) GetStates() States {
-	return *m.states
-}
-
-func (m *Model) loopTabFocus() {
-	if !funk.ContainsString(m.tabSupportModels, m.focused) {
+func (m *Model) loopFocus() {
+	if !funk.ContainsString(supportModels, m.focused) {
 		return
 	}
 
-	//m.getFocusedModelF().Blur()
-	//old := m.tabSupportModels[m.tabIndex]
-	m.tabIndex = (m.tabIndex + 1) % len(m.tabSupportModels)
-	new := m.tabSupportModels[m.tabIndex]
+	m.tabIndex = (m.tabIndex + 1 + len(supportModels)) % len(supportModels)
+	new := supportModels[m.tabIndex]
 	m.focus(new)
 }
 
 func (m *Model) getFocusedModelF() components.FocusableInterface {
-	name := m.tabSupportModels[m.tabIndex]
+	name := supportModels[m.tabIndex]
 	switch name {
 	case "tasks":
 		return &m.tasksPane
@@ -172,7 +186,7 @@ func (m *Model) focusStatusBar() {
 	m.focus("statusbar")
 }
 
-func (m Model) updateFocusedModel(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
+func (m *Model) updateFocusedModel(msg tea.KeyMsg) (*Model, tea.Cmd) {
 	var newM tea.Model
 	var cmd tea.Cmd
 	mm := m.getFocusedModel()
@@ -190,13 +204,13 @@ func (m Model) updateFocusedModel(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.tasksPane = newM.(taskspane.Model)
 		}
 		return m, cmd
-	case sidebar.Model:
+	case comsidebar.Model:
 		newM, cmd = mm.Update(msg)
-		m.sidebar = newM.(sidebar.Model)
+		m.sidebar = newM.(comsidebar.Model)
 		return m, cmd
-	case statusbar.Model:
+	case comstatusbar.Model:
 		newM, cmd = mm.Update(msg)
-		m.statusBar = newM.(statusbar.Model)
+		m.statusBar = newM.(comstatusbar.Model)
 		m.tasksPane.Filter(m.statusBar.GetFilterInput())
 
 		// post action
@@ -210,13 +224,48 @@ func (m Model) updateFocusedModel(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-//func (m *Model) SetInputting(is bool) {
-//	m.isInputting = is
-//}
+func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
+	m.statusBar.SetStatus("tab: " + tab + " item: " + item.Title())
+	svc, err := injector.InitTaskCachedService()
+	if err != nil {
+		m.statusBar.SetStatus("ERROR: " + err.Error())
+	}
+	taskRichSvc, err := injector.InitTaskRichService()
+	if err != nil {
+		m.statusBar.SetStatus("ERROR: " + err.Error())
+	}
+	query := &queries.TaskListQuery{}
+	if tab == "Contexts" {
+		query.ContextID = item.ID()
+	}
+	tasks, err := svc.ListAllByQuery(query)
+	if err != nil {
+		m.statusBar.SetStatus("ERROR: " + err.Error())
+	}
+	rts, _ := taskRichSvc.RichThem(tasks)
+	m.states.Tasks = rts
+	m.tasksPane, _ = m.tasksPane.UpdateX(m.states.Tasks)
+	m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
 
-//func (m Model) IsInputting() bool {
-//	return m.isInputting
-//}
+	return nil
+}
+
+func (m Model) initTasks() {
+	var tasks []*models.RichTask
+	var err error
+	//if os.Getenv("MOCK") == "true" {
+	tasks, err = mockdata.AllTasksMock()
+	//} else {
+	//	// FIXME query tasks with filter
+	//	tasks, err = AllTasks()
+	//}
+	if err != nil {
+		m.err = err
+		return
+	}
+
+	m.states.Tasks = tasks
+}
 
 // FIXME using daemon syncer
 // nolint:deadcode
@@ -259,59 +308,39 @@ func AllTasks() ([]*models.RichTask, error) {
 	return rts, nil
 }
 
-func InitialModel() Model {
+func InitialModel() *Model {
 	var err error
-	var tasks []*models.RichTask
-	if os.Getenv("MOCK") == "true" {
-		tasks, err = mockdata.AllTasksMock()
-	} else {
-		tasks, err = AllTasks()
-	}
 	if err != nil {
 		// FIXME
 		panic(err)
 	}
+	_, err = injector.InitApp()
+	if err != nil {
+		panic(err)
+	}
 
-	// FIXME move tables km to model
-	keys := table.DefaultKeyMap()
-	keys.RowDown.SetKeys("j", "down")
-	keys.RowUp.SetKeys("k", "up")
+	states := &States{}
 
-	statusB := statusbar.NewDefault()
-	// XXX ?
-	statusB.SetContent("tasks", "a fox jumped over the lazy dog", "1/999", "PAUSE")
+	statusBar := comstatusbar.NewDefault()
+	statusBar.SetMode("tasks")
+	statusBar.SetStatus("a fox jumped over the lazy dog")
+	statusBar.SetInfo1("1/999")
+	statusBar.SetInfo2("HELP")
 
 	// FIXME tasks should comes from syncer
-	tp := taskspane.InitModel(tasks)
-	sb := sidebar.InitModel()
+	taskPane := taskspane.InitModel(states.Tasks)
+
 	m := Model{
-		tasksPane: tp,
-		sidebar:   sb,
-		statusBar: statusB,
-		tabSupportModels: []string{
-			"tasks",
-			"sidebar",
-			//"statusB",
-		},
-		allModels: []string{
-			"tasks",
-			"sidebar",
-			"statusbar",
-		},
-		//allFocusableModels: []components.FocusableInterface{
-		//	&tp,
-		//	&sb,
-		//},
-		//allModels: []tea.Model{
-		//	&tp,
-		//	&sb,
-		//},
+		tasksPane: taskPane,
+		statusBar: statusBar,
+		states:    states,
 	}
+	sb := comsidebar.InitModel(comsidebar.Properties{}, m.OnItemChange)
+	m.sidebar = sb
 	// FIXME focus as an method
-	//m.av = "tasks"
 	m.tabIndex = 0
 	m.focused = "tasks"
 	m.tasksPane.Focus()
 
-	return m
+	return &m
 }
