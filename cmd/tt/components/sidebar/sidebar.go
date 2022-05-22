@@ -47,6 +47,7 @@ type Model struct {
 	currentTabIndex int
 	currentTab      string
 	Contexts        []models.Context
+	Folders         []models.Folder
 
 	// view
 	// list has states(selected)
@@ -54,7 +55,7 @@ type Model struct {
 	folderList  list.Model
 
 	// handler
-	onChange func(tab string, item Item) error
+	onItemChange func(tab string, item Item) error
 }
 
 func (m Model) Init() tea.Cmd {
@@ -84,9 +85,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				title: c.Name,
 			})
 		}
+	case []models.Folder:
+		m.Folders = msg
+		for i, _ := range m.folderList.Items() {
+			m.folderList.RemoveItem(i)
+		}
+		for _, c := range m.Folders {
+			m.folderList.InsertItem(-1, Item{
+				id:    c.ID,
+				title: c.Name,
+			})
+		}
 	case tea.KeyMsg:
 		changed := false
-		var newItem Item
+		var newItem = Item{id: 0}
 		switch msg.String() {
 		case "h":
 			m.updateTab(-1)
@@ -110,7 +122,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 		if changed {
-			m.onChange(defaultTabs[m.currentTabIndex], newItem)
+			m.onItemChange(defaultTabs[m.currentTabIndex], newItem)
 		}
 	}
 
@@ -187,14 +199,14 @@ func (m *Model) Resize(width, height int) {
 }
 
 func InitModel(p Properties,
-	onChange func(tab string, item Item) error,
+	onItemChange func(tab string, item Item) error,
 ) Model {
 
 	m := Model{
 		properties:      p,
 		isCollapsed:     false,
 		currentTabIndex: 0,
-		onChange:        onChange,
+		onItemChange:    onItemChange,
 		contextList:     common.NewSimpleList(),
 		folderList:      common.NewSimpleList(),
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/common"
+	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/alswl/go-toodledo/pkg/syncer"
@@ -13,6 +14,7 @@ import (
 var IntegrationTestSet = wire.NewSet(
 	common.NewCliConfigForTesting,
 	common.NewConfigCliConfig,
+	logging.ProvideLogger,
 
 	dal.ProvideBackend,
 	client.NewToodledo,

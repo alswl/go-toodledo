@@ -10,7 +10,8 @@ import (
 )
 
 type TaskListQuery struct {
-	Title     string
+	Title string
+	// FIXME how to present no content?
 	ContextID int64
 	FolderID  int64
 	GoalID    int64

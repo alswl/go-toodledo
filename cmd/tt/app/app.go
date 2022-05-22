@@ -7,37 +7,43 @@ import (
 	comsidebar "github.com/alswl/go-toodledo/cmd/tt/components/sidebar"
 	comstatusbar "github.com/alswl/go-toodledo/cmd/tt/components/statusbar"
 	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
-	"github.com/alswl/go-toodledo/cmd/tt/mockdata"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
+	"github.com/alswl/go-toodledo/pkg/services"
+	"github.com/alswl/go-toodledo/pkg/syncer"
 	"github.com/alswl/go-toodledo/pkg/utils"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
 )
 
-var allModels = []string{
-	"tasks",
-	"sidebar",
-	"statusbar",
-}
-var supportModels = []string{
-	"tasks",
-	"sidebar",
-	//"statusB",
-}
+var (
+	allModels = []string{
+		"tasks",
+		"sidebar",
+		"statusbar",
+	}
+	supportModels = []string{
+		"tasks",
+		"sidebar",
+	}
+)
 
 type States struct {
 	// Tasks is available tasks
 	Tasks    []*models.RichTask
-	Contexts []models.Context
-	// XXX
-	Filter string
+	Contexts []*models.Context
+	Folders  []*models.Folder
+	query    *queries.TaskListQuery
 }
 
 type Model struct {
+	taskRichSvc services.TaskRichService
+	contextSvc  services.ContextCachedService
+	folderSvc   services.FolderCachedService
+	taskSvc     services.TaskCachedService
+
 	// properties
 	// TODO
 
@@ -57,29 +63,61 @@ type Model struct {
 	// TODO help pane
 	//help          help.Model
 	isInputting bool
+	syncer      syncer.ToodledoFetcher
 }
 
 func (m *Model) Init() tea.Cmd {
-	contextSvc, err := injector.InitContextCachedService()
-	if err != nil {
-		m.err = err
-		return nil
-	}
-	cs, err := contextSvc.ListAll()
-	if err != nil {
-		m.err = err
-		return nil
-	}
-	m.states.Contexts = utils.UnwrapListPointer(cs)
-	m.sidebar, _ = m.sidebar.UpdateX(utils.UnwrapListPointer(cs))
+	var cmds []tea.Cmd
 
-	m.initTasks()
-	m.tasksPane, _ = m.tasksPane.UpdateX(m.states.Tasks)
+	cmds = append(cmds, func() tea.Msg {
+		cs, err := m.contextSvc.ListAll()
+		if err != nil {
+			m.err = err
+			return nil
+		}
+		fs, err := m.folderSvc.ListAll()
+		if err != nil {
+			m.err = err
+			return nil
+		}
 
-	return nil
+		// Contexts are first tab in sidebar
+		m.states.Contexts = cs
+		m.sidebar, _ = m.sidebar.UpdateX(utils.UnwrapListPointer(cs))
+		if len(m.states.Contexts) > 0 {
+			// using default first now TODO add non-context item
+			m.states.query.ContextID = m.states.Contexts[0].ID
+		}
+
+		// folders
+		m.states.Folders = fs
+		m.sidebar, _ = m.sidebar.UpdateX(utils.UnwrapListPointer(fs))
+
+		// tasks
+		tasks, err := m.taskSvc.ListAllByQuery(m.states.query)
+		if err != nil {
+			m.statusBar.SetStatus("ERROR: " + err.Error())
+		}
+		rts, _ := m.taskRichSvc.RichThem(tasks)
+		m.states.Tasks = rts
+		m.tasksPane, _ = m.tasksPane.UpdateX(m.states.Tasks)
+		m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
+
+		return nil
+	})
+	cmds = append(cmds, func() tea.Msg {
+		m.statusBar.SetInfo1("syncing")
+		err := m.syncer.SyncOnce()
+		if err != nil {
+			m.statusBar.SetStatus("ERROR: " + err.Error())
+		}
+		m.statusBar.SetInfo1("done")
+		return nil
+	})
+
+	return tea.Batch(cmds...)
 }
 
-// Update the Model states, this Model is only one instance and global using
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// process logics
 	// 1. global keymap
@@ -234,11 +272,31 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	if err != nil {
 		m.statusBar.SetStatus("ERROR: " + err.Error())
 	}
-	query := &queries.TaskListQuery{}
-	if tab == "Contexts" {
-		query.ContextID = item.ID()
+	switch tab {
+	case "Contexts":
+		m.states.query = &queries.TaskListQuery{}
+		if item.ID() == 0 && len(m.states.Contexts) > 0 {
+			if len(m.states.Contexts) == 0 {
+				// TODO None folder impl
+			} else {
+				m.states.query.ContextID = m.states.Contexts[0].ID
+			}
+		} else {
+			m.states.query.ContextID = item.ID()
+		}
+	case "Folders":
+		m.states.query = &queries.TaskListQuery{}
+		if item.ID() == 0 {
+			if len(m.states.Folders) == 0 {
+				// TODO None folder impl
+			} else {
+				m.states.query.FolderID = m.states.Folders[0].ID
+			}
+		} else {
+			m.states.query.FolderID = item.ID()
+		}
 	}
-	tasks, err := svc.ListAllByQuery(query)
+	tasks, err := svc.ListAllByQuery(m.states.query)
 	if err != nil {
 		m.statusBar.SetStatus("ERROR: " + err.Error())
 	}
@@ -248,64 +306,6 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
 
 	return nil
-}
-
-func (m Model) initTasks() {
-	var tasks []*models.RichTask
-	var err error
-	//if os.Getenv("MOCK") == "true" {
-	tasks, err = mockdata.AllTasksMock()
-	//} else {
-	//	// FIXME query tasks with filter
-	//	tasks, err = AllTasks()
-	//}
-	if err != nil {
-		m.err = err
-		return
-	}
-
-	m.states.Tasks = tasks
-}
-
-// FIXME using daemon syncer
-// nolint:deadcode
-func AllTasks() ([]*models.RichTask, error) {
-	_, err := injector.InitApp()
-	if err != nil {
-		logrus.Fatal("login required, using `toodledo auth login` to login.")
-		return nil, err
-	}
-	svc, err := injector.InitTaskCachedService()
-	if err != nil {
-		logrus.WithError(err).Fatal("failed to init task service")
-		return nil, err
-	}
-	syncer, err := injector.InitSyncer()
-	if err != nil {
-		logrus.WithError(err).Fatal("init syncer failed")
-		return nil, err
-	}
-	taskRichSvc, err := injector.InitTaskRichService()
-	if err != nil {
-		logrus.WithError(err).Fatal("init task rich service failed")
-		return nil, err
-	}
-	err = syncer.SyncOnce()
-	if err != nil {
-		logrus.WithError(err).Fatal("sync failed")
-		return nil, err
-	}
-	tasks, err := svc.ListAllByQuery(&queries.TaskListQuery{})
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	rts, err := taskRichSvc.RichThem(tasks)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-	return rts, nil
 }
 
 func InitialModel() *Model {
@@ -318,8 +318,33 @@ func InitialModel() *Model {
 	if err != nil {
 		panic(err)
 	}
+	taskSvc, err := injector.InitTaskCachedService()
+	if err != nil {
+		panic(err)
+	}
+	taskRichSvc, err := injector.InitTaskRichService()
+	if err != nil {
+		panic(err)
+	}
+	contextSvc, err := injector.InitContextCachedService()
+	if err != nil {
+		panic(err)
+	}
+	folderSvc, err := injector.InitFolderCachedService()
+	if err != nil {
+		panic(err)
+	}
+	syncer, err := injector.InitSyncer()
+	if err != nil {
+		panic(err)
+	}
 
-	states := &States{}
+	states := &States{
+		Tasks:    []*models.RichTask{},
+		Contexts: []*models.Context{},
+		Folders:  []*models.Folder{},
+		query:    &queries.TaskListQuery{},
+	}
 
 	statusBar := comstatusbar.NewDefault()
 	statusBar.SetMode("tasks")
@@ -331,15 +356,22 @@ func InitialModel() *Model {
 	taskPane := taskspane.InitModel(states.Tasks)
 
 	m := Model{
-		tasksPane: taskPane,
-		statusBar: statusBar,
-		states:    states,
+		taskRichSvc: taskRichSvc,
+		contextSvc:  contextSvc,
+		folderSvc:   folderSvc,
+		taskSvc:     taskSvc,
+		syncer:      syncer,
+		states:      states,
+		err:         nil,
+		focused:     "tasks",
+		tabIndex:    0,
+		ready:       false,
+		tasksPane:   taskPane,
+		statusBar:   statusBar,
+		isInputting: false,
 	}
-	sb := comsidebar.InitModel(comsidebar.Properties{}, m.OnItemChange)
-	m.sidebar = sb
+	m.sidebar = comsidebar.InitModel(comsidebar.Properties{}, m.OnItemChange)
 	// FIXME focus as an method
-	m.tabIndex = 0
-	m.focused = "tasks"
 	m.tasksPane.Focus()
 
 	return &m

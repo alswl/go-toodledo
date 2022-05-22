@@ -10,6 +10,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/common"
+	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/alswl/go-toodledo/pkg/syncer"
@@ -305,7 +306,8 @@ func InitSyncer() (syncer.ToodledoFetcher, error) {
 	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
-	toodledoFetcher, err := syncer.NewToodledoSyncer(folderCachedService, accountService, goalCachedService, taskCachedService, contextCachedService, backend)
+	logger := logging.ProvideLogger()
+	toodledoFetcher, err := syncer.NewToodledoSyncer(folderCachedService, accountService, goalCachedService, taskCachedService, contextCachedService, backend, logger)
 	if err != nil {
 		return nil, err
 	}

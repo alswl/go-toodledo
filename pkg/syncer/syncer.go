@@ -22,9 +22,9 @@ type simpleSyncerWrapper struct {
 	fn  func() error
 }
 
-func NewSimpleSyncer(interval time.Duration, fn func() error) Syncer {
+func NewSimpleSyncer(interval time.Duration, fn func() error, logger *logrus.Logger) Syncer {
 	stop := make(chan struct{})
-	return &simpleSyncerWrapper{ticker: time.NewTicker(interval), stop: stop, log: logrus.New(), fn: fn}
+	return &simpleSyncerWrapper{ticker: time.NewTicker(interval), stop: stop, log: logger, fn: fn}
 }
 
 func (s *simpleSyncerWrapper) run(ctx context.Context) {
