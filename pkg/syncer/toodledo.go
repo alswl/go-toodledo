@@ -33,7 +33,8 @@ func NewToodledoSyncer(
 	goalSvc services.GoalCachedService,
 	taskSvc services.TaskCachedService,
 	contextSvc services.ContextCachedService,
-	backend dal.Backend, logger *logrus.Logger) (ToodledoFetcher, error) {
+	backend dal.Backend,
+	logger *logrus.Logger) (ToodledoFetcher, error) {
 	ts := toodledoFetcher{
 		log:        logrus.New(),
 		folderSvc:  folderSvc,
