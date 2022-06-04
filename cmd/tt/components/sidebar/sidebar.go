@@ -5,6 +5,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/tt/components/common"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/models/constants"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -24,9 +25,9 @@ func (i Item) Description() string { return "" }
 func (i Item) FilterValue() string { return i.title }
 
 var defaultTabs = []string{
-	"Contexts",
-	"Folders",
-	//"Goals",
+	constants.Contexts,
+	constants.Folders,
+	constants.Goals,
 	//"Priority",
 	//"Tags",
 	//"Search",
@@ -48,11 +49,13 @@ type Model struct {
 	currentTab      string
 	Contexts        []models.Context
 	Folders         []models.Folder
+	Goals           []models.Goal
 
 	// view
 	// list has states(selected)
 	contextList list.Model
 	folderList  list.Model
+	goalList    list.Model
 
 	// handler
 	onItemChange func(tab string, item Item) error
@@ -92,6 +95,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		for _, c := range m.Folders {
 			m.folderList.InsertItem(-1, Item{
+				id:    c.ID,
+				title: c.Name,
+			})
+		}
+	case []models.Goal:
+		m.Goals = msg
+		for i, _ := range m.goalList.Items() {
+			m.goalList.RemoveItem(i)
+		}
+		for _, c := range m.Goals {
+			m.goalList.InsertItem(-1, Item{
 				id:    c.ID,
 				title: c.Name,
 			})
@@ -143,10 +157,12 @@ func (m *Model) getVisibleList() *list.Model {
 	var list *list.Model
 
 	switch tab {
-	case "Contexts":
+	case constants.Contexts:
 		list = &m.contextList
-	case "Folders":
+	case constants.Folders:
 		list = &m.folderList
+	case constants.Goals:
+		list = &m.goalList
 	default:
 		panic("unknown tab")
 	}
@@ -158,10 +174,12 @@ func (m *Model) updateVisibleList(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 
 	switch tab {
-	case "Contexts":
+	case constants.Contexts:
 		m.contextList, cmd = m.contextList.Update(msg)
-	case "Folders":
+	case constants.Folders:
 		m.folderList, cmd = m.folderList.Update(msg)
+	case constants.Goals:
+		m.goalList, cmd = m.goalList.Update(msg)
 	}
 	return cmd
 }
@@ -209,6 +227,7 @@ func InitModel(p Properties,
 		onItemChange:    onItemChange,
 		contextList:     common.NewSimpleList(),
 		folderList:      common.NewSimpleList(),
+		goalList:        common.NewSimpleList(),
 	}
 	//if len(m.list.Items()) > 0 {
 	//	m.list.Select(0)
