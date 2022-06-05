@@ -27,6 +27,10 @@ func NewTaskRichService(taskSvc TaskService, folderSvc FolderCachedService, cont
 	return &taskRichService{taskSvc: taskSvc, folderSvc: folderSvc, contextSvc: contextSvc, goalSvc: goalSvc, logger: logger}
 }
 
+func NewTaskRichCachedService(taskSvc TaskCachedService, folderSvc FolderCachedService, contextSvc ContextCachedService, goalSvc GoalCachedService, logger logrus.FieldLogger) TaskRichCachedService {
+	return &taskRichService{taskSvc: taskSvc, folderSvc: folderSvc, contextSvc: contextSvc, goalSvc: goalSvc, logger: logger}
+}
+
 func (s *taskRichService) FindByIdRich(id int64) (*models.RichTask, error) {
 	t, err := s.taskSvc.FindById(id)
 	if err != nil {
