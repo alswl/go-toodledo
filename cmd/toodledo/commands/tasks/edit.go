@@ -22,14 +22,14 @@ var editCmd = &cobra.Command{
 		}
 		svc, err := injector.InitTaskService()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to init task service")
+			logrus.WithError(err).Fatal("init task service")
 			return
 		}
 
 		id, _ := strconv.Atoi(args[0])
 		t, err := svc.FindById(int64(id))
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to find task")
+			logrus.WithError(err).Fatal("find task")
 			return
 		}
 		newT := models.Task{}
@@ -38,7 +38,7 @@ var editCmd = &cobra.Command{
 		//TODO to fields, with opt()
 		newTReturned, err := svc.Edit(int64(id), &newT)
 		if err != nil {
-			logrus.WithField("id", id).WithError(err).Fatal("failed to edit task")
+			logrus.WithField("id", id).WithError(err).Fatal("edit task")
 			return
 		}
 		fmt.Println(render.Tables4Task([]*models.Task{newTReturned}))

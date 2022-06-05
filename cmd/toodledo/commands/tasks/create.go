@@ -43,21 +43,21 @@ func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService, folderSvc s
 	if q.Context != "" {
 		context, err := contextSvc.Find(q.Context)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to find context")
+			return nil, errors.Wrap(err, "find context")
 		}
 		query.ContextID = context.ID
 	}
 	if q.Folder != "" {
 		folder, err := folderSvc.Find(q.Folder)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to find folder")
+			return nil, errors.Wrap(err, "find folder")
 		}
 		query.FolderID = folder.ID
 	}
 	if q.Goal != "" {
 		goal, err := goalSvc.Find(q.Goal)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to find goal")
+			return nil, errors.Wrap(err, "find goal")
 		}
 		query.GoalID = goal.ID
 	}
@@ -134,7 +134,7 @@ var createCmd = &cobra.Command{
 func init() {
 	err := utils.BindFlagsByQuery(createCmd, cmdCreateQuery{})
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to generate flags for command %s", createCmd.Use))
+		panic(errors.Wrapf(err, "generate flags for command %s", createCmd.Use))
 	}
 	//createCmd.Flags().String("title", "", "title of the task")
 }

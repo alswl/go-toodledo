@@ -147,7 +147,7 @@ func regenerate(conf *oauth2.Config, oldToken *oauth2.Token) (*oauth2.Token, err
 	newToken, err := src.Token()
 	if err != nil {
 		logrus.WithField("err", err).Error("regenerate token failed")
-		return nil, fmt.Errorf("failed to get new token: %s", err)
+		return nil, fmt.Errorf("get new token: %s", err)
 	}
 	return newToken, nil
 }

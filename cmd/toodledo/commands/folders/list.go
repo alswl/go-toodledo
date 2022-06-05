@@ -18,7 +18,7 @@ var ListCmd = &cobra.Command{
 		}
 		svc, err := injector.InitFolderCachedService()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to init folder service")
+			logrus.WithError(err).Fatal("init folder service")
 			return
 		}
 		syncer, err := injector.InitSyncer()

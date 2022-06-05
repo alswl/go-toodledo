@@ -201,7 +201,7 @@ func (s *taskService) Delete(id int64) error {
 		return err
 	}
 	if len(failed) > 0 && len(success) == 1 {
-		return fmt.Errorf("failed to delete task %d", id)
+		return fmt.Errorf("delete task %d", id)
 	}
 	return nil
 }
@@ -245,7 +245,7 @@ func (s *taskService) UnComplete(id int64) (*models.Task, error) {
 //if b.folder != "" && query.FolderID == 0 {
 //	folder, err := b.folderSvc.Find(b.folder)
 //	if err != nil {
-//		return errors.Wrap(err, "failed to find folder")
+//		return errors.Wrap(err, "find folder")
 //	}
 //	query.FolderID = folder.ID
 //}
@@ -253,14 +253,14 @@ func (s *taskService) UnComplete(id int64) (*models.Task, error) {
 //if b.context != "" && query.ContextID == 0 {
 //	context, err := b.contextSvc.Find(b.context)
 //	if err != nil {
-//		return errors.Wrap(err, "failed to find context")
+//		return errors.Wrap(err, "find context")
 //	}
 //	query.ContextID = context.ID
 //}
 //if b.goal != "" && query.GoalID == 0 {
 //	goal, err := b.goalSvc.Find(b.goal)
 //	if err != nil {
-//		return errors.Wrap(err, "failed to find goal")
+//		return errors.Wrap(err, "find goal")
 //	}
 //	query.GoalID = goal.ID
 //}
