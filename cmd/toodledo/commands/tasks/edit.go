@@ -144,6 +144,8 @@ var editCmd = &cobra.Command{
 func init() {
 	err := utils.BindFlagsByQuery(editCmd, cmdEditQuery{})
 	if err != nil {
-		panic(errors.Wrapf(err, "generate flags for command %s", editCmd.Use))
+		panic(errors.Wrapf(err, "generate flags for command %s", editorCmd.Use))
 	}
+
+	TaskCmd.AddCommand(editCmd)
 }
