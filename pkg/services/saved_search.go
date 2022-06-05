@@ -26,7 +26,7 @@ func (s *savedSearchService) ListAll() ([]*models.SavedSearch, error) {
 	p := saved_search.NewGetTasksSearchPhpParams()
 	resp, err := s.cli.SavedSearch.GetTasksSearchPhp(p, s.auth)
 	if err != nil {
-		logrus.WithField("resp", resp).WithError(err).Error("Failed to list all saved searches")
+		logrus.WithField("resp", resp).WithError(err).Error("list all saved searches")
 		return nil, err
 	}
 	var list []*models.SavedSearch

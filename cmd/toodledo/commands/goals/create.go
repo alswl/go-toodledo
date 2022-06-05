@@ -20,7 +20,7 @@ var CreateCmd = &cobra.Command{
 		}
 		svc, err := injector.InitGoalService()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to init goals service")
+			logrus.WithError(err).Fatal("init goals service")
 			return
 		}
 		name := args[0]

@@ -36,7 +36,7 @@ func (q *cmdListQuery) PrepareIDs(contextSvc services.ContextService, goalSvc se
 		// TODO case sensitive
 		c, err := contextSvc.Find(q.Context)
 		if err != nil {
-			return errors.Wrap(err, "failed to get context by name")
+			return errors.Wrap(err, "get context by name")
 		}
 		q.ContextID = c.ID
 	}
@@ -44,7 +44,7 @@ func (q *cmdListQuery) PrepareIDs(contextSvc services.ContextService, goalSvc se
 		// TODO case sensitive
 		f, err := folderSvc.Find(q.Folder)
 		if err != nil {
-			return errors.Wrap(err, "failed to get folder by name")
+			return errors.Wrap(err, "get folder by name")
 		}
 		q.FolderID = f.ID
 	}
@@ -52,7 +52,7 @@ func (q *cmdListQuery) PrepareIDs(contextSvc services.ContextService, goalSvc se
 		// TODO case sensitive
 		g, err := goalSvc.Find(q.Goal)
 		if err != nil {
-			return errors.Wrap(err, "failed to get goal by name")
+			return errors.Wrap(err, "get goal by name")
 		}
 		q.GoalID = g.ID
 	}
@@ -100,22 +100,22 @@ var listCmd = &cobra.Command{
 		}
 		svc, err := injector.InitTaskCachedService()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to init task service")
+			logrus.WithError(err).Fatal("init task service")
 			return
 		}
 		contextSvc, err := injector.InitContextCachedService()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to init context service")
+			logrus.WithError(err).Fatal("init context service")
 			return
 		}
 		folderSvc, err := injector.InitFolderCachedService()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to init folder service")
+			logrus.WithError(err).Fatal("init folder service")
 			return
 		}
 		goalSvc, err := injector.InitGoalCachedService()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to init goal service")
+			logrus.WithError(err).Fatal("init goal service")
 			return
 		}
 		syncer, err := injector.InitSyncer()
@@ -156,6 +156,6 @@ var listCmd = &cobra.Command{
 func init() {
 	err := utils.BindFlagsByQuery(listCmd, cmdListQuery{})
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to generate flags for command %s", listCmd.Use))
+		panic(errors.Wrapf(err, "generate flags for command %s", listCmd.Use))
 	}
 }

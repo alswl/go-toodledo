@@ -15,6 +15,7 @@ var SuperSet = wire.NewSet(
 	common.NewCliConfigFromViper,
 	common.NewConfigCliConfig,
 	logging.ProvideLogger,
+	logging.ProvideLoggerItf,
 
 	dal.ProvideBackend,
 	client.NewToodledo,
@@ -34,11 +35,10 @@ var SuperSet = wire.NewSet(
 	services.NewGoalService,
 	services.NewGoalCachedService,
 	services.NewSavedSearchService,
+	services.NewTaskRichCachedService,
 
 	// wire not support generic now
 	//informers.ProvideTaskInformer,
-
-	services.NewTaskRichService,
 
 	syncer.NewToodledoSyncer,
 	app.NewToodledoCliApp,

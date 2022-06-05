@@ -37,8 +37,8 @@ func init() {
 
 	_ = viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 
-	rootCmd.AddCommand(tasks.TaskCmd, folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd,
-		savedsearches.SavedSearchCmd,
+	rootCmd.AddCommand(tasks.TaskCmd,
+		folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd, savedsearches.SavedSearchCmd,
 		auth.AuthCmd, configs.ConfigCmd, completionCmd)
 }
 
@@ -50,7 +50,8 @@ func initConfig() {
 		// Find home directory.
 		home, err := os.UserHomeDir()
 		if err != nil {
-			panic(err)
+			_, _ = fmt.Fprintln(os.Stderr, err)
+			return
 		}
 
 		// Search config in home directory with name ".toodledo" (without extension).
@@ -68,7 +69,7 @@ func initConfig() {
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }

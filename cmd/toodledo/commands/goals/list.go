@@ -18,12 +18,12 @@ var ListCmd = &cobra.Command{
 		}
 		svc, err := injector.InitGoalService()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to init goals service")
+			logrus.WithError(err).Fatal("init goals service")
 			return
 		}
 		all, err := svc.ListAll()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to list goals")
+			logrus.WithError(err).Fatal("list goals")
 			return
 		}
 

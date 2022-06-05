@@ -134,7 +134,7 @@ func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 			if f.Type == reflect.TypeOf(time.Time{}) {
 				get, err := cmd.Flags().GetString(name)
 				if err != nil {
-					return errors.Wrapf(err, "failed to get %s", name)
+					return errors.Wrapf(err, "get %s", name)
 				}
 				parsed, err := time.ParseInLocation("2006-01-02", get, ChinaTimeZone)
 				// if err, not set value
@@ -147,31 +147,31 @@ func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 		case reflect.Bool:
 			get, err := cmd.Flags().GetBool(name)
 			if err != nil {
-				return errors.Wrapf(err, "failed to get %s", name)
+				return errors.Wrapf(err, "get %s", name)
 			}
 			v.SetBool(get)
 		case reflect.Int:
 			get, err := cmd.Flags().GetInt(name)
 			if err != nil {
-				return errors.Wrapf(err, "failed to get %s", name)
+				return errors.Wrapf(err, "get %s", name)
 			}
 			v.SetInt(int64(get))
 		case reflect.Int32:
 			get, err := cmd.Flags().GetInt32(name)
 			if err != nil {
-				return errors.Wrapf(err, "failed to get %s", name)
+				return errors.Wrapf(err, "get %s", name)
 			}
 			v.Set(reflect.ValueOf(get))
 		case reflect.Int64:
 			get, err := cmd.Flags().GetInt64(name)
 			if err != nil {
-				return errors.Wrapf(err, "failed to get %s", name)
+				return errors.Wrapf(err, "get %s", name)
 			}
 			v.Set(reflect.ValueOf(get))
 		case reflect.String:
 			get, err := cmd.Flags().GetString(name)
 			if err != nil {
-				return errors.Wrapf(err, "failed to get %s", name)
+				return errors.Wrapf(err, "get %s", name)
 			}
 			v.SetString(get)
 		case reflect.Slice:
@@ -179,25 +179,25 @@ func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 			case reflect.String:
 				get, err := cmd.Flags().GetStringSlice(name)
 				if err != nil {
-					return errors.Wrapf(err, "failed to get %s", name)
+					return errors.Wrapf(err, "get %s", name)
 				}
 				v.Set(reflect.ValueOf(get))
 			case reflect.Int:
 				get, err := cmd.Flags().GetIntSlice(name)
 				if err != nil {
-					return errors.Wrapf(err, "failed to get %s", name)
+					return errors.Wrapf(err, "get %s", name)
 				}
 				v.Set(reflect.ValueOf(get))
 			case reflect.Int32:
 				get, err := cmd.Flags().GetInt32Slice(name)
 				if err != nil {
-					return errors.Wrapf(err, "failed to get %s", name)
+					return errors.Wrapf(err, "get %s", name)
 				}
 				v.Set(reflect.ValueOf(get))
 			case reflect.Int64:
 				get, err := cmd.Flags().GetInt64Slice(name)
 				if err != nil {
-					return errors.Wrapf(err, "failed to get %s", name)
+					return errors.Wrapf(err, "get %s", name)
 				}
 				v.Set(reflect.ValueOf(get))
 			default:

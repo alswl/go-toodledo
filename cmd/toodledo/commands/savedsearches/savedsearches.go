@@ -6,8 +6,5 @@ var SavedSearchCmd = &cobra.Command{
 	Use:     "saved-search",
 	Aliases: []string{"ss"},
 	Short:   "Manage toodledo saved search",
-}
-
-func init() {
-	SavedSearchCmd.AddCommand(ListCmd)
+	// TODO search task by saved-searches
 }

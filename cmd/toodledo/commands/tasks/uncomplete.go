@@ -21,14 +21,14 @@ var uncompleteCmd = &cobra.Command{
 		}
 		svc, err := injector.InitTaskService()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to init task service")
+			logrus.WithError(err).Fatal("init task service")
 			return
 		}
 
 		id, _ := strconv.Atoi(args[0])
 		newTReturned, err := svc.UnComplete(int64(id))
 		if err != nil {
-			logrus.WithField("id", id).WithError(err).Fatal("failed to complete task")
+			logrus.WithField("id", id).WithError(err).Fatal("complete task")
 			return
 		}
 		fmt.Println(render.Tables4Task([]*models.Task{newTReturned}))

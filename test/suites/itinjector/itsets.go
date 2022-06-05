@@ -15,6 +15,7 @@ var IntegrationTestSet = wire.NewSet(
 	common.NewCliConfigForTesting,
 	common.NewConfigCliConfig,
 	logging.ProvideLogger,
+	logging.ProvideLoggerItf,
 
 	dal.ProvideBackend,
 	client.NewToodledo,
@@ -34,11 +35,10 @@ var IntegrationTestSet = wire.NewSet(
 	services.NewGoalService,
 	services.NewGoalCachedService,
 	services.NewSavedSearchService,
+	services.NewTaskRichCachedService,
 
 	// wire not support generic now
 	//informers.ProvideTaskInformer,
-
-	services.NewTaskRichService,
 
 	syncer.NewToodledoSyncer,
 	app.NewToodledoCliApp,

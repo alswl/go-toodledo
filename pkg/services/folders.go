@@ -41,7 +41,7 @@ func (s *folderService) Create(name string) (*models.Folder, error) {
 	params.SetName(name)
 	resp, err := s.cli.Folder.PostFoldersAddPhp(params, s.auth)
 	if err != nil {
-		logrus.WithField("resp", resp).WithError(err).Error("Failed to create")
+		logrus.WithField("resp", resp).WithError(err).Error("create")
 		return nil, err
 	}
 	return resp.Payload[0], nil
@@ -58,7 +58,7 @@ func (s *folderService) Delete(name string) error {
 	params.SetID(f.ID)
 	resp, err := s.cli.Folder.PostFoldersDeletePhp(params, s.auth)
 	if err != nil {
-		logrus.WithField("resp", resp).WithError(err).Error("Failed to delete folder")
+		logrus.WithField("resp", resp).WithError(err).Error("delete folder")
 		return err
 	}
 	return nil

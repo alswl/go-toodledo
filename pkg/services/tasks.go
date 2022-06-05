@@ -29,22 +29,24 @@ type TaskService interface {
 	// DeleteBatch is batch delete tasks, return success ids, failed items and error
 	DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error)
 	Edit(id int64, t *models.Task) (*models.Task, error)
+	EditByQuery(query *queries.TaskEditQuery) (*models.Task, error)
 	Complete(id int64) (*models.Task, error)
 	UnComplete(id int64) (*models.Task, error)
 	ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error)
 }
 
 type taskService struct {
-	cli  *client.Toodledo
-	auth runtime.ClientAuthInfoWriter
+	cli    *client.Toodledo
+	auth   runtime.ClientAuthInfoWriter
+	logger logrus.FieldLogger
 }
 
-func NewTaskService0(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) *taskService {
-	return &taskService{cli: cli, auth: auth}
+func NewTaskService0(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter, logger logrus.FieldLogger) *taskService {
+	return &taskService{cli: cli, auth: auth, logger: logger}
 }
 
-func NewTaskService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) TaskService {
-	return NewTaskService0(cli, auth)
+func NewTaskService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter, logger logrus.FieldLogger) TaskService {
+	return NewTaskService0(cli, auth, logger)
 }
 
 func (s *taskService) ListAll() ([]*models.Task, int, error) {
@@ -138,6 +140,7 @@ func (s *taskService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Tas
 	p := task.NewPostTasksAddPhpParams()
 	p.Tasks = &bytesS
 	p.Fields = &DefaultFieldsInResponse
+	// https://api.toodledo.com/3/tasks/index.php#adding
 	resp, err := s.cli.Task.PostTasksAddPhp(p, s.auth)
 	if err != nil {
 		return nil, err
@@ -201,13 +204,13 @@ func (s *taskService) Delete(id int64) error {
 		return err
 	}
 	if len(failed) > 0 && len(success) == 1 {
-		return fmt.Errorf("failed to delete task %d", id)
+		return fmt.Errorf("delete task %d", id)
 	}
 	return nil
 }
 
-// Edit ...
 func (s *taskService) Edit(id int64, t *models.Task) (*models.Task, error) {
+	t.ID = id
 	bytes, _ := json.Marshal([]models.Task{*t})
 	bytesS := (string)(bytes)
 	p := task.NewPostTasksEditPhpParams()
@@ -216,28 +219,44 @@ func (s *taskService) Edit(id int64, t *models.Task) (*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	// FIXME index
+	if len(resp.Payload) == 0 {
+		s.logger.WithField("id", id).WithField("resp", resp).Debug("edit task by query")
+		return nil, fmt.Errorf("no response, edit task %d", id)
+	}
+	return resp.Payload[0], err
+}
+
+func (s *taskService) EditByQuery(query *queries.TaskEditQuery) (*models.Task, error) {
+	ts := []models.Task{*query.ToModel()}
+	bs, _ := json.Marshal(ts)
+	bsStr := (string)(bs)
+	p := task.NewPostTasksEditPhpParams()
+	p.Tasks = &bsStr
+	p.Fields = &DefaultFieldsInResponse
+	// https://api.toodledo.com/3/tasks/index.php#editing
+	resp, err := s.cli.Task.PostTasksEditPhp(p, s.auth)
+	if err != nil {
+		return nil, err
+	}
 	return resp.Payload[0], err
 }
 
 func (s *taskService) Complete(id int64) (*models.Task, error) {
-	t, err := s.FindById(id)
+	_, err := s.FindById(id)
 	if err != nil {
 		return nil, err
 	}
 	return s.Edit(id, &models.Task{
-		ID:        t.ID,
 		Completed: time.Now().Unix(),
 	})
 }
 
 func (s *taskService) UnComplete(id int64) (*models.Task, error) {
-	t, err := s.FindById(id)
+	_, err := s.FindById(id)
 	if err != nil {
 		return nil, err
 	}
 	return s.Edit(id, &models.Task{
-		ID:        t.ID,
 		Completed: 0,
 	})
 }
@@ -245,7 +264,7 @@ func (s *taskService) UnComplete(id int64) (*models.Task, error) {
 //if b.folder != "" && query.FolderID == 0 {
 //	folder, err := b.folderSvc.Find(b.folder)
 //	if err != nil {
-//		return errors.Wrap(err, "failed to find folder")
+//		return errors.Wrap(err, "find folder")
 //	}
 //	query.FolderID = folder.ID
 //}
@@ -253,14 +272,14 @@ func (s *taskService) UnComplete(id int64) (*models.Task, error) {
 //if b.context != "" && query.ContextID == 0 {
 //	context, err := b.contextSvc.Find(b.context)
 //	if err != nil {
-//		return errors.Wrap(err, "failed to find context")
+//		return errors.Wrap(err, "find context")
 //	}
 //	query.ContextID = context.ID
 //}
 //if b.goal != "" && query.GoalID == 0 {
 //	goal, err := b.goalSvc.Find(b.goal)
 //	if err != nil {
-//		return errors.Wrap(err, "failed to find goal")
+//		return errors.Wrap(err, "find goal")
 //	}
 //	query.GoalID = goal.ID
 //}

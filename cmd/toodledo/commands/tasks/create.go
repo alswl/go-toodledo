@@ -5,6 +5,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
+	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/alswl/go-toodledo/pkg/services"
@@ -15,8 +16,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// cmdCreateQuery present the parameters for the command
-// parse query with cmd
 type cmdCreateQuery struct {
 	// TODO
 	//ContextID int64
@@ -33,38 +32,39 @@ type cmdCreateQuery struct {
 	DueDate string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
 	// TODO
 	// Tags
+	Title string
 }
 
 func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService, folderSvc services.FolderService,
 	goalSvc services.GoalService) (*queries.TaskCreateQuery, error) {
-	var err error
-	var query queries.TaskCreateQuery
+	query := queries.TaskCreateQuery{}
 
 	if q.Context != "" {
 		context, err := contextSvc.Find(q.Context)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to find context")
+			return nil, errors.Wrap(err, "find context")
 		}
 		query.ContextID = context.ID
 	}
 	if q.Folder != "" {
 		folder, err := folderSvc.Find(q.Folder)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to find folder")
+			return nil, errors.Wrap(err, "find folder")
 		}
 		query.FolderID = folder.ID
 	}
 	if q.Goal != "" {
 		goal, err := goalSvc.Find(q.Goal)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to find goal")
+			return nil, errors.Wrap(err, "find goal")
 		}
 		query.GoalID = goal.ID
 	}
-	query.DueDate = q.DueDate
 	query.Priority = tpriority.PriorityString2Type(q.Priority)
+	query.Status = tstatus.StatusString2Type(q.Status)
+	query.DueDate = q.DueDate
 
-	return &query, err
+	return &query, nil
 }
 
 var createCmd = &cobra.Command{
@@ -114,11 +114,11 @@ var createCmd = &cobra.Command{
 			logrus.Fatal(err)
 			return
 		}
+		cmdQ.Title = args[0]
 		q, err := cmdQ.ToQuery(contextSvc, folderSvc, goalSvc)
 		if err != nil {
 			logrus.WithError(err).Fatal("parse query failed")
 		}
-		q.Title = args[0]
 
 		// TODO simple worked
 		t, err := svc.CreateByQuery(q)
@@ -134,7 +134,7 @@ var createCmd = &cobra.Command{
 func init() {
 	err := utils.BindFlagsByQuery(createCmd, cmdCreateQuery{})
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to generate flags for command %s", createCmd.Use))
+		panic(errors.Wrapf(err, "generate flags for command %s", createCmd.Use))
 	}
 	//createCmd.Flags().String("title", "", "title of the task")
 }
