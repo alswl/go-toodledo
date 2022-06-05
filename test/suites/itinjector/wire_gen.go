@@ -265,20 +265,19 @@ func InitTaskRichService() (services.TaskRichService, error) {
 		return nil, err
 	}
 	fieldLogger := logging.ProvideLoggerItf()
-	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
+	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
-	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
 	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
 	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
-	taskRichService := services.NewTaskRichService(taskCachedService, folderCachedService, contextCachedService, goalCachedService, fieldLogger)
+	taskRichService := services.NewTaskRichService(taskService, folderCachedService, contextCachedService, goalCachedService, fieldLogger)
 	return taskRichService, nil
 }
 
@@ -297,20 +296,19 @@ func InitTaskRichCachedService() (services.TaskRichService, error) {
 		return nil, err
 	}
 	fieldLogger := logging.ProvideLoggerItf()
-	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
+	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
 		return nil, err
 	}
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
-	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
 	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
 	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
-	taskRichService := services.NewTaskRichService(taskCachedService, folderCachedService, contextCachedService, goalCachedService, fieldLogger)
+	taskRichService := services.NewTaskRichService(taskService, folderCachedService, contextCachedService, goalCachedService, fieldLogger)
 	return taskRichService, nil
 }
 

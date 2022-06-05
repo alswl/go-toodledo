@@ -3,6 +3,7 @@ package tasks
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
@@ -86,35 +87,15 @@ var editCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		svc, err := injector.InitTaskService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init task service")
-			return
-		}
-		taskRichSvc, err := injector.InitTaskRichService()
-		if err != nil {
-			logrus.WithError(err).Error("init task rich service")
-			return
-		}
-		contextSvc, err := injector.InitContextCachedService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init context service")
-			return
-		}
-		folderSvc, err := injector.InitFolderCachedService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init folder service")
-			return
-		}
-		goalSvc, err := injector.InitGoalCachedService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init goal service")
-			return
-		}
+		taskSvc, _ := injector.InitTaskService()
+		contextSvc, _ := injector.InitContextCachedService()
+		folderSvc, _ := injector.InitFolderCachedService()
+		goalSvc, _ := injector.InitGoalCachedService()
+		taskRichSvc := services.NewTaskRichService(taskSvc, folderSvc, contextSvc, goalSvc, logging.ProvideLogger())
 
 		// fetch task
 		id, _ := strconv.Atoi(args[0])
-		_, err = svc.FindById(int64(id))
+		_, err = taskSvc.FindById(int64(id))
 		if err != nil {
 			logrus.WithError(err).Fatal("find task")
 			return
@@ -132,12 +113,11 @@ var editCmd = &cobra.Command{
 		}
 		q.ID = int64(id)
 
-		newT, err := svc.EditByQuery(q)
+		newT, err := taskSvc.EditByQuery(q)
 		if err != nil {
 			logrus.WithError(err).Fatal("edit task")
 		}
 
-		// FIXME rich is cached service, using it with params
 		rt, _ := taskRichSvc.Rich(newT)
 		fmt.Println(render.Tables4RichTasks([]*models.RichTask{rt}))
 	},

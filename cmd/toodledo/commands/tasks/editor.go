@@ -3,8 +3,10 @@ package tasks
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/render"
+	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -23,20 +25,15 @@ var editorCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		svc, err := injector.InitTaskService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init task service")
-			return
-		}
-		taskRichSvc, err := injector.InitTaskRichService()
-		if err != nil {
-			logrus.WithError(err).Error("init task rich service")
-			return
-		}
+		taskSvc, _ := injector.InitTaskService()
+		contextSvc, _ := injector.InitContextCachedService()
+		folderSvc, _ := injector.InitFolderCachedService()
+		goalSvc, _ := injector.InitGoalCachedService()
+		taskRichSvc := services.NewTaskRichService(taskSvc, folderSvc, contextSvc, goalSvc, logging.ProvideLogger())
 
 		// fetch task
 		id, _ := strconv.Atoi(args[0])
-		t, err := svc.FindById(int64(id))
+		t, err := taskSvc.FindById(int64(id))
 		if err != nil {
 			logrus.WithError(err).Fatal("find task")
 			return
@@ -72,12 +69,11 @@ var editorCmd = &cobra.Command{
 			return
 		}
 
-		newT, err := svc.Edit(int64(id), &inputT)
+		newT, err := taskSvc.Edit(int64(id), &inputT)
 		if err != nil {
 			logrus.WithError(err).Fatal("edit task")
 		}
 
-		// FIXME rich is cached service, using it with params
 		rt, _ := taskRichSvc.Rich(newT)
 		fmt.Println(render.Tables4RichTasks([]*models.RichTask{rt}))
 	},
