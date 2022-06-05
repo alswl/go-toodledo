@@ -275,7 +275,8 @@ func InitTaskRichService() (services.TaskRichService, error) {
 	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
 	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
 	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
-	taskRichService := services.NewTaskRichService(taskCachedService, folderCachedService, contextCachedService, goalCachedService)
+	fieldLogger := logging.ProvideLoggerItf()
+	taskRichService := services.NewTaskRichService(taskCachedService, folderCachedService, contextCachedService, goalCachedService, fieldLogger)
 	return taskRichService, nil
 }
 

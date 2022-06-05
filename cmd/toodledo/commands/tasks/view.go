@@ -10,6 +10,8 @@ import (
 	"strconv"
 )
 
+var output string
+
 var viewCmd = &cobra.Command{
 	Use:  "view",
 	Args: cobra.ExactArgs(1),
@@ -21,7 +23,7 @@ var viewCmd = &cobra.Command{
 		}
 		svc, err := injector.InitTaskService()
 		if err != nil {
-			logrus.Fatal(err)
+			logrus.WithError(err).Fatal("init task service")
 			return
 		}
 		taskRichSvc, err := injector.InitTaskRichService()
@@ -37,7 +39,30 @@ var viewCmd = &cobra.Command{
 			return
 		}
 
-		rts, _ := taskRichSvc.RichThem([]*models.Task{task})
-		fmt.Println(render.Tables4RichTasks(rts))
+		rt, err := taskRichSvc.Rich(task)
+		if err != nil {
+			logrus.WithError(err).Fatal("rich task failed")
+			return
+		}
+
+		switch output {
+		case "table":
+			fmt.Println(render.Tables4RichTasks([]*models.RichTask{rt}))
+		case "yaml":
+			output, err := render.Yaml4RichTask(rt)
+			if err != nil {
+				logrus.WithError(err).Fatal("render yaml failed")
+				return
+			}
+			fmt.Println(output)
+		default:
+			logrus.Fatal("unknown output type")
+		}
 	},
+}
+
+func init() {
+	viewCmd.Flags().StringVarP(&output, "output", "o", "table", "table | yaml")
+
+	TaskCmd.AddCommand(viewCmd)
 }

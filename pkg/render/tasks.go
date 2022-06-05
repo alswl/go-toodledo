@@ -6,6 +6,7 @@ import (
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"gopkg.in/yaml.v3"
 )
 
 // Tables4Task ...
@@ -97,4 +98,20 @@ func Tables4RichTasks(tasks []*models.RichTask) string {
 	t.AppendRows(rows)
 	t.Render()
 	return buf.String()
+}
+
+func Yaml4RichTasks(tasks []*models.RichTask) (string, error) {
+	bs, err := yaml.Marshal(tasks)
+	if err != nil {
+		return "", err
+	}
+	return string(bs), nil
+}
+
+func Yaml4RichTask(task *models.RichTask) (string, error) {
+	bs, err := yaml.Marshal(task)
+	if err != nil {
+		return "", err
+	}
+	return string(bs), nil
 }

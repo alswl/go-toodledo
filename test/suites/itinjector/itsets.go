@@ -15,6 +15,7 @@ var IntegrationTestSet = wire.NewSet(
 	common.NewCliConfigForTesting,
 	common.NewConfigCliConfig,
 	logging.ProvideLogger,
+	logging.ProvideLoggerItf,
 
 	dal.ProvideBackend,
 	client.NewToodledo,

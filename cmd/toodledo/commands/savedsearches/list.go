@@ -31,3 +31,7 @@ var ListCmd = &cobra.Command{
 		fmt.Println(render.Tables4SavedSearches(all))
 	},
 }
+
+func init() {
+	SavedSearchCmd.AddCommand(ListCmd)
+}

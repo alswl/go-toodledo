@@ -15,6 +15,7 @@ var SuperSet = wire.NewSet(
 	common.NewCliConfigFromViper,
 	common.NewConfigCliConfig,
 	logging.ProvideLogger,
+	logging.ProvideLoggerItf,
 
 	dal.ProvideBackend,
 	client.NewToodledo,
