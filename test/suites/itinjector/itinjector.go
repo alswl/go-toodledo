@@ -78,6 +78,11 @@ func InitTaskRichService() (services.TaskRichService, error) {
 	return nil, nil
 }
 
+func InitTaskRichCachedService() (services.TaskRichCachedService, error) {
+	wire.Build(IntegrationTestSet)
+	return nil, nil
+}
+
 func InitSyncer() (syncer.ToodledoFetcher, error) {
 	wire.Build(IntegrationTestSet)
 	return nil, nil

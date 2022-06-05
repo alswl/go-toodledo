@@ -12,9 +12,10 @@ type TaskRichService interface {
 	RichThem(tasks []*models.Task) ([]*models.RichTask, error)
 }
 
+type TaskRichCachedService = TaskRichService
+
 type taskRichService struct {
-	//taskSvc    TaskService
-	taskSvc    TaskCachedService
+	taskSvc    TaskService
 	folderSvc  FolderService
 	contextSvc ContextService
 	goalSvc    GoalService
@@ -22,8 +23,12 @@ type taskRichService struct {
 }
 
 // NewTaskRichService create rich service with cached service(except task service)
-func NewTaskRichService(taskSvc TaskCachedService, folderSvc FolderCachedService, contextSvc ContextCachedService, goalSvc GoalCachedService, logger logrus.FieldLogger) TaskRichService {
-	return &taskRichService{taskSvc: taskSvc, folderSvc: folderSvc, contextSvc: contextSvc, goalSvc: goalSvc, logger: logger}
+//func NewTaskRichService(taskSvc TaskService, folderSvc FolderCachedService, contextSvc ContextCachedService, goalSvc GoalCachedService, logger logrus.FieldLogger) TaskRichService {
+//	return &taskRichService{taskSvc: taskSvc, folderSvc: folderSvc, contextSvc: contextSvc, goalSvc: goalSvc, logger: logger}
+//}
+
+func NewTaskRichService(taskCachedSvc TaskCachedService, folderSvc FolderCachedService, contextSvc ContextCachedService, goalSvc GoalCachedService, logger logrus.FieldLogger) TaskRichCachedService {
+	return &taskRichService{taskSvc: taskCachedSvc, folderSvc: folderSvc, contextSvc: contextSvc, goalSvc: goalSvc, logger: logger}
 }
 
 func (s *taskRichService) FindByIdRich(id int64) (*models.RichTask, error) {

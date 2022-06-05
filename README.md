@@ -2,12 +2,11 @@
 
 Go library and Cli for Toodledo.
 
-Status: WIP
+Status: Under Development
 
 ## Usage
 
 ```sh
-> toodledo help
 Usage:
   toodledo [command]
 
@@ -23,10 +22,9 @@ Available Commands:
   task         Manage toodledo tasks
 
 Flags:
-      --access_token string
+      --access_token string   
       --config string         config file (default is $HOME/.toodledo.yaml)
   -h, --help                  help for toodledo
-  -v, --version               version for toodledo
 
 Use "toodledo [command] --help" for more information about a command.
 
@@ -37,19 +35,20 @@ Usage:
   toodledo task [command]
 
 Available Commands:
-  complete
+  complete    
   create      Create a task
-  delete
-  edit
-  list
-  uncomplete
-  view
+  delete      
+  edit        
+  editor      
+  list        
+  uncomplete  
+  view        
 
 Flags:
   -h, --help   help for task
 
 Global Flags:
-      --access_token string
+      --access_token string   
       --config string         config file (default is $HOME/.toodledo.yaml)
 
 Use "toodledo task [command] --help" for more information about a command.
@@ -72,10 +71,33 @@ toodledo auth login YOUR-CODE
 toodledo auth me
 ```
 
+### Tasks
+
+```shell
+# list
+> toodledo task list --context home --goal goal-b
+INFO[0002] Syncing tasks
+         # │ [X] │ TITLE    │ STATUS │ CONTEXT │ PRIORITY │ FOLDER │ GOAL   │ DUE │ REPEAT │ LENGTH │ TIMER
+───────────┼─────┼──────────┼────────┼─────────┼──────────┼────────┼────────┼─────┼────────┼────────┼───────
+ 334313679 │ [ ] │ cooking3 │   None │ home    │   Medium │        │ goal-b │     │        │        │
+
+# complete
+> toodledo task complete 323245685
+         # │ [X] │ TITLE  │ STATUS │ CONTEXT │ PRIORITY │ FOLDER  │ GOAL    │ DUE │ REPEAT │ LENGTH │ TIMER
+───────────┼─────┼────────┼────────┼─────────┼──────────┼─────────┼─────────┼─────┼────────┼────────┼───────
+ 323245685 │ [X] │ test-c │   None │ Not Set │      Low │ Not Set │ Not Set │   0 │        │      0 │     0
+
+# edit
+> toodledo task edit --title cooking4-8 --context a --status nextaction 334313701
+         # │ [X] │ TITLE      │     STATUS │ CONTEXT │ PRIORITY │ FOLDER │ GOAL   │ DUE │ REPEAT │ LENGTH │ TIMER
+───────────┼─────┼────────────┼────────────┼─────────┼──────────┼────────┼────────┼─────┼────────┼────────┼───────
+ 334313701 │ [ ] │ cooking4-8 │ NextAction │ a       │   Medium │ a      │ goal-b │     │        │        │
+```
+
 ## Build
 
 ```sh
-git clone https://github.com/alswl/go-toodledo.git
-make
-./bin/toodledo --help
+> git clone https://github.com/alswl/go-toodledo.git
+> make
+> ./bin/toodledo --help
 ```

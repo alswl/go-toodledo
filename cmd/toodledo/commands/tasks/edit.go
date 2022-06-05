@@ -5,6 +5,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
+	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/alswl/go-toodledo/pkg/services"
@@ -61,8 +62,9 @@ func (q *cmdEditQuery) ToQuery(contextSvc services.ContextService, folderSvc ser
 		}
 		query.GoalID = goal.ID
 	}
-	query.DueDate = q.DueDate
 	query.Priority = tpriority.PriorityString2Type(q.Priority)
+	query.Status = tstatus.StatusString2Type(q.Status)
+	query.DueDate = q.DueDate
 	if q.Title != "" {
 		query.Title = q.Title
 	}
