@@ -1,23 +1,34 @@
 package services
 
-import "github.com/alswl/go-toodledo/pkg/models"
+import (
+	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+)
 
 type TaskRichService interface {
 	FindByIdRich(id int64) (*models.RichTask, error)
+	Rich(tasks *models.Task) (*models.RichTask, error)
 	RichThem(tasks []*models.Task) ([]*models.RichTask, error)
 }
 
+type TaskRichCachedService = TaskRichService
+
 type taskRichService struct {
-	//taskSvc    TaskService
-	taskSvc    TaskCachedService
+	taskSvc    TaskService
 	folderSvc  FolderService
 	contextSvc ContextService
 	goalSvc    GoalService
+	logger     logrus.FieldLogger
 }
 
 // NewTaskRichService create rich service with cached service(except task service)
-func NewTaskRichService(taskSvc TaskCachedService, folderSvc FolderCachedService, contextSvc ContextCachedService, goalSvc GoalCachedService) TaskRichService {
-	return &taskRichService{taskSvc: taskSvc, folderSvc: folderSvc, contextSvc: contextSvc, goalSvc: goalSvc}
+func NewTaskRichService(taskSvc TaskService, folderSvc FolderCachedService, contextSvc ContextCachedService, goalSvc GoalCachedService, logger logrus.FieldLogger) TaskRichCachedService {
+	return &taskRichService{taskSvc: taskSvc, folderSvc: folderSvc, contextSvc: contextSvc, goalSvc: goalSvc, logger: logger}
+}
+
+func NewTaskRichCachedService(taskSvc TaskCachedService, folderSvc FolderCachedService, contextSvc ContextCachedService, goalSvc GoalCachedService, logger logrus.FieldLogger) TaskRichCachedService {
+	return &taskRichService{taskSvc: taskSvc, folderSvc: folderSvc, contextSvc: contextSvc, goalSvc: goalSvc, logger: logger}
 }
 
 func (s *taskRichService) FindByIdRich(id int64) (*models.RichTask, error) {
@@ -57,4 +68,16 @@ func (s *taskRichService) RichThem(tasks []*models.Task) ([]*models.RichTask, er
 		rts = append(rts, rt)
 	}
 	return rts, nil
+}
+
+func (s *taskRichService) Rich(tasks *models.Task) (*models.RichTask, error) {
+	them, err := s.RichThem([]*models.Task{tasks})
+	if err != nil {
+		return nil, err
+	}
+	if len(them) != 1 {
+		s.logger.WithField("task", tasks).WithField("them", them).Debug("taskRichService.Rich: len(them) != 1")
+		return nil, errors.New("rich failed")
+	}
+	return them[0], nil
 }

@@ -40,7 +40,7 @@ func (s *contextservice) Create(name string) (*models.Context, error) {
 	params.SetName(name)
 	resp, err := s.cli.Context.PostContextsAddPhp(params, s.auth)
 	if err != nil {
-		logrus.WithField("resp", resp).WithError(err).Error("Failed to create")
+		logrus.WithField("resp", resp).WithError(err).Error("create")
 		return nil, err
 	}
 	return resp.Payload[0], nil
@@ -57,7 +57,7 @@ func (s *contextservice) Delete(name string) error {
 	params.SetID(f.ID)
 	resp, err := s.cli.Context.PostContextsDeletePhp(params, s.auth)
 	if err != nil {
-		logrus.WithField("resp", resp).WithError(err).Error("Failed to delete context")
+		logrus.WithField("resp", resp).WithError(err).Error("delete context")
 		return err
 	}
 	return nil

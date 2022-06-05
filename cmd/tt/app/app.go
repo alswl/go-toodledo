@@ -9,6 +9,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/models/constants"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/alswl/go-toodledo/pkg/syncer"
@@ -35,6 +36,7 @@ type States struct {
 	Tasks    []*models.RichTask
 	Contexts []*models.Context
 	Folders  []*models.Folder
+	Goals    []*models.Goal
 	query    *queries.TaskListQuery
 }
 
@@ -42,6 +44,7 @@ type Model struct {
 	taskRichSvc services.TaskRichService
 	contextSvc  services.ContextCachedService
 	folderSvc   services.FolderCachedService
+	goalSvc     services.GoalCachedService
 	taskSvc     services.TaskCachedService
 
 	// properties
@@ -80,6 +83,10 @@ func (m *Model) Init() tea.Cmd {
 			m.err = err
 			return nil
 		}
+		gs, err := m.goalSvc.ListAll()
+		if err != nil {
+			m.err = err
+		}
 
 		// Contexts are first tab in sidebar
 		m.states.Contexts = cs
@@ -92,6 +99,10 @@ func (m *Model) Init() tea.Cmd {
 		// folders
 		m.states.Folders = fs
 		m.sidebar, _ = m.sidebar.UpdateX(utils.UnwrapListPointer(fs))
+
+		// goals
+		m.states.Goals = gs
+		m.sidebar, _ = m.sidebar.UpdateX(utils.UnwrapListPointer(gs))
 
 		// tasks
 		tasks, err := m.taskSvc.ListAllByQuery(m.states.query)
@@ -273,7 +284,7 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 		m.statusBar.SetStatus("ERROR: " + err.Error())
 	}
 	switch tab {
-	case "Contexts":
+	case constants.Contexts:
 		m.states.query = &queries.TaskListQuery{}
 		if item.ID() == 0 && len(m.states.Contexts) > 0 {
 			if len(m.states.Contexts) == 0 {
@@ -284,7 +295,7 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 		} else {
 			m.states.query.ContextID = item.ID()
 		}
-	case "Folders":
+	case constants.Folders:
 		m.states.query = &queries.TaskListQuery{}
 		if item.ID() == 0 {
 			if len(m.states.Folders) == 0 {
@@ -294,6 +305,17 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 			}
 		} else {
 			m.states.query.FolderID = item.ID()
+		}
+	case constants.Goals:
+		m.states.query = &queries.TaskListQuery{}
+		if item.ID() == 0 {
+			if len(m.states.Goals) == 0 {
+				// TODO None folder impl
+			} else {
+				m.states.query.GoalID = m.states.Goals[0].ID
+			}
+		} else {
+			m.states.query.GoalID = item.ID()
 		}
 	}
 	tasks, err := svc.ListAllByQuery(m.states.query)
@@ -334,6 +356,10 @@ func InitialModel() *Model {
 	if err != nil {
 		panic(err)
 	}
+	goalSvc, err := injector.InitGoalCachedService()
+	if err != nil {
+		panic(err)
+	}
 	syncer, err := injector.InitSyncer()
 	if err != nil {
 		panic(err)
@@ -343,6 +369,7 @@ func InitialModel() *Model {
 		Tasks:    []*models.RichTask{},
 		Contexts: []*models.Context{},
 		Folders:  []*models.Folder{},
+		Goals:    []*models.Goal{},
 		query:    &queries.TaskListQuery{},
 	}
 
@@ -359,6 +386,7 @@ func InitialModel() *Model {
 		taskRichSvc: taskRichSvc,
 		contextSvc:  contextSvc,
 		folderSvc:   folderSvc,
+		goalSvc:     goalSvc,
 		taskSvc:     taskSvc,
 		syncer:      syncer,
 		states:      states,

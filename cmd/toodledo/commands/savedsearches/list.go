@@ -19,15 +19,19 @@ var ListCmd = &cobra.Command{
 		}
 		svc, err := injector.InitSavedSearchService()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to init saved search service")
+			logrus.WithError(err).Fatal("init saved search service")
 			return
 		}
 		all, err := svc.ListAll()
 		if err != nil {
-			logrus.WithError(err).Fatal("failed to list saved searches")
+			logrus.WithError(err).Fatal("list saved searches")
 			return
 		}
 
 		fmt.Println(render.Tables4SavedSearches(all))
 	},
+}
+
+func init() {
+	SavedSearchCmd.AddCommand(ListCmd)
 }

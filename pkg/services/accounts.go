@@ -53,12 +53,12 @@ func (s *accountService) GetLastSyncInfo() (*models.Account, error) {
 	if err == dal.ErrObjectNotFound {
 		return nil, nil
 	} else if err != nil {
-		return nil, errors.Wrap(err, "failed to get last sync info")
+		return nil, errors.Wrap(err, "get last sync info")
 	}
 	u := models.Account{}
 	err = json.Unmarshal(bytes, &u)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal last sync info")
+		return nil, errors.Wrap(err, "unmarshal last sync info")
 	}
 	return &u, nil
 }
@@ -66,11 +66,11 @@ func (s *accountService) GetLastSyncInfo() (*models.Account, error) {
 func (s *accountService) SetLastSyncInfo(account *models.Account) error {
 	bytes, err := json.Marshal(account)
 	if err != nil {
-		return errors.Wrap(err, "failed to marshal last sync info")
+		return errors.Wrap(err, "marshal last sync info")
 	}
 	err = s.db.Put(BucketAccount, key, bytes)
 	if err != nil {
-		return errors.Wrap(err, "failed to set last sync info")
+		return errors.Wrap(err, "set last sync info")
 	}
 	return nil
 }

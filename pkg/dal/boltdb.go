@@ -19,7 +19,7 @@ func (b *bolt) prepare(db *boltdb.DB, bucket []byte) error {
 	return db.Update(func(tx *boltdb.Tx) error {
 		_, err := tx.CreateBucketIfNotExists(bucket)
 		if err != nil {
-			return errors.Wrap(err, "failed to create bucket in boltdb")
+			return errors.Wrap(err, "create bucket in boltdb")
 		}
 		return nil
 	})
@@ -63,7 +63,7 @@ func (b *bolt) Put(bucket, key string, value []byte) error {
 			return ErrBucketNotFound
 		}
 		if err := bkt.Put([]byte(key), value); err != nil {
-			return errors.Wrapf(err, "failed to put key %s in boltdb", key)
+			return errors.Wrapf(err, "put key %s in boltdb", key)
 		}
 		return nil
 	})
@@ -137,7 +137,7 @@ func (b *bolt) Truncate(bucket string) error {
 
 		err := tx.DeleteBucket([]byte(bucket))
 		if err != nil {
-			return errors.Wrapf(err, "failed to truncate %s in boltdb", bucket)
+			return errors.Wrapf(err, "truncate %s in boltdb", bucket)
 		}
 		return nil
 	})

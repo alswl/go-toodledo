@@ -60,7 +60,7 @@ func (s *toodledoFetcher) sync() error {
 		return err
 	}
 	if err != nil {
-		s.log.WithError(err).Error("Failed to get me in sync")
+		s.log.WithError(err).Error("get me in sync")
 		return err
 	}
 
@@ -68,21 +68,21 @@ func (s *toodledoFetcher) sync() error {
 		s.log.Info("Syncing folders")
 		err = s.folderSvc.Sync()
 		if err != nil {
-			s.log.WithError(err).Error("Failed to sync folders")
+			s.log.WithError(err).Error("sync folders")
 		}
 	}
 	if lastSyncInfo == nil || me.LasteditContext > lastSyncInfo.LasteditContext {
 		s.log.Info("Syncing contexts")
 		err = s.contextSvc.Sync()
 		if err != nil {
-			s.log.WithError(err).Error("Failed to sync contexts")
+			s.log.WithError(err).Error("sync contexts")
 		}
 	}
 	if lastSyncInfo == nil || me.LasteditGoal > lastSyncInfo.LasteditGoal {
 		s.log.Info("Syncing goals")
 		err = s.goalSvc.Sync()
 		if err != nil {
-			s.log.WithError(err).Error("Failed to sync goals")
+			s.log.WithError(err).Error("sync goals")
 		}
 	}
 	if lastSyncInfo == nil || me.LasteditTask > lastSyncInfo.LasteditTask {
@@ -93,13 +93,13 @@ func (s *toodledoFetcher) sync() error {
 		}
 		err = s.taskSvc.PartialSync(lastEditTime)
 		if err != nil {
-			s.log.WithError(err).Error("Failed to sync tasks")
+			s.log.WithError(err).Error("sync tasks")
 		}
 	}
 
 	err = s.accountSvc.SetLastSyncInfo(me)
 	if err != nil {
-		s.log.WithError(err).Error("Failed to set last sync info")
+		s.log.WithError(err).Error("set last sync info")
 	}
 
 	return nil

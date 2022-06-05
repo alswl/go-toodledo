@@ -88,6 +88,10 @@ func ProvideLogger() *logrus.Logger {
 	return GetLogger("default")
 }
 
+func ProvideLoggerItf() logrus.FieldLogger {
+	return GetLogger("default")
+}
+
 func InitFactory(logRoot string, isStd bool, isSilence bool) error {
 	var err error
 	once.Do(func() {

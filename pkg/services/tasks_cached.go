@@ -293,6 +293,11 @@ func (s *taskCachedService) Edit(id int64, t *models.Task) (*models.Task, error)
 	return edited, nil
 }
 
+func (s *taskCachedService) EditByQuery(query *queries.TaskEditQuery) (*models.Task, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s *taskCachedService) Complete(id int64) (*models.Task, error) {
 	completed, err := s.remoteSvc.Complete(id)
 	if err != nil {
