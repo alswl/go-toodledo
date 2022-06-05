@@ -15,8 +15,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// cmdCreateQuery present the parameters for the command
-// parse query with cmd
 type cmdCreateQuery struct {
 	// TODO
 	//ContextID int64
@@ -33,12 +31,12 @@ type cmdCreateQuery struct {
 	DueDate string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
 	// TODO
 	// Tags
+	Title string
 }
 
 func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService, folderSvc services.FolderService,
 	goalSvc services.GoalService) (*queries.TaskCreateQuery, error) {
-	var err error
-	var query queries.TaskCreateQuery
+	query := queries.TaskCreateQuery{}
 
 	if q.Context != "" {
 		context, err := contextSvc.Find(q.Context)
@@ -64,7 +62,7 @@ func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService, folderSvc s
 	query.DueDate = q.DueDate
 	query.Priority = tpriority.PriorityString2Type(q.Priority)
 
-	return &query, err
+	return &query, nil
 }
 
 var createCmd = &cobra.Command{
@@ -114,11 +112,11 @@ var createCmd = &cobra.Command{
 			logrus.Fatal(err)
 			return
 		}
+		cmdQ.Title = args[0]
 		q, err := cmdQ.ToQuery(contextSvc, folderSvc, goalSvc)
 		if err != nil {
 			logrus.WithError(err).Fatal("parse query failed")
 		}
-		q.Title = args[0]
 
 		// TODO simple worked
 		t, err := svc.CreateByQuery(q)

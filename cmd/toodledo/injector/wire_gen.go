@@ -138,7 +138,8 @@ func InitTaskService() (services.TaskService, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter)
+	fieldLogger := logging.ProvideLoggerItf()
+	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
 	return taskService, nil
 }
 
@@ -156,7 +157,8 @@ func InitTaskCachedService() (services.TaskCachedService, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter)
+	fieldLogger := logging.ProvideLoggerItf()
+	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
 	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
 		return nil, err
@@ -262,7 +264,8 @@ func InitTaskRichService() (services.TaskRichService, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter)
+	fieldLogger := logging.ProvideLoggerItf()
+	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
 	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
 		return nil, err
@@ -275,7 +278,6 @@ func InitTaskRichService() (services.TaskRichService, error) {
 	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
 	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
 	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
-	fieldLogger := logging.ProvideLoggerItf()
 	taskRichService := services.NewTaskRichService(taskCachedService, folderCachedService, contextCachedService, goalCachedService, fieldLogger)
 	return taskRichService, nil
 }
@@ -303,7 +305,8 @@ func InitSyncer() (syncer.ToodledoFetcher, error) {
 	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
 	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
 	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
-	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter)
+	fieldLogger := logging.ProvideLoggerItf()
+	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
 	taskCachedService := services.NewTaskCachedService(taskService, accountService, backend)
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)

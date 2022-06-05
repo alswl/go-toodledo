@@ -9,22 +9,7 @@ import (
 	"time"
 )
 
-type TaskListQuery struct {
-	Title string
-	// FIXME how to present no content?
-	ContextID int64
-	FolderID  int64
-	GoalID    int64
-	DueDate   string
-	// Priority, low is zero, is default value, Priority should be pointer
-	Priority *priority.Priority
-	Status   *status.Status
-}
-
-// TaskCreateQuery is query model of Task
-type TaskCreateQuery struct {
-	// TODO fields missing
-	Title     string `description:"" validate:"required"`
+type TaskWritePartialQuery struct {
 	ContextID int64
 	FolderID  int64
 	GoalID    int64
@@ -48,6 +33,19 @@ type TaskCreateQuery struct {
 	Timer    int64
 	TimerOne time.Time
 	//Via string
+}
+
+// TaskCreateQuery is query model of Task
+// https://api.toodledo.com/3/tasks/index.php#adding
+// required:
+// title
+// optional:
+// folder, context, goal, location, priority, status,star, duration, remind,
+// starttime, duetime, completed, duedatemod, repeat, tag, duedate, startdate, note, parent, meta
+type TaskCreateQuery struct {
+	TaskWritePartialQuery
+
+	Title string `description:"" validate:"required"`
 }
 
 // ToModel converts TaskCreateQuery to Task
@@ -202,9 +200,4 @@ func (b *TaskCreateQueryBuilder) WithTimerOne(timerOne time.Time) *TaskCreateQue
 // Build returns TaskCreateQuery
 func (b *TaskCreateQueryBuilder) Build() *TaskCreateQuery {
 	return &b.query
-}
-
-// TODO
-type TaskEditQuery struct {
-	TaskCreateQuery
 }

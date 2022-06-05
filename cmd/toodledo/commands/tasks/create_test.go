@@ -40,11 +40,13 @@ func Test_cmdQuery_ToQuery(t *testing.T) {
 				DueDate:   "2022-01-01",
 			},
 			want: &queries.TaskCreateQuery{
-				ContextID: 1,
-				FolderID:  2,
-				GoalID:    3,
-				Priority:  2,
-				DueDate:   "2022-01-01",
+				TaskWritePartialQuery: queries.TaskWritePartialQuery{
+					ContextID: 1,
+					FolderID:  2,
+					GoalID:    3,
+					Priority:  2,
+					DueDate:   "2022-01-01",
+				},
 			},
 			wantErr: false,
 		},

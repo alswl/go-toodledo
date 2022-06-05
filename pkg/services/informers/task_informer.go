@@ -149,6 +149,11 @@ func (h *TaskInformer) Edit(id int64, t *models.Task) (*models.Task, error) {
 	return t, nil
 }
 
+func (h *TaskInformer) EditByQuery(query *queries.TaskEditQuery) (*models.Task, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (h *TaskInformer) Complete(id int64) (*models.Task, error) {
 	// XXX test
 	t := &models.Task{
