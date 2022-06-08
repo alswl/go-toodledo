@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/auth"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/browser"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/configs"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/contexts"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/folders"
@@ -39,6 +40,7 @@ func init() {
 
 	rootCmd.AddCommand(tasks.TaskCmd,
 		folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd, savedsearches.SavedSearchCmd,
+		browser.Cmd,
 		auth.AuthCmd, configs.ConfigCmd, completionCmd)
 }
 
