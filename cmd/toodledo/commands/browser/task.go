@@ -1,4 +1,4 @@
-package tasks
+package browser
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 	"strconv"
 )
 
-var browserCmd = &cobra.Command{
-	Use:  "browser",
+var taskCmd = &cobra.Command{
+	Use:  "task",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO support task name, first match
@@ -20,5 +20,5 @@ var browserCmd = &cobra.Command{
 }
 
 func init() {
-	TaskCmd.AddCommand(browserCmd)
+	Cmd.AddCommand(taskCmd)
 }
