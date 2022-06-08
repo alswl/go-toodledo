@@ -16,14 +16,9 @@ var viewCmd = &cobra.Command{
 	Use:  "view",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		_, err := injector.InitApp()
+		app, err := injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
-			return
-		}
-		svc, err := injector.InitTaskService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init task service")
 			return
 		}
 		taskRichSvc, err := injector.InitTaskRichService()
@@ -33,7 +28,7 @@ var viewCmd = &cobra.Command{
 		}
 
 		id, _ := strconv.Atoi(args[0])
-		task, err := svc.FindById((int64)(id))
+		task, err := app.TaskSvc.FindById((int64)(id))
 		if err != nil {
 			logrus.WithError(err).Fatal("find task failed")
 			return

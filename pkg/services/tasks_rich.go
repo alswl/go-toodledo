@@ -2,12 +2,11 @@ package services
 
 import (
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 type TaskRichService interface {
-	FindByIdRich(id int64) (*models.RichTask, error)
+	Find(id int64) (*models.RichTask, error)
 	Rich(tasks *models.Task) (*models.RichTask, error)
 	RichThem(tasks []*models.Task) ([]*models.RichTask, error)
 }
@@ -31,11 +30,16 @@ func NewTaskRichCachedService(taskSvc TaskCachedService, folderSvc FolderCachedS
 	return &taskRichService{taskSvc: taskSvc, folderSvc: folderSvc, contextSvc: contextSvc, goalSvc: goalSvc, logger: logger}
 }
 
-func (s *taskRichService) FindByIdRich(id int64) (*models.RichTask, error) {
+func (s *taskRichService) Find(id int64) (*models.RichTask, error) {
+	// FIXME deprecated, using Rich()
 	t, err := s.taskSvc.FindById(id)
 	if err != nil {
 		return nil, err
 	}
+	return s.Rich(t)
+}
+
+func (s *taskRichService) Rich(t *models.Task) (*models.RichTask, error) {
 	var context = &models.Context{}
 	if t.Context != 0 {
 		context, _ = s.contextSvc.FindByID(t.Context)
@@ -60,24 +64,13 @@ func (s *taskRichService) FindByIdRich(id int64) (*models.RichTask, error) {
 
 func (s *taskRichService) RichThem(tasks []*models.Task) ([]*models.RichTask, error) {
 	var rts []*models.RichTask
+	// FIXME rich with context, folder, goal
 	for _, task := range tasks {
-		rt, err := s.FindByIdRich(task.ID)
+		rt, err := s.Find(task.ID)
 		if err != nil {
 			return nil, err
 		}
 		rts = append(rts, rt)
 	}
 	return rts, nil
-}
-
-func (s *taskRichService) Rich(tasks *models.Task) (*models.RichTask, error) {
-	them, err := s.RichThem([]*models.Task{tasks})
-	if err != nil {
-		return nil, err
-	}
-	if len(them) != 1 {
-		s.logger.WithField("task", tasks).WithField("them", them).Debug("taskRichService.Rich: len(them) != 1")
-		return nil, errors.New("rich failed")
-	}
-	return them[0], nil
 }

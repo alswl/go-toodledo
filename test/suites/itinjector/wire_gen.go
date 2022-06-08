@@ -373,7 +373,13 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	if err != nil {
 		return nil, err
 	}
-	toodledoCliApp := app.NewToodledoCliApp(account)
+	fieldLogger := logging.ProvideLoggerItf()
+	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
+	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
+	savedSearchService := services.NewSavedSearchService(toodledo, clientAuthInfoWriter)
+	toodledoCliApp := app.NewToodledoCliApp(account, accountService, taskService, folderService, contextService, goalService, savedSearchService)
 	return toodledoCliApp, nil
 }
 
