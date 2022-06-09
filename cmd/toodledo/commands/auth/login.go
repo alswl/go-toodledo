@@ -11,9 +11,8 @@ import (
 
 var loginCmd = &cobra.Command{
 	Use:  "login",
-	Args: cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-
 		app, err := injector.InitApp()
 		if err == nil {
 			me, err := app.AccountSvc.Me()

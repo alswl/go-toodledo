@@ -100,7 +100,6 @@ func NewToodledo() *Toodledo {
 	return New(transportConfig, strfmt.Default)
 }
 
-// NewOAuth2ConfigFromConfigs ...
 func NewOAuth2ConfigFromConfigs(cfg models.ToodledoConfig) (*oauth2.Config, error) {
 	// TODO remove viper
 	clientId := cfg.ClientId
@@ -118,7 +117,6 @@ func NewOAuth2ConfigFromConfigs(cfg models.ToodledoConfig) (*oauth2.Config, erro
 	return conf, nil
 }
 
-// NewOAuth2ConfigFromViper ...
 func NewOAuth2ConfigFromViper() (*oauth2.Config, error) {
 	// TODO delete, 3 usage left
 	clientId := viper.GetString("auth.client_id")

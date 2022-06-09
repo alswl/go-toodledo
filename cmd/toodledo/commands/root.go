@@ -42,7 +42,7 @@ func init() {
 	rootCmd.AddCommand(tasks.TaskCmd,
 		folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd, savedsearches.SavedSearchCmd,
 		browser.Cmd,
-		auth.Cmd, config.ConfigCmd, completionCmd)
+		auth.Cmd, config.Cmd, completionCmd)
 }
 
 func initConfig() {
@@ -59,8 +59,8 @@ func initConfig() {
 
 		// Search config in ~/.config/toodledo/conf.yaml
 		viper.AddConfigPath(path.Join(home, ".config", "toodledo"))
-		viper.SetConfigType("yaml")
 		viper.SetConfigName("conf")
+		viper.SetConfigType("yaml")
 	}
 
 	viper.AutomaticEnv()

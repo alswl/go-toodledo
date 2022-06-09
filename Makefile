@@ -113,7 +113,7 @@ generate-code-wire:
 	#diff cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go || true
 	@(cd test/suites/itinjector; $$GOPATH/bin/wire)
 
-build: fmt
+build:
 	@for target in $(TARGETS); do                                                             \
 	  GOOS=$(GOOS) GOARCH=$(GOARCH) go build -v -o $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) \
 	    -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)                             \

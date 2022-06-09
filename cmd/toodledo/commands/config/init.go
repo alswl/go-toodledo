@@ -2,13 +2,15 @@ package config
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
+	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v3"
 )
 
 type initOptions struct {
-	Hostname     string
+	Endpoint     string
 	ClientID     string
 	ClientSecret string
 }
@@ -16,23 +18,40 @@ type initOptions struct {
 var initOpts initOptions
 
 var initCmd = &cobra.Command{
-	Use: "init --client-id <client-id> --client-secret <client-secret>",
+	Use:  "init <client-id> <client-secret>",
+	Args: cobra.ExactArgs(2),
+	Long: heredoc.Doc(`
+init toodledo config,
+you can register your own app here: https://api.toodledo.com/3/account/doc_register.php 
+`),
 	Run: func(cmd *cobra.Command, args []string) {
-		// XXX impl init with params
+		clientID := args[0]
+		clientSecret := args[1]
 
-		settings := viper.AllSettings()
-		text, _ := yaml.Marshal(settings)
-		fmt.Println(text)
+		if viper.ConfigFileUsed() != "" {
+			logrus.Fatal("config file already exists, please view $HOME/.config/toodledo/conf.yaml")
+			return
+		}
+
+		config := models.NewToodledoCliConfig()
+		if initOpts.Endpoint != "" {
+			config.Endpoint = initOpts.Endpoint
+		}
+		config.Auth.ClientId = clientID
+		config.Auth.ClientSecret = clientSecret
+		// FIXME not works, "" in top level
+		viper.Set("", config)
+		err := viper.SafeWriteConfig()
+		if err != nil {
+			logrus.WithError(err).Fatal("write config file")
+			return
+		}
+		fmt.Println("ok")
 	},
 }
 
 func init() {
-	initCmd.Flags().StringVarP(&initOpts.Hostname, "hostname", "h", "https://api.toodledo.com", "toodledo api hostname")
-	initCmd.MarkFlagRequired("hostname")
-	initCmd.Flags().StringVarP(&initOpts.ClientID, "client-id", "i", "", "toodledo client id")
-	initCmd.MarkFlagRequired("client-id")
-	initCmd.Flags().StringVarP(&initOpts.ClientSecret, "client-secret", "s", "", "toodledo client secret")
-	initCmd.MarkFlagRequired("client-secret")
+	initCmd.Flags().StringVarP(&initOpts.Endpoint, "endpoint", "e", "https://api.toodledo.com", "toodledo api hostname")
 
-	ConfigCmd.AddCommand(initCmd)
+	Cmd.AddCommand(initCmd)
 }
