@@ -23,7 +23,7 @@ Available Commands:
 
 Flags:
       --access_token string   
-      --config string         config file (default is $HOME/.toodledo.yaml)
+      --config string         config file (default is $HOME/.config/toodledo/conf.yaml)
   -h, --help                  help for toodledo
 
 Use "toodledo [command] --help" for more information about a command.
@@ -49,7 +49,7 @@ Flags:
 
 Global Flags:
       --access_token string   
-      --config string         config file (default is $HOME/.toodledo.yaml)
+      --config string         config file (default is $HOME/config/toodledo/conf.yaml)
 
 Use "toodledo task [command] --help" for more information about a command.
 

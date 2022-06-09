@@ -1,4 +1,4 @@
-package configs
+package config
 
 import (
 	"fmt"
@@ -14,4 +14,8 @@ var viewCmd = &cobra.Command{
 		text, _ := yaml.Marshal(settings)
 		fmt.Println(text)
 	},
+}
+
+func init() {
+	ConfigCmd.AddCommand(viewCmd)
 }

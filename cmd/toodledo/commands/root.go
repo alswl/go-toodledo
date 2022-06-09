@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/auth"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/browser"
-	"github.com/alswl/go-toodledo/cmd/toodledo/commands/configs"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/config"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/contexts"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/folders"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/goals"
@@ -34,14 +34,15 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringP("access_token", "", "", "")
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.toodledo.yaml)")
+	// XXX changed, test
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/config/toodledo/conf.yaml)")
 
 	_ = viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 
 	rootCmd.AddCommand(tasks.TaskCmd,
 		folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd, savedsearches.SavedSearchCmd,
 		browser.Cmd,
-		auth.AuthCmd, configs.ConfigCmd, completionCmd)
+		auth.Cmd, config.ConfigCmd, completionCmd)
 }
 
 func initConfig() {
@@ -56,10 +57,10 @@ func initConfig() {
 			return
 		}
 
-		// Search config in home directory with name ".toodledo" (without extension).
+		// Search config in ~/.config/toodledo/conf.yaml
 		viper.AddConfigPath(path.Join(home, ".config", "toodledo"))
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".toodledo")
+		viper.SetConfigName("conf")
 	}
 
 	viper.AutomaticEnv()

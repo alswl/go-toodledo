@@ -2,11 +2,11 @@ package auth
 
 import "github.com/spf13/cobra"
 
-var AuthCmd = &cobra.Command{
-	Use:   "auth",
+var Cmd = &cobra.Command{
+	Use:   "auth <command>",
 	Short: "Manage authentication",
 }
 
 func init() {
-	AuthCmd.AddCommand(loginCmd, tokenCmd, meCmd)
+	Cmd.AddCommand(loginCmd, tokenCmd)
 }
