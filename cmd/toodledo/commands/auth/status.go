@@ -29,7 +29,3 @@ var statusCmd = &cobra.Command{
 		fmt.Println((string)(out))
 	},
 }
-
-func init() {
-	Cmd.AddCommand(statusCmd)
-}
