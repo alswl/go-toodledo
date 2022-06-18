@@ -33,5 +33,4 @@ var ListCmd = &cobra.Command{
 }
 
 func init() {
-	SavedSearchCmd.AddCommand(ListCmd)
 }

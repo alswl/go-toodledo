@@ -1,12 +1,15 @@
 package contexts
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/alswl/go-toodledo/pkg/cmdutil"
+	"github.com/spf13/cobra"
+)
 
-var ContextCmd = &cobra.Command{
-	Use:   "context",
-	Short: "Manage toodledo contexts",
-}
-
-func init() {
+func NewCmd(f *cmdutil.Factory) *cobra.Command {
+	var ContextCmd = &cobra.Command{
+		Use:   "context",
+		Short: "Manage toodledo contexts",
+	}
 	ContextCmd.AddCommand(ListCmd, CreateCmd, DeleteCmd, RenameCmd, ViewCmd)
+	return ContextCmd
 }

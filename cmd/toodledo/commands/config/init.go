@@ -53,5 +53,4 @@ you can register your own app here: https://api.toodledo.com/3/account/doc_regis
 func init() {
 	initCmd.Flags().StringVarP(&initOpts.Endpoint, "endpoint", "e", "https://api.toodledo.com", "toodledo api hostname")
 
-	Cmd.AddCommand(initCmd)
 }

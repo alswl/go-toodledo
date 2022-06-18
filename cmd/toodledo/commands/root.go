@@ -10,8 +10,8 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/goals"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/savedsearches"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/tasks"
+	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/iostreams"
-	"github.com/alswl/go-toodledo/pkg/utils/cmds"
 	"github.com/alswl/go-toodledo/pkg/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -26,7 +26,7 @@ var (
 	cfgFile string
 )
 
-func NewRootCmd(f *cmds.Factory) *cobra.Command {
+func NewRootCmd(f *cmdutil.Factory) *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use:              "toodledo",
 		TraverseChildren: true,
@@ -41,9 +41,9 @@ func NewRootCmd(f *cmds.Factory) *cobra.Command {
 
 	// TODO all subcmd using factory
 	rootCmd.AddCommand(tasks.TaskCmd,
-		folders.FolderCmd, contexts.ContextCmd, goals.GoalCmd, savedsearches.SavedSearchCmd,
-		browser.Cmd,
-		auth.NewCmd(f), config.Cmd, completionCmd)
+		folders.NewCmd(f), contexts.NewCmd(f), goals.NewCmd(f), savedsearches.NewCmd(f),
+		browser.NewCmd(f),
+		auth.NewCmd(f), config.NewCmd(f), completionCmd)
 
 	return rootCmd
 }
@@ -80,7 +80,7 @@ func initConfig() {
 
 func Execute() {
 	iostreams.UsingSystem()
-	cmd := NewRootCmd(cmds.NewFactory())
+	cmd := NewRootCmd(cmdutil.NewFactory())
 	if err := cmd.Execute(); err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

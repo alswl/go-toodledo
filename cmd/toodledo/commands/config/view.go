@@ -17,5 +17,4 @@ var viewCmd = &cobra.Command{
 }
 
 func init() {
-	Cmd.AddCommand(viewCmd)
 }
