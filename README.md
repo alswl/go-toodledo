@@ -16,7 +16,9 @@ Status: Under Development
 
 More commands usage can be found in the [Manual](./docs/toodledo.md).
 
-### Login
+### Quick Start
+
+Login:
 
 ```sh
 # login
@@ -27,7 +29,7 @@ toodledo auth login YOUR-CODE
 toodledo auth me
 ```
 
-### Tasks
+Tasks:
 
 ```shell
 # list
@@ -35,20 +37,35 @@ toodledo auth me
 INFO[0002] Syncing tasks
          # │ [X] │ TITLE    │ STATUS │ CONTEXT │ PRIORITY │ FOLDER │ GOAL   │ DUE │ REPEAT │ LENGTH │ TIMER
 ───────────┼─────┼──────────┼────────┼─────────┼──────────┼────────┼────────┼─────┼────────┼────────┼───────
- 334313679 │ [ ] │ cooking3 │   None │ home    │   Medium │        │ goal-b │     │        │        │
+ 330000079 │ [ ] │ cooking3 │   None │ home    │   Medium │        │ goal-b │     │        │        │
 
 # complete
 > toodledo task complete 323245685
          # │ [X] │ TITLE  │ STATUS │ CONTEXT │ PRIORITY │ FOLDER  │ GOAL    │ DUE │ REPEAT │ LENGTH │ TIMER
 ───────────┼─────┼────────┼────────┼─────────┼──────────┼─────────┼─────────┼─────┼────────┼────────┼───────
- 323245685 │ [X] │ test-c │   None │ Not Set │      Low │ Not Set │ Not Set │   0 │        │      0 │     0
+ 320000085 │ [X] │ test-c │   None │ Not Set │      Low │ Not Set │ Not Set │   0 │        │      0 │     0
 
 # edit
 > toodledo task edit --title cooking4-8 --context a --status nextaction 334313701
          # │ [X] │ TITLE      │     STATUS │ CONTEXT │ PRIORITY │ FOLDER │ GOAL   │ DUE │ REPEAT │ LENGTH │ TIMER
 ───────────┼─────┼────────────┼────────────┼─────────┼──────────┼────────┼────────┼─────┼────────┼────────┼───────
- 334313701 │ [ ] │ cooking4-8 │ NextAction │ a       │   Medium │ a      │ goal-b │     │        │        │
+ 330000001 │ [ ] │ cooking4-8 │ NextAction │ a       │   Medium │ a      │ goal-b │     │        │        │
 ```
+
+Goals:
+
+```sh
+> toodledo folder list
+       # │ NAME                         │ ARCHIVED
+─────────┼──────────────────────────────┼──────────
+ 3000096 │ AnalysisDesign               │        0
+ 4000073 │ Business                     │        0
+ 4000039 │ Custom-Support               │        1
+ 3000006 │ Coding                       │        0
+ 3000000 │ Family                       │        0
+```
+
+More commands usage can be found in the [Manual](./docs/toodledo.md).
 
 ## Build
 
