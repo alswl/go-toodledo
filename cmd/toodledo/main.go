@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/cmd/toodledo/commands"
+	"github.com/alswl/go-toodledo/cmd/toodledo/root"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"os"
 )
@@ -14,5 +14,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	commands.Execute()
+	root.Execute()
 }

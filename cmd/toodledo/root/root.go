@@ -1,7 +1,8 @@
-package commands
+package root
 
 import (
 	"fmt"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/auth"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/browse"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/config"
@@ -42,7 +43,7 @@ func NewRootCmd(f *cmdutil.Factory) *cobra.Command {
 	// TODO add Environment
 	rootCmd.AddCommand(tasks.NewCmd(f), folders.NewCmd(f), contexts.NewCmd(f), goals.NewCmd(f),
 		savedsearches.NewCmd(f), browse.NewCmd(f),
-		auth.NewCmd(f), config.NewCmd(f), NewCompletionCmd(f))
+		auth.NewCmd(f), config.NewCmd(f), commands.NewCompletionCmd(f))
 
 	return rootCmd
 }

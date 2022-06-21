@@ -7,58 +7,14 @@ Status: Under Development
 ## Usage
 
 ```sh
-Usage:
-  toodledo [command]
-
-Available Commands:
-  auth         Manage authentication
-  completion   Generate completion script
-  config       Manage config
-  context      Manage toodledo contexts
-  folder       Manage toodledo folders
-  goal         Manage toodledo goals
-  help         Help about any command
-  saved-search Manage toodledo saved search
-  task         Manage toodledo tasks
-
-Flags:
-      --access_token string   
-      --config string         config file (default is $HOME/.config/toodledo/conf.yaml)
-  -h, --help                  help for toodledo
-
-Use "toodledo [command] --help" for more information about a command.
-
-> toodledo task --help
-Manage toodledo tasks
-
-Usage:
-  toodledo task [command]
-
-Available Commands:
-  complete    
-  create      Create a task
-  delete      
-  edit        
-  editor      
-  list        
-  uncomplete  
-  view        
-
-Flags:
-  -h, --help   help for task
-
-Global Flags:
-      --access_token string   
-      --config string         config file (default is $HOME/config/toodledo/conf.yaml)
-
-Use "toodledo task [command] --help" for more information about a command.
-
 > toodledo task list --context home --status nextaction
          # │ [X] │ TITLE            │     STATUS │ CONTEXT │ PRIORITY │ FOLDER  │ GOAL │ DUE        │ REPEAT      │ LENGTH │ TIMER
 ───────────┼─────┼──────────────────┼────────────┼─────────┼──────────┼─────────┼──────┼────────────┼─────────────┼────────┼───────
  327077755 │ [ ] │ next-action item │ NextAction │ home    │     High │ to-0128 │ b    │ 2022-02-24 │ FREQ=WEEKLY │ 1m0s   │ 20m0s
  327078471 │ [ ] │ abc2x            │ NextAction │ home    │     High │         │ c    │            │             │        │
 ```
+
+More commands usage can be found in the [Manual](./docs/toodledo.md).
 
 ### Login
 
