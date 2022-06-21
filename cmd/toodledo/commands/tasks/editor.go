@@ -3,6 +3,7 @@ package tasks
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/render"
@@ -42,9 +43,20 @@ var editorCmd = &cobra.Command{
 		e := editor.NewDefaultEditor([]string{})
 		tmpFile := fmt.Sprintf("/tmp/toodledo-task-editor-%d.yaml", t.ID)
 		f, err := os.OpenFile(tmpFile, os.O_CREATE|os.O_RDWR, 0755)
+		if err != nil {
+			logrus.WithError(err).Fatal("open tmp file")
+			return
+		}
 		bs, _ := yaml.Marshal(t)
-		f.Write(bs)
-		f.Close()
+		_, err = f.Write(bs)
+		if err != nil {
+			logrus.WithError(err).Fatal("write task to tmp file")
+			return
+		}
+		err = f.Close()
+		if err != nil {
+			logrus.WithError(err).Fatal("close tmp file")
+		}
 
 		err = e.Launch(tmpFile)
 		if err != nil {
@@ -52,7 +64,12 @@ var editorCmd = &cobra.Command{
 			return
 		}
 		f, err = os.OpenFile(tmpFile, os.O_RDONLY, 0644)
-		defer f.Close()
+		defer func() {
+			err = f.Close()
+			if err != nil {
+				logrus.WithError(err).Fatal("close tmp file")
+			}
+		}()
 		if err != nil {
 			logrus.WithError(err).Fatal("open file")
 			return
@@ -79,6 +96,6 @@ var editorCmd = &cobra.Command{
 	},
 }
 
-func init() {
-	TaskCmd.AddCommand(editorCmd)
+func NewEditorCmd(f *cmdutil.Factory) *cobra.Command {
+	return editorCmd
 }

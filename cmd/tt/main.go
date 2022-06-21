@@ -15,7 +15,8 @@ func initViper() {
 	// Find home directory.
 	home, err := os.UserHomeDir()
 	if err != nil {
-		panic(err)
+		logrus.WithError(err).Fatal("Failed to get user home directory")
+		return
 	}
 
 	// Search config in home directory with name ".toodledo" (without extension).

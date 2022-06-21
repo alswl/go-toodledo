@@ -3,6 +3,7 @@ package common
 import (
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/mitchellh/go-homedir"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"path"
@@ -39,7 +40,7 @@ func NewCliConfigForTesting() (models.ToodledoCliConfig, error) {
 	viper.SetConfigName(".toodledo-test")
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
-		panic(err)
+		return models.ToodledoCliConfig{}, errors.Wrapf(err, "failed to read config")
 	}
 	return NewCliConfigFromViper()
 }

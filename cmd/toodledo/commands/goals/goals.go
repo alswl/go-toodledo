@@ -1,13 +1,16 @@
 package goals
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/alswl/go-toodledo/pkg/cmdutil"
+	"github.com/spf13/cobra"
+)
 
-var GoalCmd = &cobra.Command{
-	Use:   "goal",
-	Short: "Manage toodledo goals",
-}
-
-func init() {
-	GoalCmd.AddCommand(ListCmd, CreateCmd, DeleteCmd,
-		RenameCmd, ArchiveCmd, ActivateCmd)
+func NewCmd(f *cmdutil.Factory) *cobra.Command {
+	var cmd = &cobra.Command{
+		Use:   "goal",
+		Short: "Manage toodledo goals",
+	}
+	cmd.AddCommand(NewListCmd(f), NewCreateCmd(f), NewDeleteCmd(f),
+		NewRenameCmd(f), NewArchiveCmd(f), NewActivateCmd(f))
+	return cmd
 }

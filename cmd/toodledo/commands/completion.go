@@ -1,14 +1,16 @@
 package commands
 
 import (
+	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/spf13/cobra"
 	"os"
 )
 
-var completionCmd = &cobra.Command{
-	Use:   "completion [bash|zsh|fish|powershell]",
-	Short: "Generate completion script",
-	Long: `To load completions:
+func NewCompletionCmd(f *cmdutil.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:   "completion [bash|zsh|fish|powershell]",
+		Short: "Generate completion script",
+		Long: `To load completions:
 
 Bash:
 
@@ -47,19 +49,20 @@ PowerShell:
   PS> toodledo completion powershell > toodledo.ps1
   # and source this file from your PowerShell profile.
 `,
-	DisableFlagsInUseLine: true,
-	ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
-	Args:                  cobra.ExactValidArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		switch args[0] {
-		case "bash":
-			_ = cmd.Root().GenBashCompletion(os.Stdout)
-		case "zsh":
-			_ = cmd.Root().GenZshCompletion(os.Stdout)
-		case "fish":
-			_ = cmd.Root().GenFishCompletion(os.Stdout, true)
-		case "powershell":
-			_ = cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
-		}
-	},
+		DisableFlagsInUseLine: true,
+		ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
+		Args:                  cobra.ExactValidArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			switch args[0] {
+			case "bash":
+				_ = cmd.Root().GenBashCompletion(os.Stdout)
+			case "zsh":
+				_ = cmd.Root().GenZshCompletion(os.Stdout)
+			case "fish":
+				_ = cmd.Root().GenFishCompletion(os.Stdout, true)
+			case "powershell":
+				_ = cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
+			}
+		},
+	}
 }

@@ -3,6 +3,7 @@ package tasks
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
@@ -131,10 +132,14 @@ var createCmd = &cobra.Command{
 	},
 }
 
-func init() {
-	err := utils.BindFlagsByQuery(createCmd, cmdCreateQuery{})
+func NewCreateCmd(f *cmdutil.Factory) *cobra.Command {
+	cmd := createCmd
+	err := utils.BindFlagsByQuery(cmd, cmdCreateQuery{})
 	if err != nil {
-		panic(errors.Wrapf(err, "generate flags for command %s", createCmd.Use))
+		logrus.WithError(err).Fatal("bind flags failed")
 	}
-	//createCmd.Flags().String("title", "", "title of the task")
+	return cmd
+}
+
+func init() {
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/alswl/go-toodledo/pkg/syncer2"
+	"github.com/pkg/errors"
 	"github.com/thoas/go-funk"
 	"sync"
 )
@@ -135,7 +136,10 @@ func (h *TaskInformer) Delete(id int64) error {
 func (h *TaskInformer) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error) {
 	// XXX test
 	for _, id := range ids {
-		h.Delete(id)
+		err := h.Delete(id)
+		if err != nil {
+			return nil, nil, errors.Wrapf(err, "failed to delete task %d", id)
+		}
 	}
 	return []int64{}, []*models.TaskDeleteItem{}, nil
 }

@@ -59,5 +59,8 @@ var viewCmd = &cobra.Command{
 func init() {
 	viewCmd.Flags().StringVarP(&output, "output", "o", "table", "table | yaml")
 
-	TaskCmd.AddCommand(viewCmd)
+	(&cobra.Command{
+		Use:   "task",
+		Short: "Manage toodledo tasks",
+	}).AddCommand(viewCmd)
 }
