@@ -3,6 +3,7 @@ package tasks
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
@@ -72,66 +73,61 @@ func (q *cmdEditQuery) ToQuery(contextSvc services.ContextService, folderSvc ser
 	return &query, nil
 }
 
-var editCmd = &cobra.Command{
-	Use:  "edit",
-	Args: cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		cmdQ := cmdEditQuery{}
-		err := utils.FillQueryByFlags(cmd, &cmdQ)
-		if err != nil {
-			logrus.WithError(err).Fatal("parse query failed")
-		}
-		// services
-		_, err = injector.InitApp()
-		if err != nil {
-			logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
-			return
-		}
-		taskSvc, _ := injector.InitTaskService()
-		contextSvc, _ := injector.InitContextCachedService()
-		folderSvc, _ := injector.InitFolderCachedService()
-		goalSvc, _ := injector.InitGoalCachedService()
-		taskRichSvc := services.NewTaskRichService(taskSvc, folderSvc, contextSvc, goalSvc, logging.ProvideLogger())
+func NewEditCmd(f *cmdutil.Factory) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "edit",
+		Args: cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			cmdQ := cmdEditQuery{}
+			err := utils.FillQueryByFlags(cmd, &cmdQ)
+			if err != nil {
+				logrus.WithError(err).Fatal("parse query failed")
+			}
+			// services
+			_, err = injector.InitApp()
+			if err != nil {
+				logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
+				return
+			}
+			taskSvc, _ := injector.InitTaskService()
+			contextSvc, _ := injector.InitContextCachedService()
+			folderSvc, _ := injector.InitFolderCachedService()
+			goalSvc, _ := injector.InitGoalCachedService()
+			taskRichSvc := services.NewTaskRichService(taskSvc, folderSvc, contextSvc, goalSvc, logging.ProvideLogger())
 
-		// fetch task
-		id, _ := strconv.Atoi(args[0])
-		_, err = taskSvc.FindById(int64(id))
-		if err != nil {
-			logrus.WithError(err).Fatal("find task")
-			return
-		}
+			// fetch task
+			id, _ := strconv.Atoi(args[0])
+			_, err = taskSvc.FindById(int64(id))
+			if err != nil {
+				logrus.WithError(err).Fatal("find task")
+				return
+			}
 
-		// query
-		q, err := cmdQ.ToQuery(contextSvc, folderSvc, goalSvc)
-		if err != nil {
-			logrus.WithError(err).Fatal("parse query failed")
-		}
-		// FIXME not works
-		if funk.IsZero(q) {
-			logrus.Fatal("query is empty")
-			return
-		}
-		q.ID = int64(id)
+			// query
+			q, err := cmdQ.ToQuery(contextSvc, folderSvc, goalSvc)
+			if err != nil {
+				logrus.WithError(err).Fatal("parse query failed")
+			}
+			// FIXME not works
+			if funk.IsZero(q) {
+				logrus.Fatal("query is empty")
+				return
+			}
+			q.ID = int64(id)
 
-		newT, err := taskSvc.EditByQuery(q)
-		if err != nil {
-			logrus.WithError(err).Fatal("edit task")
-		}
+			newT, err := taskSvc.EditByQuery(q)
+			if err != nil {
+				logrus.WithError(err).Fatal("edit task")
+			}
 
-		rt, _ := taskRichSvc.Rich(newT)
-		fmt.Println(render.Tables4RichTasks([]*models.RichTask{rt}))
-	},
-}
-
-func init() {
-	err := utils.BindFlagsByQuery(editCmd, cmdEditQuery{})
+			rt, _ := taskRichSvc.Rich(newT)
+			fmt.Println(render.Tables4RichTasks([]*models.RichTask{rt}))
+		},
+	}
+	err := utils.BindFlagsByQuery(cmd, cmdEditQuery{})
 	if err != nil {
 		logrus.WithError(err).Fatal("bind flags failed")
-		return
+		return nil
 	}
-
-	(&cobra.Command{
-		Use:   "task",
-		Short: "Manage toodledo tasks",
-	}).AddCommand(editCmd)
+	return cmd
 }

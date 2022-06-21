@@ -1,4 +1,4 @@
-package folders
+package tasks
 
 import (
 	"fmt"
@@ -8,31 +8,33 @@ import (
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"strconv"
 )
 
-func NewViewCmd(f *cmdutil.Factory) *cobra.Command {
+func NewDoneCmd(f *cmdutil.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:  "view",
-		Args: cobra.ExactArgs(1),
+		Use:     "done",
+		Aliases: []string{"complete"},
+		Args:    cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			_, err := injector.InitApp()
 			if err != nil {
 				logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			svc, err := injector.InitFolderService()
+			svc, err := injector.InitTaskService()
 			if err != nil {
-				logrus.Fatal(err)
+				logrus.WithError(err).Fatal("init task service")
 				return
 			}
-			name := args[0]
-			f, err := svc.Find(name)
+
+			id, _ := strconv.Atoi(args[0])
+			newTReturned, err := svc.Complete(int64(id))
 			if err != nil {
-				logrus.WithError(err).Fatal()
+				logrus.WithField("id", id).WithError(err).Fatal("complete task")
 				return
 			}
-			fmt.Println(render.Tables4Folder([]*models.Folder{f}))
+			fmt.Println(render.Tables4Task([]*models.Task{newTReturned}))
 		},
 	}
-
 }

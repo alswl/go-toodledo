@@ -6,11 +6,11 @@ import (
 )
 
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
-	var FolderCmd = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:   "folder",
 		Short: "Manage toodledo folders",
 	}
-	FolderCmd.AddCommand(ListCmd, CreateCmd, DeleteCmd,
-		RenameCmd, ArchiveCmd, ActivateCmd, ViewCmd)
-	return FolderCmd
+	cmd.AddCommand(NewListCmd(f), NewCreateCmd(f), NewDeleteCmd(f),
+		NewRenameCmd(f), NewArchiveCmd(f), NewActivateCmd(f), NewViewCmd(f))
+	return cmd
 }

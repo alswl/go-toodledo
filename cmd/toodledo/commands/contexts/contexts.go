@@ -10,6 +10,6 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 		Use:   "context",
 		Short: "Manage toodledo contexts",
 	}
-	ContextCmd.AddCommand(ListCmd, CreateCmd, DeleteCmd, RenameCmd, ViewCmd)
+	ContextCmd.AddCommand(NewListCmd(f), NewCreateCmd(f), NewDeleteCmd(f), NewRenameCmd(f), NewViewCmd(f))
 	return ContextCmd
 }

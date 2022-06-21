@@ -39,9 +39,10 @@ func NewRootCmd(f *cmdutil.Factory) *cobra.Command {
 
 	_ = viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 
+	// TODO add Environment
 	rootCmd.AddCommand(tasks.NewCmd(f), folders.NewCmd(f), contexts.NewCmd(f), goals.NewCmd(f),
 		savedsearches.NewCmd(f), browse.NewCmd(f),
-		auth.NewCmd(f), config.NewCmd(f), completionCmd)
+		auth.NewCmd(f), config.NewCmd(f), NewCompletionCmd(f))
 
 	return rootCmd
 }

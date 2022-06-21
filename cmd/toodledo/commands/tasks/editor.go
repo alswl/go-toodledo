@@ -3,6 +3,7 @@ package tasks
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/render"
@@ -79,9 +80,6 @@ var editorCmd = &cobra.Command{
 	},
 }
 
-func init() {
-	(&cobra.Command{
-		Use:   "task",
-		Short: "Manage toodledo tasks",
-	}).AddCommand(editorCmd)
+func NewEditorCmd(f *cmdutil.Factory) *cobra.Command {
+	return editorCmd
 }
