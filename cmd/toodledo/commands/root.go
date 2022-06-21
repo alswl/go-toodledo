@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/auth"
-	"github.com/alswl/go-toodledo/cmd/toodledo/commands/browser"
+	"github.com/alswl/go-toodledo/cmd/toodledo/commands/browse"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/config"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/contexts"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/folders"
@@ -39,10 +39,8 @@ func NewRootCmd(f *cmdutil.Factory) *cobra.Command {
 
 	_ = viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
 
-	// TODO all subcmd using factory
-	rootCmd.AddCommand(tasks.TaskCmd,
-		folders.NewCmd(f), contexts.NewCmd(f), goals.NewCmd(f), savedsearches.NewCmd(f),
-		browser.NewCmd(f),
+	rootCmd.AddCommand(tasks.NewCmd(f), folders.NewCmd(f), contexts.NewCmd(f), goals.NewCmd(f),
+		savedsearches.NewCmd(f), browse.NewCmd(f),
 		auth.NewCmd(f), config.NewCmd(f), completionCmd)
 
 	return rootCmd

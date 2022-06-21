@@ -80,5 +80,8 @@ var editorCmd = &cobra.Command{
 }
 
 func init() {
-	TaskCmd.AddCommand(editorCmd)
+	(&cobra.Command{
+		Use:   "task",
+		Short: "Manage toodledo tasks",
+	}).AddCommand(editorCmd)
 }

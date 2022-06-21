@@ -3,6 +3,7 @@ package tasks
 import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
+	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
@@ -78,84 +79,84 @@ func (q *cmdListQuery) ToQuery() (*queries.TaskListQuery, error) {
 	return query, nil
 }
 
-var listCmd = &cobra.Command{
-	Use:  "list",
-	Args: cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		cmdQ := cmdListQuery{}
-		err := utils.FillQueryByFlags(cmd, &cmdQ)
-		if err != nil {
-			logrus.WithError(err).Fatal("failed")
-		}
-		validate := validator.New()
-		err = validate.Struct(cmdQ)
-		if err != nil {
-			logrus.WithError(err).Fatal("validate failed")
-		}
+func NewListCmd(f *cmdutil.Factory) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:  "list",
+		Args: cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			cmdQ := cmdListQuery{}
+			err := utils.FillQueryByFlags(cmd, &cmdQ)
+			if err != nil {
+				logrus.WithError(err).Fatal("failed")
+			}
+			validate := validator.New()
+			err = validate.Struct(cmdQ)
+			if err != nil {
+				logrus.WithError(err).Fatal("validate failed")
+			}
 
-		_, err = injector.InitApp()
-		if err != nil {
-			logrus.Fatal("login required, using `toodledo auth login` to login.")
-			return
-		}
-		svc, err := injector.InitTaskCachedService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init task service")
-			return
-		}
-		contextSvc, err := injector.InitContextCachedService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init context service")
-			return
-		}
-		folderSvc, err := injector.InitFolderCachedService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init folder service")
-			return
-		}
-		goalSvc, err := injector.InitGoalCachedService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init goal service")
-			return
-		}
-		syncer, err := injector.InitSyncer()
-		if err != nil {
-			logrus.WithError(err).Fatal("init syncer failed")
-			return
-		}
-		taskRichSvc, err := injector.InitTaskRichService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init task rich service failed")
-			return
-		}
-		err = syncer.SyncOnce()
-		if err != nil {
-			logrus.WithError(err).Fatal("sync failed")
-			return
-		}
-		err = cmdQ.PrepareIDs(contextSvc, goalSvc, folderSvc)
-		if err != nil {
-			logrus.WithError(err).Fatal("prepare ids failed")
-			return
-		}
-		q, err := cmdQ.ToQuery()
-		if err != nil {
-			logrus.WithError(err).Fatal("parse query failed")
-		}
+			_, err = injector.InitApp()
+			if err != nil {
+				logrus.Fatal("login required, using `toodledo auth login` to login.")
+				return
+			}
+			svc, err := injector.InitTaskCachedService()
+			if err != nil {
+				logrus.WithError(err).Fatal("init task service")
+				return
+			}
+			contextSvc, err := injector.InitContextCachedService()
+			if err != nil {
+				logrus.WithError(err).Fatal("init context service")
+				return
+			}
+			folderSvc, err := injector.InitFolderCachedService()
+			if err != nil {
+				logrus.WithError(err).Fatal("init folder service")
+				return
+			}
+			goalSvc, err := injector.InitGoalCachedService()
+			if err != nil {
+				logrus.WithError(err).Fatal("init goal service")
+				return
+			}
+			syncer, err := injector.InitSyncer()
+			if err != nil {
+				logrus.WithError(err).Fatal("init syncer failed")
+				return
+			}
+			taskRichSvc, err := injector.InitTaskRichService()
+			if err != nil {
+				logrus.WithError(err).Fatal("init task rich service failed")
+				return
+			}
+			err = syncer.SyncOnce()
+			if err != nil {
+				logrus.WithError(err).Fatal("sync failed")
+				return
+			}
+			err = cmdQ.PrepareIDs(contextSvc, goalSvc, folderSvc)
+			if err != nil {
+				logrus.WithError(err).Fatal("prepare ids failed")
+				return
+			}
+			q, err := cmdQ.ToQuery()
+			if err != nil {
+				logrus.WithError(err).Fatal("parse query failed")
+			}
 
-		tasks, err := svc.ListAllByQuery(q)
-		if err != nil {
-			logrus.Error(err)
-			return
-		}
-		rts, _ := taskRichSvc.RichThem(tasks)
-		fmt.Println(render.Tables4RichTasks(rts))
-	},
-}
-
-func init() {
-	err := utils.BindFlagsByQuery(listCmd, cmdListQuery{})
-	if err != nil {
-		panic(errors.Wrapf(err, "generate flags for command %s", listCmd.Use))
+			tasks, err := svc.ListAllByQuery(q)
+			if err != nil {
+				logrus.Error(err)
+				return
+			}
+			rts, _ := taskRichSvc.RichThem(tasks)
+			fmt.Println(render.Tables4RichTasks(rts))
+		},
 	}
+	err := utils.BindFlagsByQuery(cmd, cmdListQuery{})
+	if err != nil {
+		logrus.WithError(err).Fatal("bind flags failed")
+	}
+	return cmd
 }

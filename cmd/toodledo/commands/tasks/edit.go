@@ -126,8 +126,12 @@ var editCmd = &cobra.Command{
 func init() {
 	err := utils.BindFlagsByQuery(editCmd, cmdEditQuery{})
 	if err != nil {
-		panic(errors.Wrapf(err, "generate flags for command %s", editorCmd.Use))
+		logrus.WithError(err).Fatal("bind flags failed")
+		return
 	}
 
-	TaskCmd.AddCommand(editCmd)
+	(&cobra.Command{
+		Use:   "task",
+		Short: "Manage toodledo tasks",
+	}).AddCommand(editCmd)
 }
