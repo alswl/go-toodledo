@@ -60,7 +60,7 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 		keys := funk.Map(cks, func(x *models.EnvironmentWithKey) string {
 			// TODO using description, v2 completions
 			//return fmt.Sprintf("%s", x.Key, x.Name)
-			return fmt.Sprintf("%s", x.Key)
+			return x.Key
 		}).([]string)
 
 		return keys, cobra.ShellCompDirectiveNoFileComp

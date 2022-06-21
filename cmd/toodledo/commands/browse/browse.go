@@ -34,7 +34,7 @@ toodledo browse --task 288246017
 				opts.selector = args[0]
 			}
 
-			var url = ""
+			url := ""
 			if opts.task {
 				id, err := strconv.Atoi(opts.selector)
 				if err != nil {
@@ -43,7 +43,7 @@ toodledo browse --task 288246017
 				}
 				url = fmt.Sprintf("https://www.toodledo.com/tasks/index.php?#task_%d", id)
 			} else {
-				url = fmt.Sprintf("https://www.toodledo.com/")
+				url = "https://www.toodledo.com/"
 			}
 			err := utilsos.OpenInBrowser(url)
 			if err != nil {

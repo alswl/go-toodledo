@@ -21,7 +21,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 
-			fmt.Printf(render.RenderEnvironments(cks))
+			fmt.Print(render.RenderEnvironments(cks))
 		},
 	}
 

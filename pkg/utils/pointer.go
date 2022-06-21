@@ -2,7 +2,7 @@ package utils
 
 func WrapListPointer[T any](list []T) []*T {
 	var result []*T
-	for i, _ := range list {
+	for i := range list {
 		result = append(result, &list[i])
 	}
 	return result
@@ -10,7 +10,7 @@ func WrapListPointer[T any](list []T) []*T {
 
 func UnwrapListPointer[T any](list []*T) []T {
 	var result []T
-	for i, _ := range list {
+	for i := range list {
 		result = append(result, *list[i])
 	}
 	return result

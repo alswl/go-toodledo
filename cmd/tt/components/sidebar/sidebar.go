@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/sirupsen/logrus"
 )
 
 // TODO move to styles
@@ -136,7 +137,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 		if changed {
-			m.onItemChange(defaultTabs[m.currentTabIndex], newItem)
+			err := m.onItemChange(defaultTabs[m.currentTabIndex], newItem)
+			if err != nil {
+				logrus.WithError(err).Error("failed to change item")
+			}
 		}
 	}
 
