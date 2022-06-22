@@ -22,7 +22,7 @@ func initViper() {
 	// Search config in home directory with name ".toodledo" (without extension).
 	viper.AddConfigPath(path.Join(home, ".config", "toodledo"))
 	viper.SetConfigType("yaml")
-	viper.SetConfigName(".toodledo")
+	viper.SetConfigName("toodledo")
 
 	viper.AutomaticEnv()
 

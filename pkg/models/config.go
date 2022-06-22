@@ -1,5 +1,10 @@
 package models
 
+import (
+	"github.com/mitchellh/go-homedir"
+	"path"
+)
+
 // ToodledoConfigEnvironment ...
 type ToodledoConfigEnvironment struct {
 	Name    string `mapstructure:"name"`
@@ -22,16 +27,16 @@ type ToodledoConfig struct {
 type ToodledoCliConfig struct {
 	Endpoint       string                                `mapstructure:"endpoint" yaml:"host"`
 	Auth           ToodledoConfig                        `mapstructure:"auth" yaml:"auth"`
-	Database       ToodledoConfigDatabase                `mapstructure:"database" yaml:"database"`
-	Environment    map[string]*ToodledoConfigEnvironment `mapstructure:"environments"`
-	DefaultContext string                                `mapstructure:"default-environment"`
+	Database       ToodledoConfigDatabase                `mapstructure:"database omitempty" yaml:"database omitempty"`
+	Environment    map[string]*ToodledoConfigEnvironment `mapstructure:"environments  omitempty" yaml:"environment omitempty"`
+	DefaultContext string                                `mapstructure:"default-environment" yaml:"defaultContext omitempty"`
 }
 
 func NewToodledoCliConfig() ToodledoCliConfig {
 	return ToodledoCliConfig{
 		Endpoint:       "https://api.toodledo.com",
 		Auth:           ToodledoConfig{},
-		Database:       ToodledoConfigDatabase{},
+		Database:       NewDefaultToodledoConfigDatabase(),
 		Environment:    map[string]*ToodledoConfigEnvironment{},
 		DefaultContext: "",
 	}
@@ -40,8 +45,15 @@ func NewToodledoCliConfig() ToodledoCliConfig {
 // TODO delete auth
 var DefaultBuckets = []string{"folders", "contexts", "tasks", "auth", "account", "goals"}
 
-// ToodledoConfigDatabase ...
 type ToodledoConfigDatabase struct {
-	DataFile string   `mapstructure:"data_file" yaml:"data_file"`
+	DataFile string   `mapstructure:"data_file omitempty" yaml:"data_file omitempty"`
 	Buckets  []string `mapstructure:"-" yaml:"-"`
+}
+
+func NewDefaultToodledoConfigDatabase() ToodledoConfigDatabase {
+	home, _ := homedir.Dir()
+	return ToodledoConfigDatabase{
+		DataFile: path.Join(home, ".config", "toodledo", "data", "data.db"),
+		Buckets:  DefaultBuckets,
+	}
 }

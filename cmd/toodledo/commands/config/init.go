@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -8,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
 type initOptions struct {
@@ -41,8 +43,8 @@ you can register your own app here: https://api.toodledo.com/3/account/doc_regis
 			}
 			config.Auth.ClientId = clientID
 			config.Auth.ClientSecret = clientSecret
-			// FIXME not works, "" in top level
-			viper.Set("", config)
+			bs, _ := yaml.Marshal(config)
+			viper.ReadConfig(bytes.NewBuffer(bs))
 			err := viper.SafeWriteConfig()
 			if err != nil {
 				logrus.WithError(err).Fatal("write config file")

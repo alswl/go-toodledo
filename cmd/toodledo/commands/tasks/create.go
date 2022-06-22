@@ -64,15 +64,17 @@ func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService, folderSvc s
 	query.Priority = tpriority.PriorityString2Type(q.Priority)
 	query.Status = tstatus.StatusString2Type(q.Status)
 	query.DueDate = q.DueDate
+	query.Title = q.Title
 
 	return &query, nil
 }
 
 var createCmd = &cobra.Command{
 	Use:     "create",
+	Args:    cobra.ExactArgs(1),
+	Aliases: []string{"new"},
 	Short:   "Create a task",
 	Example: "toodledo tasks create --context=1 --folder=2 --goal=3 --priority=High --due_date=2020-01-01 title",
-	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		cmdQ := cmdCreateQuery{}
 		err := utils.FillQueryByFlags(cmd, &cmdQ)
@@ -127,8 +129,8 @@ var createCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("create task failed")
 			return
 		}
-		rts, _ := taskRichSvc.RichThem([]*models.Task{t})
-		fmt.Println(render.Tables4RichTasks(rts))
+		rt, _ := taskRichSvc.Rich(t)
+		fmt.Println(render.Tables4RichTasks([]*models.RichTask{rt}))
 	},
 }
 

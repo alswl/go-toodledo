@@ -12,6 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
+	pointerutil "k8s.io/utils/pointer"
 	"strconv"
 	"time"
 )
@@ -157,6 +158,7 @@ func (s *taskService) Create(title string) (*models.Task, error) {
 	bytesS := (string)(bytes)
 	p := task.NewPostTasksAddPhpParams()
 	p.Tasks = &bytesS
+	p.Fields = pointerutil.String(enums.TaskFields2String(enums.GeneralTaskFields))
 	resp, err := s.cli.Task.PostTasksAddPhp(p, s.auth)
 	if err != nil {
 		return nil, err

@@ -14,10 +14,12 @@ func ProvideBackend(config models.ToodledoCliConfig) (Backend, error) {
 	if b, ok := bolts[config.Database.DataFile]; ok {
 		return b, nil
 	}
-	b, err := NewBoltDB(config)
+	b, err := NewBoltDB(config.Database)
 	if err != nil {
 		return nil, err
 	}
+	// FIXME config.Database.DataFile may be empty
+	// FIXME support multi user usage
 	bolts[config.Database.DataFile] = b
 	return b, nil
 }

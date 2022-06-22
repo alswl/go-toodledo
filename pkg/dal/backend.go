@@ -39,12 +39,12 @@ type Backend interface {
 }
 
 // NewBoltDB is used to make bolt metadata store instance.
-func NewBoltDB(config models.ToodledoCliConfig) (Backend, error) {
+func NewBoltDB(config models.ToodledoConfigDatabase) (Backend, error) {
 	//opt := &boltdb.Options{
 	//	Timeout: time.Second * 10,
 	//}
 
-	dir := filepath.Dir(config.Database.DataFile)
+	dir := filepath.Dir(config.DataFile)
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return nil, errors.Wrapf(err, "create metadata path, %s", dir)
@@ -53,11 +53,11 @@ func NewBoltDB(config models.ToodledoCliConfig) (Backend, error) {
 
 	b := &bolt{}
 
-	db, err := boltdb.Open(config.Database.DataFile, 0600, nil)
+	db, err := boltdb.Open(config.DataFile, 0600, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, "open boltdb, %s", config.Database.DataFile)
+		return nil, errors.Wrapf(err, "open boltdb, %s", config.DataFile)
 	}
-	for _, bucket := range config.Database.Buckets {
+	for _, bucket := range config.Buckets {
 		if err := b.prepare(db, []byte(bucket)); err != nil {
 			return nil, err
 		}
