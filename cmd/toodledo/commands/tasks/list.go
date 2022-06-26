@@ -27,13 +27,13 @@ type cmdListQuery struct {
 	Priority  string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
 	Status    string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`
 
-	DueDate string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
+	DueDate  string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
+	SubTasks string `validate:"omitempty,oneof=Inline Hidden Indented inline hidden indented"`
 	// TODO
 	// Tags
 }
 
-// FIXME
-//var listOpts = &ListOpts{}
+var cmdQ = &cmdListQuery{}
 
 func (q *cmdListQuery) PrepareIDs(contextSvc services.ContextService, goalSvc services.GoalService,
 	folderSvc services.FolderService) error {
@@ -90,16 +90,18 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 		Short: "List tasks",
 		Example: heredoc.Doc(`
 			$ toodledo tasks list
-			$ toodledo tasks list --context "Work"	
-			$ toodledo tasks list --folder "Work"
-			$ toodledo tasks list --goal "Work"
-			$ toodledo tasks list --priority "High"
-			$ toodledo tasks list --status "Active"
+			$ toodledo tasks list --context Work
+			$ toodledo tasks list --context-id 4455
+			$ toodledo tasks list --folder inbox
+			$ toodledo tasks list --folder-id 4455
+			$ toodledo tasks list --goal landing-moon
+			$ toodledo tasks list --goal-id 4455
+			$ toodledo tasks list --priority High
+			$ toodledo tasks list --status Active
 			$ toodledo tasks list --due-date "2020-01-01"
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			cmdQ := cmdListQuery{}
-			err := utils.FillQueryByFlags(cmd, &cmdQ)
+			err := utils.FillQueryByFlags(cmd, cmdQ)
 			if err != nil {
 				logrus.WithError(err).Fatal("failed")
 			}
@@ -145,8 +147,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			fmt.Println(render.Tables4RichTasks(rts))
 		},
 	}
-	// FIXME bind to query instance
-	err := utils.BindFlagsByQuery(cmd, cmdListQuery{})
+	err := utils.BindFlagsByQuery(cmd, *cmdQ)
 	if err != nil {
 		logrus.WithError(err).Fatal("bind flags failed")
 	}
