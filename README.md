@@ -24,9 +24,9 @@ Login:
 # login
 toodledo auth login
 # follow steps, open link your browser
-toodledo auth login YOUR-CODE
+toodledo auth token YOUR-CODE
 # verify
-toodledo auth me
+toodledo auth status
 ```
 
 Tasks:
