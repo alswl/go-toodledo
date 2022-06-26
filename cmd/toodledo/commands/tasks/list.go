@@ -8,6 +8,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
+	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/subtasksview"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/alswl/go-toodledo/pkg/services"
@@ -29,8 +30,8 @@ type cmdListQuery struct {
 	Priority  string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
 	Status    string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`
 
-	DueDate  string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
-	SubTasks string `validate:"omitempty,oneof=Inline Hidden Indented inline hidden indented"`
+	DueDate      string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
+	SubTasksMode string `validate:"omitempty,oneof=Inline Hidden Indented inline hidden indented"`
 
 	Format string `validate:"omitempty,oneof=name json yaml"`
 	// TODO
@@ -147,7 +148,8 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.Error(err)
 				return
 			}
-			rts, _ := taskRichSvc.RichThem(tasks)
+			sorted, err := services.SortSubTasks(tasks, subtasksview.ModeString2Type(cmdQ.SubTasksMode))
+			rts, _ := taskRichSvc.RichThem(sorted)
 			switch cmdQ.Format {
 			case "json":
 				bs, _ := json.Marshal(rts)
