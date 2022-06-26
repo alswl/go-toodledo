@@ -8,6 +8,7 @@ import (
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "folder",
+		Args:  cobra.NoArgs,
 		Short: "Manage toodledo folders",
 	}
 	cmd.AddCommand(NewListCmd(f), NewCreateCmd(f), NewDeleteCmd(f),

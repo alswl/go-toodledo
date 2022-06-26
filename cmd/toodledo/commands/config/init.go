@@ -22,8 +22,12 @@ var initOpts initOptions
 
 func NewInitCommand(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "init <client-id> <client-secret>",
-		Args: cobra.ExactArgs(2),
+		Use:   "init",
+		Args:  cobra.ExactArgs(2),
+		Short: "Initialize config",
+		Example: heredoc.Doc(`
+			$ toodledo config init <client-id> <client-secret>
+`),
 		Long: heredoc.Doc(`
 init toodledo config,
 you can register your own app here: https://api.toodledo.com/3/account/doc_register.php 

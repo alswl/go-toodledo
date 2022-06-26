@@ -2,6 +2,7 @@ package contexts
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -12,8 +13,12 @@ import (
 
 func NewCreateCmd(f *cmdutil.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:  "create",
-		Args: cobra.ExactArgs(1),
+		Use:   "create",
+		Args:  cobra.ExactArgs(1),
+		Short: "Create a new context",
+		Example: heredoc.Doc(`
+			$ toodledo context create Work
+`),
 		Run: func(cmd *cobra.Command, args []string) {
 			_, err := injector.InitApp()
 			if err != nil {

@@ -8,6 +8,7 @@ import (
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:     "saved-search",
+		Args:    cobra.NoArgs,
 		Aliases: []string{"ss"},
 		Short:   "Manage toodledo saved search",
 		// TODO search task by saved-searches

@@ -8,6 +8,7 @@ import (
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	var ContextCmd = &cobra.Command{
 		Use:   "context",
+		Args:  cobra.NoArgs,
 		Short: "Manage toodledo contexts",
 	}
 	ContextCmd.AddCommand(NewListCmd(f), NewCreateCmd(f), NewDeleteCmd(f), NewRenameCmd(f), NewViewCmd(f))

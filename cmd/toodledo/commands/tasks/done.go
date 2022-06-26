@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -14,19 +15,19 @@ import (
 func NewDoneCmd(f *cmdutil.Factory) *cobra.Command {
 	return &cobra.Command{
 		Use:     "done",
-		Aliases: []string{"complete"},
 		Args:    cobra.ExactArgs(1),
+		Aliases: []string{"complete"},
+		Short:   "Mark a task as done",
+		Example: heredoc.Doc(`
+			$ toodledo tasks done 8848
+		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			_, err := injector.InitApp()
+			app, err := injector.InitApp()
 			if err != nil {
 				logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			svc, err := injector.InitTaskService()
-			if err != nil {
-				logrus.WithError(err).Fatal("init task service")
-				return
-			}
+			svc := app.TaskSvc
 
 			id, _ := strconv.Atoi(args[0])
 			newTReturned, err := svc.Complete(int64(id))

@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -74,7 +75,9 @@ var createCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	Aliases: []string{"new"},
 	Short:   "Create a task",
-	Example: "toodledo tasks create --context=1 --folder=2 --goal=3 --priority=High --due_date=2020-01-01 title",
+	Example: heredoc.Doc(`
+		$ toodledo tasks create --context=1 --folder=2 --goal=3 --priority=High --due_date=2020-01-01 title
+`),
 	Run: func(cmd *cobra.Command, args []string) {
 		cmdQ := cmdCreateQuery{}
 		err := utils.FillQueryByFlags(cmd, &cmdQ)
@@ -87,36 +90,16 @@ var createCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("validate failed")
 		}
 
-		_, err = injector.InitApp()
+		app, err := injector.InitApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		svc, err := injector.InitTaskService()
-		if err != nil {
-			logrus.Fatal(err)
-			return
-		}
-		taskRichSvc, err := injector.InitTaskRichService()
-		if err != nil {
-			logrus.WithError(err).Fatal("init task rich service failed")
-			return
-		}
-		contextSvc, err := injector.InitContextCachedService()
-		if err != nil {
-			logrus.Fatal(err)
-			return
-		}
-		folderSvc, err := injector.InitFolderCachedService()
-		if err != nil {
-			logrus.Fatal(err)
-			return
-		}
-		goalSvc, err := injector.InitGoalCachedService()
-		if err != nil {
-			logrus.Fatal(err)
-			return
-		}
+		svc := app.TaskCachedSvc
+		taskRichSvc := app.TaskRichSvc
+		contextSvc := app.ContextCachedSvc
+		folderSvc := app.FolderCachedSvc
+		goalSvc := app.GoalCachedSvc
 		cmdQ.Title = args[0]
 		q, err := cmdQ.ToQuery(contextSvc, folderSvc, goalSvc)
 		if err != nil {

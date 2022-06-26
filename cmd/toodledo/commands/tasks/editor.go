@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
@@ -17,8 +18,12 @@ import (
 )
 
 var editorCmd = &cobra.Command{
-	Use:  "editor",
-	Args: cobra.ExactArgs(1),
+	Use:   "editor",
+	Args:  cobra.ExactArgs(1),
+	Short: "Edit a task in editor",
+	Example: heredoc.Doc(`
+		$ toodledo tasks editor 8848
+	`),
 	Run: func(cmd *cobra.Command, args []string) {
 		// services
 		_, err := injector.InitApp()

@@ -2,6 +2,7 @@ package folders
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -12,19 +13,19 @@ import (
 
 func NewActivateCmd(f *cmdutil.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:  "activate",
-		Args: cobra.ExactArgs(1),
+		Use:   "activate",
+		Args:  cobra.ExactArgs(1),
+		Short: "Activate folder",
+		Example: heredoc.Doc(`
+			$ toodledo folder activate reading
+		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			_, err := injector.InitApp()
+			app, err := injector.InitApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			svc, err := injector.InitFolderService()
-			if err != nil {
-				logrus.Fatal(err)
-				return
-			}
+			svc := app.FolderSvc
 			name := args[0]
 
 			f, err := svc.Find(name)

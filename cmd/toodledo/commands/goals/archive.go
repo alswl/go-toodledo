@@ -2,6 +2,7 @@ package goals
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -12,19 +13,19 @@ import (
 
 func NewArchiveCmd(f *cmdutil.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:  "archive",
-		Args: cobra.ExactArgs(1),
+		Use:   "archive",
+		Args:  cobra.ExactArgs(1),
+		Short: "Archive goal",
+		Example: heredoc.Doc(`
+			$ toodledo goal archive landing-moon
+		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			_, err := injector.InitApp()
+			app, err := injector.InitApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			svc, err := injector.InitGoalService()
-			if err != nil {
-				logrus.WithError(err).Fatal("init goals service")
-				return
-			}
+			svc := app.GoalSvc
 			name := args[0]
 
 			f, err := svc.Find(name)

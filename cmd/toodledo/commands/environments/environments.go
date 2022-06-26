@@ -17,7 +17,8 @@ const DefaultEnvironmentKey = "default-environment"
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "environment",
-		Short: "Switch for the variable reality",
+		Args:  cobra.NoArgs,
+		Short: "Manage the environments",
 	}
 	_ = (&cobra.Command{
 		Use:  "switch key",

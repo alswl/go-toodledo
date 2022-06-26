@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -12,8 +13,12 @@ import (
 
 func NewLoginCmd(f *cmdutil.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:  "login",
-		Args: cobra.ExactArgs(0),
+		Use:   "login",
+		Args:  cobra.ExactArgs(0),
+		Short: "Login to Toodledo",
+		Example: heredoc.Doc(`
+			$ toodledo auth login
+`),
 		Run: func(cmd *cobra.Command, args []string) {
 			app, err := injector.InitApp()
 			if err == nil {
@@ -26,7 +31,6 @@ func NewLoginCmd(f *cmdutil.Factory) *cobra.Command {
 
 			conf, err := client.NewOAuth2ConfigFromViper()
 			if err != nil {
-				// XXX test
 				logrus.WithError(err).Fatal("init toodledo config, using `toodledo config init` to set up.")
 				return
 			}
