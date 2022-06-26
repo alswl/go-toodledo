@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
@@ -84,8 +85,18 @@ func (q *cmdListQuery) ToQuery() (*queries.TaskListQuery, error) {
 
 func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "list",
-		Args: cobra.NoArgs,
+		Use:   "list",
+		Args:  cobra.NoArgs,
+		Short: "List tasks",
+		Example: heredoc.Doc(`
+			$ toodledo tasks list
+			$ toodledo tasks list --context "Work"	
+			$ toodledo tasks list --folder "Work"
+			$ toodledo tasks list --goal "Work"
+			$ toodledo tasks list --priority "High"
+			$ toodledo tasks list --status "Active"
+			$ toodledo tasks list --due-date "2020-01-01"
+		`),
 		Run: func(cmd *cobra.Command, args []string) {
 			cmdQ := cmdListQuery{}
 			err := utils.FillQueryByFlags(cmd, &cmdQ)

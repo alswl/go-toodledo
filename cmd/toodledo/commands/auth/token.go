@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	log "github.com/sirupsen/logrus"
@@ -11,8 +12,12 @@ import (
 
 func NewTokenCmd(f *cmdutil.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:  "token",
-		Args: cobra.ExactArgs(1),
+		Use:   "token",
+		Args:  cobra.ExactArgs(1),
+		Short: "Get access token from code",
+		Example: heredoc.Doc(`
+			$ toodledo auth token YOUR-TOKEN-IN-THE-URL
+`),
 		Run: func(cmd *cobra.Command, args []string) {
 			code := args[0]
 			if code == "" {

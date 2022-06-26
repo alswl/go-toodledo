@@ -7,7 +7,8 @@ import (
 
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	var Cmd = &cobra.Command{
-		Use:   "auth <command>",
+		Use:   "auth",
+		Args:  cobra.NoArgs,
 		Short: "Manage authentication",
 	}
 	Cmd.AddCommand(NewLoginCmd(f), NewTokenCmd(f), NewStatusCmd(f))

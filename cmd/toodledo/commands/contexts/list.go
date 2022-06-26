@@ -2,6 +2,7 @@ package contexts
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/render"
@@ -11,18 +12,20 @@ import (
 
 func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use: "list",
+		Use:   "list",
+		Args:  cobra.NoArgs,
+		Short: "List contexts",
+		Example: heredoc.Doc(`
+			$ toodledo context list
+		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			_, err := injector.InitApp()
+			app, err := injector.InitApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			svc, err := injector.InitContextService()
-			if err != nil {
-				logrus.Fatal(err)
-				return
-			}
+			// FIXME cached
+			svc := app.ContextSvc
 
 			all, err := svc.ListAll()
 			if err != nil {

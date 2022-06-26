@@ -2,9 +2,9 @@ package tasks
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
-	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
@@ -75,8 +75,18 @@ func (q *cmdEditQuery) ToQuery(contextSvc services.ContextService, folderSvc ser
 
 func NewEditCmd(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "edit",
-		Args: cobra.ExactArgs(1),
+		Use:   "edit",
+		Args:  cobra.ExactArgs(1),
+		Short: "Edit a task",
+		Example: heredoc.Doc(`
+			$ toodledo tasks edit 8848
+			$ toodledo tasks edit --title="New title" 8848
+			$ toodledo tasks edit --context=Work 8848
+			$ toodledo tasks edit --folder=Inbox 8848
+			$ toodledo tasks edit --goal=landing-moon 8848
+			$ toodledo tasks edit --priority=High 8848
+			$ toodledo tasks edit --status=Active 8848
+		`),
 		Run: func(cmd *cobra.Command, args []string) {
 			cmdQ := cmdEditQuery{}
 			err := utils.FillQueryByFlags(cmd, &cmdQ)
@@ -84,16 +94,16 @@ func NewEditCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.WithError(err).Fatal("parse query failed")
 			}
 			// services
-			_, err = injector.InitApp()
+			app, err := injector.InitApp()
 			if err != nil {
 				logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			taskSvc, _ := injector.InitTaskService()
-			contextSvc, _ := injector.InitContextCachedService()
-			folderSvc, _ := injector.InitFolderCachedService()
-			goalSvc, _ := injector.InitGoalCachedService()
-			taskRichSvc := services.NewTaskRichService(taskSvc, folderSvc, contextSvc, goalSvc, logging.ProvideLogger())
+			taskSvc := app.TaskSvc
+			contextSvc := app.ContextCachedSvc
+			folderSvc := app.FolderCachedSvc
+			goalSvc := app.GoalCachedSvc
+			taskRichSvc := app.TaskRichSvc
 
 			// fetch task
 			id, _ := strconv.Atoi(args[0])

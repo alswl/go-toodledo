@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/sirupsen/logrus"
@@ -14,6 +15,9 @@ func NewStatusCmd(f *cmdutil.Factory) *cobra.Command {
 		Use:   "status",
 		Args:  cobra.ExactArgs(0),
 		Short: "View authentication status",
+		Example: heredoc.Doc(`
+			$ toodledo auth status
+`),
 		Run: func(cmd *cobra.Command, args []string) {
 			app, err := injector.InitApp()
 			if err != nil {

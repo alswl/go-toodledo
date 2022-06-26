@@ -26,8 +26,10 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 		Args:  cobra.MaximumNArgs(1),
 		Short: "Browse toodledo in browser",
 		Example: heredoc.Doc(`
-toodledo browse
-toodledo browse --task 288246017
+			// open toodledo web site
+			$ toodledo browse
+			// open task in browse
+			$ toodledo browse --task 288246017
 `),
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) > 0 {

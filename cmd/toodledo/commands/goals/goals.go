@@ -8,6 +8,7 @@ import (
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "goal",
+		Args:  cobra.NoArgs,
 		Short: "Manage toodledo goals",
 	}
 	cmd.AddCommand(NewListCmd(f), NewCreateCmd(f), NewDeleteCmd(f),

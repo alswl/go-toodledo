@@ -2,6 +2,7 @@ package environments
 
 import (
 	"fmt"
+	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/services"
@@ -12,8 +13,12 @@ import (
 
 func NewSwitchCmd(f *cmdutil.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:  "switch key",
-		Args: cobra.ExactArgs(1),
+		Use:   "switch",
+		Args:  cobra.ExactArgs(1),
+		Short: "Switch environment",
+		Example: heredoc.Doc(`
+			$ toodledo environment switch <name>
+		`),
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			if len(args) != 0 {
 				return nil, cobra.ShellCompDirectiveNoFileComp
