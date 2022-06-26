@@ -9,19 +9,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type ListOpts struct {
+	noCache bool
+}
+
+var listOpts = &ListOpts{}
+
 func NewListCmd(f *cmdutil.Factory) *cobra.Command {
-	return &cobra.Command{
-		Use: "list",
+	cmd := &cobra.Command{
+		Use:  "list",
+		Args: cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			_, err := injector.InitApp()
+			app, err := injector.InitApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			svc, err := injector.InitGoalService()
-			if err != nil {
-				logrus.WithError(err).Fatal("init goals service")
-				return
+			svc := app.GoalSvc
+			if !listOpts.noCache {
+				svc = app.GoalCachedSvc
+				syncer := app.Syncer
+				err = syncer.SyncOnce()
+				if err != nil {
+					logrus.Fatal("sync failed")
+					return
+				}
 			}
 			all, err := svc.ListAll()
 			if err != nil {
@@ -32,4 +44,6 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			fmt.Println(render.Tables4Goal(all))
 		},
 	}
+	cmd.Flags().BoolVarP(&listOpts.noCache, "no-cache", "", false, "do not using cache")
+	return cmd
 }

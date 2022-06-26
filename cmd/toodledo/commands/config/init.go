@@ -44,7 +44,7 @@ you can register your own app here: https://api.toodledo.com/3/account/doc_regis
 			config.Auth.ClientId = clientID
 			config.Auth.ClientSecret = clientSecret
 			bs, _ := yaml.Marshal(config)
-			viper.ReadConfig(bytes.NewBuffer(bs))
+			_ = viper.ReadConfig(bytes.NewBuffer(bs))
 			err := viper.SafeWriteConfig()
 			if err != nil {
 				logrus.WithError(err).Fatal("write config file")

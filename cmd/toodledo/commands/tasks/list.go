@@ -31,6 +31,9 @@ type cmdListQuery struct {
 	// Tags
 }
 
+// FIXME
+//var listOpts = &ListOpts{}
+
 func (q *cmdListQuery) PrepareIDs(contextSvc services.ContextService, goalSvc services.GoalService,
 	folderSvc services.FolderService) error {
 	if q.ContextID == 0 && q.Context != "" {
@@ -94,47 +97,24 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			if err != nil {
 				logrus.WithError(err).Fatal("validate failed")
 			}
-
-			_, err = injector.InitApp()
+			app, err := injector.InitApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			svc, err := injector.InitTaskCachedService()
-			if err != nil {
-				logrus.WithError(err).Fatal("init task service")
-				return
-			}
-			contextSvc, err := injector.InitContextCachedService()
-			if err != nil {
-				logrus.WithError(err).Fatal("init context service")
-				return
-			}
-			folderSvc, err := injector.InitFolderCachedService()
-			if err != nil {
-				logrus.WithError(err).Fatal("init folder service")
-				return
-			}
-			goalSvc, err := injector.InitGoalCachedService()
-			if err != nil {
-				logrus.WithError(err).Fatal("init goal service")
-				return
-			}
-			syncer, err := injector.InitSyncer()
-			if err != nil {
-				logrus.WithError(err).Fatal("init syncer failed")
-				return
-			}
-			taskRichSvc, err := injector.InitTaskRichService()
-			if err != nil {
-				logrus.WithError(err).Fatal("init task rich service failed")
-				return
-			}
+
+			svc := app.TaskCachedSvc
+			contextSvc := app.ContextCachedSvc
+			folderSvc := app.FolderCachedSvc
+			goalSvc := app.GoalCachedSvc
+			taskRichSvc := app.TaskRichSvc
+			syncer := app.Syncer
 			err = syncer.SyncOnce()
 			if err != nil {
 				logrus.WithError(err).Fatal("sync failed")
 				return
 			}
+
 			err = cmdQ.PrepareIDs(contextSvc, goalSvc, folderSvc)
 			if err != nil {
 				logrus.WithError(err).Fatal("prepare ids failed")
@@ -154,6 +134,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			fmt.Println(render.Tables4RichTasks(rts))
 		},
 	}
+	// FIXME bind to query instance
 	err := utils.BindFlagsByQuery(cmd, cmdListQuery{})
 	if err != nil {
 		logrus.WithError(err).Fatal("bind flags failed")

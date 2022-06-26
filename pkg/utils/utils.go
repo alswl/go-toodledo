@@ -52,6 +52,7 @@ func OpenBrowser(url string) {
 	}
 }
 
+// BindFlagsByQuery bind flags to query, the query support basic types, and support `validate:"required"`
 func BindFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
 	if reflect.ValueOf(obj).Type().Kind() != reflect.Struct {
 		return fmt.Errorf("%s is not a struct", reflect.ValueOf(obj).Type().Kind())

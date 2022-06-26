@@ -375,11 +375,22 @@ func InitApp() (*app.ToodledoCliApp, error) {
 	}
 	fieldLogger := logging.ProvideLoggerItf()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
+	servicesTaskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
+	taskCachedService := services.NewTaskCachedService(servicesTaskService, accountService, backend)
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	folderCachedService := services.NewFolderCachedService(folderService, accountService, backend)
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
+	contextCachedService := services.NewContextCachedService(contextService, accountService, backend)
 	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
+	goalCachedService := services.NewGoalCachedService(goalService, accountService, backend)
 	savedSearchService := services.NewSavedSearchService(toodledo, clientAuthInfoWriter)
-	toodledoCliApp := app.NewToodledoCliApp(account, accountService, taskService, folderService, contextService, goalService, savedSearchService)
+	taskRichService := services.NewTaskRichCachedService(taskCachedService, folderCachedService, contextCachedService, goalCachedService, fieldLogger)
+	logger := logging.ProvideLogger()
+	toodledoFetcher, err := syncer.NewToodledoSyncer(folderCachedService, accountService, goalCachedService, taskCachedService, contextCachedService, backend, logger)
+	if err != nil {
+		return nil, err
+	}
+	toodledoCliApp := app.NewToodledoCliApp(account, accountService, taskService, taskCachedService, folderService, folderCachedService, contextService, contextCachedService, goalService, goalCachedService, savedSearchService, taskRichService, toodledoFetcher)
 	return toodledoCliApp, nil
 }
 
