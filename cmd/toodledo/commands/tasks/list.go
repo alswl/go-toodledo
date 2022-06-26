@@ -1,6 +1,7 @@
 package tasks
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
@@ -15,6 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/yaml"
 )
 
 type cmdListQuery struct {
@@ -29,6 +31,8 @@ type cmdListQuery struct {
 
 	DueDate  string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
 	SubTasks string `validate:"omitempty,oneof=Inline Hidden Indented inline hidden indented"`
+
+	Format string `validate:"omitempty,oneof=name json yaml"`
 	// TODO
 	// Tags
 }
@@ -144,9 +148,19 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 			rts, _ := taskRichSvc.RichThem(tasks)
-			fmt.Println(render.Tables4RichTasks(rts))
+			switch cmdQ.Format {
+			case "json":
+				bs, _ := json.Marshal(rts)
+				fmt.Println(string(bs))
+			case "yaml":
+				bs, _ := yaml.Marshal(rts)
+				fmt.Println(string(bs))
+			default:
+				fmt.Println(render.Tables4RichTasks(rts))
+			}
 		},
 	}
+
 	err := utils.BindFlagsByQuery(cmd, *cmdQ)
 	if err != nil {
 		logrus.WithError(err).Fatal("bind flags failed")

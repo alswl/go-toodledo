@@ -86,10 +86,12 @@ generate-code:
 	@echo -n ''
 
 generate-code-enum:
+	# go install golang.org/x/tools/cmd/stringer
 	@echo generate stringer for enums
 	# TODO using ls
 	@(cd pkg/models/enums/tasks/priority; go generate)
 	@(cd pkg/models/enums/tasks/status; go generate)
+	@(cd pkg/models/enums/tasks/subtasksview; go generate)
 
 generate-code-swagger:
 	@(cd pkg; rm client/zz_generated_*.go;rm client/*/zz_generated_*.go; rm models/zz_generated_*.go; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override -C ../api/config.yaml)
