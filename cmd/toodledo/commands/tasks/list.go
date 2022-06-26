@@ -1,12 +1,14 @@
 package tasks
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
+	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/subtasksview"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/alswl/go-toodledo/pkg/services"
@@ -15,6 +17,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/yaml"
 )
 
 type cmdListQuery struct {
@@ -27,13 +30,15 @@ type cmdListQuery struct {
 	Priority  string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
 	Status    string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`
 
-	DueDate string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
+	DueDate      string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
+	SubTasksMode string `validate:"omitempty,oneof=Inline Hidden Indented inline hidden indented"`
+
+	Format string `validate:"omitempty,oneof=name json yaml"`
 	// TODO
 	// Tags
 }
 
-// FIXME
-//var listOpts = &ListOpts{}
+var cmdQ = &cmdListQuery{}
 
 func (q *cmdListQuery) PrepareIDs(contextSvc services.ContextService, goalSvc services.GoalService,
 	folderSvc services.FolderService) error {
@@ -90,16 +95,18 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 		Short: "List tasks",
 		Example: heredoc.Doc(`
 			$ toodledo tasks list
-			$ toodledo tasks list --context "Work"	
-			$ toodledo tasks list --folder "Work"
-			$ toodledo tasks list --goal "Work"
-			$ toodledo tasks list --priority "High"
-			$ toodledo tasks list --status "Active"
+			$ toodledo tasks list --context Work
+			$ toodledo tasks list --context-id 4455
+			$ toodledo tasks list --folder inbox
+			$ toodledo tasks list --folder-id 4455
+			$ toodledo tasks list --goal landing-moon
+			$ toodledo tasks list --goal-id 4455
+			$ toodledo tasks list --priority High
+			$ toodledo tasks list --status Active
 			$ toodledo tasks list --due-date "2020-01-01"
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			cmdQ := cmdListQuery{}
-			err := utils.FillQueryByFlags(cmd, &cmdQ)
+			err := utils.FillQueryByFlags(cmd, cmdQ)
 			if err != nil {
 				logrus.WithError(err).Fatal("failed")
 			}
@@ -141,12 +148,22 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.Error(err)
 				return
 			}
-			rts, _ := taskRichSvc.RichThem(tasks)
-			fmt.Println(render.Tables4RichTasks(rts))
+			sorted, err := services.SortSubTasks(tasks, subtasksview.ModeString2Type(cmdQ.SubTasksMode))
+			rts, _ := taskRichSvc.RichThem(sorted)
+			switch cmdQ.Format {
+			case "json":
+				bs, _ := json.Marshal(rts)
+				fmt.Println(string(bs))
+			case "yaml":
+				bs, _ := yaml.Marshal(rts)
+				fmt.Println(string(bs))
+			default:
+				fmt.Println(render.Tables4RichTasks(rts))
+			}
 		},
 	}
-	// FIXME bind to query instance
-	err := utils.BindFlagsByQuery(cmd, cmdListQuery{})
+
+	err := utils.BindFlagsByQuery(cmd, *cmdQ)
 	if err != nil {
 		logrus.WithError(err).Fatal("bind flags failed")
 	}

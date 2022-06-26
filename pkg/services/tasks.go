@@ -262,28 +262,3 @@ func (s *taskService) UnComplete(id int64) (*models.Task, error) {
 		Completed: 0,
 	})
 }
-
-//if b.folder != "" && query.FolderID == 0 {
-//	folder, err := b.folderSvc.Find(b.folder)
-//	if err != nil {
-//		return errors.Wrap(err, "find folder")
-//	}
-//	query.FolderID = folder.ID
-//}
-//
-//if b.context != "" && query.ContextID == 0 {
-//	context, err := b.contextSvc.Find(b.context)
-//	if err != nil {
-//		return errors.Wrap(err, "find context")
-//	}
-//	query.ContextID = context.ID
-//}
-//if b.goal != "" && query.GoalID == 0 {
-//	goal, err := b.goalSvc.Find(b.goal)
-//	if err != nil {
-//		return errors.Wrap(err, "find goal")
-//	}
-//	query.GoalID = goal.ID
-//}
-//
-//return nil
