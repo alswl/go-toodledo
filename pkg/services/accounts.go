@@ -78,6 +78,7 @@ func (s *accountService) SetLastSyncInfo(account *models.Account) error {
 func (s *accountService) cachedMe(key string) (*models.Account, bool, error) {
 	bytes, err := s.db.Get(BucketAccount, key)
 	u := models.Account{}
+	// TODO refactor, cacheOrSet(key, setFn): val
 	if err == dal.ErrObjectNotFound {
 		me, err := s.Me()
 		if err != nil {
@@ -101,5 +102,6 @@ func (s *accountService) cachedMe(key string) (*models.Account, bool, error) {
 }
 
 func (s *accountService) CachedMe() (*models.Account, bool, error) {
+	// TODO refactor, cacheOrSet(key, setFn): val
 	return s.cachedMe("me")
 }

@@ -53,7 +53,6 @@ func (s *toodledoFetcher) SyncOnce() error {
 }
 
 func (s *toodledoFetcher) sync() error {
-	// TODO remove duplicated call
 	me, _ := s.accountSvc.Me()
 	lastSyncInfo, err := s.accountSvc.GetLastSyncInfo()
 	if err != nil {
