@@ -14,5 +14,6 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 		// TODO search task by saved-searches
 	}
 	cmd.AddCommand(NewListCmd(f))
+	cmd.AddCommand(NewViewCmd(f))
 	return cmd
 }
