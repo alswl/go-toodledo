@@ -85,6 +85,7 @@ func (s *taskService) ListWithChanged(lastEditTime *int32, start, limit int64) (
 	p := task.NewGetTasksGetPhpParams()
 	fields := enums.TaskFields2String(enums.GeneralTaskFields)
 	p.SetFields(&fields)
+	// FIXME do not set comp, get all tasks
 	comp := int64(0)
 	p.SetComp(&comp)
 	num := limit

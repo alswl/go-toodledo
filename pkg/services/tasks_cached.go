@@ -225,6 +225,16 @@ func (s *taskCachedService) ListAllByQuery(query *queries.TaskListQuery) ([]*mod
 			return t.Goal == query.GoalID
 		}).([]*models.Task)
 	}
+	if query.Incomplete != nil {
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			if *query.Incomplete {
+				return t.Completed == 0
+			} else {
+				return t.Completed == 1
+			}
+		}).([]*models.Task)
+	}
+
 	return ts, nil
 }
 
