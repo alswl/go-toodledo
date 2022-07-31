@@ -58,6 +58,7 @@ GOOS = darwin
 GOARCH = amd64
 VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
 
+# TODO using k8s makefile style
 
 
 .PHONY: fmt build container test integration-test push clean lint download generate-code compress
@@ -84,6 +85,10 @@ lint:
 
 generate-code:
 	@echo -n ''
+
+.PHONY: generate-docs
+generate-docs:
+	go run ./cmd/gendocs/main.go
 
 generate-code-enum:
 	# go install golang.org/x/tools/cmd/stringer

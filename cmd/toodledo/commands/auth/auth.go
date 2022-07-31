@@ -12,5 +12,6 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 		Short: "Manage authentication",
 	}
 	Cmd.AddCommand(NewLoginCmd(f), NewTokenCmd(f), NewStatusCmd(f))
+	Cmd.AddCommand(NewLogoutCmd(f))
 	return Cmd
 }
