@@ -13,6 +13,7 @@ type TaskListQuery struct {
 	GoalID    int64
 	DueDate   string
 	// Priority, low is zero, is default value, Priority should be pointer
-	Priority *priority.Priority
-	Status   *status.Status
+	Priority   *priority.Priority
+	Status     *status.Status
+	Incomplete *bool
 }

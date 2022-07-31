@@ -33,7 +33,9 @@ type cmdListQuery struct {
 	DueDate      string `validate:"omitempty,datetime=2006-01-02" json:"due_date" description:"format 2021-01-01"`
 	SubTasksMode string `validate:"omitempty,oneof=Inline Hidden Indented inline hidden indented"`
 
-	Format string `validate:"omitempty,oneof=name json yaml"`
+	Format     string `validate:"omitempty,oneof=name json yaml"`
+	Incomplete bool   `validate:"omitempty"`
+	Complete   bool   `validate:"omitempty"`
 	// TODO
 	// Tags
 }
@@ -83,6 +85,17 @@ func (q *cmdListQuery) ToQuery() (*queries.TaskListQuery, error) {
 	if q.Status != "" {
 		s := tstatus.StatusString2Type(q.Status)
 		query.Status = &s
+	}
+	// TODO validate incomplete and complete
+	if q.Incomplete {
+		in := true
+		query.Incomplete = &in
+	}
+	// FIXME, not supported now, wait syncer support
+	// remoteSvc.List
+	if q.Complete {
+		in := false
+		query.Incomplete = &in
 	}
 
 	return query, nil
