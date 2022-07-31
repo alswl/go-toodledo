@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/alswl/go-toodledo/pkg/models"
+	utilsviper "github.com/alswl/go-toodledo/pkg/utils/viper"
 	"github.com/go-openapi/runtime"
 	openapiclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -15,6 +16,10 @@ import (
 
 	"time"
 )
+
+const AuthAccessToken = "auth.access_token"
+const AuthExpiredAt = "auth.expired_at"
+const AuthRefreshToken = "auth.refresh_token"
 
 // SimpleAuth ...
 type SimpleAuth struct {
@@ -37,16 +42,16 @@ func NewAuthFromConfig(cfg models.ToodledoConfig) (runtime.ClientAuthInfoWriter,
 	accessToken := cfg.AccessToken
 	rt := cfg.RefreshToken
 	if accessToken == "" {
-		logrus.Error("auth.access_token is empty")
-		return nil, errors.New("auth.access_token is empty")
+		logrus.WithField("key", AuthAccessToken).Error("empty")
+		return nil, fmt.Errorf("%s is empty", AuthAccessToken)
 	}
 	expiredAt := cfg.ExpiredAt
 	if expiredAt == "" {
-		return nil, errors.New("auth.expired_at is empty")
+		return nil, fmt.Errorf("%s is empty", AuthExpiredAt)
 	}
 	at, err := time.Parse(time.RFC3339, expiredAt)
 	if err != nil {
-		return nil, errors.New("auth.expired_at parse error")
+		return nil, fmt.Errorf("%s is invalid", AuthExpiredAt)
 	}
 
 	return NewAuthWithRefresh(cfg.ClientId, cfg.ClientSecret, accessToken, rt, at, SaveTokenWithViper)
@@ -78,7 +83,7 @@ func NewAuthWithRefresh(clientId, clientSecret, accessToken, refreshToken string
 	}
 
 	if refreshToken == "" {
-		return nil, errors.New("auth.refresh_token is empty")
+		return nil, fmt.Errorf("%s is empty", AuthRefreshToken)
 	}
 	newToken, err := regenerate(conf, &token)
 	if err != nil {
@@ -155,12 +160,29 @@ func regenerate(conf *oauth2.Config, oldToken *oauth2.Token) (*oauth2.Token, err
 // TODO refactor
 func SaveTokenWithViper(tok *oauth2.Token) error {
 	// TOTO move to Configs
-	viper.Set("auth.access_token", tok.AccessToken)
-	viper.Set("auth.expired_at", tok.Expiry.Format(time.RFC3339))
-	viper.Set("auth.refresh_token", tok.RefreshToken)
+	viper.Set(AuthAccessToken, tok.AccessToken)
+	viper.Set(AuthExpiredAt, tok.Expiry.Format(time.RFC3339))
+	viper.Set(AuthRefreshToken, tok.RefreshToken)
 	err := viper.WriteConfig()
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func CleanAuthWithViper() error {
+	err := utilsviper.Unset(AuthAccessToken)
+	if err != nil {
+		return err
+	}
+	err = utilsviper.Unset(AuthRefreshToken)
+	if err != nil {
+		return err
+	}
+	err = utilsviper.Unset(AuthExpiredAt)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

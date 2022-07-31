@@ -36,7 +36,6 @@ func NewAccountService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter, 
 	return &accountService{cli: cli, auth: auth, db: db}
 }
 
-// Me ...
 func (s *accountService) Me() (*models.Account, error) {
 	p := account.NewGetAccountGetPhpParams()
 	resp, err := s.cli.Account.GetAccountGetPhp(p, s.auth)

@@ -11,6 +11,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/goals"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/savedsearches"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/tasks"
+	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/iostreams"
 	"github.com/alswl/go-toodledo/pkg/version"
@@ -38,7 +39,7 @@ func NewRootCmd(f *cmdutil.Factory) *cobra.Command {
 	// XXX changed, test
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/config/toodledo/conf.yaml)")
 
-	_ = viper.BindPFlag("auth.access_token", rootCmd.PersistentFlags().Lookup("access_token"))
+	_ = viper.BindPFlag(client.AuthAccessToken, rootCmd.PersistentFlags().Lookup("access_token"))
 
 	// TODO add Environment
 	rootCmd.AddCommand(tasks.NewCmd(f), folders.NewCmd(f), contexts.NewCmd(f), goals.NewCmd(f),
