@@ -14,7 +14,7 @@ Status: Under Development
  327078471 │ [ ] │ abc2x            │ NextAction │ home    │     High │         │ c    │            │             │        │
 ```
 
-More commands usage can be found in the [Manual](./docs/toodledo.md).
+More commands usage can be found in the [Manual](./docs/commands/toodledo.md).
 
 ### Quick Start
 

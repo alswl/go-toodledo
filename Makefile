@@ -88,6 +88,8 @@ generate-code:
 
 .PHONY: generate-docs
 generate-docs:
+	rm -rf docs/toodledo/commands
+	mkdir -p docs/commands
 	go run ./cmd/gendocs/main.go
 
 generate-code-enum:
