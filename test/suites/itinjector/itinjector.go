@@ -7,8 +7,8 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/dal"
+	"github.com/alswl/go-toodledo/pkg/fetcher"
 	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/alswl/go-toodledo/pkg/syncer"
 	"github.com/go-openapi/runtime"
 	"github.com/google/wire"
 )
@@ -28,7 +28,7 @@ func InitFolderService() (services.FolderService, error) {
 	return nil, nil
 }
 
-func InitFolderCachedService() (services.FolderCachedService, error) {
+func InitFolderLocalService() (services.FolderLocalService, error) {
 	wire.Build(IntegrationTestSet)
 	return nil, nil
 }
@@ -38,7 +38,7 @@ func InitContextService() (services.ContextService, error) {
 	return nil, nil
 }
 
-func InitContextCachedService() (services.ContextCachedService, error) {
+func InitContextLocalService() (services.ContextLocalService, error) {
 	wire.Build(IntegrationTestSet)
 	return nil, nil
 }
@@ -48,7 +48,7 @@ func InitTaskService() (services.TaskService, error) {
 	return nil, nil
 }
 
-func InitTaskCachedService() (services.TaskCachedService, error) {
+func InitTaskLocalService() (services.TaskLocalService, error) {
 	wire.Build(IntegrationTestSet)
 	return nil, nil
 }
@@ -58,7 +58,7 @@ func InitGoalService() (services.GoalService, error) {
 	return nil, nil
 }
 
-func InitGoalCachedService() (services.GoalCachedService, error) {
+func InitGoalLocalService() (services.GoalLocalService, error) {
 	wire.Build(IntegrationTestSet)
 	return nil, nil
 }
@@ -83,13 +83,18 @@ func InitTaskRichCachedService() (services.TaskRichCachedService, error) {
 	return nil, nil
 }
 
-func InitSyncer() (syncer.ToodledoFetcher, error) {
+func InitSyncer() (fetcher.ToodledoFetcher, error) {
 	wire.Build(IntegrationTestSet)
 	return nil, nil
 }
 
-func InitApp() (*app.ToodledoCliApp, error) {
+func InitTUIApp() (*app.ToodledoTUIApp, error) {
 	wire.Build(IntegrationTestSet)
+	return nil, nil
+}
+
+func InitCLIApp() (*app.ToodledoCLIApp, error) {
+	wire.Build(CLISet)
 	return nil, nil
 }
 

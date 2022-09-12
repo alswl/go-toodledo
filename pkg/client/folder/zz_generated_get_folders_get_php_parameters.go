@@ -52,10 +52,12 @@ func NewGetFoldersGetPhpParamsWithHTTPClient(client *http.Client) *GetFoldersGet
 	}
 }
 
-/* GetFoldersGetPhpParams contains all the parameters to send to the API endpoint
-   for the get folders get php operation.
+/*
+GetFoldersGetPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get folders get php operation.
+
+	Typically these are written to a http.Request.
 */
 type GetFoldersGetPhpParams struct {
 	timeout    time.Duration

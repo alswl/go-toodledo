@@ -9,9 +9,10 @@ import (
 	"sync"
 )
 
-// ContextCachedService ...
-type ContextCachedService interface {
-	Cached
+// ContextLocalService is a cached service
+// it synced interval by fetcher
+type ContextLocalService interface {
+	LocalStorage
 	ContextService
 }
 
@@ -25,8 +26,8 @@ type contextCachedService struct {
 	accountSvc AccountService
 }
 
-// NewContextCachedService ...
-func NewContextCachedService(contextsvc ContextService, accountSvc AccountService, db dal.Backend) ContextCachedService {
+// NewContextLocalService ...
+func NewContextLocalService(contextsvc ContextService, accountSvc AccountService, db dal.Backend) ContextLocalService {
 	s := contextCachedService{
 		svc:        contextsvc,
 		db:         db,

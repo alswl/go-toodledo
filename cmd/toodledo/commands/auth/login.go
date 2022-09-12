@@ -20,7 +20,7 @@ func NewLoginCmd(f *cmdutil.Factory) *cobra.Command {
 			$ toodledo auth login
 `),
 		Run: func(cmd *cobra.Command, args []string) {
-			app, err := injector.InitApp()
+			app, err := injector.InitCLIApp()
 			if err == nil {
 				me, err := app.AccountSvc.Me()
 				if err == nil {

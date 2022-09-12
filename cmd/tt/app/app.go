@@ -8,11 +8,11 @@ import (
 	comstatusbar "github.com/alswl/go-toodledo/cmd/tt/components/statusbar"
 	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
+	"github.com/alswl/go-toodledo/pkg/fetcher"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/constants"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/alswl/go-toodledo/pkg/syncer"
 	"github.com/alswl/go-toodledo/pkg/utils"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -42,10 +42,10 @@ type States struct {
 
 type Model struct {
 	taskRichSvc services.TaskRichService
-	contextSvc  services.ContextCachedService
-	folderSvc   services.FolderCachedService
-	goalSvc     services.GoalCachedService
-	taskSvc     services.TaskCachedService
+	contextSvc  services.ContextLocalService
+	folderSvc   services.FolderLocalService
+	goalSvc     services.GoalLocalService
+	taskSvc     services.TaskExtendedService
 
 	// properties
 	// TODO
@@ -66,7 +66,7 @@ type Model struct {
 	// TODO help pane
 	//help          help.Model
 	isInputting bool
-	syncer      syncer.ToodledoFetcher
+	fetcher     fetcher.ToodledoFetcher
 }
 
 func (m *Model) Init() tea.Cmd {
@@ -118,7 +118,7 @@ func (m *Model) Init() tea.Cmd {
 	})
 	cmds = append(cmds, func() tea.Msg {
 		m.statusBar.SetInfo1("syncing")
-		err := m.syncer.SyncOnce()
+		err := m.fetcher.FetchOnce()
 		if err != nil {
 			m.statusBar.SetStatus("ERROR: " + err.Error())
 		}
@@ -275,7 +275,7 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) (*Model, tea.Cmd) {
 
 func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	m.statusBar.SetStatus("tab: " + tab + " item: " + item.Title())
-	svc, err := injector.InitTaskCachedService()
+	svc, err := injector.InitTaskLocalService()
 	if err != nil {
 		m.statusBar.SetStatus("ERROR: " + err.Error())
 	}
@@ -336,11 +336,11 @@ func InitialModel() *Model {
 		// FIXME
 		panic(err)
 	}
-	_, err = injector.InitApp()
+	_, err = injector.InitTUIApp()
 	if err != nil {
 		panic(err)
 	}
-	taskSvc, err := injector.InitTaskCachedService()
+	taskSvc, err := injector.InitTaskLocalService()
 	if err != nil {
 		panic(err)
 	}
@@ -348,15 +348,15 @@ func InitialModel() *Model {
 	if err != nil {
 		panic(err)
 	}
-	contextSvc, err := injector.InitContextCachedService()
+	contextSvc, err := injector.InitContextLocalService()
 	if err != nil {
 		panic(err)
 	}
-	folderSvc, err := injector.InitFolderCachedService()
+	folderSvc, err := injector.InitFolderLocalService()
 	if err != nil {
 		panic(err)
 	}
-	goalSvc, err := injector.InitGoalCachedService()
+	goalSvc, err := injector.InitGoalLocalService()
 	if err != nil {
 		panic(err)
 	}
@@ -388,7 +388,7 @@ func InitialModel() *Model {
 		folderSvc:   folderSvc,
 		goalSvc:     goalSvc,
 		taskSvc:     taskSvc,
-		syncer:      syncer,
+		fetcher:     syncer,
 		states:      states,
 		err:         nil,
 		focused:     "tasks",

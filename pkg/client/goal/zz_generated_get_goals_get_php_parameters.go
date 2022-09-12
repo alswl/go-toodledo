@@ -52,10 +52,12 @@ func NewGetGoalsGetPhpParamsWithHTTPClient(client *http.Client) *GetGoalsGetPhpP
 	}
 }
 
-/* GetGoalsGetPhpParams contains all the parameters to send to the API endpoint
-   for the get goals get php operation.
+/*
+GetGoalsGetPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get goals get php operation.
+
+	Typically these are written to a http.Request.
 */
 type GetGoalsGetPhpParams struct {
 	timeout    time.Duration

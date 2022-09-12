@@ -57,7 +57,8 @@ func NewPostGoalsAddPhpOK() *PostGoalsAddPhpOK {
 	return &PostGoalsAddPhpOK{}
 }
 
-/* PostGoalsAddPhpOK describes a response with status code 200, with default header values.
+/*
+	PostGoalsAddPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -87,7 +88,8 @@ func NewPostGoalsAddPhpUnauthorized() *PostGoalsAddPhpUnauthorized {
 	return &PostGoalsAddPhpUnauthorized{}
 }
 
-/* PostGoalsAddPhpUnauthorized describes a response with status code 401, with default header values.
+/*
+	PostGoalsAddPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -119,7 +121,8 @@ func NewPostGoalsAddPhpTooManyRequests() *PostGoalsAddPhpTooManyRequests {
 	return &PostGoalsAddPhpTooManyRequests{}
 }
 
-/* PostGoalsAddPhpTooManyRequests describes a response with status code 429, with default header values.
+/*
+	PostGoalsAddPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -151,7 +154,8 @@ func NewPostGoalsAddPhpServiceUnavailable() *PostGoalsAddPhpServiceUnavailable {
 	return &PostGoalsAddPhpServiceUnavailable{}
 }
 
-/* PostGoalsAddPhpServiceUnavailable describes a response with status code 503, with default header values.
+/*
+	PostGoalsAddPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

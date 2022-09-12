@@ -10,7 +10,7 @@ import (
 )
 
 func Test_cache_ListAll(t *testing.T) {
-	app, err := itinjector.InitApp()
+	app, err := itinjector.InitTUIApp()
 	assert.Nil(t, err)
 	assert.NotNil(t, app)
 	svc, err := itinjector.InitFolderService()

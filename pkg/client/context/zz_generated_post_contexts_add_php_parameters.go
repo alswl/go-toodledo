@@ -53,10 +53,12 @@ func NewPostContextsAddPhpParamsWithHTTPClient(client *http.Client) *PostContext
 	}
 }
 
-/* PostContextsAddPhpParams contains all the parameters to send to the API endpoint
-   for the post contexts add php operation.
+/*
+PostContextsAddPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post contexts add php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostContextsAddPhpParams struct {
 

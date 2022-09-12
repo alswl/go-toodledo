@@ -42,7 +42,7 @@ type ClientService interface {
 }
 
 /*
-  GetFoldersGetPhp get folders get php API
+GetFoldersGetPhp get folders get php API
 */
 func (a *Client) GetFoldersGetPhp(params *GetFoldersGetPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetFoldersGetPhpOK, error) {
 	// TODO: Validate the params before sending
@@ -81,7 +81,7 @@ func (a *Client) GetFoldersGetPhp(params *GetFoldersGetPhpParams, authInfo runti
 }
 
 /*
-  PostFoldersAddPhp post folders add php API
+PostFoldersAddPhp post folders add php API
 */
 func (a *Client) PostFoldersAddPhp(params *PostFoldersAddPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostFoldersAddPhpOK, error) {
 	// TODO: Validate the params before sending
@@ -120,7 +120,7 @@ func (a *Client) PostFoldersAddPhp(params *PostFoldersAddPhpParams, authInfo run
 }
 
 /*
-  PostFoldersDeletePhp post folders delete php API
+PostFoldersDeletePhp post folders delete php API
 */
 func (a *Client) PostFoldersDeletePhp(params *PostFoldersDeletePhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostFoldersDeletePhpOK, error) {
 	// TODO: Validate the params before sending
@@ -159,7 +159,7 @@ func (a *Client) PostFoldersDeletePhp(params *PostFoldersDeletePhpParams, authIn
 }
 
 /*
-  PostFoldersEditPhp post folders edit php API
+PostFoldersEditPhp post folders edit php API
 */
 func (a *Client) PostFoldersEditPhp(params *PostFoldersEditPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostFoldersEditPhpOK, error) {
 	// TODO: Validate the params before sending

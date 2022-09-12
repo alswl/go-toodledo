@@ -36,7 +36,7 @@ type ClientService interface {
 }
 
 /*
-  GetAccountGetPhp get account get php API
+GetAccountGetPhp get account get php API
 */
 func (a *Client) GetAccountGetPhp(params *GetAccountGetPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetAccountGetPhpOK, error) {
 	// TODO: Validate the params before sending

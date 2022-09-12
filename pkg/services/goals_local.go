@@ -9,33 +9,34 @@ import (
 	"sync"
 )
 
-// FolderCachedService ...
-type FolderCachedService interface {
-	Cached
-	FolderService
+// GoalLocalService is a cached service
+// it synced interval by fetcher
+type GoalLocalService interface {
+	LocalStorage
+	GoalService
 }
 
-var FolderBucket = "folders"
+var GoalBucket = "goals"
 
-type folderCachedService struct {
+type goalCachedService struct {
 	syncLock sync.Mutex
 
-	svc        FolderService
+	svc        GoalService
 	db         dal.Backend
 	accountSvc AccountService
 }
 
-// NewFolderCachedService ...
-func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService, db dal.Backend) FolderCachedService {
-	s := folderCachedService{
-		svc:        folderSvc,
+// NewGoalLocalService ...
+func NewGoalLocalService(goalsvc GoalService, accountSvc AccountService, db dal.Backend) GoalLocalService {
+	s := goalCachedService{
+		svc:        goalsvc,
 		db:         db,
 		accountSvc: accountSvc,
 	}
 	return &s
 }
 
-func (s *folderCachedService) Sync() error {
+func (s *goalCachedService) Sync() error {
 	all, err := s.svc.ListAll()
 	if err != nil {
 		return err
@@ -48,48 +49,48 @@ func (s *folderCachedService) Sync() error {
 	}
 	for _, f := range all {
 		bytes, _ := json.Marshal(f)
-		_ = s.db.Put(FolderBucket, f.Name, bytes)
+		_ = s.db.Put(GoalBucket, f.Name, bytes)
 	}
 	return nil
 }
 
-func (s *folderCachedService) PartialSync(lastEditTime *int32) error {
+func (s *goalCachedService) PartialSync(lastEditTime *int32) error {
 	return s.Sync()
 }
 
 // Rename ...
-func (s *folderCachedService) Rename(name string, newName string) (*models.Folder, error) {
+func (s *goalCachedService) Rename(name string, newName string) (*models.Goal, error) {
 	_ = s.LocalClear()
 	return s.svc.Rename(name, newName)
 }
 
 // Archive ...
-func (s *folderCachedService) Archive(id int, isArchived bool) (*models.Folder, error) {
+func (s *goalCachedService) Archive(id int, isArchived bool) (*models.Goal, error) {
 	_ = s.LocalClear()
 	return s.svc.Archive(id, isArchived)
 }
 
 // Delete ...
-func (s *folderCachedService) Delete(name string) error {
+func (s *goalCachedService) Delete(name string) error {
 	_ = s.LocalClear()
 	return s.svc.Delete(name)
 }
 
 // Create ...
-func (s *folderCachedService) Create(name string) (*models.Folder, error) {
+func (s *goalCachedService) Create(name string) (*models.Goal, error) {
 	_ = s.LocalClear()
 	return s.svc.Create(name)
 }
 
 // ListAll ...
-func (s *folderCachedService) ListAll() ([]*models.Folder, error) {
-	fs := make([]*models.Folder, 0)
-	all, err := s.db.List(FolderBucket)
+func (s *goalCachedService) ListAll() ([]*models.Goal, error) {
+	fs := make([]*models.Goal, 0)
+	all, err := s.db.List(GoalBucket)
 	if err != nil {
 		return nil, err
 	}
 	for _, bytes := range all {
-		f := &models.Folder{}
+		f := &models.Goal{}
 		_ = json.Unmarshal(bytes, &f)
 		fs = append(fs, f)
 	}
@@ -97,15 +98,15 @@ func (s *folderCachedService) ListAll() ([]*models.Folder, error) {
 }
 
 // Find ...
-func (s *folderCachedService) Find(name string) (*models.Folder, error) {
+func (s *goalCachedService) Find(name string) (*models.Goal, error) {
 	fs, err := s.ListAll()
 	if err != nil {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Folder) bool {
+	filtered := funk.Filter(fs, func(x *models.Goal) bool {
 		return x.Name == name
-	}).([]*models.Folder)
+	}).([]*models.Goal)
 	if len(filtered) == 0 {
 		return nil, common.ErrNotFound
 	}
@@ -113,15 +114,15 @@ func (s *folderCachedService) Find(name string) (*models.Folder, error) {
 	return f, nil
 }
 
-func (s *folderCachedService) FindByID(id int64) (*models.Folder, error) {
+func (s *goalCachedService) FindByID(id int64) (*models.Goal, error) {
 	fs, err := s.ListAll()
 	if err != nil {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Folder) bool {
+	filtered := funk.Filter(fs, func(x *models.Goal) bool {
 		return x.ID == id
-	}).([]*models.Folder)
+	}).([]*models.Goal)
 	if len(filtered) == 0 {
 		return nil, common.ErrNotFound
 	}
@@ -129,8 +130,8 @@ func (s *folderCachedService) FindByID(id int64) (*models.Folder, error) {
 	return f, nil
 }
 
-func (s *folderCachedService) LocalClear() error {
-	err := s.db.Truncate(FolderBucket)
+func (s *goalCachedService) LocalClear() error {
+	err := s.db.Truncate(GoalBucket)
 	if err != nil {
 		return err
 	}

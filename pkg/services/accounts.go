@@ -21,8 +21,8 @@ var BucketAccount = "account"
 type AccountService interface {
 	Me() (*models.Account, error)
 	CachedMe() (*models.Account, bool, error)
-	GetLastSyncInfo() (*models.Account, error)
-	SetLastSyncInfo(account *models.Account) error
+	GetLastFetchInfo() (*models.Account, error)
+	SetLastFetchInfo(account *models.Account) error
 }
 
 type accountService struct {
@@ -47,7 +47,7 @@ func (s *accountService) Me() (*models.Account, error) {
 
 var key = "lastSyncInfo"
 
-func (s *accountService) GetLastSyncInfo() (*models.Account, error) {
+func (s *accountService) GetLastFetchInfo() (*models.Account, error) {
 	bytes, err := s.db.Get(BucketAccount, key)
 	if err == dal.ErrObjectNotFound {
 		return nil, nil
@@ -62,7 +62,7 @@ func (s *accountService) GetLastSyncInfo() (*models.Account, error) {
 	return &u, nil
 }
 
-func (s *accountService) SetLastSyncInfo(account *models.Account) error {
+func (s *accountService) SetLastFetchInfo(account *models.Account) error {
 	bytes, err := json.Marshal(account)
 	if err != nil {
 		return errors.Wrap(err, "marshal last sync info")

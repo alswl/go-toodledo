@@ -20,7 +20,7 @@ func NewActivateCmd(f *cmdutil.Factory) *cobra.Command {
 			$ toodledo folder activate reading
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			app, err := injector.InitApp()
+			app, err := injector.InitCLIApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return

@@ -44,7 +44,7 @@ type ClientService interface {
 }
 
 /*
-  GetTasksDeletedPhp get tasks deleted php API
+GetTasksDeletedPhp get tasks deleted php API
 */
 func (a *Client) GetTasksDeletedPhp(params *GetTasksDeletedPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTasksDeletedPhpOK, error) {
 	// TODO: Validate the params before sending
@@ -83,7 +83,7 @@ func (a *Client) GetTasksDeletedPhp(params *GetTasksDeletedPhpParams, authInfo r
 }
 
 /*
-  GetTasksGetPhp get tasks get php API
+GetTasksGetPhp get tasks get php API
 */
 func (a *Client) GetTasksGetPhp(params *GetTasksGetPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTasksGetPhpOK, error) {
 	// TODO: Validate the params before sending
@@ -122,7 +122,7 @@ func (a *Client) GetTasksGetPhp(params *GetTasksGetPhpParams, authInfo runtime.C
 }
 
 /*
-  PostTasksAddPhp post tasks add php API
+PostTasksAddPhp post tasks add php API
 */
 func (a *Client) PostTasksAddPhp(params *PostTasksAddPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostTasksAddPhpOK, error) {
 	// TODO: Validate the params before sending
@@ -161,7 +161,7 @@ func (a *Client) PostTasksAddPhp(params *PostTasksAddPhpParams, authInfo runtime
 }
 
 /*
-  PostTasksDeletePhp post tasks delete php API
+PostTasksDeletePhp post tasks delete php API
 */
 func (a *Client) PostTasksDeletePhp(params *PostTasksDeletePhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostTasksDeletePhpOK, error) {
 	// TODO: Validate the params before sending
@@ -200,7 +200,7 @@ func (a *Client) PostTasksDeletePhp(params *PostTasksDeletePhpParams, authInfo r
 }
 
 /*
-  PostTasksEditPhp post tasks edit php API
+PostTasksEditPhp post tasks edit php API
 */
 func (a *Client) PostTasksEditPhp(params *PostTasksEditPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostTasksEditPhpOK, error) {
 	// TODO: Validate the params before sending

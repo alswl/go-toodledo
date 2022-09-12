@@ -57,7 +57,8 @@ func NewGetFoldersGetPhpOK() *GetFoldersGetPhpOK {
 	return &GetFoldersGetPhpOK{}
 }
 
-/* GetFoldersGetPhpOK describes a response with status code 200, with default header values.
+/*
+	GetFoldersGetPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -87,7 +88,8 @@ func NewGetFoldersGetPhpUnauthorized() *GetFoldersGetPhpUnauthorized {
 	return &GetFoldersGetPhpUnauthorized{}
 }
 
-/* GetFoldersGetPhpUnauthorized describes a response with status code 401, with default header values.
+/*
+	GetFoldersGetPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -119,7 +121,8 @@ func NewGetFoldersGetPhpTooManyRequests() *GetFoldersGetPhpTooManyRequests {
 	return &GetFoldersGetPhpTooManyRequests{}
 }
 
-/* GetFoldersGetPhpTooManyRequests describes a response with status code 429, with default header values.
+/*
+	GetFoldersGetPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -151,7 +154,8 @@ func NewGetFoldersGetPhpServiceUnavailable() *GetFoldersGetPhpServiceUnavailable
 	return &GetFoldersGetPhpServiceUnavailable{}
 }
 
-/* GetFoldersGetPhpServiceUnavailable describes a response with status code 503, with default header values.
+/*
+	GetFoldersGetPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

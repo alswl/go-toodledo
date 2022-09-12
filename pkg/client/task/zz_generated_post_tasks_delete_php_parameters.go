@@ -52,10 +52,12 @@ func NewPostTasksDeletePhpParamsWithHTTPClient(client *http.Client) *PostTasksDe
 	}
 }
 
-/* PostTasksDeletePhpParams contains all the parameters to send to the API endpoint
-   for the post tasks delete php operation.
+/*
+PostTasksDeletePhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post tasks delete php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostTasksDeletePhpParams struct {
 

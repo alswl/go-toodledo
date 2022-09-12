@@ -53,10 +53,12 @@ func NewPostContextsEditPhpParamsWithHTTPClient(client *http.Client) *PostContex
 	}
 }
 
-/* PostContextsEditPhpParams contains all the parameters to send to the API endpoint
-   for the post contexts edit php operation.
+/*
+PostContextsEditPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post contexts edit php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostContextsEditPhpParams struct {
 

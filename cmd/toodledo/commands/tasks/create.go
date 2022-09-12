@@ -90,16 +90,16 @@ var createCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("validate failed")
 		}
 
-		app, err := injector.InitApp()
+		app, err := injector.InitCLIApp()
 		if err != nil {
 			logrus.Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		svc := app.TaskCachedSvc
+		svc := app.TaskSvc
 		taskRichSvc := app.TaskRichSvc
-		contextSvc := app.ContextCachedSvc
-		folderSvc := app.FolderCachedSvc
-		goalSvc := app.GoalCachedSvc
+		contextSvc := app.ContextSvc
+		folderSvc := app.FolderSvc
+		goalSvc := app.GoalSvc
 		cmdQ.Title = args[0]
 		q, err := cmdQ.ToQuery(contextSvc, folderSvc, goalSvc)
 		if err != nil {

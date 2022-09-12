@@ -53,10 +53,12 @@ func NewPostFoldersEditPhpParamsWithHTTPClient(client *http.Client) *PostFolders
 	}
 }
 
-/* PostFoldersEditPhpParams contains all the parameters to send to the API endpoint
-   for the post folders edit php operation.
+/*
+PostFoldersEditPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post folders edit php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostFoldersEditPhpParams struct {
 

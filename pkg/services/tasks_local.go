@@ -13,14 +13,15 @@ import (
 	"sync"
 )
 
-type TaskCachedService interface {
-	Cached
+type TaskLocalService interface {
 	TaskService
-
-	ListAllByQuery(query *queries.TaskListQuery) ([]*models.Task, error)
+	TaskExtendedService
+	LocalStorage
 }
 
-type taskCachedService struct {
+var _ TaskLocalService = (*taskLocalService)(nil)
+
+type taskLocalService struct {
 	remoteSvc  *taskService
 	accountSvc AccountService
 
@@ -28,15 +29,15 @@ type taskCachedService struct {
 	db       dal.Backend
 }
 
-func NewTaskCachedService(remoteSvc *taskService, accountSvc AccountService, db dal.Backend) TaskCachedService {
-	return &taskCachedService{remoteSvc: remoteSvc, accountSvc: accountSvc, db: db}
+func NewTaskLocalService(remoteSvc *taskService, accountSvc AccountService, db dal.Backend) TaskLocalService {
+	return &taskLocalService{remoteSvc: remoteSvc, accountSvc: accountSvc, db: db}
 }
 
 var TaskBucket = "tasks"
 
 var MaxNumPerRequest = int64(1000)
 
-func (s *taskCachedService) LocalClear() error {
+func (s *taskLocalService) LocalClear() error {
 	err := s.db.Truncate(TaskBucket)
 	if err != nil {
 		return err
@@ -44,15 +45,15 @@ func (s *taskCachedService) LocalClear() error {
 	return nil
 }
 
-func (s *taskCachedService) ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+func (s *taskLocalService) ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
 	return s.remoteSvc.ListWithChanged(lastEditTime, start, limit)
 }
 
-func (s *taskCachedService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
+func (s *taskLocalService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
 	return s.remoteSvc.ListDeleted(lastEditTime)
 }
 
-func (s *taskCachedService) syncWithFn(fnEdited func() ([]*models.Task, error), fnDeleted func() ([]*models.TaskDeleted, error)) error {
+func (s *taskLocalService) syncWithFn(fnEdited func() ([]*models.Task, error), fnDeleted func() ([]*models.TaskDeleted, error)) error {
 	editedTasks, err := fnEdited()
 	if err != nil {
 		return err
@@ -75,20 +76,20 @@ func (s *taskCachedService) syncWithFn(fnEdited func() ([]*models.Task, error), 
 	return nil
 }
 
-func (s *taskCachedService) Sync() error {
+func (s *taskLocalService) Sync() error {
 	return s.syncWithFn(s.listAllRemote, func() ([]*models.TaskDeleted, error) {
 		return []*models.TaskDeleted{}, nil
 	})
 }
 
-func (s *taskCachedService) PartialSync(lastEditTime *int32) error {
+func (s *taskLocalService) PartialSync(lastEditTime *int32) error {
 	return s.syncWithFn(
 		func() ([]*models.Task, error) { return s.listChanged(lastEditTime) },
 		func() ([]*models.TaskDeleted, error) { return s.ListDeleted(lastEditTime) },
 	)
 }
 
-func (s *taskCachedService) FindById(id int64) (*models.Task, error) {
+func (s *taskLocalService) FindById(id int64) (*models.Task, error) {
 	all, _, err := s.ListAll()
 	if err != nil {
 		return nil, err
@@ -103,7 +104,7 @@ func (s *taskCachedService) FindById(id int64) (*models.Task, error) {
 	return head, nil
 }
 
-func (s *taskCachedService) listAllRemote() ([]*models.Task, error) {
+func (s *taskLocalService) listAllRemote() ([]*models.Task, error) {
 	var ts, all []*models.Task
 	var err error
 	var pagination *models.PaginatedInfo
@@ -127,7 +128,7 @@ func (s *taskCachedService) listAllRemote() ([]*models.Task, error) {
 	return all, nil
 }
 
-func (s *taskCachedService) listChanged(lastEditTime *int32) ([]*models.Task, error) {
+func (s *taskLocalService) listChanged(lastEditTime *int32) ([]*models.Task, error) {
 	var ts, all []*models.Task
 	var err error
 	var pagination *models.PaginatedInfo
@@ -151,7 +152,9 @@ func (s *taskCachedService) listChanged(lastEditTime *int32) ([]*models.Task, er
 	return all, nil
 }
 
-func (s *taskCachedService) ListAll() ([]*models.Task, int, error) {
+// ListAll returns all tasks from cache, maybe cached missed
+// FIXME avoid cache missed
+func (s *taskLocalService) ListAll() ([]*models.Task, int, error) {
 	all, err := s.db.List(TaskBucket)
 	if err != nil {
 		return nil, 0, err
@@ -168,7 +171,7 @@ func (s *taskCachedService) ListAll() ([]*models.Task, int, error) {
 	return ts, len(all), nil
 }
 
-func (s *taskCachedService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+func (s *taskLocalService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
 	// TODO test
 	all, _, err := s.ListAll()
 	if err != nil {
@@ -186,7 +189,7 @@ func (s *taskCachedService) List(start, limit int64) ([]*models.Task, *models.Pa
 	}, nil
 }
 
-func (s *taskCachedService) ListAllByQuery(query *queries.TaskListQuery) ([]*models.Task, error) {
+func (s *taskLocalService) ListAllByQuery(query *queries.TaskListQuery) ([]*models.Task, error) {
 	all, err := s.db.List(TaskBucket)
 	if err != nil {
 		return nil, err
@@ -238,7 +241,7 @@ func (s *taskCachedService) ListAllByQuery(query *queries.TaskListQuery) ([]*mod
 	return ts, nil
 }
 
-func (s *taskCachedService) Create(title string) (*models.Task, error) {
+func (s *taskLocalService) Create(title string) (*models.Task, error) {
 	created, err := s.remoteSvc.Create(title)
 	if err != nil {
 		return nil, err
@@ -251,7 +254,7 @@ func (s *taskCachedService) Create(title string) (*models.Task, error) {
 	return created, nil
 }
 
-func (s *taskCachedService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
+func (s *taskLocalService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
 	created, err := s.remoteSvc.CreateByQuery(query)
 	if err != nil {
 		return nil, err
@@ -264,7 +267,7 @@ func (s *taskCachedService) CreateByQuery(query *queries.TaskCreateQuery) (*mode
 	return created, nil
 }
 
-func (s *taskCachedService) Delete(id int64) error {
+func (s *taskLocalService) Delete(id int64) error {
 	err := s.remoteSvc.Delete(id)
 	if err != nil {
 		return err
@@ -277,7 +280,7 @@ func (s *taskCachedService) Delete(id int64) error {
 	return nil
 }
 
-func (s *taskCachedService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error) {
+func (s *taskLocalService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error) {
 	batch, items, err := s.remoteSvc.DeleteBatch(ids)
 	if err != nil {
 		return nil, nil, err
@@ -290,7 +293,7 @@ func (s *taskCachedService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDel
 	return batch, items, nil
 }
 
-func (s *taskCachedService) Edit(id int64, t *models.Task) (*models.Task, error) {
+func (s *taskLocalService) Edit(id int64, t *models.Task) (*models.Task, error) {
 	edited, err := s.remoteSvc.Edit(id, t)
 	if err != nil {
 		return nil, err
@@ -303,12 +306,12 @@ func (s *taskCachedService) Edit(id int64, t *models.Task) (*models.Task, error)
 	return edited, nil
 }
 
-func (s *taskCachedService) EditByQuery(query *queries.TaskEditQuery) (*models.Task, error) {
+func (s *taskLocalService) EditByQuery(query *queries.TaskEditQuery) (*models.Task, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *taskCachedService) Complete(id int64) (*models.Task, error) {
+func (s *taskLocalService) Complete(id int64) (*models.Task, error) {
 	completed, err := s.remoteSvc.Complete(id)
 	if err != nil {
 		return nil, err
@@ -321,7 +324,7 @@ func (s *taskCachedService) Complete(id int64) (*models.Task, error) {
 	return completed, nil
 }
 
-func (s *taskCachedService) UnComplete(id int64) (*models.Task, error) {
+func (s *taskLocalService) UnComplete(id int64) (*models.Task, error) {
 	unCompleted, err := s.remoteSvc.UnComplete(id)
 	if err != nil {
 		return nil, err

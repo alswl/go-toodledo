@@ -57,7 +57,8 @@ func NewPostContextsEditPhpOK() *PostContextsEditPhpOK {
 	return &PostContextsEditPhpOK{}
 }
 
-/* PostContextsEditPhpOK describes a response with status code 200, with default header values.
+/*
+	PostContextsEditPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -87,7 +88,8 @@ func NewPostContextsEditPhpUnauthorized() *PostContextsEditPhpUnauthorized {
 	return &PostContextsEditPhpUnauthorized{}
 }
 
-/* PostContextsEditPhpUnauthorized describes a response with status code 401, with default header values.
+/*
+	PostContextsEditPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -119,7 +121,8 @@ func NewPostContextsEditPhpTooManyRequests() *PostContextsEditPhpTooManyRequests
 	return &PostContextsEditPhpTooManyRequests{}
 }
 
-/* PostContextsEditPhpTooManyRequests describes a response with status code 429, with default header values.
+/*
+	PostContextsEditPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -151,7 +154,8 @@ func NewPostContextsEditPhpServiceUnavailable() *PostContextsEditPhpServiceUnava
 	return &PostContextsEditPhpServiceUnavailable{}
 }
 
-/* PostContextsEditPhpServiceUnavailable describes a response with status code 503, with default header values.
+/*
+	PostContextsEditPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

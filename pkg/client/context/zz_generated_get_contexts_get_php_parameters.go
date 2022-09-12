@@ -52,10 +52,12 @@ func NewGetContextsGetPhpParamsWithHTTPClient(client *http.Client) *GetContextsG
 	}
 }
 
-/* GetContextsGetPhpParams contains all the parameters to send to the API endpoint
-   for the get contexts get php operation.
+/*
+GetContextsGetPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get contexts get php operation.
+
+	Typically these are written to a http.Request.
 */
 type GetContextsGetPhpParams struct {
 	timeout    time.Duration

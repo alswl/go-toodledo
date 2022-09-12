@@ -19,7 +19,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			$ toodledo context list
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			app, err := injector.InitApp()
+			app, err := injector.InitCLIApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return

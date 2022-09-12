@@ -3,7 +3,7 @@ package logging
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -111,6 +111,6 @@ func InitFactory(logRoot string, isStd bool, isSilence bool) error {
 }
 
 func init() {
-	silentLogger.Out = ioutil.Discard
+	silentLogger.Out = io.Discard
 	stdoutLogger.SetFormatter(formatter)
 }
