@@ -57,7 +57,8 @@ func NewGetAccountGetPhpOK() *GetAccountGetPhpOK {
 	return &GetAccountGetPhpOK{}
 }
 
-/* GetAccountGetPhpOK describes a response with status code 200, with default header values.
+/*
+	GetAccountGetPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -89,7 +90,8 @@ func NewGetAccountGetPhpUnauthorized() *GetAccountGetPhpUnauthorized {
 	return &GetAccountGetPhpUnauthorized{}
 }
 
-/* GetAccountGetPhpUnauthorized describes a response with status code 401, with default header values.
+/*
+	GetAccountGetPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -121,7 +123,8 @@ func NewGetAccountGetPhpTooManyRequests() *GetAccountGetPhpTooManyRequests {
 	return &GetAccountGetPhpTooManyRequests{}
 }
 
-/* GetAccountGetPhpTooManyRequests describes a response with status code 429, with default header values.
+/*
+	GetAccountGetPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -153,7 +156,8 @@ func NewGetAccountGetPhpServiceUnavailable() *GetAccountGetPhpServiceUnavailable
 	return &GetAccountGetPhpServiceUnavailable{}
 }
 
-/* GetAccountGetPhpServiceUnavailable describes a response with status code 503, with default header values.
+/*
+	GetAccountGetPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

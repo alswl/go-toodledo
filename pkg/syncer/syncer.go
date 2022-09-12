@@ -1,61 +1,34 @@
 package syncer
 
-import (
-	"context"
-	"github.com/sirupsen/logrus"
-	"time"
+import "github.com/alswl/go-toodledo/pkg/models"
+
+const (
+	SyncItemTypeCreate SyncItemType = "CREATE"
+	SyncItemTypeUpdate SyncItemType = "UPDATE"
+	SyncItemTypeDelete SyncItemType = "DELETE"
+
+	SyncStatusSynced  SyncStatus = "SYNCED"
+	SyncStatusSyncing SyncStatus = "SYNCING"
+	SyncStatusError   SyncStatus = "ERROR"
 )
 
-type Syncer interface {
-	// TODO using ch to stop
-	Start(context.Context)
-	Stop()
-	sync() error
+type Event struct {
+	Item *models.Task
+	Type SyncItemType
 }
 
-type simpleSyncerWrapper struct {
-	ticker  *time.Ticker
-	stop    chan struct{}
-	syncNow chan bool
+// Syncer is two-way sync
+type Syncer[T any] interface {
+	Run(stopCh chan struct{}) error
+	//Sync(diffs []*SyncEvent, callback func(progress Progress) error) (int, int, []*models.Task, error)
 
-	log *logrus.Logger
-	fn  func() error
+	PostEvent(event Event) error
+	Status() string
+
+	SubscribeStatus(func() (string, error)) error
+	AddFun(item T) error
+	DeleteFun(item T) error
+	UpdateFun(item T) error
 }
 
-func NewSimpleSyncer(interval time.Duration, fn func() error, logger *logrus.Logger) Syncer {
-	stop := make(chan struct{})
-	return &simpleSyncerWrapper{ticker: time.NewTicker(interval), stop: stop, log: logger, fn: fn}
-}
-
-func (s *simpleSyncerWrapper) run(ctx context.Context) {
-	for {
-		select {
-		case <-ctx.Done():
-			s.log.Info("syncer stopped, ctx done")
-			s.Stop()
-			break
-		case <-s.stop:
-			s.log.Info("syncer stopped, stop chan")
-			break
-		case <-s.ticker.C:
-			s.log.Info("syncer tick")
-			err := s.sync()
-			if err != nil {
-				s.log.Errorf("syncer sync error: %v", err)
-			}
-		}
-	}
-}
-
-func (s *simpleSyncerWrapper) Start(ctx context.Context) {
-	go s.run(ctx)
-}
-
-func (s *simpleSyncerWrapper) sync() error {
-	return s.fn()
-}
-
-func (s *simpleSyncerWrapper) Stop() {
-	s.ticker.Stop()
-	close(s.stop)
-}
+type TaskSyncer Syncer[models.Task]

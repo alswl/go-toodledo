@@ -6,8 +6,8 @@ import (
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/dal"
+	"github.com/alswl/go-toodledo/pkg/fetcher"
 	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/alswl/go-toodledo/pkg/syncer"
 	"github.com/google/wire"
 )
 
@@ -27,19 +27,19 @@ var IntegrationTestSet = wire.NewSet(
 	services.NewAccountService,
 	services.NewTaskService0,
 	services.NewTaskService,
-	services.NewTaskCachedService,
+	services.NewTaskLocalService,
 	services.NewFolderService,
-	services.NewFolderCachedService,
+	services.NewFolderLocalService,
 	services.NewContextService,
-	services.NewContextCachedService,
+	services.NewContextLocalService,
 	services.NewGoalService,
-	services.NewGoalCachedService,
+	services.NewGoalLocalService,
 	services.NewSavedSearchService,
 	services.NewTaskRichCachedService,
 
 	// wire not support generic now
 	//informers.ProvideTaskInformer,
 
-	syncer.NewToodledoSyncer,
-	app.NewToodledoCliApp,
+	fetcher.NewToodledoFetcher,
+	app.NewToodledoTUIApp,
 )

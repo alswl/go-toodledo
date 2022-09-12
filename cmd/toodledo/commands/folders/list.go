@@ -12,7 +12,7 @@ import (
 )
 
 type ListOpts struct {
-	noCache bool
+	//noCache bool
 }
 
 var listOpts = &ListOpts{}
@@ -26,23 +26,13 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			$ toodledo folder list
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			app, err := injector.InitApp()
+			app, err := injector.InitCLIApp()
 			if err != nil {
 				logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
 			var svc services.FolderService
-			if listOpts.noCache {
-				svc = app.FolderSvc
-			} else {
-				svc = app.FolderCachedSvc
-				syncer := app.Syncer
-				err = syncer.SyncOnce()
-				if err != nil {
-					logrus.WithError(err).Fatal("sync failed")
-					return
-				}
-			}
+			svc = app.FolderSvc
 
 			all, err := svc.ListAll()
 			if err != nil {
@@ -52,7 +42,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			fmt.Println(render.Tables4Folder(all))
 		},
 	}
-	cmd.Flags().BoolVarP(&listOpts.noCache, "no-cache", "", false, "do not using cache")
+	//cmd.Flags().BoolVarP(&listOpts.noCache, "no-cache", "", false, "do not using cache")
 	return cmd
 
 }

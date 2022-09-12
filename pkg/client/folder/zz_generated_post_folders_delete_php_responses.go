@@ -59,7 +59,8 @@ func NewPostFoldersDeletePhpOK() *PostFoldersDeletePhpOK {
 	return &PostFoldersDeletePhpOK{}
 }
 
-/* PostFoldersDeletePhpOK describes a response with status code 200, with default header values.
+/*
+	PostFoldersDeletePhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -91,7 +92,8 @@ func NewPostFoldersDeletePhpUnauthorized() *PostFoldersDeletePhpUnauthorized {
 	return &PostFoldersDeletePhpUnauthorized{}
 }
 
-/* PostFoldersDeletePhpUnauthorized describes a response with status code 401, with default header values.
+/*
+	PostFoldersDeletePhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -123,7 +125,8 @@ func NewPostFoldersDeletePhpTooManyRequests() *PostFoldersDeletePhpTooManyReques
 	return &PostFoldersDeletePhpTooManyRequests{}
 }
 
-/* PostFoldersDeletePhpTooManyRequests describes a response with status code 429, with default header values.
+/*
+	PostFoldersDeletePhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -155,7 +158,8 @@ func NewPostFoldersDeletePhpServiceUnavailable() *PostFoldersDeletePhpServiceUna
 	return &PostFoldersDeletePhpServiceUnavailable{}
 }
 
-/* PostFoldersDeletePhpServiceUnavailable describes a response with status code 503, with default header values.
+/*
+	PostFoldersDeletePhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */
@@ -182,7 +186,8 @@ func (o *PostFoldersDeletePhpServiceUnavailable) readResponse(response runtime.C
 	return nil
 }
 
-/*PostFoldersDeletePhpOKBody post folders delete php o k body
+/*
+PostFoldersDeletePhpOKBody post folders delete php o k body
 swagger:model PostFoldersDeletePhpOKBody
 */
 type PostFoldersDeletePhpOKBody struct {

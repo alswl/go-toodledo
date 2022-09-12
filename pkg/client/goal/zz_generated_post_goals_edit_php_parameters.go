@@ -53,10 +53,12 @@ func NewPostGoalsEditPhpParamsWithHTTPClient(client *http.Client) *PostGoalsEdit
 	}
 }
 
-/* PostGoalsEditPhpParams contains all the parameters to send to the API endpoint
-   for the post goals edit php operation.
+/*
+PostGoalsEditPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post goals edit php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostGoalsEditPhpParams struct {
 

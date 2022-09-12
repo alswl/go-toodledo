@@ -5,10 +5,8 @@ import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
-	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/render"
-	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -26,16 +24,16 @@ var editorCmd = &cobra.Command{
 	`),
 	Run: func(cmd *cobra.Command, args []string) {
 		// services
-		_, err := injector.InitApp()
+		app, err := injector.InitCLIApp()
 		if err != nil {
 			logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 			return
 		}
-		taskSvc, _ := injector.InitTaskService()
-		contextSvc, _ := injector.InitContextCachedService()
-		folderSvc, _ := injector.InitFolderCachedService()
-		goalSvc, _ := injector.InitGoalCachedService()
-		taskRichSvc := services.NewTaskRichService(taskSvc, folderSvc, contextSvc, goalSvc, logging.ProvideLogger())
+		taskSvc := app.TaskSvc
+		//contextSvc := app.ContextSvc
+		//folderSvc := app.FolderSvc
+		//goalSvc := app.GoalSvc
+		taskRichSvc := app.TaskRichSvc
 
 		// fetch task
 		id, _ := strconv.Atoi(args[0])

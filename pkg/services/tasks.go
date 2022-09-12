@@ -23,6 +23,8 @@ type TaskService interface {
 	FindById(id int64) (*models.Task, error)
 	List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error)
 	ListAll() ([]*models.Task, int, error)
+	// TODO
+	//ListAllAfter(after *time.Time) ([]*models.Task, error)
 	// Create is simple create with only title, it was deprecated
 	Create(title string) (*models.Task, error)
 	CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error)
@@ -36,6 +38,14 @@ type TaskService interface {
 	ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error)
 }
 
+// TaskExtendedService is a service for tasks, it provided more query parameters.
+type TaskExtendedService interface {
+	TaskService
+
+	ListAllByQuery(query *queries.TaskListQuery) ([]*models.Task, error)
+}
+
+// taskService is the implementation of TaskService by client
 type taskService struct {
 	cli    *client.Toodledo
 	auth   runtime.ClientAuthInfoWriter

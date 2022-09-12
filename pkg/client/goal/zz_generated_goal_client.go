@@ -42,7 +42,7 @@ type ClientService interface {
 }
 
 /*
-  GetGoalsGetPhp get goals get php API
+GetGoalsGetPhp get goals get php API
 */
 func (a *Client) GetGoalsGetPhp(params *GetGoalsGetPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetGoalsGetPhpOK, error) {
 	// TODO: Validate the params before sending
@@ -81,7 +81,7 @@ func (a *Client) GetGoalsGetPhp(params *GetGoalsGetPhpParams, authInfo runtime.C
 }
 
 /*
-  PostGoalsAddPhp post goals add php API
+PostGoalsAddPhp post goals add php API
 */
 func (a *Client) PostGoalsAddPhp(params *PostGoalsAddPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostGoalsAddPhpOK, error) {
 	// TODO: Validate the params before sending
@@ -120,7 +120,7 @@ func (a *Client) PostGoalsAddPhp(params *PostGoalsAddPhpParams, authInfo runtime
 }
 
 /*
-  PostGoalsDeletePhp post goals delete php API
+PostGoalsDeletePhp post goals delete php API
 */
 func (a *Client) PostGoalsDeletePhp(params *PostGoalsDeletePhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostGoalsDeletePhpOK, error) {
 	// TODO: Validate the params before sending
@@ -159,7 +159,7 @@ func (a *Client) PostGoalsDeletePhp(params *PostGoalsDeletePhpParams, authInfo r
 }
 
 /*
-  PostGoalsEditPhp post goals edit php API
+PostGoalsEditPhp post goals edit php API
 */
 func (a *Client) PostGoalsEditPhp(params *PostGoalsEditPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostGoalsEditPhpOK, error) {
 	// TODO: Validate the params before sending

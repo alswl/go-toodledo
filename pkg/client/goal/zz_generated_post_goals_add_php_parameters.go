@@ -53,10 +53,12 @@ func NewPostGoalsAddPhpParamsWithHTTPClient(client *http.Client) *PostGoalsAddPh
 	}
 }
 
-/* PostGoalsAddPhpParams contains all the parameters to send to the API endpoint
-   for the post goals add php operation.
+/*
+PostGoalsAddPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post goals add php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostGoalsAddPhpParams struct {
 

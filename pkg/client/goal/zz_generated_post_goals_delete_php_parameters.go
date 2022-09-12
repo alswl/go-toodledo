@@ -53,10 +53,12 @@ func NewPostGoalsDeletePhpParamsWithHTTPClient(client *http.Client) *PostGoalsDe
 	}
 }
 
-/* PostGoalsDeletePhpParams contains all the parameters to send to the API endpoint
-   for the post goals delete php operation.
+/*
+PostGoalsDeletePhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post goals delete php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostGoalsDeletePhpParams struct {
 

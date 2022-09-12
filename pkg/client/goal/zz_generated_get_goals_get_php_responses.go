@@ -57,7 +57,8 @@ func NewGetGoalsGetPhpOK() *GetGoalsGetPhpOK {
 	return &GetGoalsGetPhpOK{}
 }
 
-/* GetGoalsGetPhpOK describes a response with status code 200, with default header values.
+/*
+	GetGoalsGetPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -87,7 +88,8 @@ func NewGetGoalsGetPhpUnauthorized() *GetGoalsGetPhpUnauthorized {
 	return &GetGoalsGetPhpUnauthorized{}
 }
 
-/* GetGoalsGetPhpUnauthorized describes a response with status code 401, with default header values.
+/*
+	GetGoalsGetPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -119,7 +121,8 @@ func NewGetGoalsGetPhpTooManyRequests() *GetGoalsGetPhpTooManyRequests {
 	return &GetGoalsGetPhpTooManyRequests{}
 }
 
-/* GetGoalsGetPhpTooManyRequests describes a response with status code 429, with default header values.
+/*
+	GetGoalsGetPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -151,7 +154,8 @@ func NewGetGoalsGetPhpServiceUnavailable() *GetGoalsGetPhpServiceUnavailable {
 	return &GetGoalsGetPhpServiceUnavailable{}
 }
 
-/* GetGoalsGetPhpServiceUnavailable describes a response with status code 503, with default header values.
+/*
+	GetGoalsGetPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

@@ -52,10 +52,12 @@ func NewPostTasksEditPhpParamsWithHTTPClient(client *http.Client) *PostTasksEdit
 	}
 }
 
-/* PostTasksEditPhpParams contains all the parameters to send to the API endpoint
-   for the post tasks edit php operation.
+/*
+PostTasksEditPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post tasks edit php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostTasksEditPhpParams struct {
 

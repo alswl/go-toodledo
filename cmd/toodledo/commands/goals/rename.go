@@ -20,7 +20,7 @@ func NewRenameCmd(f *cmdutil.Factory) *cobra.Command {
 			$ toodledo goal rename landing-moon new-name
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			app, err := injector.InitApp()
+			app, err := injector.InitCLIApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return

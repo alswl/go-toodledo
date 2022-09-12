@@ -42,7 +42,7 @@ type ClientService interface {
 }
 
 /*
-  GetContextsGetPhp get contexts get php API
+GetContextsGetPhp get contexts get php API
 */
 func (a *Client) GetContextsGetPhp(params *GetContextsGetPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetContextsGetPhpOK, error) {
 	// TODO: Validate the params before sending
@@ -81,7 +81,7 @@ func (a *Client) GetContextsGetPhp(params *GetContextsGetPhpParams, authInfo run
 }
 
 /*
-  PostContextsAddPhp post contexts add php API
+PostContextsAddPhp post contexts add php API
 */
 func (a *Client) PostContextsAddPhp(params *PostContextsAddPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostContextsAddPhpOK, error) {
 	// TODO: Validate the params before sending
@@ -120,7 +120,7 @@ func (a *Client) PostContextsAddPhp(params *PostContextsAddPhpParams, authInfo r
 }
 
 /*
-  PostContextsDeletePhp post contexts delete php API
+PostContextsDeletePhp post contexts delete php API
 */
 func (a *Client) PostContextsDeletePhp(params *PostContextsDeletePhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostContextsDeletePhpOK, error) {
 	// TODO: Validate the params before sending
@@ -159,7 +159,7 @@ func (a *Client) PostContextsDeletePhp(params *PostContextsDeletePhpParams, auth
 }
 
 /*
-  PostContextsEditPhp post contexts edit php API
+PostContextsEditPhp post contexts edit php API
 */
 func (a *Client) PostContextsEditPhp(params *PostContextsEditPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PostContextsEditPhpOK, error) {
 	// TODO: Validate the params before sending

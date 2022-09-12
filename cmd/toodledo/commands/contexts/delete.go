@@ -18,7 +18,7 @@ func NewDeleteCmd(f *cmdutil.Factory) *cobra.Command {
 			$ toodledo context delete Work
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			_, err := injector.InitApp()
+			_, err := injector.InitCLIApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return

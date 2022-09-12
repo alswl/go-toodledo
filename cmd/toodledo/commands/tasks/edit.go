@@ -94,15 +94,15 @@ func NewEditCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.WithError(err).Fatal("parse query failed")
 			}
 			// services
-			app, err := injector.InitApp()
+			app, err := injector.InitCLIApp()
 			if err != nil {
 				logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
 			taskSvc := app.TaskSvc
-			contextSvc := app.ContextCachedSvc
-			folderSvc := app.FolderCachedSvc
-			goalSvc := app.GoalCachedSvc
+			contextSvc := app.ContextSvc
+			folderSvc := app.FolderSvc
+			goalSvc := app.GoalSvc
 			taskRichSvc := app.TaskRichSvc
 
 			// fetch task

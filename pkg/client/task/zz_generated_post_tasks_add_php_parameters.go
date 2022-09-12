@@ -52,10 +52,12 @@ func NewPostTasksAddPhpParamsWithHTTPClient(client *http.Client) *PostTasksAddPh
 	}
 }
 
-/* PostTasksAddPhpParams contains all the parameters to send to the API endpoint
-   for the post tasks add php operation.
+/*
+PostTasksAddPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post tasks add php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostTasksAddPhpParams struct {
 

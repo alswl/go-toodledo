@@ -53,10 +53,12 @@ func NewPostContextsDeletePhpParamsWithHTTPClient(client *http.Client) *PostCont
 	}
 }
 
-/* PostContextsDeletePhpParams contains all the parameters to send to the API endpoint
-   for the post contexts delete php operation.
+/*
+PostContextsDeletePhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post contexts delete php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostContextsDeletePhpParams struct {
 

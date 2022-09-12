@@ -52,10 +52,12 @@ func NewGetTasksSearchPhpParamsWithHTTPClient(client *http.Client) *GetTasksSear
 	}
 }
 
-/* GetTasksSearchPhpParams contains all the parameters to send to the API endpoint
-   for the get tasks search php operation.
+/*
+GetTasksSearchPhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the get tasks search php operation.
+
+	Typically these are written to a http.Request.
 */
 type GetTasksSearchPhpParams struct {
 	timeout    time.Duration

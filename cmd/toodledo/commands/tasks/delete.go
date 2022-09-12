@@ -19,7 +19,7 @@ func NewDeleteCmd(f *cmdutil.Factory) *cobra.Command {
 			$ toodledo tasks delete 8848
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			app, err := injector.InitApp()
+			app, err := injector.InitCLIApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return

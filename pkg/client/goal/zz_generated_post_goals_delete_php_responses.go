@@ -59,7 +59,8 @@ func NewPostGoalsDeletePhpOK() *PostGoalsDeletePhpOK {
 	return &PostGoalsDeletePhpOK{}
 }
 
-/* PostGoalsDeletePhpOK describes a response with status code 200, with default header values.
+/*
+	PostGoalsDeletePhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -91,7 +92,8 @@ func NewPostGoalsDeletePhpUnauthorized() *PostGoalsDeletePhpUnauthorized {
 	return &PostGoalsDeletePhpUnauthorized{}
 }
 
-/* PostGoalsDeletePhpUnauthorized describes a response with status code 401, with default header values.
+/*
+	PostGoalsDeletePhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -123,7 +125,8 @@ func NewPostGoalsDeletePhpTooManyRequests() *PostGoalsDeletePhpTooManyRequests {
 	return &PostGoalsDeletePhpTooManyRequests{}
 }
 
-/* PostGoalsDeletePhpTooManyRequests describes a response with status code 429, with default header values.
+/*
+	PostGoalsDeletePhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -155,7 +158,8 @@ func NewPostGoalsDeletePhpServiceUnavailable() *PostGoalsDeletePhpServiceUnavail
 	return &PostGoalsDeletePhpServiceUnavailable{}
 }
 
-/* PostGoalsDeletePhpServiceUnavailable describes a response with status code 503, with default header values.
+/*
+	PostGoalsDeletePhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */
@@ -182,7 +186,8 @@ func (o *PostGoalsDeletePhpServiceUnavailable) readResponse(response runtime.Cli
 	return nil
 }
 
-/*PostGoalsDeletePhpOKBody post goals delete php o k body
+/*
+PostGoalsDeletePhpOKBody post goals delete php o k body
 swagger:model PostGoalsDeletePhpOKBody
 */
 type PostGoalsDeletePhpOKBody struct {

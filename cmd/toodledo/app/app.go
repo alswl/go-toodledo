@@ -1,26 +1,62 @@
 package app
 
 import (
+	"github.com/alswl/go-toodledo/pkg/fetcher"
 	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/alswl/go-toodledo/pkg/syncer"
 )
 
-type ToodledoCliApp struct {
-	AccountSvc       services.AccountService
-	TaskSvc          services.TaskService
-	TaskCachedSvc    services.TaskCachedService
-	FolderSvc        services.FolderService
-	FolderCachedSvc  services.FolderCachedService
-	ContextSvc       services.ContextService
-	ContextCachedSvc services.ContextCachedService
-	GoalSvc          services.GoalService
-	GoalCachedSvc    services.GoalCachedService
-	SavedSearchSvc   services.SavedSearchService
+type ToodledoCLIApp struct {
+	AccountSvc     services.AccountService
+	TaskSvc        services.TaskService
+	FolderSvc      services.FolderService
+	ContextSvc     services.ContextService
+	GoalSvc        services.GoalService
+	SavedSearchSvc services.SavedSearchService
 
 	TaskRichSvc services.TaskRichService
-	Syncer      syncer.ToodledoFetcher
 }
 
-func NewToodledoCliApp(accountSvc services.AccountService, taskSvc services.TaskService, taskCachedSvc services.TaskCachedService, folderSvc services.FolderService, folderCachedSvc services.FolderCachedService, contextSvc services.ContextService, contextCachedSvc services.ContextCachedService, goalSvc services.GoalService, goalCachedSvc services.GoalCachedService, savedSearchSvc services.SavedSearchService, taskRichSvc services.TaskRichService, syncer syncer.ToodledoFetcher) *ToodledoCliApp {
-	return &ToodledoCliApp{AccountSvc: accountSvc, TaskSvc: taskSvc, TaskCachedSvc: taskCachedSvc, FolderSvc: folderSvc, FolderCachedSvc: folderCachedSvc, ContextSvc: contextSvc, ContextCachedSvc: contextCachedSvc, GoalSvc: goalSvc, GoalCachedSvc: goalCachedSvc, SavedSearchSvc: savedSearchSvc, TaskRichSvc: taskRichSvc, Syncer: syncer}
+func NewToodledoCLIApp(accountSvc services.AccountService, taskSvc services.TaskService, folderSvc services.FolderService, contextSvc services.ContextService, goalSvc services.GoalService, savedSearchSvc services.SavedSearchService, taskRichSvc services.TaskRichService, syncer fetcher.ToodledoFetcher) *ToodledoCLIApp {
+	return &ToodledoCLIApp{
+		AccountSvc:     accountSvc,
+		TaskSvc:        taskSvc,
+		FolderSvc:      folderSvc,
+		ContextSvc:     contextSvc,
+		GoalSvc:        goalSvc,
+		SavedSearchSvc: savedSearchSvc,
+		TaskRichSvc:    taskRichSvc,
+	}
+}
+
+type ToodledoTUIApp struct {
+	AccountSvc      services.AccountService
+	TaskSvc         services.TaskService
+	TaskLocalSvc    services.TaskLocalService
+	FolderSvc       services.FolderService
+	FolderLocalSvc  services.FolderLocalService
+	ContextSvc      services.ContextService
+	ContextLocalSvc services.ContextLocalService
+	GoalSvc         services.GoalService
+	GoalLocalSvc    services.GoalLocalService
+	SavedSearchSvc  services.SavedSearchService
+
+	TaskRichSvc services.TaskRichService
+	Syncer      fetcher.ToodledoFetcher
+}
+
+func NewToodledoTUIApp(accountSvc services.AccountService, taskSvc services.TaskService, taskCachedSvc services.TaskLocalService, folderSvc services.FolderService, folderCachedSvc services.FolderLocalService, contextSvc services.ContextService, contextCachedSvc services.ContextLocalService, goalSvc services.GoalService, goalCachedSvc services.GoalLocalService, savedSearchSvc services.SavedSearchService, taskRichSvc services.TaskRichService, syncer fetcher.ToodledoFetcher) *ToodledoTUIApp {
+	return &ToodledoTUIApp{
+		AccountSvc:      accountSvc,
+		TaskSvc:         taskSvc,
+		TaskLocalSvc:    taskCachedSvc,
+		FolderSvc:       folderSvc,
+		FolderLocalSvc:  folderCachedSvc,
+		ContextSvc:      contextSvc,
+		ContextLocalSvc: contextCachedSvc,
+		GoalSvc:         goalSvc,
+		GoalLocalSvc:    goalCachedSvc,
+		SavedSearchSvc:  savedSearchSvc,
+		TaskRichSvc:     taskRichSvc,
+		Syncer:          syncer,
+	}
 }

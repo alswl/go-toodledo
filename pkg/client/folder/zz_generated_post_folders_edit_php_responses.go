@@ -57,7 +57,8 @@ func NewPostFoldersEditPhpOK() *PostFoldersEditPhpOK {
 	return &PostFoldersEditPhpOK{}
 }
 
-/* PostFoldersEditPhpOK describes a response with status code 200, with default header values.
+/*
+	PostFoldersEditPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -87,7 +88,8 @@ func NewPostFoldersEditPhpUnauthorized() *PostFoldersEditPhpUnauthorized {
 	return &PostFoldersEditPhpUnauthorized{}
 }
 
-/* PostFoldersEditPhpUnauthorized describes a response with status code 401, with default header values.
+/*
+	PostFoldersEditPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -119,7 +121,8 @@ func NewPostFoldersEditPhpTooManyRequests() *PostFoldersEditPhpTooManyRequests {
 	return &PostFoldersEditPhpTooManyRequests{}
 }
 
-/* PostFoldersEditPhpTooManyRequests describes a response with status code 429, with default header values.
+/*
+	PostFoldersEditPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -151,7 +154,8 @@ func NewPostFoldersEditPhpServiceUnavailable() *PostFoldersEditPhpServiceUnavail
 	return &PostFoldersEditPhpServiceUnavailable{}
 }
 
-/* PostFoldersEditPhpServiceUnavailable describes a response with status code 503, with default header values.
+/*
+	PostFoldersEditPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

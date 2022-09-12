@@ -57,7 +57,8 @@ func NewGetContextsGetPhpOK() *GetContextsGetPhpOK {
 	return &GetContextsGetPhpOK{}
 }
 
-/* GetContextsGetPhpOK describes a response with status code 200, with default header values.
+/*
+	GetContextsGetPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -87,7 +88,8 @@ func NewGetContextsGetPhpUnauthorized() *GetContextsGetPhpUnauthorized {
 	return &GetContextsGetPhpUnauthorized{}
 }
 
-/* GetContextsGetPhpUnauthorized describes a response with status code 401, with default header values.
+/*
+	GetContextsGetPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -119,7 +121,8 @@ func NewGetContextsGetPhpTooManyRequests() *GetContextsGetPhpTooManyRequests {
 	return &GetContextsGetPhpTooManyRequests{}
 }
 
-/* GetContextsGetPhpTooManyRequests describes a response with status code 429, with default header values.
+/*
+	GetContextsGetPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -151,7 +154,8 @@ func NewGetContextsGetPhpServiceUnavailable() *GetContextsGetPhpServiceUnavailab
 	return &GetContextsGetPhpServiceUnavailable{}
 }
 
-/* GetContextsGetPhpServiceUnavailable describes a response with status code 503, with default header values.
+/*
+	GetContextsGetPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

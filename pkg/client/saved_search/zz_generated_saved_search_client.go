@@ -36,7 +36,7 @@ type ClientService interface {
 }
 
 /*
-  GetTasksSearchPhp get tasks search php API
+GetTasksSearchPhp get tasks search php API
 */
 func (a *Client) GetTasksSearchPhp(params *GetTasksSearchPhpParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetTasksSearchPhpOK, error) {
 	// TODO: Validate the params before sending

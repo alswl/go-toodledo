@@ -1,4 +1,4 @@
-package syncer2
+package syncer
 
 import (
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -14,7 +14,7 @@ type Progress interface {
 type SyncItemType string
 type SyncStatus string
 
-var _ Syncer2[models.Task] = (*syncer[models.Task])(nil)
+var _ Syncer[models.Task] = (*syncer[models.Task])(nil)
 
 type syncer[T models.Task] struct {
 	ticker *time.Ticker
@@ -23,7 +23,7 @@ type syncer[T models.Task] struct {
 	addFun    func()
 	deleteFun func()
 	updateFun func()
-	queue     chan SyncEvent
+	queue     chan Event
 }
 
 func (s *syncer[T]) Status() string {
@@ -56,7 +56,7 @@ func (s *syncer[T]) Run(stopCh chan struct{}) error {
 	panic("implement me")
 }
 
-func (s *syncer[T]) PostEvent(event SyncEvent) error {
+func (s *syncer[T]) PostEvent(event Event) error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -66,17 +66,17 @@ func (s *syncer[T]) RegistryStatus(f func() (string, error)) error {
 	panic("implement me")
 }
 
-func (s *syncer[T]) add(event SyncEvent) error {
+func (s *syncer[T]) add(event Event) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *syncer[T]) delete(event SyncEvent) error {
+func (s *syncer[T]) delete(event Event) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *syncer[T]) update(event SyncEvent) error {
+func (s *syncer[T]) update(event Event) error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -86,7 +86,7 @@ func (s *syncer[T]) syncFromRemote() error {
 	panic("implement me")
 }
 
-func (s *syncer[T]) syncToRemote(events []SyncEvent) error {
+func (s *syncer[T]) syncToRemote(events []Event) error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -94,7 +94,7 @@ func (s *syncer[T]) syncToRemote(events []SyncEvent) error {
 func NewSyncer() *syncer[models.Task] {
 	s := &syncer[models.Task]{
 		ticker: time.NewTicker(time.Minute * 5),
-		queue:  make(chan SyncEvent, 100),
+		queue:  make(chan Event, 100),
 	}
 	return s
 }

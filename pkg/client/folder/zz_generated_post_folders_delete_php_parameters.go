@@ -53,10 +53,12 @@ func NewPostFoldersDeletePhpParamsWithHTTPClient(client *http.Client) *PostFolde
 	}
 }
 
-/* PostFoldersDeletePhpParams contains all the parameters to send to the API endpoint
-   for the post folders delete php operation.
+/*
+PostFoldersDeletePhpParams contains all the parameters to send to the API endpoint
 
-   Typically these are written to a http.Request.
+	for the post folders delete php operation.
+
+	Typically these are written to a http.Request.
 */
 type PostFoldersDeletePhpParams struct {
 

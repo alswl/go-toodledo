@@ -57,7 +57,8 @@ func NewGetTasksDeletedPhpOK() *GetTasksDeletedPhpOK {
 	return &GetTasksDeletedPhpOK{}
 }
 
-/* GetTasksDeletedPhpOK describes a response with status code 200, with default header values.
+/*
+	GetTasksDeletedPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -87,7 +88,8 @@ func NewGetTasksDeletedPhpUnauthorized() *GetTasksDeletedPhpUnauthorized {
 	return &GetTasksDeletedPhpUnauthorized{}
 }
 
-/* GetTasksDeletedPhpUnauthorized describes a response with status code 401, with default header values.
+/*
+	GetTasksDeletedPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -119,7 +121,8 @@ func NewGetTasksDeletedPhpTooManyRequests() *GetTasksDeletedPhpTooManyRequests {
 	return &GetTasksDeletedPhpTooManyRequests{}
 }
 
-/* GetTasksDeletedPhpTooManyRequests describes a response with status code 429, with default header values.
+/*
+	GetTasksDeletedPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -151,7 +154,8 @@ func NewGetTasksDeletedPhpServiceUnavailable() *GetTasksDeletedPhpServiceUnavail
 	return &GetTasksDeletedPhpServiceUnavailable{}
 }
 
-/* GetTasksDeletedPhpServiceUnavailable describes a response with status code 503, with default header values.
+/*
+	GetTasksDeletedPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

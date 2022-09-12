@@ -10,7 +10,7 @@ import (
 )
 
 func TestTaskServiceFindById(t *testing.T) {
-	_, err := itinjector.InitApp()
+	_, err := itinjector.InitTUIApp()
 	assert.NotNil(t, err)
 	svc, err := itinjector.InitTaskService()
 	assert.NotNil(t, err)

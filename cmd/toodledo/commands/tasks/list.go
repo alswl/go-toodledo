@@ -128,19 +128,21 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			if err != nil {
 				logrus.WithError(err).Fatal("validate failed")
 			}
-			app, err := injector.InitApp()
+			// FIXME cli is using TUI App, it contains local data
+			app, err := injector.InitCLIApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
+			appExt, _ := injector.InitTUIApp()
 
-			svc := app.TaskCachedSvc
-			contextSvc := app.ContextCachedSvc
-			folderSvc := app.FolderCachedSvc
-			goalSvc := app.GoalCachedSvc
+			svc := appExt.TaskLocalSvc
+			contextSvc := app.ContextSvc
+			folderSvc := app.FolderSvc
+			goalSvc := app.GoalSvc
 			taskRichSvc := app.TaskRichSvc
-			syncer := app.Syncer
-			err = syncer.SyncOnce()
+			syncer := appExt.Syncer
+			err = syncer.FetchOnce()
 			if err != nil {
 				logrus.WithError(err).Fatal("sync failed")
 				return
