@@ -14,7 +14,7 @@ type ListOpts struct {
 	//noCache bool
 }
 
-var listOpts = &ListOpts{}
+//var listOpts = &ListOpts{}
 
 func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
