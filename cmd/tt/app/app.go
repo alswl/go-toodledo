@@ -95,19 +95,29 @@ func (m *Model) Init() tea.Cmd {
 
 		// Contexts are first tab in sidebar
 		m.states.Contexts = cs
-		m.sidebar, _ = m.sidebar.UpdateX(utils.UnwrapListPointer(cs))
-		if len(m.states.Contexts) > 0 {
-			// using default first now TODO add non-context item
-			m.states.query.ContextID = m.states.Contexts[0].ID
-		}
+		m.states.Contexts = append([]*models.Context{{
+			ID:   0,
+			Name: "All",
+		}}, cs...)
+		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Contexts))
+		// using default first now
+		m.states.query.ContextID = m.states.Contexts[0].ID
 
 		// folders
 		m.states.Folders = fs
-		m.sidebar, _ = m.sidebar.UpdateX(utils.UnwrapListPointer(fs))
+		m.states.Folders = append([]*models.Folder{{
+			ID:   0,
+			Name: "All",
+		}}, fs...)
+		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Folders))
 
 		// goals
 		m.states.Goals = gs
-		m.sidebar, _ = m.sidebar.UpdateX(utils.UnwrapListPointer(gs))
+		m.states.Goals = append([]*models.Goal{{
+			ID:   0,
+			Name: "All",
+		}}, gs...)
+		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Goals))
 
 		// tasks
 		tasks, err := m.taskSvc.ListAllByQuery(m.states.query)
@@ -116,7 +126,7 @@ func (m *Model) Init() tea.Cmd {
 		}
 		rts, _ := m.taskRichSvc.RichThem(tasks)
 		m.states.Tasks = rts
-		m.tasksPane, _ = m.tasksPane.UpdateX(m.states.Tasks)
+		m.tasksPane, _ = m.tasksPane.UpdateTyped(m.states.Tasks)
 		m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
 
 		return nil
@@ -292,38 +302,11 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	}
 	switch tab {
 	case constants.Contexts:
-		m.states.query = &queries.TaskListQuery{}
-		if item.ID() == 0 && len(m.states.Contexts) > 0 {
-			if len(m.states.Contexts) == 0 {
-				// TODO None folder impl
-			} else {
-				m.states.query.ContextID = m.states.Contexts[0].ID
-			}
-		} else {
-			m.states.query.ContextID = item.ID()
-		}
+		m.states.query.ContextID = item.ID()
 	case constants.Folders:
-		m.states.query = &queries.TaskListQuery{}
-		if item.ID() == 0 {
-			if len(m.states.Folders) == 0 {
-				// TODO None folder impl
-			} else {
-				m.states.query.FolderID = m.states.Folders[0].ID
-			}
-		} else {
-			m.states.query.FolderID = item.ID()
-		}
+		m.states.query.FolderID = item.ID()
 	case constants.Goals:
-		m.states.query = &queries.TaskListQuery{}
-		if item.ID() == 0 {
-			if len(m.states.Goals) == 0 {
-				// TODO None folder impl
-			} else {
-				m.states.query.GoalID = m.states.Goals[0].ID
-			}
-		} else {
-			m.states.query.GoalID = item.ID()
-		}
+		m.states.query.GoalID = item.ID()
 	}
 	tasks, err := svc.ListAllByQuery(m.states.query)
 	if err != nil {
@@ -331,7 +314,7 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	}
 	rts, _ := taskRichSvc.RichThem(tasks)
 	m.states.Tasks = rts
-	m.tasksPane, _ = m.tasksPane.UpdateX(m.states.Tasks)
+	m.tasksPane, _ = m.tasksPane.UpdateTyped(m.states.Tasks)
 	m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
 
 	return nil

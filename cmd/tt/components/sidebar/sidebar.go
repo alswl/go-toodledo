@@ -21,9 +21,12 @@ type Item struct {
 	title string
 }
 
-func (i Item) ID() int64           { return i.id }
-func (i Item) Title() string       { return i.title }
+func (i Item) ID() int64 { return i.id }
+
+func (i Item) Title() string { return i.title }
+
 func (i Item) Description() string { return "" }
+
 func (i Item) FilterValue() string { return i.title }
 
 var defaultTabs = []string{
@@ -68,11 +71,6 @@ func (m Model) Init() tea.Cmd {
 	return nil
 }
 
-func (m Model) UpdateX(msg tea.Msg) (Model, tea.Cmd) {
-	newM, cmd := m.Update(msg)
-	return newM.(Model), cmd
-}
-
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -86,10 +84,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.contextList.RemoveItem(i)
 		}
 		for _, c := range m.Contexts {
-			m.contextList.InsertItem(-1, Item{
-				id:    c.ID,
-				title: c.Name,
-			})
+			m.contextList.InsertItem(len(m.contextList.Items()), Item{c.ID, c.Name})
 		}
 	case []models.Folder:
 		m.Folders = msg
@@ -97,10 +92,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.folderList.RemoveItem(i)
 		}
 		for _, c := range m.Folders {
-			m.folderList.InsertItem(-1, Item{
-				id:    c.ID,
-				title: c.Name,
-			})
+			m.folderList.InsertItem(len(m.folderList.Items()), Item{c.ID, c.Name})
 		}
 	case []models.Goal:
 		m.Goals = msg
@@ -108,10 +100,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.goalList.RemoveItem(i)
 		}
 		for _, c := range m.Goals {
-			m.goalList.InsertItem(-1, Item{
-				id:    c.ID,
-				title: c.Name,
-			})
+			m.goalList.InsertItem(len(m.goalList.Items()), Item{c.ID, c.Name})
 		}
 	case tea.KeyMsg:
 		changed := false
@@ -147,6 +136,39 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	return m, cmd
+}
+
+func (m Model) View() string {
+	// TODO move to styles
+	tab := defaultTabs[m.currentTabIndex]
+	tabRender := lipgloss.NewStyle().
+		PaddingLeft(1).
+		PaddingRight(1).
+		Background(lipgloss.Color("#f0f0f0")).Render("<" + tab + ">")
+
+	m.Viewport.SetContent(
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			tabRender,
+			docStyle.Render(m.getVisibleList().View()),
+		),
+	)
+	style := styles.UnfocusedPaneStyle
+	if m.IsFocused() {
+		style = styles.PaneStyle
+	}
+	//return style.
+	//	Width(m.Viewport.Width).
+	//	Height(m.Viewport.Height).
+	//	Render(wrap.String(
+	//		wordwrap.String(m.Viewport.View(), m.Viewport.Width), m.Viewport.Width),
+	//	)
+	return style.Render(m.Viewport.View())
+}
+
+func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
+	newM, cmd := m.Update(msg)
+	return newM.(Model), cmd
 }
 
 func (m *Model) updateTab(step int) {
@@ -188,34 +210,6 @@ func (m *Model) updateVisibleList(msg tea.Msg) tea.Cmd {
 		m.goalList, cmd = m.goalList.Update(msg)
 	}
 	return cmd
-}
-
-func (m Model) View() string {
-	// TODO move to styles
-	tab := defaultTabs[m.currentTabIndex]
-	tabRender := lipgloss.NewStyle().
-		PaddingLeft(1).
-		PaddingRight(1).
-		Background(lipgloss.Color("#f0f0f0")).Render("<" + tab + ">")
-
-	m.Viewport.SetContent(
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			tabRender,
-			docStyle.Render(m.getVisibleList().View()),
-		),
-	)
-	style := styles.UnfocusedPaneStyle
-	if m.IsFocused() {
-		style = styles.PaneStyle
-	}
-	//return style.
-	//	Width(m.Viewport.Width).
-	//	Height(m.Viewport.Height).
-	//	Render(wrap.String(
-	//		wordwrap.String(m.Viewport.View(), m.Viewport.Width), m.Viewport.Width),
-	//	)
-	return style.Render(m.Viewport.View())
 }
 
 func (m *Model) Resize(width, height int) {

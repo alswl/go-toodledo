@@ -104,11 +104,6 @@ func (m Model) View() string {
 	return style.Render(m.Viewport.View())
 }
 
-func (m Model) UpdateX(msg tea.Msg) (Model, tea.Cmd) {
-	newM, cmd := m.Update(msg)
-	return newM.(Model), cmd
-}
-
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
@@ -147,6 +142,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
+func (m *Model) Resize(width, height int) {
+	// remove status bar height
+	m.Resizable.Resize(width, height)
+
+	// remove pane border, table header, and table footer
+	// TODO
+	m.tableModel = m.tableModel.WithPageSize(height - 2 - 3 - 3)
+}
+
+func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
+	newM, cmd := m.Update(msg)
+	return newM.(Model), cmd
+}
+
 func (m Model) updateFooter() Model {
 	highlightedRow := m.tableModel.HighlightedRow()
 
@@ -159,15 +168,6 @@ func (m Model) updateFooter() Model {
 
 	m.tableModel = m.tableModel.WithStaticFooter(footerText)
 	return m
-}
-
-func (m *Model) Resize(width, height int) {
-	// remove status bar height
-	m.Resizable.Resize(width, height)
-
-	// remove pane border, table header, and table footer
-	// TODO
-	m.tableModel = m.tableModel.WithPageSize(height - 2 - 3 - 3)
 }
 
 func (m *Model) TableSizeSmall() {
