@@ -12,7 +12,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/dal"
-	"github.com/alswl/go-toodledo/pkg/fetcher"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/runtime"
 )
@@ -138,7 +137,7 @@ func InitTaskService() (services.TaskService, error) {
 	if err != nil {
 		return nil, err
 	}
-	fieldLogger := logging.ProvideLoggerItf()
+	fieldLogger := logging.ProvideLogger()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
 	return taskService, nil
 }
@@ -157,7 +156,7 @@ func InitTaskLocalService() (services.TaskLocalService, error) {
 	if err != nil {
 		return nil, err
 	}
-	fieldLogger := logging.ProvideLoggerItf()
+	fieldLogger := logging.ProvideLogger()
 	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
 	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
@@ -264,7 +263,7 @@ func InitTaskRichService() (services.TaskRichService, error) {
 	if err != nil {
 		return nil, err
 	}
-	fieldLogger := logging.ProvideLoggerItf()
+	fieldLogger := logging.ProvideLogger()
 	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
 	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
@@ -296,7 +295,7 @@ func InitTaskRichCachedService() (services.TaskRichService, error) {
 	if err != nil {
 		return nil, err
 	}
-	fieldLogger := logging.ProvideLoggerItf()
+	fieldLogger := logging.ProvideLogger()
 	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
 	backend, err := dal.ProvideBackend(toodledoCliConfig)
 	if err != nil {
@@ -312,42 +311,6 @@ func InitTaskRichCachedService() (services.TaskRichService, error) {
 	goalLocalService := services.NewGoalLocalService(goalService, accountService, backend)
 	taskRichService := services.NewTaskRichCachedService(taskLocalService, folderLocalService, contextLocalService, goalLocalService, fieldLogger)
 	return taskRichService, nil
-}
-
-func InitSyncer() (fetcher.ToodledoFetcher, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigFromViper()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
-	backend, err := dal.ProvideBackend(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	folderLocalService := services.NewFolderLocalService(folderService, accountService, backend)
-	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
-	goalLocalService := services.NewGoalLocalService(goalService, accountService, backend)
-	fieldLogger := logging.ProvideLoggerItf()
-	taskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
-	taskLocalService := services.NewTaskLocalService(taskService, accountService, backend)
-	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
-	contextLocalService := services.NewContextLocalService(contextService, accountService, backend)
-	logger := logging.ProvideLogger()
-	toodledoFetcher, err := fetcher.NewToodledoFetcher(folderLocalService, accountService, goalLocalService, taskLocalService, contextLocalService, backend, logger)
-	if err != nil {
-		return nil, err
-	}
-	return toodledoFetcher, nil
 }
 
 func InitTUIApp() (*app.ToodledoTUIApp, error) {
@@ -369,7 +332,7 @@ func InitTUIApp() (*app.ToodledoTUIApp, error) {
 		return nil, err
 	}
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	fieldLogger := logging.ProvideLoggerItf()
+	fieldLogger := logging.ProvideLogger()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
 	servicesTaskService := services.NewTaskService0(toodledo, clientAuthInfoWriter, fieldLogger)
 	taskLocalService := services.NewTaskLocalService(servicesTaskService, accountService, backend)
@@ -381,12 +344,7 @@ func InitTUIApp() (*app.ToodledoTUIApp, error) {
 	goalLocalService := services.NewGoalLocalService(goalService, accountService, backend)
 	savedSearchService := services.NewSavedSearchService(toodledo, clientAuthInfoWriter)
 	taskRichService := services.NewTaskRichCachedService(taskLocalService, folderLocalService, contextLocalService, goalLocalService, fieldLogger)
-	logger := logging.ProvideLogger()
-	toodledoFetcher, err := fetcher.NewToodledoFetcher(folderLocalService, accountService, goalLocalService, taskLocalService, contextLocalService, backend, logger)
-	if err != nil {
-		return nil, err
-	}
-	toodledoTUIApp := app.NewToodledoTUIApp(accountService, taskService, taskLocalService, folderService, folderLocalService, contextService, contextLocalService, goalService, goalLocalService, savedSearchService, taskRichService, toodledoFetcher)
+	toodledoTUIApp := app.NewToodledoTUIApp(accountService, taskService, taskLocalService, folderService, folderLocalService, contextService, contextLocalService, goalService, goalLocalService, savedSearchService, taskRichService)
 	return toodledoTUIApp, nil
 }
 
@@ -409,7 +367,7 @@ func InitCLIApp() (*app.ToodledoCLIApp, error) {
 		return nil, err
 	}
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	fieldLogger := logging.ProvideLoggerItf()
+	fieldLogger := logging.ProvideLogger()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
@@ -421,12 +379,7 @@ func InitCLIApp() (*app.ToodledoCLIApp, error) {
 	contextLocalService := services.NewContextLocalService(contextService, accountService, backend)
 	goalLocalService := services.NewGoalLocalService(goalService, accountService, backend)
 	taskRichService := services.NewTaskRichCachedService(taskLocalService, folderLocalService, contextLocalService, goalLocalService, fieldLogger)
-	logger := logging.ProvideLogger()
-	toodledoFetcher, err := fetcher.NewToodledoFetcher(folderLocalService, accountService, goalLocalService, taskLocalService, contextLocalService, backend, logger)
-	if err != nil {
-		return nil, err
-	}
-	toodledoCLIApp := app.NewToodledoCLIApp(accountService, taskService, folderService, contextService, goalService, savedSearchService, taskRichService, toodledoFetcher)
+	toodledoCLIApp := app.NewToodledoCLIApp(accountService, taskService, folderService, contextService, goalService, savedSearchService, taskRichService)
 	return toodledoCLIApp, nil
 }
 

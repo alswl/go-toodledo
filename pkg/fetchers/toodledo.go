@@ -1,64 +1,62 @@
-package fetcher
+package fetchers
 
 import (
-	"context"
-	"github.com/alswl/go-toodledo/pkg/dal"
+	"fmt"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
-type ToodledoFetcher interface {
-	Start(context.Context)
-	Stop()
-	fetch() error
-	FetchOnce() error
-}
-
-type toodledoFetcher struct {
-	Fetcher
-	log *logrus.Logger
+type ToodledoFetchFunc struct {
+	log logrus.FieldLogger
 
 	folderSvc  services.FolderLocalService
 	contextSvc services.ContextLocalService
 	goalSvc    services.GoalLocalService
 	taskSvc    services.TaskLocalService
 	accountSvc services.AccountService
-	backend    dal.Backend
 }
 
-func NewToodledoFetcher(
+func NewToodledoFetchFunc(
+	log logrus.FieldLogger,
 	folderSvc services.FolderLocalService,
-	accountSvc services.AccountService,
+	contextSvc services.ContextLocalService,
 	goalSvc services.GoalLocalService,
 	taskSvc services.TaskLocalService,
-	contextSvc services.ContextLocalService,
-	backend dal.Backend,
-	logger *logrus.Logger) (ToodledoFetcher, error) {
-	ts := toodledoFetcher{
-		log:        logrus.New(),
+	accountSvc services.AccountService,
+) *ToodledoFetchFunc {
+	return &ToodledoFetchFunc{
+		log:        log,
 		folderSvc:  folderSvc,
 		contextSvc: contextSvc,
 		goalSvc:    goalSvc,
-		accountSvc: accountSvc,
 		taskSvc:    taskSvc,
+		accountSvc: accountSvc,
 	}
-	ts.Fetcher = NewSimpleFetcher(1*time.Minute, ts.fetch, logger)
-	return &ts, nil
 }
 
-func (s *toodledoFetcher) FetchOnce() error {
-	return s.fetch()
+func NewToodledoFetchFnPartial(
+	log logrus.FieldLogger,
+	folderSvc services.FolderLocalService,
+	contextSvc services.ContextLocalService,
+	goalSvc services.GoalLocalService,
+	taskSvc services.TaskLocalService,
+	accountSvc services.AccountService,
+) FetchFn {
+	return NewToodledoFetchFunc(log, folderSvc, contextSvc, goalSvc, taskSvc, accountSvc).Fetch
 }
 
-func (s *toodledoFetcher) fetch() error {
+func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber) error {
+	statusDescriber.Syncing()
+
 	me, _ := s.accountSvc.Me()
 	lastFetchInfo, err := s.accountSvc.GetLastFetchInfo()
 	if err != nil {
+		statusDescriber.Error(fmt.Errorf("auth failed"))
 		return err
 	}
 	if err != nil {
-		s.log.WithError(err).Error("get me in fetch")
+		statusDescriber.Error(fmt.Errorf("get user status failed"))
+		s.log.WithError(err).Error("get user status failed")
 		return err
 	}
 
@@ -66,6 +64,7 @@ func (s *toodledoFetcher) fetch() error {
 		s.log.Info("Fetching folders")
 		err = s.folderSvc.Sync()
 		if err != nil {
+			statusDescriber.Error(fmt.Errorf("fetch folders failed"))
 			s.log.WithError(err).Error("fetch folders")
 		}
 	}
@@ -73,6 +72,7 @@ func (s *toodledoFetcher) fetch() error {
 		s.log.Info("Fetching contexts")
 		err = s.contextSvc.Sync()
 		if err != nil {
+			statusDescriber.Error(fmt.Errorf("fetch contexts failed"))
 			s.log.WithError(err).Error("fetch contexts")
 		}
 	}
@@ -80,6 +80,7 @@ func (s *toodledoFetcher) fetch() error {
 		s.log.Info("Fetching goals")
 		err = s.goalSvc.Sync()
 		if err != nil {
+			statusDescriber.Error(fmt.Errorf("fetch goals failed"))
 			s.log.WithError(err).Error("fetch goals")
 		}
 	}
@@ -91,14 +92,16 @@ func (s *toodledoFetcher) fetch() error {
 		}
 		err = s.taskSvc.PartialSync(lastEditTime)
 		if err != nil {
+			statusDescriber.Error(fmt.Errorf("fetch tasks failed"))
 			s.log.WithError(err).Error("fetch tasks")
 		}
 	}
 
 	err = s.accountSvc.SetLastFetchInfo(me)
 	if err != nil {
+		statusDescriber.Error(fmt.Errorf("set last fetch info failed"))
 		s.log.WithError(err).Error("set last fetch info")
 	}
-
+	statusDescriber.Success()
 	return nil
 }

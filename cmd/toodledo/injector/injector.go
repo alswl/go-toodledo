@@ -7,7 +7,6 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/dal"
-	"github.com/alswl/go-toodledo/pkg/fetcher"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/go-openapi/runtime"
 	"github.com/google/wire"
@@ -79,11 +78,6 @@ func InitTaskRichService() (services.TaskRichService, error) {
 }
 
 func InitTaskRichCachedService() (services.TaskRichCachedService, error) {
-	wire.Build(SuperSet)
-	return nil, nil
-}
-
-func InitSyncer() (fetcher.ToodledoFetcher, error) {
 	wire.Build(SuperSet)
 	return nil, nil
 }

@@ -54,8 +54,8 @@ MINOR_VERSION = 1
 PATCH_VERSION = 0
 BUILD_VERSION = $(COMMIT)
 GO_MOD_VERSION = $(shell cat go.mod | sha256sum | cut -c-6)
-GOOS = darwin
-GOARCH = amd64
+GOOS = $(shell go env GOOS)
+GOARCH = ${shell go env GOARCH}
 VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
 
 # TODO using k8s makefile style
@@ -78,7 +78,7 @@ lint:
 	@test $$(gofmt -l ./pkg/ ./test/ ./cmd/ | wc -l) -eq 0
 
 	@echo "ensure integration test with // +build integration tags"
-	@test $$(find test -name '*_test.go' | wc -l) -eq $$(cat $$(find test -name '*_test.go') | grep -E '// ?\+build integration' | wc -l)
+	@test $$(find test -name '*_test.go' | wc -l) -eq $$(cat $$(find test -name '*_test.go') | grep -E '// ?go:build integration' | wc -l)
 
 	# FIXME enable it
 	# golangci-lint run

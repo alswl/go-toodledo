@@ -4,6 +4,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/components/common"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
+	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/constants"
 	"github.com/charmbracelet/bubbles/list"
@@ -42,6 +43,7 @@ type Model struct {
 	components.Resizable
 
 	// props
+	log        logrus.FieldLogger
 	properties Properties
 
 	// states
@@ -139,7 +141,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if changed {
 			err := m.onItemChange(defaultTabs[m.currentTabIndex], newItem)
 			if err != nil {
-				logrus.WithError(err).Error("failed to change item")
+				m.log.WithError(err).Error("failed to change item")
 			}
 		}
 	}
@@ -225,6 +227,7 @@ func InitModel(p Properties,
 ) Model {
 
 	m := Model{
+		log:             logging.GetLogger("tt"),
 		properties:      p,
 		isCollapsed:     false,
 		currentTabIndex: 0,

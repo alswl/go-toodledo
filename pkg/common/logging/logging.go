@@ -22,7 +22,6 @@ var formatter = &logrus.TextFormatter{
 	TimestampFormat: time.RFC3339,
 	FullTimestamp:   true,
 }
-
 var factory *loggerFactory
 var once sync.Once
 var silentLogger = logrus.New()
@@ -35,11 +34,11 @@ type loggerFactory struct {
 	isSilence bool
 }
 
-func NewLogger() *logrus.Logger {
+func NewLogger() logrus.FieldLogger {
 	return nil
 }
 
-func NewFileLogger(path string) *logrus.Logger {
+func NewFileLogger(path string) logrus.FieldLogger {
 	dir, file := filepath.Split(path)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err := os.MkdirAll(path, os.ModePerm)
@@ -60,10 +59,10 @@ func NewFileLogger(path string) *logrus.Logger {
 	return log
 }
 
-func GetLogger(name string) *logrus.Logger {
+func GetLogger(name string) logrus.FieldLogger {
 	if factory == nil {
-		logrus.Error("logger factory is not initialized")
-		return nil
+		logrus.Warn("logger factory is not initialized")
+		return logrus.StandardLogger()
 	}
 	if factory.isSilence {
 		return silentLogger
@@ -84,11 +83,7 @@ func GetLogger(name string) *logrus.Logger {
 	return NewFileLogger(path)
 }
 
-func ProvideLogger() *logrus.Logger {
-	return GetLogger("default")
-}
-
-func ProvideLoggerItf() logrus.FieldLogger {
+func ProvideLogger() logrus.FieldLogger {
 	return GetLogger("default")
 }
 

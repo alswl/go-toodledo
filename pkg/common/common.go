@@ -1,11 +1,14 @@
 package common
 
 import (
+	"fmt"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
 	"path"
 )
 
@@ -30,7 +33,7 @@ func NewCliConfigForTesting() (models.ToodledoCliConfig, error) {
 	home, err := homedir.Dir()
 	cobra.CheckErr(err)
 	viper.AddConfigPath(path.Join(home, ".config", "toodledo"))
-	viper.SetConfigName(".toodledo-test")
+	viper.SetConfigName("toodledo-test")
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
 		return models.ToodledoCliConfig{}, errors.Wrapf(err, "failed to read config")
@@ -50,4 +53,31 @@ func NewCliConfigMockForTesting() (models.ToodledoCliConfig, error) {
 		},
 	}
 	return conf, nil
+}
+
+// InitViper init viper with cfgFile or cfgDirInHome
+// it must be called before viper.GetXXX, usually it was called in init()
+func InitViper(cfgFile string, cfgDirInHome string, cfgName string) {
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Find home directory.
+		home, err := os.UserHomeDir()
+		if err != nil {
+			_, _ = fmt.Fprintln(os.Stderr, err)
+			return
+		}
+
+		// Search config in ~/.config/dir/conf.yaml
+		viper.AddConfigPath(path.Join(home, cfgDirInHome))
+		viper.SetConfigName("conf")
+		viper.SetConfigType("yaml")
+	}
+
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err == nil {
+		logrus.Debug("config file", viper.ConfigFileUsed())
+	}
 }

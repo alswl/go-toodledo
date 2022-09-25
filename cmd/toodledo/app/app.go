@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/alswl/go-toodledo/pkg/fetcher"
+	"github.com/alswl/go-toodledo/pkg/fetchers"
 	"github.com/alswl/go-toodledo/pkg/services"
 )
 
@@ -16,7 +16,15 @@ type ToodledoCLIApp struct {
 	TaskRichSvc services.TaskRichService
 }
 
-func NewToodledoCLIApp(accountSvc services.AccountService, taskSvc services.TaskService, folderSvc services.FolderService, contextSvc services.ContextService, goalSvc services.GoalService, savedSearchSvc services.SavedSearchService, taskRichSvc services.TaskRichService, syncer fetcher.ToodledoFetcher) *ToodledoCLIApp {
+func NewToodledoCLIApp(
+	accountSvc services.AccountService,
+	taskSvc services.TaskService,
+	folderSvc services.FolderService,
+	contextSvc services.ContextService,
+	goalSvc services.GoalService,
+	savedSearchSvc services.SavedSearchService,
+	taskRichSvc services.TaskRichService,
+) *ToodledoCLIApp {
 	return &ToodledoCLIApp{
 		AccountSvc:     accountSvc,
 		TaskSvc:        taskSvc,
@@ -41,10 +49,22 @@ type ToodledoTUIApp struct {
 	SavedSearchSvc  services.SavedSearchService
 
 	TaskRichSvc services.TaskRichService
-	Syncer      fetcher.ToodledoFetcher
+	fetcher     fetchers.DaemonFetcher
 }
 
-func NewToodledoTUIApp(accountSvc services.AccountService, taskSvc services.TaskService, taskCachedSvc services.TaskLocalService, folderSvc services.FolderService, folderCachedSvc services.FolderLocalService, contextSvc services.ContextService, contextCachedSvc services.ContextLocalService, goalSvc services.GoalService, goalCachedSvc services.GoalLocalService, savedSearchSvc services.SavedSearchService, taskRichSvc services.TaskRichService, syncer fetcher.ToodledoFetcher) *ToodledoTUIApp {
+func NewToodledoTUIApp(
+	accountSvc services.AccountService,
+	taskSvc services.TaskService,
+	taskCachedSvc services.TaskLocalService,
+	folderSvc services.FolderService,
+	folderCachedSvc services.FolderLocalService,
+	contextSvc services.ContextService,
+	contextCachedSvc services.ContextLocalService,
+	goalSvc services.GoalService,
+	goalCachedSvc services.GoalLocalService,
+	savedSearchSvc services.SavedSearchService,
+	taskRichSvc services.TaskRichService,
+) *ToodledoTUIApp {
 	return &ToodledoTUIApp{
 		AccountSvc:      accountSvc,
 		TaskSvc:         taskSvc,
@@ -57,6 +77,5 @@ func NewToodledoTUIApp(accountSvc services.AccountService, taskSvc services.Task
 		GoalLocalSvc:    goalCachedSvc,
 		SavedSearchSvc:  savedSearchSvc,
 		TaskRichSvc:     taskRichSvc,
-		Syncer:          syncer,
 	}
 }

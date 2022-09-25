@@ -12,7 +12,8 @@ import (
 )
 
 func TestReflector(t *testing.T) {
-	r := informers.NewReflector(logrus.New(), 10*time.Second, func(ctx context.Context, lastSynced informers.U) ([]informers.T, informers.U, error) {
+	log := logrus.StandardLogger()
+	r := informers.NewReflector(log, 10*time.Second, func(ctx context.Context, lastSynced informers.U) ([]informers.T, informers.U, error) {
 		var last = int64(42)
 		return []informers.T{""}, &last, nil
 	})
@@ -22,7 +23,8 @@ func TestReflector(t *testing.T) {
 }
 
 func TestReflectorStop(t *testing.T) {
-	r := informers.NewReflector(logrus.New(), 10*time.Second, func(ctx context.Context, lastSynced informers.U) ([]informers.T, informers.U, error) {
+	log := logrus.StandardLogger()
+	r := informers.NewReflector(log, 10*time.Second, func(ctx context.Context, lastSynced informers.U) ([]informers.T, informers.U, error) {
 		select {
 		case <-ctx.Done():
 		case <-time.After(2 * time.Second):

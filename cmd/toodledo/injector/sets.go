@@ -6,7 +6,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/dal"
-	"github.com/alswl/go-toodledo/pkg/fetcher"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/google/wire"
 )
@@ -15,7 +14,6 @@ var SuperSet = wire.NewSet(
 	common.NewCliConfigFromViper,
 	common.NewConfigCliConfig,
 	logging.ProvideLogger,
-	logging.ProvideLoggerItf,
 
 	dal.ProvideBackend,
 	client.NewToodledo,
@@ -40,6 +38,5 @@ var SuperSet = wire.NewSet(
 	// wire not support generic now
 	//informers.ProvideTaskInformer,
 
-	fetcher.NewToodledoFetcher,
 	app.NewToodledoTUIApp,
 )

@@ -122,7 +122,6 @@ func (s *taskService) ListWithChanged(lastEditTime *int32, start, limit int64) (
 }
 
 func (s *taskService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
-	// XXX
 	p := task.NewGetTasksDeletedPhpParams()
 	if lastEditTime != nil {
 		lastEditTime_ := int64(*lastEditTime)

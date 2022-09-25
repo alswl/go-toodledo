@@ -166,7 +166,7 @@ func (m *Model) Resize(width, height int) {
 	m.Resizable.Resize(width, height)
 
 	// remove pane border, table header, and table footer
-	// XXX
+	// TODO
 	m.tableModel = m.tableModel.WithPageSize(height - 2 - 3 - 3)
 }
 

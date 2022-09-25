@@ -6,6 +6,7 @@ import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
+	"github.com/alswl/go-toodledo/pkg/fetchers"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/subtasksview"
@@ -102,6 +103,7 @@ func (q *cmdListQuery) ToQuery() (*queries.TaskListQuery, error) {
 }
 
 func NewListCmd(f *cmdutil.Factory) *cobra.Command {
+	log := logrus.StandardLogger()
 	cmd := &cobra.Command{
 		Use:   "list",
 		Args:  cobra.NoArgs,
@@ -121,17 +123,17 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := utils.FillQueryByFlags(cmd, cmdQ)
 			if err != nil {
-				logrus.WithError(err).Fatal("failed")
+				log.WithError(err).Fatal("failed")
 			}
 			validate := validator.New()
 			err = validate.Struct(cmdQ)
 			if err != nil {
-				logrus.WithError(err).Fatal("validate failed")
+				log.WithError(err).Fatal("validate failed")
 			}
 			// FIXME cli is using TUI App, it contains local data
 			app, err := injector.InitCLIApp()
 			if err != nil {
-				logrus.Fatal("login required, using `toodledo auth login` to login.")
+				log.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
 			appExt, _ := injector.InitTUIApp()
@@ -141,26 +143,33 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			folderSvc := app.FolderSvc
 			goalSvc := app.GoalSvc
 			taskRichSvc := app.TaskRichSvc
-			syncer := appExt.Syncer
-			err = syncer.FetchOnce()
+			fetcher := fetchers.NewToodledoFetchFunc(
+				log,
+				appExt.FolderLocalSvc,
+				appExt.ContextLocalSvc,
+				appExt.GoalLocalSvc,
+				appExt.TaskLocalSvc,
+				app.AccountSvc,
+			)
+			err = fetcher.Fetch(fetchers.NewNoOpStatusDescriber())
 			if err != nil {
-				logrus.WithError(err).Fatal("sync failed")
+				log.WithError(err).Fatal("fetch failed")
 				return
 			}
 
 			err = cmdQ.PrepareIDs(contextSvc, goalSvc, folderSvc)
 			if err != nil {
-				logrus.WithError(err).Fatal("prepare ids failed")
+				log.WithError(err).Fatal("prepare ids failed")
 				return
 			}
 			q, err := cmdQ.ToQuery()
 			if err != nil {
-				logrus.WithError(err).Fatal("parse query failed")
+				log.WithError(err).Fatal("parse query failed")
 			}
 
 			tasks, err := svc.ListAllByQuery(q)
 			if err != nil {
-				logrus.Error(err)
+				log.Error(err)
 				return
 			}
 			sorted, err := services.SortSubTasks(tasks, subtasksview.ModeString2Type(cmdQ.SubTasksMode))

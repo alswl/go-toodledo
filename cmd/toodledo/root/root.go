@@ -13,13 +13,11 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/tasks"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/iostreams"
 	"github.com/alswl/go-toodledo/pkg/version"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"path"
-
 	"os"
 )
 
@@ -36,7 +34,6 @@ func NewRootCmd(f *cmdutil.Factory) *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().StringP("access_token", "", "", "")
-	// XXX changed, test
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/config/toodledo/conf.yaml)")
 
 	_ = viper.BindPFlag(client.AuthAccessToken, rootCmd.PersistentFlags().Lookup("access_token"))
@@ -50,33 +47,9 @@ func NewRootCmd(f *cmdutil.Factory) *cobra.Command {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
-}
-
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		if err != nil {
-			_, _ = fmt.Fprintln(os.Stderr, err)
-			return
-		}
-
-		// Search config in ~/.config/toodledo/conf.yaml
-		viper.AddConfigPath(path.Join(home, ".config", "toodledo"))
-		viper.SetConfigName("conf")
-		viper.SetConfigType("yaml")
-	}
-
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err == nil {
-		logrus.Debug("config file", viper.ConfigFileUsed())
-	}
+	cobra.OnInitialize(func() {
+		common.InitViper(cfgFile, ".config/toodledo", "conf")
+	})
 }
 
 func Execute() {

@@ -3,8 +3,7 @@
 package mockfetcher
 
 import (
-	context "context"
-
+	fetcher "github.com/alswl/go-toodledo/pkg/fetchers"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,23 +12,13 @@ type Fetcher struct {
 	mock.Mock
 }
 
-// Start provides a mock function with given fields: _a0
-func (_m *Fetcher) Start(_a0 context.Context) {
-	_m.Called(_a0)
-}
-
-// Stop provides a mock function with given fields:
-func (_m *Fetcher) Stop() {
-	_m.Called()
-}
-
-// fetch provides a mock function with given fields:
-func (_m *Fetcher) fetch() error {
-	ret := _m.Called()
+// Execute provides a mock function with given fields: sd
+func (_m *Fetcher) Execute(sd fetcher.StatusDescriber) error {
+	ret := _m.Called(sd)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func() error); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(fetcher.StatusDescriber) error); ok {
+		r0 = rf(sd)
 	} else {
 		r0 = ret.Error(0)
 	}

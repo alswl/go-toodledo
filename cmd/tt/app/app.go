@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/cmd/tt/components"
@@ -8,7 +9,8 @@ import (
 	comstatusbar "github.com/alswl/go-toodledo/cmd/tt/components/statusbar"
 	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
-	"github.com/alswl/go-toodledo/pkg/fetcher"
+	"github.com/alswl/go-toodledo/pkg/common/logging"
+	"github.com/alswl/go-toodledo/pkg/fetchers"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/constants"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
@@ -16,7 +18,9 @@ import (
 	"github.com/alswl/go-toodledo/pkg/utils"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
+	"time"
 )
 
 var (
@@ -40,15 +44,16 @@ type States struct {
 	query    *queries.TaskListQuery
 }
 
+// Model is the main tt app
 type Model struct {
 	taskRichSvc services.TaskRichService
-	contextSvc  services.ContextLocalService
-	folderSvc   services.FolderLocalService
-	goalSvc     services.GoalLocalService
+	contextSvc  services.ContextService
+	folderSvc   services.FolderService
+	goalSvc     services.GoalService
 	taskSvc     services.TaskExtendedService
 
 	// properties
-	// TODO
+	log logrus.FieldLogger
 
 	// states TODO
 	states   *States
@@ -66,7 +71,7 @@ type Model struct {
 	// TODO help pane
 	//help          help.Model
 	isInputting bool
-	fetcher     fetcher.ToodledoFetcher
+	fetcher     fetchers.DaemonFetcher
 }
 
 func (m *Model) Init() tea.Cmd {
@@ -117,12 +122,7 @@ func (m *Model) Init() tea.Cmd {
 		return nil
 	})
 	cmds = append(cmds, func() tea.Msg {
-		m.statusBar.SetInfo1("syncing")
-		err := m.fetcher.FetchOnce()
-		if err != nil {
-			m.statusBar.SetStatus("ERROR: " + err.Error())
-		}
-		m.statusBar.SetInfo1("done")
+		m.fetcher.Start(context.Background())
 		return nil
 	})
 
@@ -151,12 +151,19 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
-		// 2. main app
+		// 2. main app, command mode
 		if !m.isInputting {
 			switch msg.String() {
 			case "tab":
 				// change the model fields(isFocused)
 				m.loopFocus()
+				return m, cmd
+			case "r":
+				// FIXME ui refresh, message logic fix
+				err := m.fetcher.Notify()
+				if err != nil {
+					m.log.WithError(err).Error("notify fetcher")
+				}
 				return m, cmd
 			}
 		}
@@ -331,40 +338,21 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 }
 
 func InitialModel() *Model {
+	log := logging.GetLogger("tt")
 	var err error
 	if err != nil {
 		// FIXME
 		panic(err)
 	}
-	_, err = injector.InitTUIApp()
+	app, err := injector.InitTUIApp()
 	if err != nil {
 		panic(err)
 	}
-	taskSvc, err := injector.InitTaskLocalService()
-	if err != nil {
-		panic(err)
-	}
-	taskRichSvc, err := injector.InitTaskRichService()
-	if err != nil {
-		panic(err)
-	}
-	contextSvc, err := injector.InitContextLocalService()
-	if err != nil {
-		panic(err)
-	}
-	folderSvc, err := injector.InitFolderLocalService()
-	if err != nil {
-		panic(err)
-	}
-	goalSvc, err := injector.InitGoalLocalService()
-	if err != nil {
-		panic(err)
-	}
-	syncer, err := injector.InitSyncer()
-	if err != nil {
-		panic(err)
-	}
-
+	taskSvc := app.TaskLocalSvc
+	taskRichSvc := app.TaskRichSvc
+	contextSvc := app.ContextLocalSvc
+	folderSvc := app.FolderLocalSvc
+	goalSvc := app.GoalLocalSvc
 	states := &States{
 		Tasks:    []*models.RichTask{},
 		Contexts: []*models.Context{},
@@ -383,12 +371,12 @@ func InitialModel() *Model {
 	taskPane := taskspane.InitModel(states.Tasks)
 
 	m := Model{
+		log:         logging.GetLogger("tt"),
 		taskRichSvc: taskRichSvc,
 		contextSvc:  contextSvc,
 		folderSvc:   folderSvc,
 		goalSvc:     goalSvc,
 		taskSvc:     taskSvc,
-		fetcher:     syncer,
 		states:      states,
 		err:         nil,
 		focused:     "tasks",
@@ -401,6 +389,27 @@ func InitialModel() *Model {
 	m.sidebar = comsidebar.InitModel(comsidebar.Properties{}, m.OnItemChange)
 	// FIXME focus as an method
 	m.tasksPane.Focus()
+
+	// init fetcher
+	fetcher := fetchers.NewSimpleFetcher(log, 1*time.Minute, fetchers.NewToodledoFetchFnPartial(
+		log,
+		app.FolderLocalSvc,
+		app.ContextLocalSvc,
+		app.GoalLocalSvc,
+		app.TaskLocalSvc,
+		app.AccountSvc,
+	), fetchers.NewStatusDescriber(func() error {
+		m.statusBar.SetStatus("fetching...")
+		return nil
+	}, func() error {
+		m.statusBar.SetStatus("fetching done")
+		return nil
+	}, func(err error) error {
+		m.statusBar.SetStatus("fetching error: " + err.Error())
+		return nil
+	}))
+
+	m.fetcher = fetcher
 
 	return &m
 }
