@@ -29,6 +29,8 @@ func (i Item) Description() string { return "" }
 
 func (i Item) FilterValue() string { return i.title }
 
+type ItemChangeSubscriber func(tab string, item Item) error
+
 var defaultTabs = []string{
 	constants.Contexts,
 	constants.Folders,
@@ -59,12 +61,13 @@ type Model struct {
 
 	// view
 	// list has states(selected)
+	// TODO using wrapped list
 	contextList list.Model
 	folderList  list.Model
 	goalList    list.Model
 
 	// handler
-	onItemChange func(tab string, item Item) error
+	onItemChangeSubscribers []ItemChangeSubscriber
 }
 
 func (m Model) Init() tea.Cmd {
@@ -78,6 +81,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
 		m.contextList.SetSize(msg.Width-h, msg.Height-v)
+	// refresh
 	case []models.Context:
 		m.Contexts = msg
 		for i, _ := range m.contextList.Items() {
@@ -102,35 +106,35 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		for _, c := range m.Goals {
 			m.goalList.InsertItem(len(m.goalList.Items()), Item{c.ID, c.Name})
 		}
+	// change select
 	case tea.KeyMsg:
 		changed := false
-		var newItem = Item{id: 0}
+		currentItem0 := m.getVisibleList().SelectedItem()
+		currentItem := currentItem0.(Item)
+		newItem := currentItem
 		switch msg.String() {
 		case "h":
 			m.updateTab(-1)
-			// FIXME list changed
+			newItem = m.getVisibleList().SelectedItem().(Item)
 			changed = true
 		case "l":
 			m.updateTab(+1)
-			// FIXME list changed
+			newItem = m.getVisibleList().SelectedItem().(Item)
 			changed = true
 		default:
 			// dirty event handle without differ
-			list := m.getVisibleList()
-			oldItem := list.SelectedItem()
 			cmd = m.updateVisibleList(msg)
-			newItem0 := list.SelectedItem()
-			if newItem0 != nil {
-				newItem = newItem0.(Item)
-			}
-			if oldItem != nil && newItem0 != nil && newItem.id != oldItem.(Item).id {
+			newItem = m.getVisibleList().SelectedItem().(Item)
+			if newItem.id != currentItem.id {
 				changed = true
 			}
 		}
 		if changed {
-			err := m.onItemChange(defaultTabs[m.currentTabIndex], newItem)
-			if err != nil {
-				m.log.WithError(err).Error("failed to change item")
+			for _, sub := range m.onItemChangeSubscribers {
+				err := sub(defaultTabs[m.currentTabIndex], newItem)
+				if err != nil {
+					m.log.WithError(err).Error("failed to change item")
+				}
 			}
 		}
 	}
@@ -182,19 +186,19 @@ func (m *Model) updateTab(step int) {
 
 func (m *Model) getVisibleList() *list.Model {
 	tab := defaultTabs[m.currentTabIndex]
-	var list *list.Model
+	var l *list.Model
 
 	switch tab {
 	case constants.Contexts:
-		list = &m.contextList
+		l = &m.contextList
 	case constants.Folders:
-		list = &m.folderList
+		l = &m.folderList
 	case constants.Goals:
-		list = &m.goalList
+		l = &m.goalList
 	default:
 		panic("unknown tab")
 	}
-	return list
+	return l
 }
 
 func (m *Model) updateVisibleList(msg tea.Msg) tea.Cmd {
@@ -216,23 +220,25 @@ func (m *Model) Resize(width, height int) {
 	m.Resizable.Resize(width, height)
 }
 
-func InitModel(p Properties,
-	onItemChange func(tab string, item Item) error,
-) Model {
+func InitModel(p Properties) Model {
 
 	m := Model{
-		log:             logging.GetLogger("tt"),
-		properties:      p,
-		isCollapsed:     false,
-		currentTabIndex: 0,
-		onItemChange:    onItemChange,
-		contextList:     common.NewSimpleList(),
-		folderList:      common.NewSimpleList(),
-		goalList:        common.NewSimpleList(),
+		log:                     logging.GetLogger("tt"),
+		properties:              p,
+		isCollapsed:             false,
+		currentTabIndex:         0,
+		onItemChangeSubscribers: []ItemChangeSubscriber{},
+		contextList:             common.NewSimpleList(),
+		folderList:              common.NewSimpleList(),
+		goalList:                common.NewSimpleList(),
 	}
 	//if len(m.list.Items()) > 0 {
 	//	m.list.Select(0)
 	//}
 	m.Blur()
 	return m
+}
+
+func (m *Model) RegisterItemChange(onItemChange ItemChangeSubscriber) {
+	m.onItemChangeSubscribers = append(m.onItemChangeSubscribers, onItemChange)
 }

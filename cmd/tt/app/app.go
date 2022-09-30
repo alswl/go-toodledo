@@ -46,11 +46,12 @@ type States struct {
 
 // Model is the main tt app
 type Model struct {
-	taskRichSvc services.TaskRichService
-	contextSvc  services.ContextService
-	folderSvc   services.FolderService
-	goalSvc     services.GoalService
-	taskSvc     services.TaskExtendedService
+	taskRichSvc  services.TaskRichService
+	contextSvc   services.ContextService
+	folderSvc    services.FolderService
+	goalSvc      services.GoalService
+	taskSvc      services.TaskExtendedService
+	taskLocalSvc services.TaskLocalService
 
 	// properties
 	log logrus.FieldLogger
@@ -99,6 +100,10 @@ func (m *Model) Init() tea.Cmd {
 			ID:   0,
 			Name: "All",
 		}}, cs...)
+		m.states.Contexts = append(m.states.Contexts, &models.Context{
+			ID:   -1,
+			Name: "None",
+		})
 		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Contexts))
 		// using default first now
 		m.states.query.ContextID = m.states.Contexts[0].ID
@@ -109,6 +114,10 @@ func (m *Model) Init() tea.Cmd {
 			ID:   0,
 			Name: "All",
 		}}, fs...)
+		m.states.Folders = append(m.states.Folders, &models.Folder{
+			ID:   -1,
+			Name: "None",
+		})
 		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Folders))
 
 		// goals
@@ -117,6 +126,10 @@ func (m *Model) Init() tea.Cmd {
 			ID:   0,
 			Name: "All",
 		}}, gs...)
+		m.states.Goals = append(m.states.Goals, &models.Goal{
+			ID:   -1,
+			Name: "None",
+		})
 		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Goals))
 
 		// tasks
@@ -271,8 +284,8 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) (*Model, tea.Cmd) {
 		}
 		return m, cmd
 	case comsidebar.Model:
-		newM, cmd = mm.Update(msg)
-		m.sidebar = newM.(comsidebar.Model)
+		mmTyped := mm.(comsidebar.Model)
+		m.sidebar, cmd = mmTyped.UpdateTyped(msg)
 		return m, cmd
 	case comstatusbar.Model:
 		newM, cmd = mm.Update(msg)
@@ -292,14 +305,7 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) (*Model, tea.Cmd) {
 
 func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	m.statusBar.SetStatus("tab: " + tab + " item: " + item.Title())
-	svc, err := injector.InitTaskLocalService()
-	if err != nil {
-		m.statusBar.SetStatus("ERROR: " + err.Error())
-	}
-	taskRichSvc, err := injector.InitTaskRichService()
-	if err != nil {
-		m.statusBar.SetStatus("ERROR: " + err.Error())
-	}
+	m.states.query = &queries.TaskListQuery{}
 	switch tab {
 	case constants.Contexts:
 		m.states.query.ContextID = item.ID()
@@ -308,11 +314,12 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	case constants.Goals:
 		m.states.query.GoalID = item.ID()
 	}
-	tasks, err := svc.ListAllByQuery(m.states.query)
+	// FIXME using taskSvc
+	tasks, err := m.taskLocalSvc.ListAllByQuery(m.states.query)
 	if err != nil {
 		m.statusBar.SetStatus("ERROR: " + err.Error())
 	}
-	rts, _ := taskRichSvc.RichThem(tasks)
+	rts, _ := m.taskRichSvc.RichThem(tasks)
 	m.states.Tasks = rts
 	m.tasksPane, _ = m.tasksPane.UpdateTyped(m.states.Tasks)
 	m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
@@ -321,17 +328,16 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 }
 
 func InitialModel() *Model {
+	// prepare
 	log := logging.GetLogger("tt")
 	var err error
-	if err != nil {
-		// FIXME
-		panic(err)
-	}
 	app, err := injector.InitTUIApp()
 	if err != nil {
+		// TODO
 		panic(err)
 	}
 	taskSvc := app.TaskLocalSvc
+	taskLocalSvc := app.TaskLocalSvc
 	taskRichSvc := app.TaskRichSvc
 	contextSvc := app.ContextLocalSvc
 	folderSvc := app.FolderLocalSvc
@@ -344,34 +350,39 @@ func InitialModel() *Model {
 		query:    &queries.TaskListQuery{},
 	}
 
+	// status bar
 	statusBar := comstatusbar.NewDefault()
 	statusBar.SetMode("tasks")
 	statusBar.SetStatus("a fox jumped over the lazy dog")
 	statusBar.SetInfo1("1/999")
 	statusBar.SetInfo2("HELP")
 
-	// FIXME tasks should comes from syncer
+	// task pane
 	taskPane := taskspane.InitModel(states.Tasks)
 
+	sidebar := comsidebar.InitModel(comsidebar.Properties{})
+
+	// main app
 	m := Model{
-		log:         logging.GetLogger("tt"),
-		taskRichSvc: taskRichSvc,
-		contextSvc:  contextSvc,
-		folderSvc:   folderSvc,
-		goalSvc:     goalSvc,
-		taskSvc:     taskSvc,
-		states:      states,
-		err:         nil,
-		focused:     "tasks",
-		tabIndex:    0,
-		ready:       false,
-		tasksPane:   taskPane,
-		statusBar:   statusBar,
-		isInputting: false,
+		log:          log,
+		taskRichSvc:  taskRichSvc,
+		contextSvc:   contextSvc,
+		folderSvc:    folderSvc,
+		goalSvc:      goalSvc,
+		taskSvc:      taskSvc,
+		taskLocalSvc: taskLocalSvc,
+		states:       states,
+		err:          nil,
+		focused:      "tasks",
+		tabIndex:     0,
+		ready:        false,
+		tasksPane:    taskPane,
+		statusBar:    statusBar,
+		sidebar:      sidebar,
+		isInputting:  false,
 	}
-	m.sidebar = comsidebar.InitModel(comsidebar.Properties{}, m.OnItemChange)
-	// FIXME focus as an method
-	m.tasksPane.Focus()
+
+	m.sidebar.RegisterItemChange(m.OnItemChange)
 
 	// init fetcher
 	fetcher := fetchers.NewSimpleFetcher(log, 1*time.Minute, fetchers.NewToodledoFetchFnPartial(
@@ -382,17 +393,23 @@ func InitialModel() *Model {
 		app.TaskLocalSvc,
 		app.AccountSvc,
 	), fetchers.NewStatusDescriber(func() error {
+		// TODO using register fun instead of invoke m in New func
 		m.statusBar.SetStatus("fetching...")
 		return nil
 	}, func() error {
+		// TODO using register fun instead of invoke m in New func
 		m.statusBar.SetStatus("fetching done")
 		return nil
 	}, func(err error) error {
+		// TODO using register fun instead of invoke m in New func
 		m.statusBar.SetStatus("fetching error: " + err.Error())
 		return nil
 	}))
-
+	// TODO using register fun instead of invoke m in New func
 	m.fetcher = fetcher
+
+	// FIXME focus as an method
+	m.tasksPane.Focus()
 
 	return &m
 }
