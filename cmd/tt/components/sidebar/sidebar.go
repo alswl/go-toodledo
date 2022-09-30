@@ -21,6 +21,8 @@ type Item struct {
 	title string
 }
 
+type ItemChangeSubscriber func(tab string, item Item) error
+
 func (i Item) ID() int64 { return i.id }
 
 func (i Item) Title() string { return i.title }
@@ -64,7 +66,7 @@ type Model struct {
 	goalList    list.Model
 
 	// handler
-	onItemChange func(tab string, item Item) error
+	onItemChangeSubscribers []ItemChangeSubscriber
 }
 
 func (m Model) Init() tea.Cmd {
@@ -78,6 +80,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
 		m.contextList.SetSize(msg.Width-h, msg.Height-v)
+	// refresh
 	case []models.Context:
 		m.Contexts = msg
 		for i, _ := range m.contextList.Items() {
@@ -102,6 +105,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		for _, c := range m.Goals {
 			m.goalList.InsertItem(len(m.goalList.Items()), Item{c.ID, c.Name})
 		}
+	// change select
 	case tea.KeyMsg:
 		changed := false
 		var newItem = Item{id: 0}
@@ -128,9 +132,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 		if changed {
-			err := m.onItemChange(defaultTabs[m.currentTabIndex], newItem)
-			if err != nil {
-				m.log.WithError(err).Error("failed to change item")
+			for _, sub := range m.onItemChangeSubscribers {
+				err := sub(defaultTabs[m.currentTabIndex], newItem)
+				if err != nil {
+					m.log.WithError(err).Error("failed to change item")
+				}
 			}
 		}
 	}
@@ -216,23 +222,25 @@ func (m *Model) Resize(width, height int) {
 	m.Resizable.Resize(width, height)
 }
 
-func InitModel(p Properties,
-	onItemChange func(tab string, item Item) error,
-) Model {
+func InitModel(p Properties) Model {
 
 	m := Model{
-		log:             logging.GetLogger("tt"),
-		properties:      p,
-		isCollapsed:     false,
-		currentTabIndex: 0,
-		onItemChange:    onItemChange,
-		contextList:     common.NewSimpleList(),
-		folderList:      common.NewSimpleList(),
-		goalList:        common.NewSimpleList(),
+		log:                     logging.GetLogger("tt"),
+		properties:              p,
+		isCollapsed:             false,
+		currentTabIndex:         0,
+		onItemChangeSubscribers: []ItemChangeSubscriber{},
+		contextList:             common.NewSimpleList(),
+		folderList:              common.NewSimpleList(),
+		goalList:                common.NewSimpleList(),
 	}
 	//if len(m.list.Items()) > 0 {
 	//	m.list.Select(0)
 	//}
 	m.Blur()
 	return m
+}
+
+func (m *Model) RegisterItemChange(onItemChange ItemChangeSubscriber) {
+	m.onItemChangeSubscribers = append(m.onItemChangeSubscribers, onItemChange)
 }
