@@ -21,8 +21,6 @@ type Item struct {
 	title string
 }
 
-type ItemChangeSubscriber func(tab string, item Item) error
-
 func (i Item) ID() int64 { return i.id }
 
 func (i Item) Title() string { return i.title }
@@ -30,6 +28,8 @@ func (i Item) Title() string { return i.title }
 func (i Item) Description() string { return "" }
 
 func (i Item) FilterValue() string { return i.title }
+
+type ItemChangeSubscriber func(tab string, item Item) error
 
 var defaultTabs = []string{
 	constants.Contexts,
@@ -61,6 +61,7 @@ type Model struct {
 
 	// view
 	// list has states(selected)
+	// TODO using wrapped list
 	contextList list.Model
 	folderList  list.Model
 	goalList    list.Model
@@ -108,26 +109,23 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// change select
 	case tea.KeyMsg:
 		changed := false
-		var newItem = Item{id: 0}
+		currentItem0 := m.getVisibleList().SelectedItem()
+		currentItem := currentItem0.(Item)
+		newItem := currentItem
 		switch msg.String() {
 		case "h":
 			m.updateTab(-1)
-			// FIXME list changed
+			newItem = m.getVisibleList().SelectedItem().(Item)
 			changed = true
 		case "l":
 			m.updateTab(+1)
-			// FIXME list changed
+			newItem = m.getVisibleList().SelectedItem().(Item)
 			changed = true
 		default:
 			// dirty event handle without differ
-			list := m.getVisibleList()
-			oldItem := list.SelectedItem()
 			cmd = m.updateVisibleList(msg)
-			newItem0 := list.SelectedItem()
-			if newItem0 != nil {
-				newItem = newItem0.(Item)
-			}
-			if oldItem != nil && newItem0 != nil && newItem.id != oldItem.(Item).id {
+			newItem = m.getVisibleList().SelectedItem().(Item)
+			if newItem.id != currentItem.id {
 				changed = true
 			}
 		}
@@ -188,19 +186,19 @@ func (m *Model) updateTab(step int) {
 
 func (m *Model) getVisibleList() *list.Model {
 	tab := defaultTabs[m.currentTabIndex]
-	var list *list.Model
+	var l *list.Model
 
 	switch tab {
 	case constants.Contexts:
-		list = &m.contextList
+		l = &m.contextList
 	case constants.Folders:
-		list = &m.folderList
+		l = &m.folderList
 	case constants.Goals:
-		list = &m.goalList
+		l = &m.goalList
 	default:
 		panic("unknown tab")
 	}
-	return list
+	return l
 }
 
 func (m *Model) updateVisibleList(msg tea.Msg) tea.Cmd {
