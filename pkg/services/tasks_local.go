@@ -213,17 +213,32 @@ func (s *taskLocalService) ListAllByQuery(query *queries.TaskListQuery) ([]*mode
 			return tstatus.StatusValue2Type(t.Status) == *query.Status
 		}).([]*models.Task)
 	}
-	if query.ContextID != 0 {
+	if query.ContextID == -1 {
+		// None Context
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			return t.Context == 0
+		}).([]*models.Task)
+	} else if query.ContextID != 0 {
 		ts = funk.Filter(ts, func(t *models.Task) bool {
 			return t.Context == query.ContextID
 		}).([]*models.Task)
 	}
-	if query.FolderID != 0 {
+	if query.FolderID == -1 {
+		// None Folder
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			return t.Folder == 0
+		}).([]*models.Task)
+	} else if query.FolderID != 0 && query.FolderID != -1 {
 		ts = funk.Filter(ts, func(t *models.Task) bool {
 			return t.Folder == query.FolderID
 		}).([]*models.Task)
 	}
-	if query.GoalID != 0 {
+	if query.GoalID == -1 {
+		// None Goal
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			return t.Goal == 0
+		}).([]*models.Task)
+	} else if query.GoalID != 0 {
 		ts = funk.Filter(ts, func(t *models.Task) bool {
 			return t.Goal == query.GoalID
 		}).([]*models.Task)

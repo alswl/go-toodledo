@@ -100,6 +100,10 @@ func (m *Model) Init() tea.Cmd {
 			ID:   0,
 			Name: "All",
 		}}, cs...)
+		m.states.Contexts = append(m.states.Contexts, &models.Context{
+			ID:   -1,
+			Name: "None",
+		})
 		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Contexts))
 		// using default first now
 		m.states.query.ContextID = m.states.Contexts[0].ID
@@ -110,6 +114,10 @@ func (m *Model) Init() tea.Cmd {
 			ID:   0,
 			Name: "All",
 		}}, fs...)
+		m.states.Folders = append(m.states.Folders, &models.Folder{
+			ID:   -1,
+			Name: "None",
+		})
 		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Folders))
 
 		// goals
@@ -118,6 +126,10 @@ func (m *Model) Init() tea.Cmd {
 			ID:   0,
 			Name: "All",
 		}}, gs...)
+		m.states.Goals = append(m.states.Goals, &models.Goal{
+			ID:   -1,
+			Name: "None",
+		})
 		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Goals))
 
 		// tasks
