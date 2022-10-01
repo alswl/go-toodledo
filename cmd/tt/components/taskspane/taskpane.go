@@ -52,7 +52,7 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 		rows = append(rows, table.NewRow(
 			table.RowData{
 				//columnKeyID:       strconv.Itoa(int(t.ID)),
-				columnKeyCompleted: t.Completed(),
+				columnKeyCompleted: t.CompletedString(),
 				columnKeyTitle:     t.Title,
 				columnKeyContext:   t.TheContext.Name,
 				columnKeyPriority:  tpriority.PriorityValue2Type(t.Priority),
@@ -164,7 +164,7 @@ func (m Model) updateFooter() Model {
 	//highlightedRow := m.tableModel.HighlightedRow()
 
 	footerText := fmt.Sprintf(
-		"Pg. %d/%d - Currently looking at ID: %s",
+		"Pg. %d/%d",
 		m.tableModel.CurrentPage(),
 		m.tableModel.MaxPages(),
 		//highlightedRow.Data[columnKeyID],

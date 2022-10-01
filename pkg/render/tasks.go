@@ -76,13 +76,9 @@ func Tables4RichTasks(tasks []*models.RichTask) string {
 		"Due", "Repeat", "Length", "Timer"})
 	var rows []table.Row
 	for _, x := range tasks {
-		completed := "[ ]"
-		if x.Completed > 0 {
-			completed = "[X]"
-		}
 		rows = append(rows, table.Row{
 			x.ID,
-			completed,
+			x.CompletedString(),
 			x.Title,
 			tstatus.StatusValue2Type(x.Status),
 			x.TheContext.Name,
