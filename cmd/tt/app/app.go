@@ -29,7 +29,7 @@ var (
 		"sidebar",
 		"statusbar",
 	}
-	supportModels = []string{
+	switchAllowedPanes = []string{
 		"tasks",
 		"sidebar",
 	}
@@ -57,10 +57,10 @@ type Model struct {
 	log logrus.FieldLogger
 
 	// states TODO
-	states   *States
-	err      error
-	focused  string
-	tabIndex int
+	states *States
+	err    error
+	// focused model: tasks, sidebar, statusbar
+	focused string
 	// TODO ready check
 	ready bool
 	//isSidebarOpen bool
@@ -161,9 +161,10 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		sideBarWidth := msg.Width / 12 * 3
+		sideBarWidth := msg.Width * 2 / 12
+		taskPaneWidth := msg.Width - sideBarWidth
 		m.sidebar.Resize(sideBarWidth, msg.Height-1)
-		m.tasksPane.Resize(msg.Width-sideBarWidth, msg.Height-1)
+		m.tasksPane.Resize(taskPaneWidth, msg.Height-1)
 		m.statusBar.Resize(msg.Width, 0)
 	case tea.KeyMsg: // handle event bubble
 		// 1. global keymap
@@ -179,7 +180,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch msg.String() {
 			case "tab":
 				// change the model fields(isFocused)
-				m.loopFocus()
+				m.loopFocusPane()
 				return m, cmd
 			case "r":
 				// FIXME ui refresh, message logic fix
@@ -205,7 +206,7 @@ func (m *Model) View() string {
 		m.statusBar.SetStatus(m.err.Error())
 	}
 
-	return styles.MainPaneStyle.Render(
+	return styles.EmptyStyle.Render(
 		lipgloss.JoinVertical(
 			lipgloss.Top,
 			lipgloss.JoinHorizontal(
@@ -218,18 +219,20 @@ func (m *Model) View() string {
 	)
 }
 
-func (m *Model) loopFocus() {
-	if !funk.ContainsString(supportModels, m.focused) {
+func (m *Model) loopFocusPane() {
+	// only allowed switchAllowedPanes, not support status bar
+	if !funk.ContainsString(switchAllowedPanes, m.focused) {
 		return
 	}
 
-	m.tabIndex = (m.tabIndex + 1 + len(supportModels)) % len(supportModels)
-	new := supportModels[m.tabIndex]
-	m.focus(new)
+	currentIdx := funk.IndexOf(switchAllowedPanes, m.focused)
+	nextPane := switchAllowedPanes[(currentIdx+1)%len(switchAllowedPanes)]
+
+	m.focus(nextPane)
 }
 
-func (m *Model) getFocusedModelF() components.FocusableInterface {
-	name := supportModels[m.tabIndex]
+func (m *Model) getFocusedModeTyped() components.FocusableInterface {
+	name := m.focused
 	switch name {
 	case "tasks":
 		return &m.tasksPane
@@ -237,9 +240,9 @@ func (m *Model) getFocusedModelF() components.FocusableInterface {
 		return &m.sidebar
 	case "statusbar":
 		return &m.statusBar
-
+	default:
+		panic("unreachable")
 	}
-	panic("unreachable")
 }
 
 func (m *Model) getFocusedModel() tea.Model {
@@ -255,10 +258,11 @@ func (m *Model) getFocusedModel() tea.Model {
 	panic("unreachable")
 }
 
-func (m *Model) focus(name string) {
-	m.getFocusedModelF().Blur()
-	m.focused = name
-	m.getFocusedModelF().Focus()
+// XXX
+func (m *Model) focus(next string) {
+	m.getFocusedModeTyped().Blur()
+	m.focused = next
+	m.getFocusedModeTyped().Focus()
 }
 
 func (m *Model) focusStatusBar() {
@@ -374,7 +378,6 @@ func InitialModel() *Model {
 		states:       states,
 		err:          nil,
 		focused:      "tasks",
-		tabIndex:     0,
 		ready:        false,
 		tasksPane:    taskPane,
 		statusBar:    statusBar,

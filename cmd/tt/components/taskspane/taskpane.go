@@ -11,27 +11,29 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
-	"strconv"
 )
 
 const (
-	columnKeyID       = "id"
-	columnKeyTitle    = "title"
-	columnKeyContext  = "context"
-	columnKeyStatus   = "status"
-	columnKeyPriority = "priority"
-	columnKeyGoal     = "goal"
-	columnKeyDue      = "due"
-	columnKeyRepeat   = "repeat"
-	columnKeyLength   = "length"
-	columnKeyTimer    = "timer"
-	columnKeyTag      = "tag"
+	//columnKeyID       = "id"
+	columnKeyCompleted = "completed"
+	columnKeyTitle     = "title"
+	columnKeyContext   = "context"
+	columnKeyStatus    = "status"
+	columnKeyPriority  = "priority"
+	columnKeyGoal      = "goal"
+	columnKeyDue       = "due"
+	columnKeyRepeat    = "repeat"
+	columnKeyLength    = "length"
+	columnKeyTimer     = "timer"
+	columnKeyTag       = "tag"
 )
 
 const DefaultTableWidth = 120
+const defaultPageSize = 20
 
 var DefaultColumns = []table.Column{
-	table.NewColumn(columnKeyID, "ID", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
+	//table.NewColumn(columnKeyID, "ID", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
+	table.NewColumn(columnKeyCompleted, "[X]", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
 	table.NewFlexColumn(columnKeyTitle, "Title", 0).WithFiltered(true),
 	table.NewColumn(columnKeyContext, "Context", 10),
 	table.NewColumn(columnKeyPriority, "Priority", 10),
@@ -49,17 +51,18 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	for _, t := range tasks {
 		rows = append(rows, table.NewRow(
 			table.RowData{
-				columnKeyID:       strconv.Itoa(int(t.ID)),
-				columnKeyTitle:    t.Title,
-				columnKeyContext:  t.TheContext.Name,
-				columnKeyPriority: tpriority.PriorityValue2Type(t.Priority),
-				columnKeyStatus:   tstatus.StatusValue2Type(t.Status),
-				columnKeyGoal:     t.TheGoal.Name,
-				columnKeyDue:      t.DueString(),
-				columnKeyRepeat:   t.RepeatString(),
-				columnKeyLength:   t.LengthString(),
-				columnKeyTimer:    t.TimerString(),
-				columnKeyTag:      t.TagString(),
+				//columnKeyID:       strconv.Itoa(int(t.ID)),
+				columnKeyCompleted: t.Completed(),
+				columnKeyTitle:     t.Title,
+				columnKeyContext:   t.TheContext.Name,
+				columnKeyPriority:  tpriority.PriorityValue2Type(t.Priority),
+				columnKeyStatus:    tstatus.StatusValue2Type(t.Status),
+				columnKeyGoal:      t.TheGoal.Name,
+				columnKeyDue:       t.DueString(),
+				columnKeyRepeat:    t.RepeatString(),
+				columnKeyLength:    t.LengthString(),
+				columnKeyTimer:     t.TimerString(),
+				columnKeyTag:       t.TagString(),
 			},
 		))
 	}
@@ -97,9 +100,9 @@ func (m Model) View() string {
 		m.tableModel.View(),
 	)
 
-	style := styles.UnfocusedPaneStyle
+	style := styles.PaneStyle.Copy()
 	if m.IsFocused() {
-		style = styles.PaneStyle
+		style = styles.FocusedPaneStyle.Copy()
 	}
 	return style.Render(m.Viewport.View())
 }
@@ -118,18 +121,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "=":
-			// FIXME if table is key pressing in filter
-			//if !m.app.IsInputting() {
-			m.TableSizeGreater()
-			//	return m, tea.Batch(cmds...)
-			//}
-		case "-":
-			// FIXME if table is key pressing in filter
-			//if !m.app.IsInputting() {
-			m.TableSizeSmall()
-			//	return m, tea.Batch(cmds...)
-			//}
 		}
 
 	case []*models.RichTask:
@@ -144,11 +135,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *Model) Resize(width, height int) {
 	// remove status bar height
-	m.Resizable.Resize(width, height)
+	m.Resizable.Resize(width, height, styles.PaneStyle.GetBorderStyle())
+	paneBorder := 1
 
 	// remove pane border, table header, and table footer
-	// TODO
-	m.tableModel = m.tableModel.WithPageSize(height - 2 - 3 - 3)
+	// normal style
+	//tableHeaderHeight := 3
+	//tableFooterHeight := 1
+	//tableBorder := 1
+
+	// minimal
+	tableHeaderHeight := 1
+	tableFooterHeight := 0
+	tableBorder := 0
+	// patch for bubble-tables bug, table columns calculated
+	fixWidth := len(DefaultColumns) - 1
+
+	m.tableModel = m.tableModel.WithPageSize(height - tableBorder*2 - tableHeaderHeight - tableFooterHeight - paneBorder*2).
+		WithTargetWidth(width + fixWidth)
 }
 
 func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
@@ -157,25 +161,25 @@ func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
 }
 
 func (m Model) updateFooter() Model {
-	highlightedRow := m.tableModel.HighlightedRow()
+	//highlightedRow := m.tableModel.HighlightedRow()
 
 	footerText := fmt.Sprintf(
 		"Pg. %d/%d - Currently looking at ID: %s",
 		m.tableModel.CurrentPage(),
 		m.tableModel.MaxPages(),
-		highlightedRow.Data[columnKeyID],
+		//highlightedRow.Data[columnKeyID],
 	)
 
 	m.tableModel = m.tableModel.WithStaticFooter(footerText)
 	return m
 }
 
-func (m *Model) TableSizeSmall() {
+func (m *Model) tableSizeSmall() {
 	m.tableWidth = m.tableWidth - 10
 	m.tableModel = m.tableModel.WithTargetWidth(m.tableWidth)
 }
 
-func (m *Model) TableSizeGreater() {
+func (m *Model) tableSizeGreater() {
 	m.tableWidth = m.tableWidth + 10
 	m.tableModel = m.tableModel.WithTargetWidth(m.tableWidth)
 }
@@ -191,7 +195,8 @@ func InitModel(tasks []*models.RichTask) Model {
 
 	tb := table.New(DefaultColumns).
 		WithRows(TasksRenderRows(tasks)).
-		HeaderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("10")).Bold(true)).
+		HeaderStyle(styles.PaneStyle.Copy().Bold(true).BorderStyle(styles.EmptyBorderStyle)).
+		Border(styles.EmptyTableBorderStyle).
 		SelectableRows(false).
 		Focused(true).
 		Filtered(true).
@@ -200,7 +205,7 @@ func InitModel(tasks []*models.RichTask) Model {
 		//Border(customBorder).
 		// TODO flex height
 		//WithNoPagination().
-		WithPageSize(20).
+		WithPageSize(defaultPageSize).
 		//WithNoPagination().
 		WithFooterVisibility(false).
 		WithTargetWidth(DefaultTableWidth).

@@ -71,3 +71,11 @@ func (t RichTask) LengthString() string {
 func (t RichTask) TagString() string {
 	return t.Tag
 }
+
+func (t RichTask) Completed() string {
+	if t.Task.Completed == 1 {
+		return "[X]"
+	} else {
+		return "[ ]"
+	}
+}

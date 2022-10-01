@@ -30,7 +30,12 @@ type ResizeInterface interface {
 	Resize(width, height int)
 }
 
+// Resizable managed the size of the component,
+// Viewpoint is inner viewport of the component, which is used to render the content
+// Viewport' size is the size of the component minus the border size
 type Resizable struct {
+	Height   int
+	Width    int
 	Viewport viewport.Model
 }
 
@@ -38,9 +43,9 @@ func NewResizable(width, height int) Resizable {
 	return Resizable{Viewport: viewport.Model{Width: width, Height: height}}
 }
 
-func (r *Resizable) Resize(width, height int) {
-	border := lipgloss.NormalBorder()
-
+func (r *Resizable) Resize(width, height int, border lipgloss.Border) {
+	r.Width = width
+	r.Height = height
 	r.Viewport.Width = width - lipgloss.Width(border.Right+border.Top)
 	r.Viewport.Height = height - lipgloss.Width(border.Bottom+border.Top)
 }

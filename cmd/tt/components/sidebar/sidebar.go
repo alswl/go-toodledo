@@ -13,9 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// TODO move to styles
-var docStyle = lipgloss.NewStyle().Margin(1, 2)
-
 type Item struct {
 	id    int64
 	title string
@@ -79,7 +76,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		h, v := docStyle.GetFrameSize()
+		h, v := styles.EmptyStyle.GetFrameSize()
 		m.contextList.SetSize(msg.Width-h, msg.Height-v)
 	// refresh
 	case []models.Context:
@@ -144,22 +141,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	// TODO move to styles
-	tab := defaultTabs[m.currentTabIndex]
-	tabRender := lipgloss.NewStyle().
-		PaddingLeft(1).
-		PaddingRight(1).
-		Background(lipgloss.Color("#f0f0f0")).Render("<" + tab + ">")
+	tabName := defaultTabs[m.currentTabIndex]
+	tabRender := styles.EmptyStyle.Render("<" + tabName + ">")
 
 	m.Viewport.SetContent(
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			tabRender,
-			docStyle.Render(m.getVisibleList().View()),
+			styles.EmptyStyle.Render(m.getVisibleList().View()),
 		),
 	)
-	style := styles.UnfocusedPaneStyle
+	style := styles.PaneStyle.Copy()
 	if m.IsFocused() {
-		style = styles.PaneStyle
+		style = styles.FocusedPaneStyle.Copy()
 	}
 	//return style.
 	//	Width(m.Viewport.Width).
@@ -167,7 +161,7 @@ func (m Model) View() string {
 	//	Render(wrap.String(
 	//		wordwrap.String(m.Viewport.View(), m.Viewport.Width), m.Viewport.Width),
 	//	)
-	return style.Render(m.Viewport.View())
+	return style.Width(m.Viewport.Width).Render(m.Viewport.View())
 }
 
 func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
@@ -217,7 +211,7 @@ func (m *Model) updateVisibleList(msg tea.Msg) tea.Cmd {
 }
 
 func (m *Model) Resize(width, height int) {
-	m.Resizable.Resize(width, height)
+	m.Resizable.Resize(width, height, styles.PaneStyle.GetBorderStyle())
 }
 
 func InitModel(p Properties) Model {
