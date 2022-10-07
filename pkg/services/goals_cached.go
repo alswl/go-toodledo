@@ -9,13 +9,6 @@ import (
 	"sync"
 )
 
-// GoalLocalService is a cached service
-// it synced interval by fetcher
-type GoalLocalService interface {
-	LocalStorage
-	GoalService
-}
-
 var GoalBucket = "goals"
 
 type goalCachedService struct {
@@ -26,14 +19,25 @@ type goalCachedService struct {
 	accountSvc AccountService
 }
 
-// NewGoalLocalService ...
-func NewGoalLocalService(goalsvc GoalService, accountSvc AccountService, db dal.Backend) GoalLocalService {
+var goalLocalServiceInstance GoalPersistenceService
+var goalLocalServiceOnce sync.Once
+
+func NewGoalCachedService(goalsvc GoalService, accountSvc AccountService, db dal.Backend) GoalPersistenceService {
 	s := goalCachedService{
 		svc:        goalsvc,
 		db:         db,
 		accountSvc: accountSvc,
 	}
 	return &s
+}
+
+func ProvideGoalCachedService(svc GoalService, accountSvc AccountService, db dal.Backend) GoalPersistenceService {
+	if goalLocalServiceInstance == nil {
+		goalLocalServiceOnce.Do(func() {
+			goalLocalServiceInstance = NewGoalCachedService(svc, accountSvc, db)
+		})
+	}
+	return goalLocalServiceInstance
 }
 
 func (s *goalCachedService) Sync() error {
@@ -43,7 +47,7 @@ func (s *goalCachedService) Sync() error {
 	}
 	s.syncLock.Lock()
 	defer s.syncLock.Unlock()
-	err = s.LocalClear()
+	err = s.Clean()
 	if err != nil {
 		return err
 	}
@@ -60,25 +64,25 @@ func (s *goalCachedService) PartialSync(lastEditTime *int32) error {
 
 // Rename ...
 func (s *goalCachedService) Rename(name string, newName string) (*models.Goal, error) {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Rename(name, newName)
 }
 
 // Archive ...
 func (s *goalCachedService) Archive(id int, isArchived bool) (*models.Goal, error) {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Archive(id, isArchived)
 }
 
 // Delete ...
 func (s *goalCachedService) Delete(name string) error {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Delete(name)
 }
 
 // Create ...
 func (s *goalCachedService) Create(name string) (*models.Goal, error) {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Create(name)
 }
 
@@ -130,7 +134,7 @@ func (s *goalCachedService) FindByID(id int64) (*models.Goal, error) {
 	return f, nil
 }
 
-func (s *goalCachedService) LocalClear() error {
+func (s *goalCachedService) Clean() error {
 	err := s.db.Truncate(GoalBucket)
 	if err != nil {
 		return err

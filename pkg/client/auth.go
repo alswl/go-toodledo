@@ -138,7 +138,7 @@ func NewOAuth2ConfigFromViper() (*oauth2.Config, error) {
 		ClientSecret: clientSecret,
 		Scopes:       scopes,
 		Endpoint: oauth2.Endpoint{
-			// FIXME endpoint configurable
+			// TODO endpoint configurable
 			AuthURL:  "https://api.toodledo.com/3/account/authorize.php",
 			TokenURL: "https://api.toodledo.com/3/account/token.php",
 		},

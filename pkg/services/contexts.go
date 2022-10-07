@@ -24,18 +24,25 @@ type ContextService interface {
 	Create(name string) (*models.Context, error)
 }
 
-type contextservice struct {
+// ContextPersistenceService is a cached service
+// it synced interval by fetcher
+type ContextPersistenceService interface {
+	Synchronizable
+	ContextService
+}
+
+type contextService struct {
 	cli  *client.Toodledo
 	auth runtime.ClientAuthInfoWriter
 }
 
 // NewContextService ...
 func NewContextService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) ContextService {
-	return &contextservice{cli: cli, auth: auth}
+	return &contextService{cli: cli, auth: auth}
 }
 
 // Create ...
-func (s *contextservice) Create(name string) (*models.Context, error) {
+func (s *contextService) Create(name string) (*models.Context, error) {
 	params := context.NewPostContextsAddPhpParams()
 	params.SetName(name)
 	resp, err := s.cli.Context.PostContextsAddPhp(params, s.auth)
@@ -47,7 +54,7 @@ func (s *contextservice) Create(name string) (*models.Context, error) {
 }
 
 // Delete ...
-func (s *contextservice) Delete(name string) error {
+func (s *contextService) Delete(name string) error {
 	f, err := s.Find(name)
 	if err != nil {
 		return err
@@ -64,7 +71,7 @@ func (s *contextservice) Delete(name string) error {
 }
 
 // Rename ...
-func (s *contextservice) Rename(name string, newName string) (*models.Context, error) {
+func (s *contextService) Rename(name string, newName string) (*models.Context, error) {
 	if name == newName {
 		logrus.Error("not changed")
 		return nil, fmt.Errorf("not changed")
@@ -88,7 +95,7 @@ func (s *contextservice) Rename(name string, newName string) (*models.Context, e
 }
 
 // Find ...
-func (s *contextservice) Find(name string) (*models.Context, error) {
+func (s *contextService) Find(name string) (*models.Context, error) {
 	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
 	fs, err := s.ListAll()
 	if err != nil {
@@ -105,7 +112,7 @@ func (s *contextservice) Find(name string) (*models.Context, error) {
 	return f, nil
 }
 
-func (s *contextservice) FindByID(id int64) (*models.Context, error) {
+func (s *contextService) FindByID(id int64) (*models.Context, error) {
 	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
 	fs, err := s.ListAll()
 	if err != nil {
@@ -123,7 +130,7 @@ func (s *contextservice) FindByID(id int64) (*models.Context, error) {
 }
 
 // ListAll ...
-func (s *contextservice) ListAll() ([]*models.Context, error) {
+func (s *contextService) ListAll() ([]*models.Context, error) {
 	cli := client.NewHTTPClient(strfmt.NewFormats())
 	ts, err := cli.Context.GetContextsGetPhp(context.NewGetContextsGetPhpParams(), s.auth)
 	if err != nil {

@@ -9,19 +9,19 @@ import (
 type ToodledoFetchFunc struct {
 	log logrus.FieldLogger
 
-	folderSvc  services.FolderLocalService
-	contextSvc services.ContextLocalService
-	goalSvc    services.GoalLocalService
-	taskSvc    services.TaskLocalService
+	folderSvc  services.FolderPersistenceService
+	contextSvc services.ContextPersistenceService
+	goalSvc    services.GoalPersistenceService
+	taskSvc    services.TaskPersistenceExtService
 	accountSvc services.AccountService
 }
 
 func NewToodledoFetchFunc(
 	log logrus.FieldLogger,
-	folderSvc services.FolderLocalService,
-	contextSvc services.ContextLocalService,
-	goalSvc services.GoalLocalService,
-	taskSvc services.TaskLocalService,
+	folderSvc services.FolderPersistenceService,
+	contextSvc services.ContextPersistenceService,
+	goalSvc services.GoalPersistenceService,
+	taskSvc services.TaskPersistenceExtService,
 	accountSvc services.AccountService,
 ) *ToodledoFetchFunc {
 	return &ToodledoFetchFunc{
@@ -36,10 +36,10 @@ func NewToodledoFetchFunc(
 
 func NewToodledoFetchFnPartial(
 	log logrus.FieldLogger,
-	folderSvc services.FolderLocalService,
-	contextSvc services.ContextLocalService,
-	goalSvc services.GoalLocalService,
-	taskSvc services.TaskLocalService,
+	folderSvc services.FolderPersistenceService,
+	contextSvc services.ContextPersistenceService,
+	goalSvc services.GoalPersistenceService,
+	taskSvc services.TaskPersistenceExtService,
 	accountSvc services.AccountService,
 ) FetchFn {
 	return NewToodledoFetchFunc(log, folderSvc, contextSvc, goalSvc, taskSvc, accountSvc).Fetch
@@ -48,10 +48,14 @@ func NewToodledoFetchFnPartial(
 func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber) error {
 	statusDescriber.Syncing()
 
-	me, _ := s.accountSvc.Me()
-	lastFetchInfo, err := s.accountSvc.GetLastFetchInfo()
+	me, err := s.accountSvc.Me()
 	if err != nil {
 		statusDescriber.Error(fmt.Errorf("auth failed"))
+		return err
+	}
+	lastFetchInfo, err := s.accountSvc.GetLastFetchInfo()
+	if err != nil {
+		statusDescriber.Error(fmt.Errorf("sync failed"))
 		return err
 	}
 	if err != nil {

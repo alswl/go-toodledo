@@ -39,8 +39,8 @@ type cmdEditQuery struct {
 	Title string
 }
 
-func (q *cmdEditQuery) ToQuery(contextSvc services.ContextService, folderSvc services.FolderService,
-	goalSvc services.GoalService) (*queries.TaskEditQuery, error) {
+func toQuery(contextSvc services.ContextService, folderSvc services.FolderService,
+	goalSvc services.GoalService, q *cmdEditQuery) (*queries.TaskEditQuery, error) {
 	query := queries.TaskEditQuery{}
 
 	if q.Context != "" {
@@ -93,6 +93,10 @@ func NewEditCmd(f *cmdutil.Factory) *cobra.Command {
 			if err != nil {
 				logrus.WithError(err).Fatal("parse query failed")
 			}
+			if funk.IsZero(cmdQ) {
+				logrus.Fatal("query is empty")
+				return
+			}
 			// services
 			app, err := injector.InitCLIApp()
 			if err != nil {
@@ -114,13 +118,9 @@ func NewEditCmd(f *cmdutil.Factory) *cobra.Command {
 			}
 
 			// query
-			q, err := cmdQ.ToQuery(contextSvc, folderSvc, goalSvc)
+			q, err := toQuery(contextSvc, folderSvc, goalSvc, &cmdQ)
 			if err != nil {
 				logrus.WithError(err).Fatal("parse query failed")
-			}
-			// FIXME not works
-			if funk.IsZero(q) {
-				logrus.Fatal("query is empty")
 				return
 			}
 			q.ID = int64(id)

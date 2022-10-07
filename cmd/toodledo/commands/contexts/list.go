@@ -24,7 +24,6 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			// FIXME cached
 			svc := app.ContextSvc
 
 			all, err := svc.ListAll()

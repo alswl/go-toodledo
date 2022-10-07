@@ -13,77 +13,82 @@ import (
 )
 
 func InitAuth() (runtime.ClientAuthInfoWriter, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return &client.SimpleAuth{}, nil
 }
 
 func NewToodledoCli() (*client.Toodledo, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
 func InitFolderService() (services.FolderService, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
-func InitFolderLocalService() (services.FolderLocalService, error) {
-	wire.Build(IntegrationTestSet)
+func InitFolderLocalService() (services.FolderPersistenceService, error) {
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
 func InitContextService() (services.ContextService, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
-func InitContextLocalService() (services.ContextLocalService, error) {
-	wire.Build(IntegrationTestSet)
+func InitContextLocalService() (services.ContextPersistenceService, error) {
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
 func InitTaskService() (services.TaskService, error) {
-	wire.Build(IntegrationTestSet)
-	return nil, nil
-}
-
-func InitTaskLocalService() (services.TaskLocalService, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
 func InitGoalService() (services.GoalService, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
-func InitGoalLocalService() (services.GoalLocalService, error) {
-	wire.Build(IntegrationTestSet)
+func InitGoalLocalService() (services.GoalPersistenceService, error) {
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
 func InitAccountSvc() (services.AccountService, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
 func InitSavedSearchService() (services.SavedSearchService, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
 func InitTaskRichService() (services.TaskRichService, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
-func InitTaskRichCachedService() (services.TaskRichCachedService, error) {
-	wire.Build(IntegrationTestSet)
+func InitTaskLocalService() (services.TaskPersistenceExtService, error) {
+	wire.Build(IntegrationTestTUISet)
+	return nil, nil
+}
+
+func InitTaskExtendedService() (services.TaskPersistenceExtService, error) {
+	wire.Build(IntegrationTestTUISet)
+	return nil, nil
+}
+
+func InitTaskRichCachedService() (services.TaskRichService, error) {
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
 func InitTUIApp() (*app.ToodledoTUIApp, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }
 
@@ -93,11 +98,11 @@ func InitCLIApp() (*app.ToodledoCLIApp, error) {
 }
 
 //func InitTaskInformer() (*informers.TaskInformer, error) {
-//	wire.Build(IntegrationTestSet)
+//	wire.Build(IntegrationTestTUISet)
 //	return nil, nil
 //}
 
 func InitBackend() (dal.Backend, error) {
-	wire.Build(IntegrationTestSet)
+	wire.Build(IntegrationTestTUISet)
 	return nil, nil
 }

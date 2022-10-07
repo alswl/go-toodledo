@@ -9,13 +9,6 @@ import (
 	"sync"
 )
 
-// FolderLocalService is a cached service
-// it synced interval by fetcher
-type FolderLocalService interface {
-	LocalStorage
-	FolderService
-}
-
 var FolderBucket = "folders"
 
 type folderCachedService struct {
@@ -26,14 +19,25 @@ type folderCachedService struct {
 	accountSvc AccountService
 }
 
-// NewFolderLocalService ...
-func NewFolderLocalService(folderSvc FolderService, accountSvc AccountService, db dal.Backend) FolderLocalService {
+var folderLocalServiceInstance FolderPersistenceService
+var folderLocalServiceOnce sync.Once
+
+func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService, db dal.Backend) FolderPersistenceService {
 	s := folderCachedService{
 		svc:        folderSvc,
 		db:         db,
 		accountSvc: accountSvc,
 	}
 	return &s
+}
+
+func ProvideFolderCachedService(svc FolderService, accountSvc AccountService, db dal.Backend) FolderPersistenceService {
+	if folderLocalServiceInstance == nil {
+		folderLocalServiceOnce.Do(func() {
+			folderLocalServiceInstance = NewFolderCachedService(svc, accountSvc, db)
+		})
+	}
+	return folderLocalServiceInstance
 }
 
 func (s *folderCachedService) Sync() error {
@@ -43,7 +47,7 @@ func (s *folderCachedService) Sync() error {
 	}
 	s.syncLock.Lock()
 	defer s.syncLock.Unlock()
-	err = s.LocalClear()
+	err = s.Clean()
 	if err != nil {
 		return err
 	}
@@ -60,25 +64,25 @@ func (s *folderCachedService) PartialSync(lastEditTime *int32) error {
 
 // Rename ...
 func (s *folderCachedService) Rename(name string, newName string) (*models.Folder, error) {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Rename(name, newName)
 }
 
 // Archive ...
 func (s *folderCachedService) Archive(id int, isArchived bool) (*models.Folder, error) {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Archive(id, isArchived)
 }
 
 // Delete ...
 func (s *folderCachedService) Delete(name string) error {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Delete(name)
 }
 
 // Create ...
 func (s *folderCachedService) Create(name string) (*models.Folder, error) {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Create(name)
 }
 
@@ -130,7 +134,7 @@ func (s *folderCachedService) FindByID(id int64) (*models.Folder, error) {
 	return f, nil
 }
 
-func (s *folderCachedService) LocalClear() error {
+func (s *folderCachedService) Clean() error {
 	err := s.db.Truncate(FolderBucket)
 	if err != nil {
 		return err

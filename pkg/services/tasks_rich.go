@@ -14,22 +14,23 @@ type TaskRichService interface {
 type TaskRichCachedService = TaskRichService
 
 type taskRichService struct {
+	logger     logrus.FieldLogger
 	taskSvc    TaskService
 	folderSvc  FolderService
 	contextSvc ContextService
 	goalSvc    GoalService
-	logger     logrus.FieldLogger
 }
 
-// NewTaskRichCachedService returns a new TaskRichCachedService.
-// it will cache the attribute when rich the task
-func NewTaskRichCachedService(
-	taskSvc TaskLocalService,
-	folderSvc FolderLocalService,
-	contextSvc ContextLocalService,
-	goalSvc GoalLocalService,
+// NewTaskRichService returns a new TaskRichService.
+// it will not cache the attribute when rich the task, and query the attribute from remote
+// Please use the NewTaskRichPersistenceService first
+func NewTaskRichService(
+	taskSvc TaskService,
+	folderSvc FolderService,
+	contextSvc ContextService,
+	goalSvc GoalService,
 	logger logrus.FieldLogger,
-) TaskRichCachedService {
+) TaskRichService {
 	return &taskRichService{
 		taskSvc:    taskSvc,
 		folderSvc:  folderSvc,
@@ -39,16 +40,15 @@ func NewTaskRichCachedService(
 	}
 }
 
-// NewTaskRichService returns a new TaskRichService.
-// it will not cache the attribute when rich the task, and query the attribute from remote
-// Please use the NewTaskRichCachedService first
-func NewTaskRichService(
-	taskSvc TaskService,
-	folderSvc FolderService,
-	contextSvc ContextService,
-	goalSvc GoalService,
+// NewTaskRichPersistenceService returns a new TaskRichCachedService.
+// svc inside will cache the attribute when rich the task
+func NewTaskRichPersistenceService(
+	taskSvc TaskPersistenceExtService,
+	folderSvc FolderPersistenceService,
+	contextSvc ContextPersistenceService,
+	goalSvc GoalPersistenceService,
 	logger logrus.FieldLogger,
-) TaskRichService {
+) TaskRichCachedService {
 	return &taskRichService{
 		taskSvc:    taskSvc,
 		folderSvc:  folderSvc,

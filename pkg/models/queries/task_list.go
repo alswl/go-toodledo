@@ -7,11 +7,13 @@ import (
 
 type TaskListQuery struct {
 	Title string
-	// FIXME how to present no content?
+	// ContextID, 0 for all, -1 for none
 	ContextID int64
-	FolderID  int64
-	GoalID    int64
-	DueDate   string
+	// FolderID, 0 for all, -1 for none
+	FolderID int64
+	// GoalID, 0 for all, -1 for none
+	GoalID  int64
+	DueDate string
 	// Priority, low is zero, is default value, Priority should be pointer
 	Priority   *priority.Priority
 	Status     *status.Status

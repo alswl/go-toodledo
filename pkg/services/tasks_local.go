@@ -13,31 +13,42 @@ import (
 	"sync"
 )
 
-type TaskLocalService interface {
-	TaskService
-	TaskExtendedService
-	LocalStorage
-}
+var instance TaskPersistenceExtService
+var once sync.Once
 
-var _ TaskLocalService = (*taskLocalService)(nil)
-
-type taskLocalService struct {
-	remoteSvc  *taskService
+type taskLocalExtService struct {
+	taskSvc    TaskService
 	accountSvc AccountService
 
 	syncLock sync.Mutex
 	db       dal.Backend
 }
 
-func NewTaskLocalService(remoteSvc *taskService, accountSvc AccountService, db dal.Backend) TaskLocalService {
-	return &taskLocalService{remoteSvc: remoteSvc, accountSvc: accountSvc, db: db}
+// var _ TaskPersistenceExtService = (*taskLocalExtService)(nil)
+var _ TaskPersistenceExtService = (*taskLocalExtService)(nil)
+var _ TaskExtendedService = (*taskLocalExtService)(nil)
+var _ Synchronizable = (*taskLocalExtService)(nil)
+
+func newTaskLocalExtService(taskSvc TaskService, accountSvc AccountService, db dal.Backend) TaskPersistenceExtService {
+	return &taskLocalExtService{taskSvc: taskSvc, accountSvc: accountSvc, db: db}
+}
+
+func ProvideTaskLocalExtService(taskSvc TaskService, accountSvc AccountService, db dal.Backend) TaskPersistenceExtService {
+	once.Do(func() {
+		instance = newTaskLocalExtService(taskSvc, accountSvc, db)
+	})
+	return instance
+}
+
+func ProvideTaskLocalExtServiceIft(taskSvc TaskService, accountSvc AccountService, db dal.Backend) TaskExtendedService {
+	return ProvideTaskLocalExtService(taskSvc, accountSvc, db)
 }
 
 var TaskBucket = "tasks"
 
 var MaxNumPerRequest = int64(1000)
 
-func (s *taskLocalService) LocalClear() error {
+func (s *taskLocalExtService) Clean() error {
 	err := s.db.Truncate(TaskBucket)
 	if err != nil {
 		return err
@@ -45,15 +56,15 @@ func (s *taskLocalService) LocalClear() error {
 	return nil
 }
 
-func (s *taskLocalService) ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
-	return s.remoteSvc.ListWithChanged(lastEditTime, start, limit)
+func (s *taskLocalExtService) ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+	return s.taskSvc.ListWithChanged(lastEditTime, start, limit)
 }
 
-func (s *taskLocalService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
-	return s.remoteSvc.ListDeleted(lastEditTime)
+func (s *taskLocalExtService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
+	return s.taskSvc.ListDeleted(lastEditTime)
 }
 
-func (s *taskLocalService) syncWithFn(fnEdited func() ([]*models.Task, error), fnDeleted func() ([]*models.TaskDeleted, error)) error {
+func (s *taskLocalExtService) syncWithFn(fnEdited func() ([]*models.Task, error), fnDeleted func() ([]*models.TaskDeleted, error)) error {
 	editedTasks, err := fnEdited()
 	if err != nil {
 		return err
@@ -76,20 +87,20 @@ func (s *taskLocalService) syncWithFn(fnEdited func() ([]*models.Task, error), f
 	return nil
 }
 
-func (s *taskLocalService) Sync() error {
+func (s *taskLocalExtService) Sync() error {
 	return s.syncWithFn(s.listAllRemote, func() ([]*models.TaskDeleted, error) {
 		return []*models.TaskDeleted{}, nil
 	})
 }
 
-func (s *taskLocalService) PartialSync(lastEditTime *int32) error {
+func (s *taskLocalExtService) PartialSync(lastEditTime *int32) error {
 	return s.syncWithFn(
 		func() ([]*models.Task, error) { return s.listChanged(lastEditTime) },
 		func() ([]*models.TaskDeleted, error) { return s.ListDeleted(lastEditTime) },
 	)
 }
 
-func (s *taskLocalService) FindById(id int64) (*models.Task, error) {
+func (s *taskLocalExtService) FindById(id int64) (*models.Task, error) {
 	all, _, err := s.ListAll()
 	if err != nil {
 		return nil, err
@@ -104,7 +115,7 @@ func (s *taskLocalService) FindById(id int64) (*models.Task, error) {
 	return head, nil
 }
 
-func (s *taskLocalService) listAllRemote() ([]*models.Task, error) {
+func (s *taskLocalExtService) listAllRemote() ([]*models.Task, error) {
 	var ts, all []*models.Task
 	var err error
 	var pagination *models.PaginatedInfo
@@ -113,7 +124,7 @@ func (s *taskLocalService) listAllRemote() ([]*models.Task, error) {
 
 	// TODO query from local data
 	for {
-		ts, pagination, err = s.remoteSvc.List(start, limit)
+		ts, pagination, err = s.taskSvc.List(start, limit)
 		if err != nil {
 			return nil, err
 		}
@@ -128,7 +139,7 @@ func (s *taskLocalService) listAllRemote() ([]*models.Task, error) {
 	return all, nil
 }
 
-func (s *taskLocalService) listChanged(lastEditTime *int32) ([]*models.Task, error) {
+func (s *taskLocalExtService) listChanged(lastEditTime *int32) ([]*models.Task, error) {
 	var ts, all []*models.Task
 	var err error
 	var pagination *models.PaginatedInfo
@@ -137,7 +148,7 @@ func (s *taskLocalService) listChanged(lastEditTime *int32) ([]*models.Task, err
 
 	// TODO query from local data
 	for {
-		ts, pagination, err = s.remoteSvc.ListWithChanged(lastEditTime, start, limit)
+		ts, pagination, err = s.taskSvc.ListWithChanged(lastEditTime, start, limit)
 		if err != nil {
 			return nil, err
 		}
@@ -154,7 +165,7 @@ func (s *taskLocalService) listChanged(lastEditTime *int32) ([]*models.Task, err
 
 // ListAll returns all tasks from cache, maybe cached missed
 // FIXME avoid cache missed
-func (s *taskLocalService) ListAll() ([]*models.Task, int, error) {
+func (s *taskLocalExtService) ListAll() ([]*models.Task, int, error) {
 	all, err := s.db.List(TaskBucket)
 	if err != nil {
 		return nil, 0, err
@@ -171,7 +182,7 @@ func (s *taskLocalService) ListAll() ([]*models.Task, int, error) {
 	return ts, len(all), nil
 }
 
-func (s *taskLocalService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+func (s *taskLocalExtService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
 	// TODO test
 	all, _, err := s.ListAll()
 	if err != nil {
@@ -189,7 +200,7 @@ func (s *taskLocalService) List(start, limit int64) ([]*models.Task, *models.Pag
 	}, nil
 }
 
-func (s *taskLocalService) ListAllByQuery(query *queries.TaskListQuery) ([]*models.Task, error) {
+func (s *taskLocalExtService) ListAllByQuery(query *queries.TaskListQuery) ([]*models.Task, error) {
 	all, err := s.db.List(TaskBucket)
 	if err != nil {
 		return nil, err
@@ -256,96 +267,96 @@ func (s *taskLocalService) ListAllByQuery(query *queries.TaskListQuery) ([]*mode
 	return ts, nil
 }
 
-func (s *taskLocalService) Create(title string) (*models.Task, error) {
-	created, err := s.remoteSvc.Create(title)
+func (s *taskLocalExtService) Create(title string) (*models.Task, error) {
+	created, err := s.taskSvc.Create(title)
 	if err != nil {
 		return nil, err
 	}
 	// FIXME, using reconcile instead of cleanup
-	err = s.LocalClear()
+	err = s.Clean()
 	if err != nil {
 		return nil, err
 	}
 	return created, nil
 }
 
-func (s *taskLocalService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
-	created, err := s.remoteSvc.CreateByQuery(query)
+func (s *taskLocalExtService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
+	created, err := s.taskSvc.CreateByQuery(query)
 	if err != nil {
 		return nil, err
 	}
 	// FIXME, using reconcile instead of cleanup
-	err = s.LocalClear()
+	err = s.Clean()
 	if err != nil {
 		return nil, err
 	}
 	return created, nil
 }
 
-func (s *taskLocalService) Delete(id int64) error {
-	err := s.remoteSvc.Delete(id)
+func (s *taskLocalExtService) Delete(id int64) error {
+	err := s.taskSvc.Delete(id)
 	if err != nil {
 		return err
 	}
 	// FIXME, using reconcile instead of cleanup
-	err = s.LocalClear()
+	err = s.Clean()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *taskLocalService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error) {
-	batch, items, err := s.remoteSvc.DeleteBatch(ids)
+func (s *taskLocalExtService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error) {
+	batch, items, err := s.taskSvc.DeleteBatch(ids)
 	if err != nil {
 		return nil, nil, err
 	}
 	// FIXME, using reconcile instead of cleanup
-	err = s.LocalClear()
+	err = s.Clean()
 	if err != nil {
 		return nil, nil, err
 	}
 	return batch, items, nil
 }
 
-func (s *taskLocalService) Edit(id int64, t *models.Task) (*models.Task, error) {
-	edited, err := s.remoteSvc.Edit(id, t)
+func (s *taskLocalExtService) Edit(id int64, t *models.Task) (*models.Task, error) {
+	edited, err := s.taskSvc.Edit(id, t)
 	if err != nil {
 		return nil, err
 	}
 	// FIXME, using reconcile instead of cleanup
-	err = s.LocalClear()
+	err = s.Clean()
 	if err != nil {
 		return nil, err
 	}
 	return edited, nil
 }
 
-func (s *taskLocalService) EditByQuery(query *queries.TaskEditQuery) (*models.Task, error) {
+func (s *taskLocalExtService) EditByQuery(query *queries.TaskEditQuery) (*models.Task, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *taskLocalService) Complete(id int64) (*models.Task, error) {
-	completed, err := s.remoteSvc.Complete(id)
+func (s *taskLocalExtService) Complete(id int64) (*models.Task, error) {
+	completed, err := s.taskSvc.Complete(id)
 	if err != nil {
 		return nil, err
 	}
 	// FIXME, using reconcile instead of cleanup
-	err = s.LocalClear()
+	err = s.Clean()
 	if err != nil {
 		return nil, err
 	}
 	return completed, nil
 }
 
-func (s *taskLocalService) UnComplete(id int64) (*models.Task, error) {
-	unCompleted, err := s.remoteSvc.UnComplete(id)
+func (s *taskLocalExtService) UnComplete(id int64) (*models.Task, error) {
+	unCompleted, err := s.taskSvc.UnComplete(id)
 	if err != nil {
 		return nil, err
 	}
 	// FIXME, using reconcile instead of cleanup
-	err = s.LocalClear()
+	err = s.Clean()
 	if err != nil {
 		return nil, err
 	}

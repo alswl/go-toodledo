@@ -21,20 +21,19 @@ var CLISet = wire.NewSet(
 	client.NewAuthFromConfig,
 	client.NewOAuth2ConfigFromViper,
 
-	// FIXME using cached service instead of local service
 	services.CurrentUser,
 	services.NewAccountService,
-	services.NewTaskService0,
 	services.NewTaskService,
-	services.NewTaskLocalService,
+	services.ProvideTaskLocalExtService,
+	services.ProvideTaskLocalExtServiceIft,
 	services.NewFolderService,
-	services.NewFolderLocalService,
+	services.NewFolderCachedService,
 	services.NewContextService,
-	services.NewContextLocalService,
+	services.NewContextCachedService,
 	services.NewGoalService,
-	services.NewGoalLocalService,
+	services.ProvideGoalCachedService,
 	services.NewSavedSearchService,
-	services.NewTaskRichCachedService,
+	services.NewTaskRichPersistenceService,
 
 	// wire not support generic now
 	//informers.ProvideTaskInformer,

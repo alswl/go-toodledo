@@ -92,7 +92,6 @@ func (q *cmdListQuery) ToQuery() (*queries.TaskListQuery, error) {
 		in := true
 		query.Incomplete = &in
 	}
-	// FIXME, not supported now, wait syncer support
 	// remoteSvc.List
 	if q.Complete {
 		in := false
@@ -130,15 +129,15 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			if err != nil {
 				log.WithError(err).Fatal("validate failed")
 			}
-			// FIXME cli is using TUI App, it contains local data
 			app, err := injector.InitCLIApp()
 			if err != nil {
 				log.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
+			// TODO  cli is using TUI App, it contains local data
 			appExt, _ := injector.InitTUIApp()
 
-			svc := appExt.TaskLocalSvc
+			taskExtSvc := appExt.TaskLocalSvc
 			contextSvc := app.ContextSvc
 			folderSvc := app.FolderSvc
 			goalSvc := app.GoalSvc
@@ -167,7 +166,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				log.WithError(err).Fatal("parse query failed")
 			}
 
-			tasks, err := svc.ListAllByQuery(q)
+			tasks, err := taskExtSvc.ListAllByQuery(q)
 			if err != nil {
 				log.Error(err)
 				return

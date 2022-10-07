@@ -24,11 +24,6 @@ import (
 )
 
 var (
-	allModels = []string{
-		"tasks",
-		"sidebar",
-		"statusbar",
-	}
 	switchAllowedPanes = []string{
 		"tasks",
 		"sidebar",
@@ -44,6 +39,9 @@ type States struct {
 	query    *queries.TaskListQuery
 }
 
+type RefreshMsg struct {
+}
+
 // Model is the main tt app
 type Model struct {
 	taskRichSvc  services.TaskRichService
@@ -51,7 +49,7 @@ type Model struct {
 	folderSvc    services.FolderService
 	goalSvc      services.GoalService
 	taskSvc      services.TaskExtendedService
-	taskLocalSvc services.TaskLocalService
+	taskLocalSvc services.TaskPersistenceExtService
 
 	// properties
 	log logrus.FieldLogger
@@ -159,6 +157,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// 3. focused component
 
 	var cmd tea.Cmd
+	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		sideBarWidth := msg.Width * 2 / 12
@@ -166,6 +165,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.sidebar.Resize(sideBarWidth, msg.Height-1)
 		m.tasksPane.Resize(taskPaneWidth, msg.Height-1)
 		m.statusBar.Resize(msg.Width, 0)
+	case RefreshMsg:
+		// nothing, only ui refresh
 	case tea.KeyMsg: // handle event bubble
 		// 1. global keymap
 		if funk.ContainsString([]string{"ctrl+c"}, msg.String()) {
@@ -181,23 +182,30 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "tab":
 				// change the model fields(isFocused)
 				m.loopFocusPane()
-				return m, cmd
+				return m, tea.Batch(cmds...)
 			case "r":
-				// FIXME ui refresh, message logic fix
 				err := m.fetcher.Notify()
 				if err != nil {
 					m.log.WithError(err).Error("notify fetcher")
 				}
-				return m, cmd
+				newCmd := func() tea.Msg {
+					select {
+					case <-m.fetcher.UIRefresh():
+						return RefreshMsg{}
+					}
+				}
+				cmds = append(cmds, newCmd)
+				return m, tea.Batch(cmds...)
 			}
 		}
 
 		// 3. sub focused component
 		m, cmd = m.updateFocusedModel(msg)
+		cmds = append(cmds, cmd)
 
 		// normal keypress
 	}
-	return m, cmd
+	return m, tea.Batch(cmds...)
 }
 
 func (m *Model) View() string {
@@ -258,7 +266,6 @@ func (m *Model) getFocusedModel() tea.Model {
 	panic("unreachable")
 }
 
-// XXX
 func (m *Model) focus(next string) {
 	m.getFocusedModeTyped().Blur()
 	m.focused = next
@@ -318,7 +325,6 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	case constants.Goals:
 		m.states.query.GoalID = item.ID()
 	}
-	// FIXME using taskSvc
 	tasks, err := m.taskLocalSvc.ListAllByQuery(m.states.query)
 	if err != nil {
 		m.statusBar.SetStatus("ERROR: " + err.Error())
@@ -388,14 +394,7 @@ func InitialModel() *Model {
 	m.sidebar.RegisterItemChange(m.OnItemChange)
 
 	// init fetcher
-	fetcher := fetchers.NewSimpleFetcher(log, 1*time.Minute, fetchers.NewToodledoFetchFnPartial(
-		log,
-		app.FolderLocalSvc,
-		app.ContextLocalSvc,
-		app.GoalLocalSvc,
-		app.TaskLocalSvc,
-		app.AccountSvc,
-	), fetchers.NewStatusDescriber(func() error {
+	describer := fetchers.NewStatusDescriber(func() error {
 		// TODO using register fun instead of invoke m in New func
 		m.statusBar.SetStatus("fetching...")
 		return nil
@@ -407,11 +406,18 @@ func InitialModel() *Model {
 		// TODO using register fun instead of invoke m in New func
 		m.statusBar.SetStatus("fetching error: " + err.Error())
 		return nil
-	}))
+	})
+	fetcher := fetchers.NewSimpleFetcher(log, 1*time.Minute, fetchers.NewToodledoFetchFnPartial(
+		log,
+		app.FolderLocalSvc,
+		app.ContextLocalSvc,
+		app.GoalLocalSvc,
+		app.TaskLocalSvc,
+		app.AccountSvc,
+	), describer)
 	// TODO using register fun instead of invoke m in New func
 	m.fetcher = fetcher
 
-	// FIXME focus as an method
 	m.tasksPane.Focus()
 
 	return &m

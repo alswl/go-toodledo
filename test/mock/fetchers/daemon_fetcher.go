@@ -37,6 +37,22 @@ func (_m *DaemonFetcher) Stop() {
 	_m.Called()
 }
 
+// UIRefresh provides a mock function with given fields:
+func (_m *DaemonFetcher) UIRefresh() chan bool {
+	ret := _m.Called()
+
+	var r0 chan bool
+	if rf, ok := ret.Get(0).(func() chan bool); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(chan bool)
+		}
+	}
+
+	return r0
+}
+
 type mockConstructorTestingTNewDaemonFetcher interface {
 	mock.TestingT
 	Cleanup(func())

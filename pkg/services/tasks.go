@@ -36,6 +36,7 @@ type TaskService interface {
 	Complete(id int64) (*models.Task, error)
 	UnComplete(id int64) (*models.Task, error)
 	ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error)
+	ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error)
 }
 
 // TaskExtendedService is a service for tasks, it provided more query parameters.
@@ -45,6 +46,12 @@ type TaskExtendedService interface {
 	ListAllByQuery(query *queries.TaskListQuery) ([]*models.Task, error)
 }
 
+type TaskPersistenceExtService interface {
+	TaskService
+	TaskExtendedService
+	Synchronizable
+}
+
 // taskService is the implementation of TaskService by client
 type taskService struct {
 	cli    *client.Toodledo
@@ -52,12 +59,8 @@ type taskService struct {
 	logger logrus.FieldLogger
 }
 
-func NewTaskService0(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter, logger logrus.FieldLogger) *taskService {
-	return &taskService{cli: cli, auth: auth, logger: logger}
-}
-
 func NewTaskService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter, logger logrus.FieldLogger) TaskService {
-	return NewTaskService0(cli, auth, logger)
+	return &taskService{cli: cli, auth: auth, logger: logger}
 }
 
 func (s *taskService) ListAll() ([]*models.Task, int, error) {
@@ -173,7 +176,10 @@ func (s *taskService) Create(title string) (*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	// FIXME index
+	if len(resp.Payload) == 0 {
+		s.logger.WithField("title", title).Error("create task, return payload 0")
+		return nil, fmt.Errorf("create task, return payload 0")
+	}
 	return resp.Payload[0], err
 }
 

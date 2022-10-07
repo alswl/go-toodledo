@@ -24,6 +24,13 @@ type GoalService interface {
 	ListAll() ([]*models.Goal, error)
 }
 
+// GoalPersistenceService is a cached service
+// it synced interval by fetcher
+type GoalPersistenceService interface {
+	Synchronizable
+	GoalService
+}
+
 type goalService struct {
 	cli  *client.Toodledo
 	auth runtime.ClientAuthInfoWriter

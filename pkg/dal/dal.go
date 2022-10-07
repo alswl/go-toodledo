@@ -19,7 +19,7 @@ func ProvideBackend(config models.ToodledoCliConfig) (Backend, error) {
 		return nil, err
 	}
 	// FIXME config.Database.DataFile may be empty
-	// FIXME support multi user usage
+	// TODO support multi user usage
 	bolts[config.Database.DataFile] = b
 	return b, nil
 }

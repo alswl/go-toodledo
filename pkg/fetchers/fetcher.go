@@ -14,15 +14,18 @@ type DaemonFetcher interface {
 	// TODO using ch to stop
 	Stop()
 	Notify() error
+	// UIRefresh is used to notify ui app to refresh
+	UIRefresh() chan bool
 }
 
 // FetchFn fetch data
 type FetchFn func(sd StatusDescriber) error
 
 type intervalDaemonFetcher struct {
-	ticker   *time.Ticker
-	stop     chan struct{}
-	fetchNow chan bool
+	ticker    *time.Ticker
+	stop      chan struct{}
+	fetchNow  chan bool
+	uiRefresh chan bool
 
 	log             logrus.FieldLogger
 	fn              FetchFn
@@ -37,6 +40,7 @@ func NewSimpleFetcher(log logrus.FieldLogger, interval time.Duration, fn FetchFn
 		fn:              fn,
 		fetchNow:        make(chan bool),
 		statusDescriber: statusDescriber,
+		uiRefresh:       make(chan bool),
 	}
 }
 
@@ -46,9 +50,11 @@ func (s *intervalDaemonFetcher) run(ctx context.Context) {
 		case <-ctx.Done():
 			s.log.Info("fetcher stopped, ctx done")
 			s.Stop()
+			s.UIRefresh() <- true
 			break
 		case <-s.stop:
 			s.log.Info("fetcher stopped, stop chan")
+			s.UIRefresh() <- true
 			break
 		case <-s.fetchNow:
 			s.log.Info("fetcher now")
@@ -56,12 +62,14 @@ func (s *intervalDaemonFetcher) run(ctx context.Context) {
 			if err != nil {
 				s.log.Errorf("fetcher fetch error: %v", err)
 			}
+			s.UIRefresh() <- true
 		case <-s.ticker.C:
 			s.log.Info("fetcher tick")
 			err := s.fetch()
 			if err != nil {
 				s.log.Errorf("fetcher fetch error: %v", err)
 			}
+			s.UIRefresh() <- true
 		}
 	}
 }
@@ -90,4 +98,8 @@ func (s *intervalDaemonFetcher) Notify() error {
 		s.fetchNow <- true
 	}()
 	return nil
+}
+
+func (s *intervalDaemonFetcher) UIRefresh() chan bool {
+	return s.uiRefresh
 }

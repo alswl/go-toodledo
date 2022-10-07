@@ -24,6 +24,13 @@ type FolderService interface {
 	Create(name string) (*models.Folder, error)
 }
 
+// FolderPersistenceService is a cached service
+// it synced interval by fetcher
+type FolderPersistenceService interface {
+	Synchronizable
+	FolderService
+}
+
 // folderService query folder with remote api
 type folderService struct {
 	cli  *client.Toodledo

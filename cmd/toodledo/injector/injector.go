@@ -13,77 +13,82 @@ import (
 )
 
 func InitAuth() (runtime.ClientAuthInfoWriter, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return &client.SimpleAuth{}, nil
 }
 
 func NewToodledoCli() (*client.Toodledo, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return nil, nil
 }
 
 func InitFolderService() (services.FolderService, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return nil, nil
 }
 
-func InitFolderLocalService() (services.FolderLocalService, error) {
-	wire.Build(SuperSet)
+func InitFolderLocalService() (services.FolderPersistenceService, error) {
+	wire.Build(TUISet)
 	return nil, nil
 }
 
 func InitContextService() (services.ContextService, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return nil, nil
 }
 
-func InitContextLocalService() (services.ContextLocalService, error) {
-	wire.Build(SuperSet)
+func InitContextLocalService() (services.ContextPersistenceService, error) {
+	wire.Build(TUISet)
 	return nil, nil
 }
 
 func InitTaskService() (services.TaskService, error) {
-	wire.Build(SuperSet)
-	return nil, nil
-}
-
-func InitTaskLocalService() (services.TaskLocalService, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return nil, nil
 }
 
 func InitGoalService() (services.GoalService, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return nil, nil
 }
 
-func InitGoalLocalService() (services.GoalLocalService, error) {
-	wire.Build(SuperSet)
+func InitGoalLocalService() (services.GoalPersistenceService, error) {
+	wire.Build(TUISet)
 	return nil, nil
 }
 
 func InitAccountSvc() (services.AccountService, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return nil, nil
 }
 
 func InitSavedSearchService() (services.SavedSearchService, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return nil, nil
 }
 
 func InitTaskRichService() (services.TaskRichService, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return nil, nil
 }
 
-func InitTaskRichCachedService() (services.TaskRichCachedService, error) {
-	wire.Build(SuperSet)
+func InitTaskLocalService() (services.TaskPersistenceExtService, error) {
+	wire.Build(TUISet)
+	return nil, nil
+}
+
+func InitTaskExtendedService() (services.TaskPersistenceExtService, error) {
+	wire.Build(TUISet)
+	return nil, nil
+}
+
+func InitTaskRichCachedService() (services.TaskRichService, error) {
+	wire.Build(TUISet)
 	return nil, nil
 }
 
 func InitTUIApp() (*app.ToodledoTUIApp, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return nil, nil
 }
 
@@ -93,11 +98,11 @@ func InitCLIApp() (*app.ToodledoCLIApp, error) {
 }
 
 //func InitTaskInformer() (*informers.TaskInformer, error) {
-//	wire.Build(SuperSet)
+//	wire.Build(TUISet)
 //	return nil, nil
 //}
 
 func InitBackend() (dal.Backend, error) {
-	wire.Build(SuperSet)
+	wire.Build(TUISet)
 	return nil, nil
 }

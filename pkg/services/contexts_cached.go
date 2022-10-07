@@ -9,13 +9,6 @@ import (
 	"sync"
 )
 
-// ContextLocalService is a cached service
-// it synced interval by fetcher
-type ContextLocalService interface {
-	LocalStorage
-	ContextService
-}
-
 var ContextBucket = "contexts"
 
 type contextCachedService struct {
@@ -26,14 +19,26 @@ type contextCachedService struct {
 	accountSvc AccountService
 }
 
-// NewContextLocalService ...
-func NewContextLocalService(contextsvc ContextService, accountSvc AccountService, db dal.Backend) ContextLocalService {
+var contextLocalServiceInstance ContextPersistenceService
+var contextLocalServiceOnce sync.Once
+
+// NewContextCachedService ...
+func NewContextCachedService(contextsvc ContextService, accountSvc AccountService, db dal.Backend) ContextPersistenceService {
 	s := contextCachedService{
 		svc:        contextsvc,
 		db:         db,
 		accountSvc: accountSvc,
 	}
 	return &s
+}
+
+func ProvideContextCachedService(svc ContextService, accountSvc AccountService, db dal.Backend) ContextPersistenceService {
+	if contextLocalServiceInstance == nil {
+		contextLocalServiceOnce.Do(func() {
+			contextLocalServiceInstance = NewContextCachedService(svc, accountSvc, db)
+		})
+	}
+	return contextLocalServiceInstance
 }
 
 func (s *contextCachedService) Sync() error {
@@ -43,7 +48,7 @@ func (s *contextCachedService) Sync() error {
 	}
 	s.syncLock.Lock()
 	defer s.syncLock.Unlock()
-	err = s.LocalClear()
+	err = s.Clean()
 	if err != nil {
 		return err
 	}
@@ -60,7 +65,7 @@ func (s *contextCachedService) PartialSync(lastEditTime *int32) error {
 
 // Rename ...
 func (s *contextCachedService) Rename(name string, newName string) (*models.Context, error) {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Rename(name, newName)
 }
 
@@ -71,13 +76,13 @@ func (s *contextCachedService) Archive(id int, isArchived bool) (*models.Context
 
 // Delete ...
 func (s *contextCachedService) Delete(name string) error {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Delete(name)
 }
 
 // Create ...
 func (s *contextCachedService) Create(name string) (*models.Context, error) {
-	_ = s.LocalClear()
+	_ = s.Clean()
 	return s.svc.Create(name)
 }
 
@@ -130,7 +135,7 @@ func (s *contextCachedService) Find(name string) (*models.Context, error) {
 }
 
 // LocalClear ...
-func (s *contextCachedService) LocalClear() error {
+func (s *contextCachedService) Clean() error {
 	err := s.db.Truncate(ContextBucket)
 	if err != nil {
 		return err

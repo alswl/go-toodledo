@@ -39,13 +39,13 @@ func NewToodledoCLIApp(
 type ToodledoTUIApp struct {
 	AccountSvc      services.AccountService
 	TaskSvc         services.TaskService
-	TaskLocalSvc    services.TaskLocalService
+	TaskLocalSvc    services.TaskPersistenceExtService
 	FolderSvc       services.FolderService
-	FolderLocalSvc  services.FolderLocalService
+	FolderLocalSvc  services.FolderPersistenceService
 	ContextSvc      services.ContextService
-	ContextLocalSvc services.ContextLocalService
+	ContextLocalSvc services.ContextPersistenceService
 	GoalSvc         services.GoalService
-	GoalLocalSvc    services.GoalLocalService
+	GoalLocalSvc    services.GoalPersistenceService
 	SavedSearchSvc  services.SavedSearchService
 
 	TaskRichSvc services.TaskRichService
@@ -55,13 +55,13 @@ type ToodledoTUIApp struct {
 func NewToodledoTUIApp(
 	accountSvc services.AccountService,
 	taskSvc services.TaskService,
-	taskCachedSvc services.TaskLocalService,
+	taskCachedSvc services.TaskPersistenceExtService,
 	folderSvc services.FolderService,
-	folderCachedSvc services.FolderLocalService,
+	folderCachedSvc services.FolderPersistenceService,
 	contextSvc services.ContextService,
-	contextCachedSvc services.ContextLocalService,
+	contextCachedSvc services.ContextPersistenceService,
 	goalSvc services.GoalService,
-	goalCachedSvc services.GoalLocalService,
+	goalCachedSvc services.GoalPersistenceService,
 	savedSearchSvc services.SavedSearchService,
 	taskRichSvc services.TaskRichService,
 ) *ToodledoTUIApp {

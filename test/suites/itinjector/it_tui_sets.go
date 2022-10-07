@@ -1,4 +1,4 @@
-package injector
+package itinjector
 
 import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
@@ -10,30 +10,30 @@ import (
 	"github.com/google/wire"
 )
 
-var SuperSet = wire.NewSet(
-	common.NewCliConfigFromViper,
+var IntegrationTestTUISet = wire.NewSet(
+	common.NewCliConfigForTesting,
 	common.NewConfigCliConfig,
 	logging.ProvideLogger,
 
 	dal.ProvideBackend,
 	client.NewToodledo,
-	//client.NewAuthFromViper,
+	//client.NewAuthFromConfig,
 	client.NewAuthFromConfig,
-	client.NewOAuth2ConfigFromViper,
+	client.NewOAuth2ConfigFromConfigs,
 
 	services.CurrentUser,
 	services.NewAccountService,
-	services.NewTaskService0,
 	services.NewTaskService,
-	services.NewTaskLocalService,
+	services.ProvideTaskLocalExtService,
+	services.ProvideTaskLocalExtServiceIft,
 	services.NewFolderService,
-	services.NewFolderLocalService,
+	services.NewFolderCachedService,
 	services.NewContextService,
-	services.NewContextLocalService,
+	services.NewContextCachedService,
 	services.NewGoalService,
-	services.NewGoalLocalService,
+	services.NewGoalCachedService,
 	services.NewSavedSearchService,
-	services.NewTaskRichCachedService,
+	services.NewTaskRichService,
 
 	// wire not support generic now
 	//informers.ProvideTaskInformer,

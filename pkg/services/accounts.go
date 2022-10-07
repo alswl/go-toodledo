@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// CurrentUser ...
+// CurrentUser return live user
 func CurrentUser(svc AccountService) (*models.Account, error) {
 	return svc.Me()
 }
