@@ -346,12 +346,12 @@ func InitialModel() *Model {
 		// TODO
 		panic(err)
 	}
-	taskSvc := app.TaskLocalSvc
-	taskLocalSvc := app.TaskLocalSvc
+	taskExtSvc := app.TaskExtSvc
+	taskLocalSvc := app.TaskExtSvc
 	taskRichSvc := app.TaskRichSvc
-	contextSvc := app.ContextLocalSvc
-	folderSvc := app.FolderLocalSvc
-	goalSvc := app.GoalLocalSvc
+	contextSvc := app.ContextExtSvc
+	folderSvc := app.FolderExtSvc
+	goalSvc := app.GoalExtSvc
 	states := &States{
 		Tasks:    []*models.RichTask{},
 		Contexts: []*models.Context{},
@@ -368,7 +368,7 @@ func InitialModel() *Model {
 	statusBar.SetInfo2("HELP")
 
 	// task pane
-	taskPane := taskspane.InitModel(states.Tasks)
+	taskPane := taskspane.InitModel(taskExtSvc, states.Tasks)
 
 	sidebar := comsidebar.InitModel(comsidebar.Properties{})
 
@@ -379,7 +379,7 @@ func InitialModel() *Model {
 		contextSvc:   contextSvc,
 		folderSvc:    folderSvc,
 		goalSvc:      goalSvc,
-		taskSvc:      taskSvc,
+		taskSvc:      taskExtSvc,
 		taskLocalSvc: taskLocalSvc,
 		states:       states,
 		err:          nil,
@@ -409,10 +409,10 @@ func InitialModel() *Model {
 	})
 	fetcher := fetchers.NewSimpleFetcher(log, 1*time.Minute, fetchers.NewToodledoFetchFnPartial(
 		log,
-		app.FolderLocalSvc,
-		app.ContextLocalSvc,
-		app.GoalLocalSvc,
-		app.TaskLocalSvc,
+		app.FolderExtSvc,
+		app.ContextExtSvc,
+		app.GoalExtSvc,
+		app.TaskExtSvc,
 		app.AccountSvc,
 	), describer)
 	// TODO using register fun instead of invoke m in New func

@@ -37,16 +37,16 @@ func NewToodledoCLIApp(
 }
 
 type ToodledoTUIApp struct {
-	AccountSvc      services.AccountService
-	TaskSvc         services.TaskService
-	TaskLocalSvc    services.TaskPersistenceExtService
-	FolderSvc       services.FolderService
-	FolderLocalSvc  services.FolderPersistenceService
-	ContextSvc      services.ContextService
-	ContextLocalSvc services.ContextPersistenceService
-	GoalSvc         services.GoalService
-	GoalLocalSvc    services.GoalPersistenceService
-	SavedSearchSvc  services.SavedSearchService
+	AccountSvc     services.AccountService
+	TaskSvc        services.TaskService
+	TaskExtSvc     services.TaskPersistenceExtService
+	FolderSvc      services.FolderService
+	FolderExtSvc   services.FolderPersistenceService
+	ContextSvc     services.ContextService
+	ContextExtSvc  services.ContextPersistenceService
+	GoalSvc        services.GoalService
+	GoalExtSvc     services.GoalPersistenceService
+	SavedSearchSvc services.SavedSearchService
 
 	TaskRichSvc services.TaskRichService
 	fetcher     fetchers.DaemonFetcher
@@ -55,7 +55,7 @@ type ToodledoTUIApp struct {
 func NewToodledoTUIApp(
 	accountSvc services.AccountService,
 	taskSvc services.TaskService,
-	taskCachedSvc services.TaskPersistenceExtService,
+	taskExtSvc services.TaskPersistenceExtService,
 	folderSvc services.FolderService,
 	folderCachedSvc services.FolderPersistenceService,
 	contextSvc services.ContextService,
@@ -66,16 +66,16 @@ func NewToodledoTUIApp(
 	taskRichSvc services.TaskRichService,
 ) *ToodledoTUIApp {
 	return &ToodledoTUIApp{
-		AccountSvc:      accountSvc,
-		TaskSvc:         taskSvc,
-		TaskLocalSvc:    taskCachedSvc,
-		FolderSvc:       folderSvc,
-		FolderLocalSvc:  folderCachedSvc,
-		ContextSvc:      contextSvc,
-		ContextLocalSvc: contextCachedSvc,
-		GoalSvc:         goalSvc,
-		GoalLocalSvc:    goalCachedSvc,
-		SavedSearchSvc:  savedSearchSvc,
-		TaskRichSvc:     taskRichSvc,
+		AccountSvc:     accountSvc,
+		TaskSvc:        taskSvc,
+		TaskExtSvc:     taskExtSvc,
+		FolderSvc:      folderSvc,
+		FolderExtSvc:   folderCachedSvc,
+		ContextSvc:     contextSvc,
+		ContextExtSvc:  contextCachedSvc,
+		GoalSvc:        goalSvc,
+		GoalExtSvc:     goalCachedSvc,
+		SavedSearchSvc: savedSearchSvc,
+		TaskRichSvc:    taskRichSvc,
 	}
 }

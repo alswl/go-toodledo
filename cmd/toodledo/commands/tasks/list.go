@@ -137,17 +137,17 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			// TODO  cli is using TUI App, it contains local data
 			appExt, _ := injector.InitTUIApp()
 
-			taskExtSvc := appExt.TaskLocalSvc
+			taskExtSvc := appExt.TaskExtSvc
 			contextSvc := app.ContextSvc
 			folderSvc := app.FolderSvc
 			goalSvc := app.GoalSvc
 			taskRichSvc := app.TaskRichSvc
 			fetcher := fetchers.NewToodledoFetchFunc(
 				log,
-				appExt.FolderLocalSvc,
-				appExt.ContextLocalSvc,
-				appExt.GoalLocalSvc,
-				appExt.TaskLocalSvc,
+				appExt.FolderExtSvc,
+				appExt.ContextExtSvc,
+				appExt.GoalExtSvc,
+				appExt.TaskExtSvc,
 				app.AccountSvc,
 			)
 			err = fetcher.Fetch(fetchers.NewNoOpStatusDescriber())

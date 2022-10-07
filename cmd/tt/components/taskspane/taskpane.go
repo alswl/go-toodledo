@@ -7,14 +7,17 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
+	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
+	"github.com/sirupsen/logrus"
+	"github.com/thoas/go-funk"
 )
 
 const (
-	//columnKeyID       = "id"
+	columnKeyID        = "id"
 	columnKeyCompleted = "completed"
 	columnKeyTitle     = "title"
 	columnKeyContext   = "context"
@@ -32,7 +35,6 @@ const DefaultTableWidth = 120
 const defaultPageSize = 20
 
 var DefaultColumns = []table.Column{
-	//table.NewColumn(columnKeyID, "ID", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
 	table.NewColumn(columnKeyCompleted, "[X]", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
 	table.NewFlexColumn(columnKeyTitle, "Title", 0).WithFiltered(true),
 	table.NewColumn(columnKeyContext, "Context", 10),
@@ -51,7 +53,7 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	for _, t := range tasks {
 		rows = append(rows, table.NewRow(
 			table.RowData{
-				//columnKeyID:       strconv.Itoa(int(t.ID)),
+				columnKeyID:        t.ID,
 				columnKeyCompleted: t.CompletedString(),
 				columnKeyTitle:     t.Title,
 				columnKeyContext:   t.TheContext.Name,
@@ -87,7 +89,8 @@ type Model struct {
 	// TODO table should be only view mode (without filter mode)
 	tableModel table.Model
 	tableWidth int
-	//props      app.States
+
+	taskSvc services.TaskService
 }
 
 func (m Model) Init() tea.Cmd {
@@ -124,6 +127,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		switch msg.String() {
+		case "x":
+			m.handleComplete()
+		}
 
 	case []*models.RichTask:
 		// update tasks(render new table)
@@ -191,7 +198,33 @@ func (m *Model) Filter(input textinput.Model) {
 	m.tableModel = m.tableModel.WithFilterInput(input)
 }
 
-func InitModel(tasks []*models.RichTask) Model {
+func (m *Model) handleComplete() {
+	// done or undone
+	row := m.tableModel.HighlightedRow()
+	if funk.IsZero(row) {
+		return
+	}
+	id := row.Data[columnKeyID].(int64)
+	checked := row.Data[columnKeyCompleted]
+	if checked == "[ ]" {
+		_, err := m.taskSvc.Complete(id)
+		if err != nil {
+			// FIXME message to status bar
+			logrus.Error(err)
+			return
+		}
+	} else {
+		_, err := m.taskSvc.UnComplete(id)
+		if err != nil {
+			// FIXME message to status bar
+			logrus.Error(err)
+			return
+		}
+	}
+	// XXX message to status bar
+}
+
+func InitModel(taskSvc services.TaskService, tasks []*models.RichTask) Model {
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
@@ -215,6 +248,7 @@ func InitModel(tasks []*models.RichTask) Model {
 		WithKeyMap(keys)
 
 	m := Model{
+		taskSvc: taskSvc,
 		//choices:    nil,
 		//cursor:     0,
 		//selected:   nil,
