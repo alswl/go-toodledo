@@ -365,7 +365,7 @@ func InitialModel() *Model {
 	statusBar.SetMode("tasks")
 	statusBar.SetStatus("a fox jumped over the lazy dog")
 	statusBar.SetInfo1("1/999")
-	statusBar.SetInfo2("HELP")
+	statusBar.SetInfo2("HELP(h)")
 
 	// task pane
 	taskPane := taskspane.InitModel(taskExtSvc, states.Tasks)

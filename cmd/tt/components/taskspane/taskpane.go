@@ -34,19 +34,21 @@ const (
 const DefaultTableWidth = 120
 const defaultPageSize = 20
 
-var DefaultColumns = []table.Column{
-	table.NewColumn(columnKeyCompleted, "[X]", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
-	table.NewFlexColumn(columnKeyTitle, "Title", 0).WithFiltered(true),
-	table.NewColumn(columnKeyContext, "Context", 10),
-	table.NewColumn(columnKeyPriority, "Priority", 10),
-	table.NewColumn(columnKeyStatus, "Status", 10),
-	table.NewColumn(columnKeyGoal, "Goal", 10),
-	table.NewColumn(columnKeyDue, "DueString", 10),
-	table.NewColumn(columnKeyRepeat, "Repeat", 5),
-	table.NewColumn(columnKeyLength, "Length", 5),
-	table.NewColumn(columnKeyTimer, "Timer", 5),
-	table.NewColumn(columnKeyTag, "Tag", 10),
-}
+var (
+	DefaultColumns = []table.Column{
+		table.NewColumn(columnKeyCompleted, "[X]", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
+		table.NewFlexColumn(columnKeyTitle, "Title", 0).WithFiltered(true),
+		table.NewColumn(columnKeyContext, "Context", 10),
+		table.NewColumn(columnKeyPriority, "Priority", 10),
+		table.NewColumn(columnKeyStatus, "Status", 10),
+		table.NewColumn(columnKeyGoal, "Goal", 10),
+		table.NewColumn(columnKeyDue, "DueString", 10),
+		table.NewColumn(columnKeyRepeat, "Repeat", 5),
+		table.NewColumn(columnKeyLength, "Length", 5),
+		table.NewColumn(columnKeyTimer, "Timer", 5),
+		table.NewColumn(columnKeyTag, "Tag", 10),
+	}
+)
 
 func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	var rows []table.Row
