@@ -191,6 +191,12 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				newCmd := func() tea.Msg {
 					select {
 					case <-m.fetcher.UIRefresh():
+						tasks, err := m.taskLocalSvc.ListAllByQuery(m.states.query)
+						if err != nil {
+							m.log.WithError(err).Error("list tasks")
+						}
+						rts, _ := m.taskRichSvc.RichThem(tasks)
+						m.states.Tasks = rts
 						return RefreshMsg{}
 					}
 				}
@@ -204,6 +210,12 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				newCmd := func() tea.Msg {
 					select {
 					case <-m.fetcher.UIRefresh():
+						tasks, err := m.taskLocalSvc.ListAllByQuery(m.states.query)
+						if err != nil {
+							m.log.WithError(err).Error("list tasks")
+						}
+						rts, _ := m.taskRichSvc.RichThem(tasks)
+						m.states.Tasks = rts
 						return RefreshMsg{}
 					}
 				}

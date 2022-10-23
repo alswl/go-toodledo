@@ -11,6 +11,7 @@ import (
 	"github.com/thoas/go-funk"
 	"strconv"
 	"sync"
+	"time"
 )
 
 var instance TaskPersistenceExtService
@@ -261,6 +262,20 @@ func (s *taskLocalExtService) ListAllByQuery(query *queries.TaskListQuery) ([]*m
 			} else {
 				return t.Completed == 1
 			}
+		}).([]*models.Task)
+	} else {
+		// nil Incomplete return incomplete + today complete
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			if t.Completed == 0 {
+				return true
+			}
+			now := time.Now()
+			from := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+			to := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, now.Location())
+			if t.Completed > from.Unix() && t.Completed < to.Unix() {
+				return true
+			}
+			return false
 		}).([]*models.Task)
 	}
 
