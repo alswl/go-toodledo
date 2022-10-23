@@ -13,19 +13,20 @@ type DaemonFetcher interface {
 	// Stop the fetcher
 	// TODO using ch to stop
 	Stop()
-	Notify() error
+	Notify(isHardRefresh bool) error
 	// UIRefresh is used to notify ui app to refresh
 	UIRefresh() chan bool
 }
 
 // FetchFn fetch data
-type FetchFn func(sd StatusDescriber) error
+type FetchFn func(sd StatusDescriber, isHardRefresh bool) error
 
 type intervalDaemonFetcher struct {
-	ticker    *time.Ticker
-	stop      chan struct{}
-	fetchNow  chan bool
-	uiRefresh chan bool
+	ticker        *time.Ticker
+	stop          chan struct{}
+	fetchNow      chan bool
+	fetchForceNow chan bool
+	uiRefresh     chan bool
 
 	log             logrus.FieldLogger
 	fn              FetchFn
@@ -56,16 +57,16 @@ func (s *intervalDaemonFetcher) run(ctx context.Context) {
 			s.log.Info("fetcher stopped, stop chan")
 			s.UIRefresh() <- true
 			break
-		case <-s.fetchNow:
-			s.log.Info("fetcher now")
-			err := s.fetch()
+		case isHardRefresh := <-s.fetchNow:
+			s.log.WithField("ifHardRefresh", isHardRefresh).Info("fetcher now")
+			err := s.fetch(isHardRefresh)
 			if err != nil {
 				s.log.Errorf("fetcher fetch error: %v", err)
 			}
 			s.UIRefresh() <- true
 		case <-s.ticker.C:
 			s.log.Info("fetcher tick")
-			err := s.fetch()
+			err := s.fetch(false)
 			if err != nil {
 				s.log.Errorf("fetcher fetch error: %v", err)
 			}
@@ -81,8 +82,8 @@ func (s *intervalDaemonFetcher) Start(ctx context.Context) {
 
 // fetch is used to fetch data from remote
 // it was synchronized
-func (s *intervalDaemonFetcher) fetch() error {
-	return s.fn(s.statusDescriber)
+func (s *intervalDaemonFetcher) fetch(hardRefresh bool) error {
+	return s.fn(s.statusDescriber, hardRefresh)
 }
 
 func (s *intervalDaemonFetcher) Stop() {
@@ -92,10 +93,10 @@ func (s *intervalDaemonFetcher) Stop() {
 }
 
 // Notify is used to notify fetcher to fetch data now
-func (s *intervalDaemonFetcher) Notify() error {
+func (s *intervalDaemonFetcher) Notify(isHardRefresh bool) error {
 	s.log.Info("fetcher notify")
 	go func() {
-		s.fetchNow <- true
+		s.fetchNow <- isHardRefresh
 	}()
 	return nil
 }

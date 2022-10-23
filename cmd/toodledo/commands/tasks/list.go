@@ -150,7 +150,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				appExt.TaskExtSvc,
 				app.AccountSvc,
 			)
-			err = fetcher.Fetch(fetchers.NewNoOpStatusDescriber())
+			err = fetcher.Fetch(fetchers.NewNoOpStatusDescriber(), true)
 			if err != nil {
 				log.WithError(err).Fatal("fetch failed")
 				return

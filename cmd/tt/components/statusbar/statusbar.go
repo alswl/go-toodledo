@@ -128,5 +128,6 @@ func NewDefault() Model {
 	)
 	ti := textinput.New()
 	ti.Prompt = "/"
-	return Model{sb: sb, filterTextInput: ti}
+	m := Model{sb: sb, filterTextInput: ti}
+	return m
 }

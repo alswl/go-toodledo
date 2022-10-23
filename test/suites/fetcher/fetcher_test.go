@@ -13,7 +13,7 @@ import (
 func TestFetcherProgress(t *testing.T) {
 	log := logrus.New()
 	// fn present the fetch function
-	fn := func(sd fetchers.StatusDescriber) error {
+	fn := func(sd fetchers.StatusDescriber, isHardRefresh bool) error {
 		ticker := time.NewTicker(time.Second * 1)
 		timeout := time.After(time.Second * 10)
 		i := 0

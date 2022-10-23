@@ -131,7 +131,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "x":
-			m.handleComplete()
+			m.handleCompleteToggle()
 		}
 
 	case []*models.RichTask:
@@ -200,7 +200,7 @@ func (m *Model) Filter(input textinput.Model) {
 	m.tableModel = m.tableModel.WithFilterInput(input)
 }
 
-func (m *Model) handleComplete() {
+func (m *Model) handleCompleteToggle() {
 	// done or undone
 	row := m.tableModel.HighlightedRow()
 	if funk.IsZero(row) {

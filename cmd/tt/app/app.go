@@ -184,9 +184,22 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.loopFocusPane()
 				return m, tea.Batch(cmds...)
 			case "r":
-				err := m.fetcher.Notify()
+				err := m.fetcher.Notify(false)
 				if err != nil {
 					m.log.WithError(err).Error("notify fetcher")
+				}
+				newCmd := func() tea.Msg {
+					select {
+					case <-m.fetcher.UIRefresh():
+						return RefreshMsg{}
+					}
+				}
+				cmds = append(cmds, newCmd)
+				return m, tea.Batch(cmds...)
+			case "R":
+				err := m.fetcher.Notify(true)
+				if err != nil {
+					m.log.WithError(err).Error("notify fetcher(force)")
 				}
 				newCmd := func() tea.Msg {
 					select {
@@ -332,7 +345,8 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	rts, _ := m.taskRichSvc.RichThem(tasks)
 	m.states.Tasks = rts
 	m.tasksPane, _ = m.tasksPane.UpdateTyped(m.states.Tasks)
-	m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
+	//m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
+	m.statusBar.SetInfo1(fmt.Sprintf("./%d", len(m.states.Tasks)))
 
 	return nil
 }
@@ -363,8 +377,7 @@ func InitialModel() *Model {
 	// status bar
 	statusBar := comstatusbar.NewDefault()
 	statusBar.SetMode("tasks")
-	statusBar.SetStatus("a fox jumped over the lazy dog")
-	statusBar.SetInfo1("1/999")
+	statusBar.SetInfo1(fmt.Sprintf("./%d", len(states.Tasks)))
 	statusBar.SetInfo2("HELP(h)")
 
 	// task pane
