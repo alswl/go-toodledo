@@ -60,7 +60,7 @@ func NewPostGoalsDeletePhpOK() *PostGoalsDeletePhpOK {
 }
 
 /*
-	PostGoalsDeletePhpOK describes a response with status code 200, with default header values.
+PostGoalsDeletePhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -93,7 +93,7 @@ func NewPostGoalsDeletePhpUnauthorized() *PostGoalsDeletePhpUnauthorized {
 }
 
 /*
-	PostGoalsDeletePhpUnauthorized describes a response with status code 401, with default header values.
+PostGoalsDeletePhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -126,7 +126,7 @@ func NewPostGoalsDeletePhpTooManyRequests() *PostGoalsDeletePhpTooManyRequests {
 }
 
 /*
-	PostGoalsDeletePhpTooManyRequests describes a response with status code 429, with default header values.
+PostGoalsDeletePhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -159,7 +159,7 @@ func NewPostGoalsDeletePhpServiceUnavailable() *PostGoalsDeletePhpServiceUnavail
 }
 
 /*
-	PostGoalsDeletePhpServiceUnavailable describes a response with status code 503, with default header values.
+PostGoalsDeletePhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

@@ -58,7 +58,7 @@ func NewPostGoalsEditPhpOK() *PostGoalsEditPhpOK {
 }
 
 /*
-	PostGoalsEditPhpOK describes a response with status code 200, with default header values.
+PostGoalsEditPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -89,7 +89,7 @@ func NewPostGoalsEditPhpUnauthorized() *PostGoalsEditPhpUnauthorized {
 }
 
 /*
-	PostGoalsEditPhpUnauthorized describes a response with status code 401, with default header values.
+PostGoalsEditPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -122,7 +122,7 @@ func NewPostGoalsEditPhpTooManyRequests() *PostGoalsEditPhpTooManyRequests {
 }
 
 /*
-	PostGoalsEditPhpTooManyRequests describes a response with status code 429, with default header values.
+PostGoalsEditPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -155,7 +155,7 @@ func NewPostGoalsEditPhpServiceUnavailable() *PostGoalsEditPhpServiceUnavailable
 }
 
 /*
-	PostGoalsEditPhpServiceUnavailable describes a response with status code 503, with default header values.
+PostGoalsEditPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */
