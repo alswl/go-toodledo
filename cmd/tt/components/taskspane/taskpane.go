@@ -208,6 +208,8 @@ func (m *Model) handleCompleteToggle() {
 	}
 	id := row.Data[columnKeyID].(int64)
 	checked := row.Data[columnKeyCompleted]
+
+	// follow ui
 	if checked == "[ ]" {
 		_, err := m.taskSvc.Complete(id)
 		if err != nil {

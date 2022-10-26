@@ -196,7 +196,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// 3. focused component
 
 	var cmd tea.Cmd
-	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		sideBarWidth := msg.Width * 2 / 12
@@ -206,7 +205,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.statusBar.Resize(msg.Width, 0)
 	case RefreshMsg:
 		// nothing, only ui refresh
-		return m, tea.Batch(cmds...)
+		return m, cmd
 	case tea.KeyMsg: // handle event bubble
 		// 1. global keymap
 		if funk.ContainsString([]string{"ctrl+c"}, msg.String()) {
@@ -225,12 +224,11 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		// 3. sub focused component
-		m, cmd = m.updateFocusedModel(msg)
-		cmds = append(cmds, cmd)
+		cmd = m.updateFocusedModel(msg)
 
 		// normal keypress
 	}
-	return m, tea.Batch(cmds...)
+	return m, cmd
 }
 
 func (m *Model) View() string {
@@ -301,7 +299,22 @@ func (m *Model) focusStatusBar() {
 	m.focus("statusbar")
 }
 
-func (m *Model) updateFocusedModel(msg tea.KeyMsg) (*Model, tea.Cmd) {
+func (m *Model) handleTaskPane(msg tea.KeyMsg) tea.Cmd {
+	var cmd tea.Cmd
+	switch msg.String() {
+	case "/":
+		m.isInputting = true
+		m.focusStatusBar()
+		m.statusBar.FocusFilter()
+	default:
+		var newM taskspane.Model
+		newM, cmd = m.tasksPane.UpdateTyped(msg)
+		m.tasksPane = newM
+	}
+	return cmd
+}
+
+func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
 	var newM tea.Model
 	var cmd tea.Cmd
 	mm := m.getFocusedModel()
@@ -309,20 +322,11 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) (*Model, tea.Cmd) {
 	// post action in main app
 	switch mm.(type) {
 	case taskspane.Model:
-		switch msg.String() {
-		case "/":
-			m.isInputting = true
-			m.focusStatusBar()
-			m.statusBar.FocusFilter()
-		default:
-			newM, cmd = mm.Update(msg)
-			m.tasksPane = newM.(taskspane.Model)
-		}
-		return m, cmd
+		cmd = m.handleTaskPane(msg)
 	case comsidebar.Model:
 		mmTyped := mm.(comsidebar.Model)
 		m.sidebar, cmd = mmTyped.UpdateTyped(msg)
-		return m, cmd
+		return cmd
 	case comstatusbar.Model:
 		newM, cmd = mm.Update(msg)
 		m.statusBar = newM.(comstatusbar.Model)
@@ -334,9 +338,9 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) (*Model, tea.Cmd) {
 			m.isInputting = false
 			m.focus("tasks")
 		}
-		return m, cmd
+		return cmd
 	}
-	return m, cmd
+	return cmd
 }
 
 func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
