@@ -152,23 +152,27 @@ func (m *Model) Init() tea.Cmd {
 }
 
 // handleCommandMode handles command mode, return false if continue
-func (m *Model) handleCommandMode(msg tea.KeyMsg) (tea.Model, tea.Cmd, bool) {
+func (m *Model) handleCommandMode(msg tea.KeyMsg) (tea.Cmd, bool) {
 	switch msg.String() {
 	case "tab":
 		// change the model fields(isFocused)
 		m.loopFocusPane()
-		return m, nil, false
+		return nil, false
 	case "r":
-		m, cmd := m.handleRefresh(false)
-		return m, cmd, false
+		cmd := m.handleRefresh(false)
+		return cmd, false
 	case "R":
-		m, cmd := m.handleRefresh(true)
-		return m, cmd, false
+		cmd := m.handleRefresh(true)
+		return cmd, false
 	}
-	return nil, nil, true
+	return nil, true
 }
 
-func (m *Model) handleRefresh(isHardRefresh bool) (tea.Model, tea.Cmd) {
+func (m *Model) Refresh(isHardRefresh bool) tea.Cmd {
+	return m.handleRefresh(isHardRefresh)
+}
+
+func (m *Model) handleRefresh(isHardRefresh bool) tea.Cmd {
 	err := m.fetcher.Notify(isHardRefresh)
 	if err != nil {
 		m.log.WithError(err).Error("notify fetcher, hard(?)" + strconv.FormatBool(isHardRefresh))
@@ -186,7 +190,7 @@ func (m *Model) handleRefresh(isHardRefresh bool) (tea.Model, tea.Cmd) {
 			return RefreshMsg{}
 		}
 	}
-	return m, cmd
+	return cmd
 }
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -217,9 +221,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// 2. main app, command mode
 		if !m.isInputting {
-			newM, newCmd, isContinue := m.handleCommandMode(msg)
+			newCmd, isContinue := m.handleCommandMode(msg)
 			if !isContinue {
-				return newM, newCmd
+				return m, newCmd
 			}
 		}
 
@@ -444,7 +448,7 @@ func InitialModel() *Model {
 	// TODO using register fun instead of invoke m in New func
 	m.fetcher = fetcher
 
-	taskPane := taskspane.InitModel(taskExtSvc, states.Tasks, fetcher)
+	taskPane := taskspane.InitModel(taskExtSvc, states.Tasks, &m)
 	m.tasksPane = taskPane
 
 	m.tasksPane.Focus()

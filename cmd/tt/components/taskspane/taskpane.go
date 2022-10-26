@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
-	"github.com/alswl/go-toodledo/pkg/fetchers"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
@@ -93,8 +92,8 @@ type Model struct {
 	tableModel table.Model
 	tableWidth int
 
-	taskSvc services.TaskService
-	fetcher fetchers.DaemonFetcher
+	taskSvc   services.TaskService
+	refresher components.Refreshable
 }
 
 func (m Model) Init() tea.Cmd {
@@ -116,8 +115,7 @@ func (m Model) View() string {
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
-		cmd  tea.Cmd
-		cmds []tea.Cmd
+		cmd tea.Cmd
 	)
 
 	// children first, bubble blow up model
@@ -127,13 +125,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	//if cmd == tea.Quit() {
 	//	return m, cmd
 	//}
-	cmds = append(cmds, cmd)
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "x":
-			m.handleCompleteToggle()
+			cmd = m.handleCompleteToggle()
 		}
 
 	case []*models.RichTask:
@@ -144,7 +141,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Resize(msg.Width, msg.Height)
 	}
 
-	return m, tea.Batch(cmds...)
+	return m, cmd
 }
 
 func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
@@ -202,11 +199,11 @@ func (m *Model) Filter(input textinput.Model) {
 	m.tableModel = m.tableModel.WithFilterInput(input)
 }
 
-func (m *Model) handleCompleteToggle() {
+func (m *Model) handleCompleteToggle() tea.Cmd {
 	// done or undone
 	row := m.tableModel.HighlightedRow()
 	if funk.IsZero(row) {
-		return
+		return nil
 	}
 	id := row.Data[columnKeyID].(int64)
 	checked := row.Data[columnKeyCompleted]
@@ -217,20 +214,20 @@ func (m *Model) handleCompleteToggle() {
 		if err != nil {
 			// FIXME message to status bar
 			logrus.Error(err)
-			return
+			return nil
 		}
 	} else {
 		_, err := m.taskSvc.UnComplete(id)
 		if err != nil {
 			// FIXME message to status bar
 			logrus.Error(err)
-			return
+			return nil
 		}
 	}
-	_ = m.fetcher.Notify(false)
+	return m.refresher.Refresh(false)
 }
 
-func InitModel(taskSvc services.TaskService, tasks []*models.RichTask, fetcher fetchers.DaemonFetcher) Model {
+func InitModel(taskSvc services.TaskService, tasks []*models.RichTask, refresher components.Refreshable) Model {
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
@@ -254,8 +251,8 @@ func InitModel(taskSvc services.TaskService, tasks []*models.RichTask, fetcher f
 		WithKeyMap(keys)
 
 	m := Model{
-		taskSvc: taskSvc,
-		fetcher: fetcher,
+		taskSvc:   taskSvc,
+		refresher: refresher,
 		//choices:    nil,
 		//cursor:     0,
 		//selected:   nil,
