@@ -397,8 +397,6 @@ func InitialModel() *Model {
 	statusBar.SetInfo2("HELP(h)")
 
 	// task pane
-	taskPane := taskspane.InitModel(taskExtSvc, states.Tasks)
-
 	sidebar := comsidebar.InitModel(comsidebar.Properties{})
 
 	// main app
@@ -414,7 +412,6 @@ func InitialModel() *Model {
 		err:          nil,
 		focused:      "tasks",
 		ready:        false,
-		tasksPane:    taskPane,
 		statusBar:    statusBar,
 		sidebar:      sidebar,
 		isInputting:  false,
@@ -446,6 +443,9 @@ func InitialModel() *Model {
 	), describer)
 	// TODO using register fun instead of invoke m in New func
 	m.fetcher = fetcher
+
+	taskPane := taskspane.InitModel(taskExtSvc, states.Tasks, fetcher)
+	m.tasksPane = taskPane
 
 	m.tasksPane.Focus()
 

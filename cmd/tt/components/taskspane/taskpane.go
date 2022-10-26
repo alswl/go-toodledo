@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
+	"github.com/alswl/go-toodledo/pkg/fetchers"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
@@ -93,6 +94,7 @@ type Model struct {
 	tableWidth int
 
 	taskSvc services.TaskService
+	fetcher fetchers.DaemonFetcher
 }
 
 func (m Model) Init() tea.Cmd {
@@ -225,10 +227,10 @@ func (m *Model) handleCompleteToggle() {
 			return
 		}
 	}
-	// XXX message to status bar
+	_ = m.fetcher.Notify(false)
 }
 
-func InitModel(taskSvc services.TaskService, tasks []*models.RichTask) Model {
+func InitModel(taskSvc services.TaskService, tasks []*models.RichTask, fetcher fetchers.DaemonFetcher) Model {
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
@@ -253,6 +255,7 @@ func InitModel(taskSvc services.TaskService, tasks []*models.RichTask) Model {
 
 	m := Model{
 		taskSvc: taskSvc,
+		fetcher: fetcher,
 		//choices:    nil,
 		//cursor:     0,
 		//selected:   nil,
