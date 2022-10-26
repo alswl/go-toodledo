@@ -20,6 +20,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
+	"strconv"
 	"time"
 )
 
@@ -150,6 +151,44 @@ func (m *Model) Init() tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
+// handleCommandMode handles command mode, return false if continue
+func (m *Model) handleCommandMode(msg tea.KeyMsg) (tea.Model, tea.Cmd, bool) {
+	switch msg.String() {
+	case "tab":
+		// change the model fields(isFocused)
+		m.loopFocusPane()
+		return m, nil, false
+	case "r":
+		m, cmd := m.handleRefresh(false)
+		return m, cmd, false
+	case "R":
+		m, cmd := m.handleRefresh(true)
+		return m, cmd, false
+	}
+	return nil, nil, true
+}
+
+func (m *Model) handleRefresh(isHardRefresh bool) (tea.Model, tea.Cmd) {
+	err := m.fetcher.Notify(isHardRefresh)
+	if err != nil {
+		m.log.WithError(err).Error("notify fetcher, hard(?)" + strconv.FormatBool(isHardRefresh))
+	}
+	cmd := func() tea.Msg {
+		select {
+		case <-m.fetcher.UIRefresh():
+			tasks, err := m.taskLocalSvc.ListAllByQuery(m.states.query)
+			if err != nil {
+				m.log.WithError(err).Error("list tasks")
+			}
+			rts, _ := m.taskRichSvc.RichThem(tasks)
+			m.states.Tasks = rts
+			m.tasksPane, _ = m.tasksPane.UpdateTyped(m.states.Tasks)
+			return RefreshMsg{}
+		}
+	}
+	return m, cmd
+}
+
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// process logics
 	// 1. global keymap
@@ -167,6 +206,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.statusBar.Resize(msg.Width, 0)
 	case RefreshMsg:
 		// nothing, only ui refresh
+		return m, tea.Batch(cmds...)
 	case tea.KeyMsg: // handle event bubble
 		// 1. global keymap
 		if funk.ContainsString([]string{"ctrl+c"}, msg.String()) {
@@ -178,49 +218,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// 2. main app, command mode
 		if !m.isInputting {
-			switch msg.String() {
-			case "tab":
-				// change the model fields(isFocused)
-				m.loopFocusPane()
-				return m, tea.Batch(cmds...)
-			case "r":
-				err := m.fetcher.Notify(false)
-				if err != nil {
-					m.log.WithError(err).Error("notify fetcher")
-				}
-				newCmd := func() tea.Msg {
-					select {
-					case <-m.fetcher.UIRefresh():
-						tasks, err := m.taskLocalSvc.ListAllByQuery(m.states.query)
-						if err != nil {
-							m.log.WithError(err).Error("list tasks")
-						}
-						rts, _ := m.taskRichSvc.RichThem(tasks)
-						m.states.Tasks = rts
-						return RefreshMsg{}
-					}
-				}
-				cmds = append(cmds, newCmd)
-				return m, tea.Batch(cmds...)
-			case "R":
-				err := m.fetcher.Notify(true)
-				if err != nil {
-					m.log.WithError(err).Error("notify fetcher(force)")
-				}
-				newCmd := func() tea.Msg {
-					select {
-					case <-m.fetcher.UIRefresh():
-						tasks, err := m.taskLocalSvc.ListAllByQuery(m.states.query)
-						if err != nil {
-							m.log.WithError(err).Error("list tasks")
-						}
-						rts, _ := m.taskRichSvc.RichThem(tasks)
-						m.states.Tasks = rts
-						return RefreshMsg{}
-					}
-				}
-				cmds = append(cmds, newCmd)
-				return m, tea.Batch(cmds...)
+			newM, newCmd, isContinue := m.handleCommandMode(msg)
+			if !isContinue {
+				return newM, newCmd
 			}
 		}
 
