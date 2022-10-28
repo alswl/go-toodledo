@@ -136,6 +136,3 @@ require (
 )
 
 //replace github.com/evertras/bubble-table => /Users/alswl/dev/project/bubble-table
-
-// https://github.com/muesli/termenv/issues/98
-replace github.com/muesli/termenv => github.com/muesli/termenv v0.9.0
