@@ -173,16 +173,21 @@ func (m *Model) Refresh(isHardRefresh bool) tea.Cmd {
 }
 
 func (m *Model) handleRefresh(isHardRefresh bool) tea.Cmd {
-	err := m.fetcher.Notify(isHardRefresh)
+	refreshedChan, err := m.fetcher.Notify(isHardRefresh)
 	if err != nil {
 		m.log.WithError(err).Error("notify fetcher, hard(?)" + strconv.FormatBool(isHardRefresh))
 	}
+	// this cmd is works like promise
 	cmd := func() tea.Msg {
 		select {
-		case <-m.fetcher.UIRefresh():
-			tasks, err := m.taskLocalSvc.ListAllByQuery(m.states.query)
-			if err != nil {
-				m.log.WithError(err).Error("list tasks")
+		case success := <-refreshedChan:
+			if !success {
+				m.statusBar.SetStatus("ERROR: refresh failed")
+				return nil
+			}
+			tasks, ierr := m.taskLocalSvc.ListAllByQuery(m.states.query)
+			if ierr != nil {
+				m.log.WithError(ierr).Error("list tasks")
 			}
 			rts, _ := m.taskRichSvc.RichThem(tasks)
 			m.states.Tasks = rts
