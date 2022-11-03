@@ -73,9 +73,9 @@ func (t RichTask) TagString() string {
 }
 
 func (t RichTask) CompletedString() string {
-	if t.Task.Completed == 1 {
-		return "[X]"
-	} else {
+	if t.Task.Completed == 0 {
 		return "[ ]"
+	} else {
+		return "[X]"
 	}
 }

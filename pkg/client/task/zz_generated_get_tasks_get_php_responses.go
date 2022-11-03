@@ -58,7 +58,7 @@ func NewGetTasksGetPhpOK() *GetTasksGetPhpOK {
 }
 
 /*
-	GetTasksGetPhpOK describes a response with status code 200, with default header values.
+GetTasksGetPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -89,7 +89,7 @@ func NewGetTasksGetPhpUnauthorized() *GetTasksGetPhpUnauthorized {
 }
 
 /*
-	GetTasksGetPhpUnauthorized describes a response with status code 401, with default header values.
+GetTasksGetPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -122,7 +122,7 @@ func NewGetTasksGetPhpTooManyRequests() *GetTasksGetPhpTooManyRequests {
 }
 
 /*
-	GetTasksGetPhpTooManyRequests describes a response with status code 429, with default header values.
+GetTasksGetPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -155,7 +155,7 @@ func NewGetTasksGetPhpServiceUnavailable() *GetTasksGetPhpServiceUnavailable {
 }
 
 /*
-	GetTasksGetPhpServiceUnavailable describes a response with status code 503, with default header values.
+GetTasksGetPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

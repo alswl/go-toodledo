@@ -58,7 +58,7 @@ func NewPostTasksEditPhpOK() *PostTasksEditPhpOK {
 }
 
 /*
-	PostTasksEditPhpOK describes a response with status code 200, with default header values.
+PostTasksEditPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -89,7 +89,7 @@ func NewPostTasksEditPhpUnauthorized() *PostTasksEditPhpUnauthorized {
 }
 
 /*
-	PostTasksEditPhpUnauthorized describes a response with status code 401, with default header values.
+PostTasksEditPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -122,7 +122,7 @@ func NewPostTasksEditPhpTooManyRequests() *PostTasksEditPhpTooManyRequests {
 }
 
 /*
-	PostTasksEditPhpTooManyRequests describes a response with status code 429, with default header values.
+PostTasksEditPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -155,7 +155,7 @@ func NewPostTasksEditPhpServiceUnavailable() *PostTasksEditPhpServiceUnavailable
 }
 
 /*
-	PostTasksEditPhpServiceUnavailable describes a response with status code 503, with default header values.
+PostTasksEditPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

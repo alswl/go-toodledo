@@ -58,7 +58,7 @@ func NewPostFoldersAddPhpOK() *PostFoldersAddPhpOK {
 }
 
 /*
-	PostFoldersAddPhpOK describes a response with status code 200, with default header values.
+PostFoldersAddPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -89,7 +89,7 @@ func NewPostFoldersAddPhpUnauthorized() *PostFoldersAddPhpUnauthorized {
 }
 
 /*
-	PostFoldersAddPhpUnauthorized describes a response with status code 401, with default header values.
+PostFoldersAddPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -122,7 +122,7 @@ func NewPostFoldersAddPhpTooManyRequests() *PostFoldersAddPhpTooManyRequests {
 }
 
 /*
-	PostFoldersAddPhpTooManyRequests describes a response with status code 429, with default header values.
+PostFoldersAddPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -155,7 +155,7 @@ func NewPostFoldersAddPhpServiceUnavailable() *PostFoldersAddPhpServiceUnavailab
 }
 
 /*
-	PostFoldersAddPhpServiceUnavailable describes a response with status code 503, with default header values.
+PostFoldersAddPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

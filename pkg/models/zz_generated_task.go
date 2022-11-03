@@ -34,7 +34,7 @@ type Task struct {
 	Children int64 `json:"children,omitempty"`
 
 	// A GMT unix timestamp for when the task was completed. If the task is not completed, the value will be 0. Toodledo does not track the time that a task was completed, so tasks will always appear to be completed at noon.
-	Completed int64 `json:"completed,omitempty"`
+	Completed int64 `json:"completed"`
 
 	// The id number of the context. Omit this field or set it to 0 to leave the task unassigned to a context.
 	Context int64 `json:"context,omitempty"`
@@ -43,9 +43,9 @@ type Task struct {
 	Duedate int64 `json:"duedate,omitempty"`
 
 	// An integer representing the due date modifier.
-	// 0 = DueString By
-	// 1 = DueString On (=)
-	// 2 = DueString After (>)
+	// 0 = Due By
+	// 1 = Due On (=)
+	// 2 = Due After (>)
 	// 3 = Optionally (?)
 	//
 	Duedatemod int64 `json:"duedatemod,omitempty"`

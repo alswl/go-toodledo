@@ -1154,6 +1154,7 @@ definitions:
           not completed, the value will be 0. Toodledo does not track the time
           that a task was completed, so tasks will always appear to be completed
           at noon.
+        x-omitempty: false
       added:
         type: integer
         description: A GMT unix timestamp for when the task was last modified.

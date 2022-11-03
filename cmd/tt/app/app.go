@@ -20,6 +20,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
+	"strconv"
 	"time"
 )
 
@@ -150,6 +151,53 @@ func (m *Model) Init() tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
+// handleCommandMode handles command mode, return false if continue
+func (m *Model) handleCommandMode(msg tea.KeyMsg) (tea.Cmd, bool) {
+	switch msg.String() {
+	case "tab":
+		// change the model fields(isFocused)
+		m.loopFocusPane()
+		return nil, false
+	case "r":
+		cmd := m.handleRefresh(false)
+		return cmd, false
+	case "R":
+		cmd := m.handleRefresh(true)
+		return cmd, false
+	}
+	return nil, true
+}
+
+func (m *Model) Refresh(isHardRefresh bool) tea.Cmd {
+	return m.handleRefresh(isHardRefresh)
+}
+
+func (m *Model) handleRefresh(isHardRefresh bool) tea.Cmd {
+	refreshedChan, err := m.fetcher.Notify(isHardRefresh)
+	if err != nil {
+		m.log.WithError(err).Error("notify fetcher, hard(?)" + strconv.FormatBool(isHardRefresh))
+	}
+	// this cmd is works like promise
+	cmd := func() tea.Msg {
+		select {
+		case success := <-refreshedChan:
+			if !success {
+				m.statusBar.SetStatus("ERROR: refresh failed")
+				return nil
+			}
+			tasks, ierr := m.taskLocalSvc.ListAllByQuery(m.states.query)
+			if ierr != nil {
+				m.log.WithError(ierr).Error("list tasks")
+			}
+			rts, _ := m.taskRichSvc.RichThem(tasks)
+			m.states.Tasks = rts
+			m.tasksPane, _ = m.tasksPane.UpdateTyped(m.states.Tasks)
+			return RefreshMsg{}
+		}
+	}
+	return cmd
+}
+
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// process logics
 	// 1. global keymap
@@ -157,7 +205,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// 3. focused component
 
 	var cmd tea.Cmd
-	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		sideBarWidth := msg.Width * 2 / 12
@@ -167,6 +214,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.statusBar.Resize(msg.Width, 0)
 	case RefreshMsg:
 		// nothing, only ui refresh
+		return m, cmd
 	case tea.KeyMsg: // handle event bubble
 		// 1. global keymap
 		if funk.ContainsString([]string{"ctrl+c"}, msg.String()) {
@@ -178,34 +226,18 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// 2. main app, command mode
 		if !m.isInputting {
-			switch msg.String() {
-			case "tab":
-				// change the model fields(isFocused)
-				m.loopFocusPane()
-				return m, tea.Batch(cmds...)
-			case "r":
-				err := m.fetcher.Notify()
-				if err != nil {
-					m.log.WithError(err).Error("notify fetcher")
-				}
-				newCmd := func() tea.Msg {
-					select {
-					case <-m.fetcher.UIRefresh():
-						return RefreshMsg{}
-					}
-				}
-				cmds = append(cmds, newCmd)
-				return m, tea.Batch(cmds...)
+			newCmd, isContinue := m.handleCommandMode(msg)
+			if !isContinue {
+				return m, newCmd
 			}
 		}
 
 		// 3. sub focused component
-		m, cmd = m.updateFocusedModel(msg)
-		cmds = append(cmds, cmd)
+		cmd = m.updateFocusedModel(msg)
 
 		// normal keypress
 	}
-	return m, tea.Batch(cmds...)
+	return m, cmd
 }
 
 func (m *Model) View() string {
@@ -276,7 +308,22 @@ func (m *Model) focusStatusBar() {
 	m.focus("statusbar")
 }
 
-func (m *Model) updateFocusedModel(msg tea.KeyMsg) (*Model, tea.Cmd) {
+func (m *Model) handleTaskPane(msg tea.KeyMsg) tea.Cmd {
+	var cmd tea.Cmd
+	switch msg.String() {
+	case "/":
+		m.isInputting = true
+		m.focusStatusBar()
+		m.statusBar.FocusFilter()
+	default:
+		var newM taskspane.Model
+		newM, cmd = m.tasksPane.UpdateTyped(msg)
+		m.tasksPane = newM
+	}
+	return cmd
+}
+
+func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
 	var newM tea.Model
 	var cmd tea.Cmd
 	mm := m.getFocusedModel()
@@ -284,20 +331,11 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) (*Model, tea.Cmd) {
 	// post action in main app
 	switch mm.(type) {
 	case taskspane.Model:
-		switch msg.String() {
-		case "/":
-			m.isInputting = true
-			m.focusStatusBar()
-			m.statusBar.FocusFilter()
-		default:
-			newM, cmd = mm.Update(msg)
-			m.tasksPane = newM.(taskspane.Model)
-		}
-		return m, cmd
+		cmd = m.handleTaskPane(msg)
 	case comsidebar.Model:
 		mmTyped := mm.(comsidebar.Model)
 		m.sidebar, cmd = mmTyped.UpdateTyped(msg)
-		return m, cmd
+		return cmd
 	case comstatusbar.Model:
 		newM, cmd = mm.Update(msg)
 		m.statusBar = newM.(comstatusbar.Model)
@@ -309,9 +347,9 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) (*Model, tea.Cmd) {
 			m.isInputting = false
 			m.focus("tasks")
 		}
-		return m, cmd
+		return cmd
 	}
-	return m, cmd
+	return cmd
 }
 
 func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
@@ -332,7 +370,8 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	rts, _ := m.taskRichSvc.RichThem(tasks)
 	m.states.Tasks = rts
 	m.tasksPane, _ = m.tasksPane.UpdateTyped(m.states.Tasks)
-	m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
+	//m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
+	m.statusBar.SetInfo1(fmt.Sprintf("./%d", len(m.states.Tasks)))
 
 	return nil
 }
@@ -346,12 +385,12 @@ func InitialModel() *Model {
 		// TODO
 		panic(err)
 	}
-	taskSvc := app.TaskLocalSvc
-	taskLocalSvc := app.TaskLocalSvc
+	taskExtSvc := app.TaskExtSvc
+	taskLocalSvc := app.TaskExtSvc
 	taskRichSvc := app.TaskRichSvc
-	contextSvc := app.ContextLocalSvc
-	folderSvc := app.FolderLocalSvc
-	goalSvc := app.GoalLocalSvc
+	contextSvc := app.ContextExtSvc
+	folderSvc := app.FolderExtSvc
+	goalSvc := app.GoalExtSvc
 	states := &States{
 		Tasks:    []*models.RichTask{},
 		Contexts: []*models.Context{},
@@ -363,13 +402,10 @@ func InitialModel() *Model {
 	// status bar
 	statusBar := comstatusbar.NewDefault()
 	statusBar.SetMode("tasks")
-	statusBar.SetStatus("a fox jumped over the lazy dog")
-	statusBar.SetInfo1("1/999")
-	statusBar.SetInfo2("HELP")
+	statusBar.SetInfo1(fmt.Sprintf("./%d", len(states.Tasks)))
+	statusBar.SetInfo2("HELP(h)")
 
 	// task pane
-	taskPane := taskspane.InitModel(states.Tasks)
-
 	sidebar := comsidebar.InitModel(comsidebar.Properties{})
 
 	// main app
@@ -379,13 +415,12 @@ func InitialModel() *Model {
 		contextSvc:   contextSvc,
 		folderSvc:    folderSvc,
 		goalSvc:      goalSvc,
-		taskSvc:      taskSvc,
+		taskSvc:      taskExtSvc,
 		taskLocalSvc: taskLocalSvc,
 		states:       states,
 		err:          nil,
 		focused:      "tasks",
 		ready:        false,
-		tasksPane:    taskPane,
 		statusBar:    statusBar,
 		sidebar:      sidebar,
 		isInputting:  false,
@@ -409,14 +444,17 @@ func InitialModel() *Model {
 	})
 	fetcher := fetchers.NewSimpleFetcher(log, 1*time.Minute, fetchers.NewToodledoFetchFnPartial(
 		log,
-		app.FolderLocalSvc,
-		app.ContextLocalSvc,
-		app.GoalLocalSvc,
-		app.TaskLocalSvc,
+		app.FolderExtSvc,
+		app.ContextExtSvc,
+		app.GoalExtSvc,
+		app.TaskExtSvc,
 		app.AccountSvc,
 	), describer)
 	// TODO using register fun instead of invoke m in New func
 	m.fetcher = fetcher
+
+	taskPane := taskspane.InitModel(taskExtSvc, states.Tasks, &m)
+	m.tasksPane = taskPane
 
 	m.tasksPane.Focus()
 

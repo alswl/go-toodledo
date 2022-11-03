@@ -60,7 +60,7 @@ func NewPostContextsDeletePhpOK() *PostContextsDeletePhpOK {
 }
 
 /*
-	PostContextsDeletePhpOK describes a response with status code 200, with default header values.
+PostContextsDeletePhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -93,7 +93,7 @@ func NewPostContextsDeletePhpUnauthorized() *PostContextsDeletePhpUnauthorized {
 }
 
 /*
-	PostContextsDeletePhpUnauthorized describes a response with status code 401, with default header values.
+PostContextsDeletePhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -126,7 +126,7 @@ func NewPostContextsDeletePhpTooManyRequests() *PostContextsDeletePhpTooManyRequ
 }
 
 /*
-	PostContextsDeletePhpTooManyRequests describes a response with status code 429, with default header values.
+PostContextsDeletePhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -159,7 +159,7 @@ func NewPostContextsDeletePhpServiceUnavailable() *PostContextsDeletePhpServiceU
 }
 
 /*
-	PostContextsDeletePhpServiceUnavailable describes a response with status code 503, with default header values.
+PostContextsDeletePhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

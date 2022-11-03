@@ -9,28 +9,28 @@ import (
 type ToodledoFetchFunc struct {
 	log logrus.FieldLogger
 
-	folderSvc  services.FolderPersistenceService
-	contextSvc services.ContextPersistenceService
-	goalSvc    services.GoalPersistenceService
-	taskSvc    services.TaskPersistenceExtService
-	accountSvc services.AccountService
+	folderPstSvc  services.FolderPersistenceService
+	contextPstSvc services.ContextPersistenceService
+	goalPstSvc    services.GoalPersistenceService
+	taskPstExtSvc services.TaskPersistenceExtService
+	accountSvc    services.AccountService
 }
 
 func NewToodledoFetchFunc(
 	log logrus.FieldLogger,
-	folderSvc services.FolderPersistenceService,
-	contextSvc services.ContextPersistenceService,
-	goalSvc services.GoalPersistenceService,
-	taskSvc services.TaskPersistenceExtService,
+	folderPstSvc services.FolderPersistenceService,
+	contextPstSvc services.ContextPersistenceService,
+	goalPstSvc services.GoalPersistenceService,
+	taskPstSvc services.TaskPersistenceExtService,
 	accountSvc services.AccountService,
 ) *ToodledoFetchFunc {
 	return &ToodledoFetchFunc{
-		log:        log,
-		folderSvc:  folderSvc,
-		contextSvc: contextSvc,
-		goalSvc:    goalSvc,
-		taskSvc:    taskSvc,
-		accountSvc: accountSvc,
+		log:           log,
+		folderPstSvc:  folderPstSvc,
+		contextPstSvc: contextPstSvc,
+		goalPstSvc:    goalPstSvc,
+		taskPstExtSvc: taskPstSvc,
+		accountSvc:    accountSvc,
 	}
 }
 
@@ -45,7 +45,7 @@ func NewToodledoFetchFnPartial(
 	return NewToodledoFetchFunc(log, folderSvc, contextSvc, goalSvc, taskSvc, accountSvc).Fetch
 }
 
-func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber) error {
+func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber, isHardRefresh bool) error {
 	statusDescriber.Syncing()
 
 	me, err := s.accountSvc.Me()
@@ -64,37 +64,49 @@ func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber) error {
 		return err
 	}
 
-	if lastFetchInfo == nil || me.LasteditFolder > lastFetchInfo.LasteditFolder {
+	if isHardRefresh || (lastFetchInfo == nil || me.LasteditFolder > lastFetchInfo.LasteditFolder) {
 		s.log.Info("Fetching folders")
-		err = s.folderSvc.Sync()
+		err = s.folderPstSvc.Sync()
 		if err != nil {
 			statusDescriber.Error(fmt.Errorf("fetch folders failed"))
 			s.log.WithError(err).Error("fetch folders")
 		}
 	}
-	if lastFetchInfo == nil || me.LasteditContext > lastFetchInfo.LasteditContext {
+	if isHardRefresh || (lastFetchInfo == nil || me.LasteditContext > lastFetchInfo.LasteditContext) {
 		s.log.Info("Fetching contexts")
-		err = s.contextSvc.Sync()
+		err = s.contextPstSvc.Sync()
 		if err != nil {
 			statusDescriber.Error(fmt.Errorf("fetch contexts failed"))
 			s.log.WithError(err).Error("fetch contexts")
 		}
 	}
-	if lastFetchInfo == nil || me.LasteditGoal > lastFetchInfo.LasteditGoal {
+	if isHardRefresh || (lastFetchInfo == nil || me.LasteditGoal > lastFetchInfo.LasteditGoal) {
 		s.log.Info("Fetching goals")
-		err = s.goalSvc.Sync()
+		err = s.goalPstSvc.Sync()
 		if err != nil {
 			statusDescriber.Error(fmt.Errorf("fetch goals failed"))
 			s.log.WithError(err).Error("fetch goals")
 		}
 	}
-	if lastFetchInfo == nil || me.LasteditTask > lastFetchInfo.LasteditTask {
+	if isHardRefresh || (lastFetchInfo == nil || me.LasteditTask > lastFetchInfo.LasteditTask) {
 		s.log.Info("Fetching tasks")
 		var lastEditTime *int32
-		if lastFetchInfo != nil {
-			lastEditTime = &lastFetchInfo.LasteditTask
+		if isHardRefresh {
+			err = s.taskPstExtSvc.Clean()
+			if err != nil {
+				return err
+			}
+			err = s.taskPstExtSvc.Sync()
+			if err != nil {
+				return err
+			}
+		} else {
+			if lastFetchInfo != nil {
+				lastEditTime = &lastFetchInfo.LasteditTask
+			}
+			// TODO partial sync not works with nil(cache not clean, all is empty)
+			err = s.taskPstExtSvc.PartialSync(lastEditTime)
 		}
-		err = s.taskSvc.PartialSync(lastEditTime)
 		if err != nil {
 			statusDescriber.Error(fmt.Errorf("fetch tasks failed"))
 			s.log.WithError(err).Error("fetch tasks")

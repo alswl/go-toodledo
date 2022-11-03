@@ -2,6 +2,7 @@ package components
 
 import (
 	"github.com/charmbracelet/bubbles/viewport"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -48,4 +49,8 @@ func (r *Resizable) Resize(width, height int, border lipgloss.Border) {
 	r.Height = height
 	r.Viewport.Width = width - lipgloss.Width(border.Right+border.Top)
 	r.Viewport.Height = height - lipgloss.Width(border.Bottom+border.Top)
+}
+
+type Refreshable interface {
+	Refresh(isHardRefresh bool) tea.Cmd
 }

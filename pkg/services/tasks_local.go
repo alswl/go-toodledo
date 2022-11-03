@@ -11,10 +11,21 @@ import (
 	"github.com/thoas/go-funk"
 	"strconv"
 	"sync"
+	"time"
 )
 
 var instance TaskPersistenceExtService
 var once sync.Once
+
+const MaxNumPerRequest = int64(1000)
+
+var TaskBucket = "tasks"
+
+// var _ TaskPersistenceExtService = (*taskLocalExtService)(nil)
+var _ TaskPersistenceExtService = (*taskLocalExtService)(nil)
+
+var _ TaskExtendedService = (*taskLocalExtService)(nil)
+var _ Synchronizable = (*taskLocalExtService)(nil)
 
 type taskLocalExtService struct {
 	taskSvc    TaskService
@@ -23,11 +34,6 @@ type taskLocalExtService struct {
 	syncLock sync.Mutex
 	db       dal.Backend
 }
-
-// var _ TaskPersistenceExtService = (*taskLocalExtService)(nil)
-var _ TaskPersistenceExtService = (*taskLocalExtService)(nil)
-var _ TaskExtendedService = (*taskLocalExtService)(nil)
-var _ Synchronizable = (*taskLocalExtService)(nil)
 
 func newTaskLocalExtService(taskSvc TaskService, accountSvc AccountService, db dal.Backend) TaskPersistenceExtService {
 	return &taskLocalExtService{taskSvc: taskSvc, accountSvc: accountSvc, db: db}
@@ -43,10 +49,6 @@ func ProvideTaskLocalExtService(taskSvc TaskService, accountSvc AccountService, 
 func ProvideTaskLocalExtServiceIft(taskSvc TaskService, accountSvc AccountService, db dal.Backend) TaskExtendedService {
 	return ProvideTaskLocalExtService(taskSvc, accountSvc, db)
 }
-
-var TaskBucket = "tasks"
-
-var MaxNumPerRequest = int64(1000)
 
 func (s *taskLocalExtService) Clean() error {
 	err := s.db.Truncate(TaskBucket)
@@ -262,74 +264,48 @@ func (s *taskLocalExtService) ListAllByQuery(query *queries.TaskListQuery) ([]*m
 				return t.Completed == 1
 			}
 		}).([]*models.Task)
+	} else {
+		// nil Incomplete return incomplete + today complete
+		ts = funk.Filter(ts, func(t *models.Task) bool {
+			if t.Completed == 0 {
+				return true
+			}
+			now := time.Now()
+			from := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+			to := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, now.Location())
+			if t.Completed > from.Unix() && t.Completed < to.Unix() {
+				return true
+			}
+			return false
+		}).([]*models.Task)
 	}
 
 	return ts, nil
 }
 
 func (s *taskLocalExtService) Create(title string) (*models.Task, error) {
-	created, err := s.taskSvc.Create(title)
-	if err != nil {
-		return nil, err
-	}
-	// FIXME, using reconcile instead of cleanup
-	err = s.Clean()
-	if err != nil {
-		return nil, err
-	}
-	return created, nil
+	return s.taskSvc.Create(title)
+	// no cache clean, using fetcher to sync
 }
 
 func (s *taskLocalExtService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error) {
-	created, err := s.taskSvc.CreateByQuery(query)
-	if err != nil {
-		return nil, err
-	}
-	// FIXME, using reconcile instead of cleanup
-	err = s.Clean()
-	if err != nil {
-		return nil, err
-	}
-	return created, nil
+	return s.taskSvc.CreateByQuery(query)
+	// no cache clean, using fetcher to sync
 }
 
 func (s *taskLocalExtService) Delete(id int64) error {
-	err := s.taskSvc.Delete(id)
-	if err != nil {
-		return err
-	}
-	// FIXME, using reconcile instead of cleanup
-	err = s.Clean()
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.taskSvc.Delete(id)
+	// no cache clean, using fetcher to sync
 }
 
 func (s *taskLocalExtService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error) {
-	batch, items, err := s.taskSvc.DeleteBatch(ids)
-	if err != nil {
-		return nil, nil, err
-	}
-	// FIXME, using reconcile instead of cleanup
-	err = s.Clean()
-	if err != nil {
-		return nil, nil, err
-	}
-	return batch, items, nil
+	return s.taskSvc.DeleteBatch(ids)
+	// no cache clean, using fetcher to sync
 }
 
 func (s *taskLocalExtService) Edit(id int64, t *models.Task) (*models.Task, error) {
-	edited, err := s.taskSvc.Edit(id, t)
-	if err != nil {
-		return nil, err
-	}
-	// FIXME, using reconcile instead of cleanup
-	err = s.Clean()
-	if err != nil {
-		return nil, err
-	}
-	return edited, nil
+	return s.taskSvc.Edit(id, t)
+	// no cache clean, using fetcher to sync
 }
 
 func (s *taskLocalExtService) EditByQuery(query *queries.TaskEditQuery) (*models.Task, error) {
@@ -338,27 +314,11 @@ func (s *taskLocalExtService) EditByQuery(query *queries.TaskEditQuery) (*models
 }
 
 func (s *taskLocalExtService) Complete(id int64) (*models.Task, error) {
-	completed, err := s.taskSvc.Complete(id)
-	if err != nil {
-		return nil, err
-	}
-	// FIXME, using reconcile instead of cleanup
-	err = s.Clean()
-	if err != nil {
-		return nil, err
-	}
-	return completed, nil
+	return s.taskSvc.Complete(id)
+	// no cache clean, using fetcher to partial sync
 }
 
 func (s *taskLocalExtService) UnComplete(id int64) (*models.Task, error) {
-	unCompleted, err := s.taskSvc.UnComplete(id)
-	if err != nil {
-		return nil, err
-	}
-	// FIXME, using reconcile instead of cleanup
-	err = s.Clean()
-	if err != nil {
-		return nil, err
-	}
-	return unCompleted, nil
+	return s.taskSvc.UnComplete(id)
+	// no cache clean, using fetcher to partial sync
 }

@@ -58,7 +58,7 @@ func NewPostContextsAddPhpOK() *PostContextsAddPhpOK {
 }
 
 /*
-	PostContextsAddPhpOK describes a response with status code 200, with default header values.
+PostContextsAddPhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -89,7 +89,7 @@ func NewPostContextsAddPhpUnauthorized() *PostContextsAddPhpUnauthorized {
 }
 
 /*
-	PostContextsAddPhpUnauthorized describes a response with status code 401, with default header values.
+PostContextsAddPhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -122,7 +122,7 @@ func NewPostContextsAddPhpTooManyRequests() *PostContextsAddPhpTooManyRequests {
 }
 
 /*
-	PostContextsAddPhpTooManyRequests describes a response with status code 429, with default header values.
+PostContextsAddPhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -155,7 +155,7 @@ func NewPostContextsAddPhpServiceUnavailable() *PostContextsAddPhpServiceUnavail
 }
 
 /*
-	PostContextsAddPhpServiceUnavailable describes a response with status code 503, with default header values.
+PostContextsAddPhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */

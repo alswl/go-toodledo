@@ -43,6 +43,7 @@ type TaskService interface {
 type TaskExtendedService interface {
 	TaskService
 
+	// ListAllByQuery is list tasks by query, in-completed default, and with today complted tasks
 	ListAllByQuery(query *queries.TaskListQuery) ([]*models.Task, error)
 }
 
@@ -98,8 +99,7 @@ func (s *taskService) ListWithChanged(lastEditTime *int32, start, limit int64) (
 	p := task.NewGetTasksGetPhpParams()
 	fields := enums.TaskFields2String(enums.GeneralTaskFields)
 	p.SetFields(&fields)
-	// FIXME do not set comp, get all tasks
-	comp := int64(0)
+	comp := int64(-1)
 	p.SetComp(&comp)
 	num := limit
 	p.SetNum(&num)

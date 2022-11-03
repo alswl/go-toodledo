@@ -7,14 +7,17 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
+	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
+	"github.com/sirupsen/logrus"
+	"github.com/thoas/go-funk"
 )
 
 const (
-	//columnKeyID       = "id"
+	columnKeyID        = "id"
 	columnKeyCompleted = "completed"
 	columnKeyTitle     = "title"
 	columnKeyContext   = "context"
@@ -31,27 +34,28 @@ const (
 const DefaultTableWidth = 120
 const defaultPageSize = 20
 
-var DefaultColumns = []table.Column{
-	//table.NewColumn(columnKeyID, "ID", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
-	table.NewColumn(columnKeyCompleted, "[X]", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
-	table.NewFlexColumn(columnKeyTitle, "Title", 0).WithFiltered(true),
-	table.NewColumn(columnKeyContext, "Context", 10),
-	table.NewColumn(columnKeyPriority, "Priority", 10),
-	table.NewColumn(columnKeyStatus, "Status", 10),
-	table.NewColumn(columnKeyGoal, "Goal", 10),
-	table.NewColumn(columnKeyDue, "DueString", 10),
-	table.NewColumn(columnKeyRepeat, "Repeat", 5),
-	table.NewColumn(columnKeyLength, "Length", 5),
-	table.NewColumn(columnKeyTimer, "Timer", 5),
-	table.NewColumn(columnKeyTag, "Tag", 10),
-}
+var (
+	DefaultColumns = []table.Column{
+		table.NewColumn(columnKeyCompleted, "[ ]", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
+		table.NewFlexColumn(columnKeyTitle, "Title", 0).WithFiltered(true),
+		table.NewColumn(columnKeyContext, "Context", 10),
+		table.NewColumn(columnKeyPriority, "Priority", 10),
+		table.NewColumn(columnKeyStatus, "Status", 10),
+		table.NewColumn(columnKeyGoal, "Goal", 10),
+		table.NewColumn(columnKeyDue, "DueString", 10),
+		table.NewColumn(columnKeyRepeat, "Repeat", 5),
+		table.NewColumn(columnKeyLength, "Length", 5),
+		table.NewColumn(columnKeyTimer, "Timer", 5),
+		table.NewColumn(columnKeyTag, "Tag", 10),
+	}
+)
 
 func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	var rows []table.Row
 	for _, t := range tasks {
 		rows = append(rows, table.NewRow(
 			table.RowData{
-				//columnKeyID:       strconv.Itoa(int(t.ID)),
+				columnKeyID:        t.ID,
 				columnKeyCompleted: t.CompletedString(),
 				columnKeyTitle:     t.Title,
 				columnKeyContext:   t.TheContext.Name,
@@ -87,7 +91,9 @@ type Model struct {
 	// TODO table should be only view mode (without filter mode)
 	tableModel table.Model
 	tableWidth int
-	//props      app.States
+
+	taskSvc   services.TaskService
+	refresher components.Refreshable
 }
 
 func (m Model) Init() tea.Cmd {
@@ -109,8 +115,7 @@ func (m Model) View() string {
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
-		cmd  tea.Cmd
-		cmds []tea.Cmd
+		cmd tea.Cmd
 	)
 
 	// children first, bubble blow up model
@@ -120,10 +125,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	//if cmd == tea.Quit() {
 	//	return m, cmd
 	//}
-	cmds = append(cmds, cmd)
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		switch msg.String() {
+		case "x":
+			cmd = m.handleCompleteToggle()
+		}
 
 	case []*models.RichTask:
 		// update tasks(render new table)
@@ -133,7 +141,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Resize(msg.Width, msg.Height)
 	}
 
-	return m, tea.Batch(cmds...)
+	return m, cmd
 }
 
 func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
@@ -191,7 +199,35 @@ func (m *Model) Filter(input textinput.Model) {
 	m.tableModel = m.tableModel.WithFilterInput(input)
 }
 
-func InitModel(tasks []*models.RichTask) Model {
+func (m *Model) handleCompleteToggle() tea.Cmd {
+	// done or undone
+	row := m.tableModel.HighlightedRow()
+	if funk.IsZero(row) {
+		return nil
+	}
+	id := row.Data[columnKeyID].(int64)
+	checked := row.Data[columnKeyCompleted]
+
+	// follow ui
+	if checked == "[ ]" {
+		_, err := m.taskSvc.Complete(id)
+		if err != nil {
+			// FIXME message to status bar
+			logrus.Error(err)
+			return nil
+		}
+	} else {
+		_, err := m.taskSvc.UnComplete(id)
+		if err != nil {
+			// FIXME message to status bar
+			logrus.Error(err)
+			return nil
+		}
+	}
+	return m.refresher.Refresh(false)
+}
+
+func InitModel(taskSvc services.TaskService, tasks []*models.RichTask, refresher components.Refreshable) Model {
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
@@ -215,6 +251,8 @@ func InitModel(tasks []*models.RichTask) Model {
 		WithKeyMap(keys)
 
 	m := Model{
+		taskSvc:   taskSvc,
+		refresher: refresher,
 		//choices:    nil,
 		//cursor:     0,
 		//selected:   nil,

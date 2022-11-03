@@ -13,19 +13,21 @@ type DaemonFetcher interface {
 	// Stop the fetcher
 	// TODO using ch to stop
 	Stop()
-	Notify() error
+	Notify(isHardRefresh bool) (chan bool, error)
 	// UIRefresh is used to notify ui app to refresh
 	UIRefresh() chan bool
 }
 
 // FetchFn fetch data
-type FetchFn func(sd StatusDescriber) error
+type FetchFn func(sd StatusDescriber, isHardRefresh bool) error
 
 type intervalDaemonFetcher struct {
-	ticker    *time.Ticker
-	stop      chan struct{}
-	fetchNow  chan bool
-	uiRefresh chan bool
+	ticker        *time.Ticker
+	stop          chan struct{}
+	fetchNow      chan bool
+	fetchForceNow chan bool
+	uiRefresh     chan bool
+	refreshed     chan bool
 
 	log             logrus.FieldLogger
 	fn              FetchFn
@@ -41,6 +43,7 @@ func NewSimpleFetcher(log logrus.FieldLogger, interval time.Duration, fn FetchFn
 		fetchNow:        make(chan bool),
 		statusDescriber: statusDescriber,
 		uiRefresh:       make(chan bool),
+		refreshed:       make(chan bool),
 	}
 }
 
@@ -50,26 +53,25 @@ func (s *intervalDaemonFetcher) run(ctx context.Context) {
 		case <-ctx.Done():
 			s.log.Info("fetcher stopped, ctx done")
 			s.Stop()
-			s.UIRefresh() <- true
 			break
 		case <-s.stop:
 			s.log.Info("fetcher stopped, stop chan")
-			s.UIRefresh() <- true
 			break
-		case <-s.fetchNow:
-			s.log.Info("fetcher now")
-			err := s.fetch()
+		case isHardRefresh := <-s.fetchNow:
+			s.log.WithField("ifHardRefresh", isHardRefresh).Info("fetcher now")
+			err := s.fetch(isHardRefresh)
 			if err != nil {
 				s.log.Errorf("fetcher fetch error: %v", err)
+				s.refreshed <- false
 			}
-			s.UIRefresh() <- true
+			s.refreshed <- true
 		case <-s.ticker.C:
 			s.log.Info("fetcher tick")
-			err := s.fetch()
+			err := s.fetch(false)
 			if err != nil {
 				s.log.Errorf("fetcher fetch error: %v", err)
 			}
-			s.UIRefresh() <- true
+			s.UIRefresh() <- false
 		}
 	}
 }
@@ -81,8 +83,8 @@ func (s *intervalDaemonFetcher) Start(ctx context.Context) {
 
 // fetch is used to fetch data from remote
 // it was synchronized
-func (s *intervalDaemonFetcher) fetch() error {
-	return s.fn(s.statusDescriber)
+func (s *intervalDaemonFetcher) fetch(hardRefresh bool) error {
+	return s.fn(s.statusDescriber, hardRefresh)
 }
 
 func (s *intervalDaemonFetcher) Stop() {
@@ -92,12 +94,10 @@ func (s *intervalDaemonFetcher) Stop() {
 }
 
 // Notify is used to notify fetcher to fetch data now
-func (s *intervalDaemonFetcher) Notify() error {
-	s.log.Info("fetcher notify")
-	go func() {
-		s.fetchNow <- true
-	}()
-	return nil
+func (s *intervalDaemonFetcher) Notify(isHardRefresh bool) (chan bool, error) {
+	s.log.WithField("isHardRefresh", isHardRefresh).Info("Notify")
+	s.fetchNow <- isHardRefresh
+	return s.refreshed, nil
 }
 
 func (s *intervalDaemonFetcher) UIRefresh() chan bool {

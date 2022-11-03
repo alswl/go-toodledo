@@ -60,7 +60,7 @@ func NewPostFoldersDeletePhpOK() *PostFoldersDeletePhpOK {
 }
 
 /*
-	PostFoldersDeletePhpOK describes a response with status code 200, with default header values.
+PostFoldersDeletePhpOK describes a response with status code 200, with default header values.
 
 ok
 */
@@ -93,7 +93,7 @@ func NewPostFoldersDeletePhpUnauthorized() *PostFoldersDeletePhpUnauthorized {
 }
 
 /*
-	PostFoldersDeletePhpUnauthorized describes a response with status code 401, with default header values.
+PostFoldersDeletePhpUnauthorized describes a response with status code 401, with default header values.
 
 Unauthorized
 */
@@ -126,7 +126,7 @@ func NewPostFoldersDeletePhpTooManyRequests() *PostFoldersDeletePhpTooManyReques
 }
 
 /*
-	PostFoldersDeletePhpTooManyRequests describes a response with status code 429, with default header values.
+PostFoldersDeletePhpTooManyRequests describes a response with status code 429, with default header values.
 
 TooManyRequests
 */
@@ -159,7 +159,7 @@ func NewPostFoldersDeletePhpServiceUnavailable() *PostFoldersDeletePhpServiceUna
 }
 
 /*
-	PostFoldersDeletePhpServiceUnavailable describes a response with status code 503, with default header values.
+PostFoldersDeletePhpServiceUnavailable describes a response with status code 503, with default header values.
 
 ServiceUnavailable
 */
