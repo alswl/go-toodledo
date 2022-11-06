@@ -79,6 +79,7 @@ type Model struct {
 func (m *Model) Init() tea.Cmd {
 	var cmds []tea.Cmd
 
+	// states init
 	cmds = append(cmds, func() tea.Msg {
 		cs, err := m.contextSvc.ListAll()
 		if err != nil {
@@ -145,9 +146,16 @@ func (m *Model) Init() tea.Cmd {
 
 		return nil
 	})
+
+	// daemon fetcher sstart
 	cmds = append(cmds, func() tea.Msg {
 		m.fetcher.Start(context.Background())
 		return nil
+	})
+
+	// refresh at start
+	cmds = append(cmds, func() tea.Msg {
+		return m.Refresh(false)
 	})
 
 	return tea.Batch(cmds...)
