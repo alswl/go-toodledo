@@ -12,7 +12,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
-	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
 )
 
@@ -73,6 +72,11 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	return rows
 }
 
+type parent interface {
+	components.Refreshable
+	components.Notifier
+}
+
 type Model struct {
 	components.Focusable
 	components.Resizable
@@ -92,8 +96,8 @@ type Model struct {
 	tableModel table.Model
 	tableWidth int
 
-	taskSvc   services.TaskService
-	refresher components.Refreshable
+	taskSvc services.TaskService
+	parent  parent
 }
 
 func (m Model) Init() tea.Cmd {
@@ -131,11 +135,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "x":
 			cmd = m.handleCompleteToggle()
+		case "enter":
+			cmd = m.handleTimerToggle()
 		}
 
 	case []*models.RichTask:
 		// update tasks(render new table)
 		m.tableModel = m.tableModel.WithRows(TasksRenderRows(msg))
+
 	case tea.WindowSizeMsg:
 		//top, right, bottom, left := docStyle.GetMargin()
 		m.Resize(msg.Width, msg.Height)
@@ -210,24 +217,57 @@ func (m *Model) handleCompleteToggle() tea.Cmd {
 
 	// follow ui
 	if checked == "[ ]" {
-		_, err := m.taskSvc.Complete(id)
+		//_, err := m.taskSvc.Complete(id)
+		err := fmt.Errorf("not implemented")
 		if err != nil {
-			// FIXME message to status bar
-			logrus.Error(err)
+			m.parent.Error(err.Error())
 			return nil
 		}
 	} else {
 		_, err := m.taskSvc.UnComplete(id)
 		if err != nil {
-			// FIXME message to status bar
-			logrus.Error(err)
+			m.parent.Error(err.Error())
 			return nil
 		}
 	}
-	return m.refresher.Refresh(false)
+	return m.parent.Refresh(false)
 }
 
-func InitModel(taskSvc services.TaskService, tasks []*models.RichTask, refresher components.Refreshable) Model {
+func (m *Model) handleTimerToggle() tea.Cmd {
+	row := m.tableModel.HighlightedRow()
+	if funk.IsZero(row) {
+		return nil
+	}
+	id := row.Data[columnKeyID].(int64)
+	t, err := m.taskSvc.FindById(id)
+	if err != nil {
+		m.parent.Error(err.Error())
+		return nil
+	}
+	if t.Completed > 0 {
+		m.parent.Warn("can't start timer on completed task")
+		return nil
+	}
+
+	if t.Timeron == 0 {
+		// start timer
+		err = m.taskSvc.Start(id)
+		if err != nil {
+			m.parent.Error(err.Error())
+			return nil
+		}
+	} else {
+		// stop timer
+		err = m.taskSvc.Stop(id)
+		if err != nil {
+			m.parent.Error(err.Error())
+			return nil
+		}
+	}
+	return nil
+}
+
+func InitModel(taskSvc services.TaskService, tasks []*models.RichTask, parent parent) Model {
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
@@ -251,8 +291,8 @@ func InitModel(taskSvc services.TaskService, tasks []*models.RichTask, refresher
 		WithKeyMap(keys)
 
 	m := Model{
-		taskSvc:   taskSvc,
-		refresher: refresher,
+		taskSvc: taskSvc,
+		parent:  parent,
 		//choices:    nil,
 		//cursor:     0,
 		//selected:   nil,

@@ -55,10 +55,17 @@ func (t RichTask) RepeatString() string {
 }
 
 func (t RichTask) TimerString() string {
-	if t.Timer == 0 {
+	if t.Timer == 0 && t.Timeron == 0 {
 		return ""
 	}
-	return fmt.Sprintf("%s", time.Duration(t.Timer*1000*1000*1000))
+	if t.Timeron == 0 {
+		duration := fmt.Sprintf("%s", time.Duration((t.Timer)*1000*1000*1000))
+		return fmt.Sprintf("%s", duration)
+	} else {
+		now := time.Now().Unix()
+		duration := fmt.Sprintf("%s", time.Duration((now-t.Timeron+t.Timer)*1000*1000*1000))
+		return fmt.Sprintf("> %s", duration)
+	}
 }
 
 func (t RichTask) LengthString() string {

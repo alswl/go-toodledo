@@ -11,5 +11,5 @@ func TestTaskCreateQueryMarshal(t *testing.T) {
 	bs, err := json.Marshal(q.ToModel())
 
 	assert.NoError(t, err)
-	assert.Equal(t, `{"completed":0}`, string(bs))
+	assert.Equal(t, `{}`, string(bs))
 }

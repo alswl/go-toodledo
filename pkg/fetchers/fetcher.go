@@ -40,10 +40,10 @@ func NewSimpleFetcher(log logrus.FieldLogger, interval time.Duration, fn FetchFn
 		stop:            make(chan struct{}),
 		log:             log,
 		fn:              fn,
-		fetchNow:        make(chan bool),
+		fetchNow:        make(chan bool, 0),
 		statusDescriber: statusDescriber,
-		uiRefresh:       make(chan bool),
-		refreshed:       make(chan bool),
+		uiRefresh:       make(chan bool, 0),
+		refreshed:       make(chan bool, 0),
 	}
 }
 

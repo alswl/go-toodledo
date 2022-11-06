@@ -13,6 +13,16 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 		Short: "Manage toodledo tasks",
 		Run:   list.Run,
 	}
-	cmd.AddCommand(list, NewCreateCmd(f), NewDeleteCmd(f), NewDoneCmd(f), NewReopenCmd(f), NewEditorCmd(f), NewEditCmd(f))
+	cmd.AddCommand(
+		list,
+		NewCreateCmd(f),
+		NewDeleteCmd(f),
+		NewDoneCmd(f),
+		NewReopenCmd(f),
+		NewEditorCmd(f),
+		NewEditCmd(f),
+		NewStartCmd(f),
+		NewStopCmd(f),
+	)
 	return cmd
 }

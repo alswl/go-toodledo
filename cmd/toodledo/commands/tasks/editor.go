@@ -82,7 +82,7 @@ var editorCmd = &cobra.Command{
 			logrus.WithError(err).Fatal("read file")
 			return
 		}
-		var inputT models.Task
+		var inputT models.TaskEdit
 		err = yaml.Unmarshal(bs, &inputT)
 		if err != nil {
 			logrus.WithError(err).Fatal("unmarshal yaml")

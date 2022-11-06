@@ -2,6 +2,8 @@ package models
 
 import (
 	"github.com/alswl/go-toodledo/pkg/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/thoas/go-funk"
 	"reflect"
 	"testing"
 	"time"
@@ -91,4 +93,34 @@ func TestRichTask_Due(t1 *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRIchTask_Timer(t *testing.T) {
+	var task = RichTask{}
+	task.Timer = 5
+	task.Timeron = time.Date(2022, 11, 06, 13, 00, 00, 0, utils.ChinaTimeZone).Unix()
+	assert.NotNil(t, task.TimerString())
+}
+
+func TestFunkIsEmpty(t *testing.T) {
+	var pointerNil *int = nil
+	assert.True(t, funk.IsEmpty(pointerNil))
+	var ten int = int(10)
+	var pointerTen = &ten
+	assert.False(t, funk.IsEmpty(pointerTen))
+	var zero int = int(0)
+	var pointerZero = &zero
+	assert.True(t, funk.IsEmpty(pointerZero))
+}
+
+func TestFunkIsZero(t *testing.T) {
+	var pointerNil *int = nil
+	assert.True(t, funk.IsZero(pointerNil))
+	var ten int = int(10)
+	var pointerTen = &ten
+	assert.False(t, funk.IsZero(pointerTen))
+	var zero int = int(0)
+	var pointerZero = &zero
+	// NOTICE, 0 is not zero
+	assert.False(t, funk.IsZero(pointerZero))
 }

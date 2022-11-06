@@ -52,8 +52,8 @@ func (q *TaskEditQuery) ToModel() *models.Task {
 	if len(q.Tag) > 0 {
 		t.Tag = strings.Join(q.Tag, ",")
 	}
-	if !q.TimerOne.IsZero() {
-		t.Timerone = q.TimerOne.Unix()
+	if !q.TimerOn.IsZero() {
+		t.Timeron = q.TimerOn.Unix()
 	}
 
 	return t

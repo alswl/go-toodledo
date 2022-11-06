@@ -303,12 +303,12 @@ func (s *taskLocalExtService) DeleteBatch(ids []int64) ([]int64, []*models.TaskD
 	// no cache clean, using fetcher to sync
 }
 
-func (s *taskLocalExtService) Edit(id int64, t *models.Task) (*models.Task, error) {
+func (s *taskLocalExtService) Edit(id int64, t *models.TaskEdit) (*models.Task, error) {
 	return s.taskSvc.Edit(id, t)
 	// no cache clean, using fetcher to sync
 }
 
-func (s *taskLocalExtService) EditByQuery(query *queries.TaskEditQuery) (*models.Task, error) {
+func (s *taskLocalExtService) EditByQuery(_ *queries.TaskEditQuery) (*models.Task, error) {
 	//TODO implement me
 	panic("implement me")
 }
@@ -321,4 +321,12 @@ func (s *taskLocalExtService) Complete(id int64) (*models.Task, error) {
 func (s *taskLocalExtService) UnComplete(id int64) (*models.Task, error) {
 	return s.taskSvc.UnComplete(id)
 	// no cache clean, using fetcher to partial sync
+}
+
+func (s *taskLocalExtService) Start(id int64) error {
+	return s.taskSvc.Start(id)
+}
+
+func (s *taskLocalExtService) Stop(id int64) error {
+	return s.taskSvc.Stop(id)
 }

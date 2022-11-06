@@ -107,6 +107,18 @@ func (m Model) GetFilterInput() textinput.Model {
 	return m.filterTextInput
 }
 
+func (m *Model) Info(msg string) {
+	m.SetStatus(msg)
+}
+
+func (m *Model) Warn(msg string) {
+	m.Info(msg)
+}
+
+func (m *Model) Error(msg string) {
+	m.Info(msg)
+}
+
 func NewDefault() Model {
 	sb := statusbar.New(
 		statusbar.ColorConfig{

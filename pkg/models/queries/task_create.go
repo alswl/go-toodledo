@@ -27,11 +27,11 @@ type TaskWritePartialQuery struct {
 	Priority priority.Priority
 	//Remind
 	//Repeat iCal RRULE
-	Star     bool
-	Status   status.Status
-	Tag      []string
-	Timer    int64
-	TimerOne time.Time
+	Star    bool
+	Status  status.Status
+	Tag     []string
+	Timer   int64
+	TimerOn time.Time
 	//Via string
 }
 
@@ -85,8 +85,8 @@ func (q *TaskCreateQuery) ToModel() *models.Task {
 	if len(q.Tag) > 0 {
 		t.Tag = strings.Join(q.Tag, ",")
 	}
-	if !q.TimerOne.IsZero() {
-		t.Timerone = q.TimerOne.Unix()
+	if !q.TimerOn.IsZero() {
+		t.Timeron = q.TimerOn.Unix()
 	}
 
 	return t
@@ -193,7 +193,7 @@ func (b *TaskCreateQueryBuilder) WithTimer(timer int64) *TaskCreateQueryBuilder 
 
 // WithTimerOne sets TimeOne
 func (b *TaskCreateQueryBuilder) WithTimerOne(timerOne time.Time) *TaskCreateQueryBuilder {
-	b.query.TimerOne = timerOne
+	b.query.TimerOn = timerOne
 	return b
 }
 

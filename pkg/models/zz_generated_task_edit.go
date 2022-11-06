@@ -12,10 +12,10 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// Task task
+// TaskEdit task edit
 //
-// swagger:model Task
-type Task struct {
+// swagger:model TaskEdit
+type TaskEdit struct {
 
 	// A GMT unix timestamp for when the task was last modified.
 	Added int64 `json:"added,omitempty"`
@@ -34,7 +34,7 @@ type Task struct {
 	Children int64 `json:"children,omitempty"`
 
 	// A GMT unix timestamp for when the task was completed. If the task is not completed, the value will be 0. Toodledo does not track the time that a task was completed, so tasks will always appear to be completed at noon.
-	Completed int64 `json:"completed,omitempty"`
+	Completed *int64 `json:"completed,omitempty"`
 
 	// The id number of the context. Omit this field or set it to 0 to leave the task unassigned to a context.
 	Context int64 `json:"context,omitempty"`
@@ -152,7 +152,7 @@ type Task struct {
 	Timer int64 `json:"timer,omitempty"`
 
 	// If the timer is currently on, this will contain a unix timestamp indicating the last time that the timer was started. Therefore, if the timer is currently on, you will need to calculate the elapsed time when you present it to the user. This calculation is: Total Time=timer+(now-timeron). Where "now" is a unix timestamp for the current time.
-	Timeron int64 `json:"timeron,omitempty"`
+	Timeron *int64 `json:"timeron,omitempty"`
 
 	// A string for the name of the task. Up to 255 characters.
 	Title string `json:"title,omitempty"`
@@ -172,18 +172,18 @@ type Task struct {
 	Via string `json:"via,omitempty"`
 }
 
-// Validate validates this task
-func (m *Task) Validate(formats strfmt.Registry) error {
+// Validate validates this task edit
+func (m *TaskEdit) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this task based on context it is used
-func (m *Task) ContextValidate(ctx ccontext.Context, formats strfmt.Registry) error {
+// ContextValidate validates this task edit based on context it is used
+func (m *TaskEdit) ContextValidate(ctx ccontext.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *Task) MarshalBinary() ([]byte, error) {
+func (m *TaskEdit) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -191,8 +191,8 @@ func (m *Task) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Task) UnmarshalBinary(b []byte) error {
-	var res Task
+func (m *TaskEdit) UnmarshalBinary(b []byte) error {
+	var res TaskEdit
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

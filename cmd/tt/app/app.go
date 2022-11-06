@@ -21,6 +21,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -53,7 +54,8 @@ type Model struct {
 	taskLocalSvc services.TaskPersistenceExtService
 
 	// properties
-	log logrus.FieldLogger
+	log         logrus.FieldLogger
+	refreshLock sync.Mutex
 
 	// states TODO
 	states *States
@@ -173,6 +175,13 @@ func (m *Model) Refresh(isHardRefresh bool) tea.Cmd {
 }
 
 func (m *Model) handleRefresh(isHardRefresh bool) tea.Cmd {
+	// detect refresh in progress
+	ok := m.refreshLock.TryLock()
+	if !ok {
+		return nil
+	}
+	defer m.refreshLock.Unlock()
+
 	refreshedChan, err := m.fetcher.Notify(isHardRefresh)
 	if err != nil {
 		m.log.WithError(err).Error("notify fetcher, hard(?)" + strconv.FormatBool(isHardRefresh))
@@ -374,6 +383,18 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	m.statusBar.SetInfo1(fmt.Sprintf("./%d", len(m.states.Tasks)))
 
 	return nil
+}
+
+func (m *Model) Info(msg string) {
+	m.statusBar.Info(msg)
+}
+
+func (m *Model) Warn(msg string) {
+	m.statusBar.Warn(msg)
+}
+
+func (m *Model) Error(msg string) {
+	m.statusBar.Error(msg)
 }
 
 func InitialModel() *Model {

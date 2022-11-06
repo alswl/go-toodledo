@@ -9,6 +9,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/enums"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
+	"github.com/alswl/go-toodledo/pkg/utils"
 	"github.com/go-openapi/runtime"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
@@ -31,12 +32,14 @@ type TaskService interface {
 	Delete(id int64) error
 	// DeleteBatch is batch delete tasks, return success ids, failed items and error
 	DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error)
-	Edit(id int64, t *models.Task) (*models.Task, error)
+	Edit(id int64, t *models.TaskEdit) (*models.Task, error)
 	EditByQuery(query *queries.TaskEditQuery) (*models.Task, error)
 	Complete(id int64) (*models.Task, error)
 	UnComplete(id int64) (*models.Task, error)
 	ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error)
 	ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error)
+	Start(id int64) error
+	Stop(id int64) error
 }
 
 // TaskExtendedService is a service for tasks, it provided more query parameters.
@@ -52,6 +55,8 @@ type TaskPersistenceExtService interface {
 	TaskExtendedService
 	Synchronizable
 }
+
+var _ TaskService = (*taskService)(nil)
 
 // taskService is the implementation of TaskService by client
 type taskService struct {
@@ -227,9 +232,12 @@ func (s *taskService) Delete(id int64) error {
 	return nil
 }
 
-func (s *taskService) Edit(id int64, t *models.Task) (*models.Task, error) {
+func (s *taskService) Edit(id int64, t *models.TaskEdit) (*models.Task, error) {
 	t.ID = id
-	bytes, _ := json.Marshal([]models.Task{*t})
+	// FIXME @alswl
+	// complete and timeon is not omitempty, so it will be initialized to 0
+	// edit it will cause unexpected result
+	bytes, _ := json.Marshal([]models.TaskEdit{*t})
 	bytesS := (string)(bytes)
 	p := task.NewPostTasksEditPhpParams()
 	p.Tasks = &bytesS
@@ -264,8 +272,8 @@ func (s *taskService) Complete(id int64) (*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.Edit(id, &models.Task{
-		Completed: time.Now().Unix(),
+	return s.Edit(id, &models.TaskEdit{
+		Completed: utils.WrapPointerInt64(time.Now().Unix()),
 	})
 }
 
@@ -274,7 +282,38 @@ func (s *taskService) UnComplete(id int64) (*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.Edit(id, &models.Task{
-		Completed: 0,
+	return s.Edit(id, &models.TaskEdit{
+		Completed: utils.WrapPointerInt64(0),
 	})
+}
+
+func (s *taskService) Start(id int64) error {
+	t, err := s.FindById(id)
+	if err != nil {
+		return err
+	}
+	if t.Timeron != 0 {
+		return fmt.Errorf("task %d already started", id)
+	}
+
+	_, err = s.Edit(id, &models.TaskEdit{
+		Timeron: utils.WrapPointerInt64(time.Now().Unix()),
+	})
+	return err
+}
+
+func (s *taskService) Stop(id int64) error {
+	t, err := s.FindById(id)
+	if err != nil {
+		return err
+	}
+	if t.Timeron == 0 {
+		return fmt.Errorf("task %d not started", id)
+	}
+
+	_, err = s.Edit(id, &models.TaskEdit{
+		Timer:   t.Timer + time.Now().Unix() - t.Timeron,
+		Timeron: utils.WrapPointerInt64(0),
+	})
+	return err
 }

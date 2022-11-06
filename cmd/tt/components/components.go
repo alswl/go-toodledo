@@ -54,3 +54,10 @@ func (r *Resizable) Resize(width, height int, border lipgloss.Border) {
 type Refreshable interface {
 	Refresh(isHardRefresh bool) tea.Cmd
 }
+
+// Notifier is a component that can notify to the parent component
+type Notifier interface {
+	Info(msg string)
+	Warn(msg string)
+	Error(msg string)
+}

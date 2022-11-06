@@ -15,3 +15,27 @@ func UnwrapListPointer[T any](list []*T) []T {
 	}
 	return result
 }
+
+func WrapPointerInt64(value int64) *int64 {
+	return &value
+}
+
+func UnwrapPointerInt64(value *int64) int64 {
+	return *value
+}
+
+func WrapPointerInt32(value int32) *int32 {
+	return &value
+}
+
+func UnwrapPointerInt(value *int) int {
+	return *value
+}
+
+func WrapPointerInt(value int) *int {
+	return &value
+}
+
+func UnwrapPointerInt32(value *int32) int32 {
+	return *value
+}
