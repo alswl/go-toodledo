@@ -155,6 +155,29 @@ func (_m *GoalPersistenceService) ListAll() ([]*models.Goal, error) {
 	return r0, r1
 }
 
+// ListAllWithArchived provides a mock function with given fields:
+func (_m *GoalPersistenceService) ListAllWithArchived() ([]*models.Goal, error) {
+	ret := _m.Called()
+
+	var r0 []*models.Goal
+	if rf, ok := ret.Get(0).(func() []*models.Goal); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Goal)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // PartialSync provides a mock function with given fields: lastEditTime
 func (_m *GoalPersistenceService) PartialSync(lastEditTime *int32) error {
 	ret := _m.Called(lastEditTime)

@@ -5,6 +5,7 @@ import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
+	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -12,9 +13,10 @@ import (
 
 type ListOpts struct {
 	//noCache bool
+	WithArchived bool
 }
 
-//var listOpts = &ListOpts{}
+var listOpts = &ListOpts{}
 
 func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
@@ -31,15 +33,21 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 			svc := app.GoalSvc
-			all, err := svc.ListAll()
+
+			var goals []*models.Goal
+			if listOpts.WithArchived {
+				goals, err = svc.ListAllWithArchived()
+			} else {
+				goals, err = svc.ListAll()
+			}
 			if err != nil {
 				logrus.WithError(err).Fatal("list goals")
 				return
 			}
 
-			fmt.Println(render.Tables4Goal(all))
+			fmt.Println(render.Tables4Goal(goals))
 		},
 	}
-	//cmd.Flags().BoolVarP(&listOpts.noCache, "no-cache", "", false, "do not using cache")
+	cmd.Flags().BoolVarP(&listOpts.WithArchived, "with-archived", "a", false, "list all goals including archived")
 	return cmd
 }

@@ -13,7 +13,6 @@ import (
 	"strconv"
 )
 
-// GoalService ...
 type GoalService interface {
 	Find(name string) (*models.Goal, error)
 	FindByID(id int64) (*models.Goal, error)
@@ -21,7 +20,9 @@ type GoalService interface {
 	Delete(name string) error
 	Rename(name string, newName string) (*models.Goal, error)
 	Create(name string) (*models.Goal, error)
+	// ListAll returns all goals except archived
 	ListAll() ([]*models.Goal, error)
+	ListAllWithArchived() ([]*models.Goal, error)
 }
 
 // GoalPersistenceService is a cached service
@@ -61,11 +62,11 @@ func (s *goalService) Find(name string) (*models.Goal, error) {
 
 func (s *goalService) FindByID(id int64) (*models.Goal, error) {
 	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
-	ts, err := s.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), s.auth)
+	ts, err := s.ListAllWithArchived()
 	if err != nil {
 		return nil, err
 	}
-	filtered := funk.Filter(ts.Payload, func(x *models.Goal) bool {
+	filtered := funk.Filter(ts, func(x *models.Goal) bool {
 		return x.ID == id
 	}).([]*models.Goal)
 	if len(filtered) == 0 {
@@ -143,8 +144,17 @@ func (s *goalService) Rename(name string, newName string) (*models.Goal, error) 
 	return res.Payload[0], nil
 }
 
-// ListAll ...
 func (s *goalService) ListAll() ([]*models.Goal, error) {
+	all, err := s.ListAllWithArchived()
+	if err != nil {
+		return nil, err
+	}
+	return funk.Filter(all, func(x *models.Goal) bool {
+		return x.Archived == 0
+	}).([]*models.Goal), nil
+}
+
+func (s *goalService) ListAllWithArchived() ([]*models.Goal, error) {
 	res, err := s.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), s.auth)
 	if err != nil {
 		logrus.WithField("resp", res).WithError(err).Error("request failed")

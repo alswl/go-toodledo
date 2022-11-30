@@ -50,12 +50,12 @@ type RefreshMsg struct {
 // Model is the main tt app
 // it was singleton
 type Model struct {
-	taskRichSvc  services.TaskRichService
-	contextSvc   services.ContextService
-	folderSvc    services.FolderService
-	goalSvc      services.GoalService
-	taskExtSvc   services.TaskExtendedService
-	taskLocalSvc services.TaskPersistenceExtService
+	taskRichSvc   services.TaskRichService
+	contextExtSvc services.ContextPersistenceService
+	folderExtSvc  services.FolderPersistenceService
+	goalExtSvc    services.GoalPersistenceService
+	taskExtSvc    services.TaskExtendedService
+	taskLocalSvc  services.TaskPersistenceExtService
 
 	// properties
 	log         logrus.FieldLogger
@@ -85,17 +85,37 @@ func (m *Model) Init() tea.Cmd {
 
 	// states init
 	cmds = append(cmds, func() tea.Msg {
-		cs, err := m.contextSvc.ListAll()
+		err := m.contextExtSvc.Sync()
 		if err != nil {
 			m.err = err
 			return nil
 		}
-		fs, err := m.folderSvc.ListAll()
+		err = m.contextExtSvc.Sync()
 		if err != nil {
 			m.err = err
 			return nil
 		}
-		gs, err := m.goalSvc.ListAll()
+		cs, err := m.contextExtSvc.ListAll()
+		if err != nil {
+			m.err = err
+			return nil
+		}
+		err = m.folderExtSvc.Sync()
+		if err != nil {
+			m.err = err
+			return nil
+		}
+		fs, err := m.folderExtSvc.ListAll()
+		if err != nil {
+			m.err = err
+			return nil
+		}
+		err = m.goalExtSvc.Sync()
+		if err != nil {
+			m.err = err
+			return nil
+		}
+		gs, err := m.goalExtSvc.ListAll()
 		if err != nil {
 			m.err = err
 		}
@@ -485,21 +505,21 @@ func InitialModel() *Model {
 
 	// main app
 	m := Model{
-		log:          log,
-		taskRichSvc:  taskRichSvc,
-		contextSvc:   contextSvc,
-		folderSvc:    folderSvc,
-		goalSvc:      goalSvc,
-		taskExtSvc:   taskExtSvc,
-		taskLocalSvc: taskLocalSvc,
-		states:       states,
-		err:          nil,
-		focused:      "tasks",
-		ready:        false,
-		statusBar:    statusBar,
-		sidebar:      sidebar,
-		isInputting:  false,
-		tasksPanes:   map[string]*taskspane.Model{},
+		log:           log,
+		taskRichSvc:   taskRichSvc,
+		contextExtSvc: contextSvc,
+		folderExtSvc:  folderSvc,
+		goalExtSvc:    goalSvc,
+		taskExtSvc:    taskExtSvc,
+		taskLocalSvc:  taskLocalSvc,
+		states:        states,
+		err:           nil,
+		focused:       "tasks",
+		ready:         false,
+		statusBar:     statusBar,
+		sidebar:       sidebar,
+		isInputting:   false,
+		tasksPanes:    map[string]*taskspane.Model{},
 	}
 
 	m.sidebar.RegisterItemChange(m.OnItemChange)

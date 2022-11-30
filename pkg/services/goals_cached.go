@@ -6,6 +6,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/thoas/go-funk"
+	"strconv"
 	"sync"
 )
 
@@ -41,7 +42,7 @@ func (s *goalCachedService) Sync() error {
 	}
 	for _, f := range all {
 		bytes, _ := json.Marshal(f)
-		_ = s.db.Put(GoalsBucket, f.Name, bytes)
+		_ = s.db.Put(GoalsBucket, strconv.Itoa(int(f.ID)), bytes)
 	}
 	return nil
 }
@@ -74,8 +75,17 @@ func (s *goalCachedService) Create(name string) (*models.Goal, error) {
 	return s.svc.Create(name)
 }
 
-// ListAll ...
 func (s *goalCachedService) ListAll() ([]*models.Goal, error) {
+	all, err := s.ListAllWithArchived()
+	if err != nil {
+		return nil, err
+	}
+	return funk.Filter(all, func(x *models.Goal) bool {
+		return x.Archived == 0
+	}).([]*models.Goal), nil
+}
+
+func (s *goalCachedService) ListAllWithArchived() ([]*models.Goal, error) {
 	fs := make([]*models.Goal, 0)
 	all, err := s.db.List(GoalsBucket)
 	if err != nil {
@@ -89,7 +99,6 @@ func (s *goalCachedService) ListAll() ([]*models.Goal, error) {
 	return fs, nil
 }
 
-// Find ...
 func (s *goalCachedService) Find(name string) (*models.Goal, error) {
 	fs, err := s.ListAll()
 	if err != nil {
@@ -107,19 +116,13 @@ func (s *goalCachedService) Find(name string) (*models.Goal, error) {
 }
 
 func (s *goalCachedService) FindByID(id int64) (*models.Goal, error) {
-	fs, err := s.ListAll()
+	get, err := s.db.Get(GoalsBucket, strconv.Itoa(int(id)))
 	if err != nil {
 		return nil, err
 	}
-
-	filtered := funk.Filter(fs, func(x *models.Goal) bool {
-		return x.ID == id
-	}).([]*models.Goal)
-	if len(filtered) == 0 {
-		return nil, common.ErrNotFound
-	}
-	f := filtered[0]
-	return f, nil
+	g := &models.Goal{}
+	_ = json.Unmarshal(get, &g)
+	return g, nil
 }
 
 func (s *goalCachedService) Clean() error {

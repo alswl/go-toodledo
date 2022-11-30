@@ -18,7 +18,7 @@ type taskRichService struct {
 	taskSvc    TaskService
 	folderSvc  FolderService
 	contextSvc ContextService
-	goalSvc    GoalService
+	goalSvc    GoalPersistenceService
 }
 
 // NewTaskRichService returns a new TaskRichService.
@@ -28,7 +28,7 @@ func NewTaskRichService(
 	taskSvc TaskService,
 	folderSvc FolderService,
 	contextSvc ContextService,
-	goalSvc GoalService,
+	goalSvc GoalPersistenceService,
 	logger logrus.FieldLogger,
 ) TaskRichService {
 	return &taskRichService{
