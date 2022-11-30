@@ -20,16 +20,12 @@ func NewCreateCmd(f *cmdutil.Factory) *cobra.Command {
 			$ toodledo context create Work
 `),
 		Run: func(cmd *cobra.Command, args []string) {
-			_, err := injector.InitCLIApp()
+			app, err := injector.InitCLIApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			svc, err := injector.InitContextService()
-			if err != nil {
-				logrus.Fatal(err)
-				return
-			}
+			svc := app.ContextSvc
 			name := args[0]
 
 			created, err := svc.Create(name)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/MakeNowJust/heredoc"
+	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	log "github.com/sirupsen/logrus"
@@ -39,8 +40,23 @@ func NewTokenCmd(f *cmdutil.Factory) *cobra.Command {
 				log.Error(err)
 				return
 			}
+			app, err := injector.InitCLIApp()
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			me, err := app.AccountSvc.Me()
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			err = client.SaveUserIdWithViper(me.Userid)
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			fmt.Printf("You are logged in as %s(%s)\n", me.Userid, me.Email)
 			fmt.Println("ok")
-
 		},
 	}
 

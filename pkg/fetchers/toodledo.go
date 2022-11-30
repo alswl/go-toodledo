@@ -48,7 +48,7 @@ func NewToodledoFetchFnPartial(
 func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber, isHardRefresh bool) error {
 	statusDescriber.Syncing()
 
-	me, err := s.accountSvc.Me()
+	me, _, err := s.accountSvc.CachedMe()
 	if err != nil {
 		statusDescriber.Error(fmt.Errorf("auth failed"))
 		return err

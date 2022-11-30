@@ -12,14 +12,32 @@ import (
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/dal"
+	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/go-openapi/runtime"
 )
 
 // Injectors from itinjector.go:
 
-func InitAuth() (runtime.ClientAuthInfoWriter, error) {
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
+func InitCLIBackend() (dal.Backend, error) {
+	toodledoConfigDatabase := models.NewDefaultToodledoConfigDatabase()
+	backend, err := dal.ProvideBackend(toodledoConfigDatabase)
+	if err != nil {
+		return nil, err
+	}
+	return backend, nil
+}
+
+func InitCLIOption() (models.ToodledoCliConfig, error) {
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	if err != nil {
+		return models.ToodledoCliConfig{}, err
+	}
+	return toodledoCliConfig, nil
+}
+
+func InitCLIApp() (*app.ToodledoCLIApp, error) {
+	toodledo := client.NewToodledo()
+	toodledoCliConfig, err := common.NewCliConfigFromViper()
 	if err != nil {
 		return nil, err
 	}
@@ -31,293 +49,25 @@ func InitAuth() (runtime.ClientAuthInfoWriter, error) {
 	if err != nil {
 		return nil, err
 	}
-	return clientAuthInfoWriter, nil
-}
-
-func NewToodledoCli() (*client.Toodledo, error) {
-	toodledo := client.NewToodledo()
-	return toodledo, nil
-}
-
-func InitFolderService() (services.FolderService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
-	return folderService, nil
-}
-
-func InitFolderLocalService() (services.FolderPersistenceService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
-	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	toodledoConfigDatabase := models.NewDefaultToodledoConfigDatabase()
+	backend, err := dal.ProvideBackend(toodledoConfigDatabase)
 	if err != nil {
 		return nil, err
 	}
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	folderPersistenceService := services.NewFolderCachedService(folderService, accountService, backend)
-	return folderPersistenceService, nil
-}
-
-func InitContextService() (services.ContextService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
-	return contextService, nil
-}
-
-func InitContextLocalService() (services.ContextPersistenceService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
-	backend, err := dal.ProvideBackend(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	contextPersistenceService := services.NewContextCachedService(contextService, accountService, backend)
-	return contextPersistenceService, nil
-}
-
-func InitTaskService() (services.TaskService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
 	fieldLogger := logging.ProvideLogger()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
-	return taskService, nil
-}
-
-func InitGoalService() (services.GoalService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
+	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
+	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
 	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
-	return goalService, nil
-}
-
-func InitGoalLocalService() (services.GoalPersistenceService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
-	backend, err := dal.ProvideBackend(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	goalPersistenceService := services.NewGoalCachedService(goalService, accountService, backend)
-	return goalPersistenceService, nil
-}
-
-func InitAccountSvc() (services.AccountService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	backend, err := dal.ProvideBackend(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	return accountService, nil
-}
-
-func InitSavedSearchService() (services.SavedSearchService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
 	savedSearchService := services.NewSavedSearchService(toodledo, clientAuthInfoWriter)
-	return savedSearchService, nil
-}
-
-func InitTaskRichService() (services.TaskRichService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	fieldLogger := logging.ProvideLogger()
-	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
-	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
-	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
-	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
-	taskRichService := services.NewTaskRichService(taskService, folderService, contextService, goalService, fieldLogger)
-	return taskRichService, nil
-}
-
-func InitTaskLocalService() (services.TaskPersistenceExtService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	fieldLogger := logging.ProvideLogger()
-	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
-	backend, err := dal.ProvideBackend(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
 	taskPersistenceExtService := services.ProvideTaskLocalExtService(taskService, accountService, backend)
-	return taskPersistenceExtService, nil
-}
-
-func InitTaskExtendedService() (services.TaskPersistenceExtService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	fieldLogger := logging.ProvideLogger()
-	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
-	backend, err := dal.ProvideBackend(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	taskPersistenceExtService := services.ProvideTaskLocalExtService(taskService, accountService, backend)
-	return taskPersistenceExtService, nil
-}
-
-func InitTaskRichCachedService() (services.TaskRichService, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	fieldLogger := logging.ProvideLogger()
-	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
-	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
-	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
-	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
-	taskRichService := services.NewTaskRichService(taskService, folderService, contextService, goalService, fieldLogger)
-	return taskRichService, nil
+	folderPersistenceService := services.NewFolderCachedService(folderService, accountService, backend)
+	contextPersistenceService := services.NewContextCachedService(contextService, accountService, backend)
+	goalPersistenceService := services.NewGoalCachedService(goalService, accountService, backend)
+	taskRichService := services.NewTaskRichPersistenceService(taskPersistenceExtService, folderPersistenceService, contextPersistenceService, goalPersistenceService, fieldLogger)
+	toodledoCLIApp := app.NewToodledoCLIApp(accountService, taskService, folderService, contextService, goalService, savedSearchService, taskRichService, toodledoCliConfig)
+	return toodledoCLIApp, nil
 }
 
 func InitTUIApp() (*app.ToodledoTUIApp, error) {
@@ -334,7 +84,8 @@ func InitTUIApp() (*app.ToodledoTUIApp, error) {
 	if err != nil {
 		return nil, err
 	}
-	backend, err := dal.ProvideBackend(toodledoCliConfig)
+	toodledoConfigDatabase := models.NewToodledoConfigDatabaseFromToodledoCliConfig(toodledoCliConfig)
+	backend, err := dal.ProvideBackend(toodledoConfigDatabase)
 	if err != nil {
 		return nil, err
 	}
@@ -352,50 +103,4 @@ func InitTUIApp() (*app.ToodledoTUIApp, error) {
 	taskRichService := services.NewTaskRichService(taskService, folderService, contextService, goalService, fieldLogger)
 	toodledoTUIApp := app.NewToodledoTUIApp(accountService, taskService, taskPersistenceExtService, folderService, folderPersistenceService, contextService, contextPersistenceService, goalService, goalPersistenceService, savedSearchService, taskRichService)
 	return toodledoTUIApp, nil
-}
-
-func InitCLIApp() (*app.ToodledoCLIApp, error) {
-	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigFromViper()
-	if err != nil {
-		return nil, err
-	}
-	toodledoConfig, err := common.NewConfigCliConfig(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	clientAuthInfoWriter, err := client.NewAuthFromConfig(toodledoConfig)
-	if err != nil {
-		return nil, err
-	}
-	backend, err := dal.ProvideBackend(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter, backend)
-	fieldLogger := logging.ProvideLogger()
-	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
-	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
-	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
-	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
-	savedSearchService := services.NewSavedSearchService(toodledo, clientAuthInfoWriter)
-	taskPersistenceExtService := services.ProvideTaskLocalExtService(taskService, accountService, backend)
-	folderPersistenceService := services.NewFolderCachedService(folderService, accountService, backend)
-	contextPersistenceService := services.NewContextCachedService(contextService, accountService, backend)
-	goalPersistenceService := services.ProvideGoalCachedService(goalService, accountService, backend)
-	taskRichService := services.NewTaskRichPersistenceService(taskPersistenceExtService, folderPersistenceService, contextPersistenceService, goalPersistenceService, fieldLogger)
-	toodledoCLIApp := app.NewToodledoCLIApp(accountService, taskService, folderService, contextService, goalService, savedSearchService, taskRichService)
-	return toodledoCLIApp, nil
-}
-
-func InitBackend() (dal.Backend, error) {
-	toodledoCliConfig, err := common.NewCliConfigForTesting()
-	if err != nil {
-		return nil, err
-	}
-	backend, err := dal.ProvideBackend(toodledoCliConfig)
-	if err != nil {
-		return nil, err
-	}
-	return backend, nil
 }

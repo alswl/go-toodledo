@@ -53,6 +53,7 @@ func OpenBrowser(url string) {
 }
 
 // BindFlagsByQuery bind flags to query, the query support basic types, and support `validate:"required"`
+// obj must be a struct
 func BindFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
 	if reflect.ValueOf(obj).Type().Kind() != reflect.Struct {
 		return fmt.Errorf("%s is not a struct", reflect.ValueOf(obj).Type().Kind())
@@ -112,6 +113,8 @@ func BindFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
 	return nil
 }
 
+// FillQueryByFlags fill struct by cmd query
+// obj must be a pointer
 func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 	if reflect.ValueOf(obj).Type().Kind() != reflect.Ptr {
 		return fmt.Errorf("%s is not a pointer", reflect.ValueOf(obj).Type().Kind())

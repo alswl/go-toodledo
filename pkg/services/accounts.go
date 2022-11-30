@@ -8,16 +8,24 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/go-openapi/runtime"
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 )
 
+const BucketAccount = "account"
+const lastSyncInfoKey = "lastSyncInfo"
+
+// meKey is the key of account in db, TODO multi user support
+const meKey = "me"
+
 // CurrentUser return live user
+// TODO move to cli
 func CurrentUser(svc AccountService) (*models.Account, error) {
-	return svc.Me()
+	me, _, err := svc.CachedMe()
+	return me, err
 }
 
-var BucketAccount = "account"
-
 // AccountService ...
+// TODO split to AccountService and SyncService
 type AccountService interface {
 	Me() (*models.Account, error)
 	CachedMe() (*models.Account, bool, error)
@@ -45,10 +53,40 @@ func (s *accountService) Me() (*models.Account, error) {
 	return resp.Payload, nil
 }
 
-var key = "lastSyncInfo"
+func (s *accountService) CachedMe() (*models.Account, bool, error) {
+	bytes, err := s.db.Get(BucketAccount, meKey)
+	u := models.Account{}
+	// TODO refactor, cacheOrSet(key, setFn): val
+	if err == dal.ErrObjectNotFound {
+		me, err := s.Me()
+		if err != nil {
+			return nil, false, errors.Wrapf(err, "get account s.Me() failed")
+		}
+		bytes, err = json.Marshal(me)
+		if err != nil {
+			return nil, false, errors.Wrapf(err, "marshal account failed")
+		}
+		_ = s.db.Put(BucketAccount, meKey, bytes)
+		return me, false, nil
+	} else if err != nil {
+		return nil, false, errors.Wrapf(err, "get account in db failed")
+	} else {
+		err = json.Unmarshal(bytes, &u)
+		if err != nil {
+			return nil, false, errors.Wrapf(err, "unmarshal account failed")
+		}
+		// TODO check user id for local config
+		userID := viper.GetString(models.AuthUserId)
+		if u.Userid != userID {
+			return nil, false, errors.Errorf("user id not match, local %s, remote %s, please auth logout", userID, u.Userid)
+		}
+
+		return &u, true, nil
+	}
+}
 
 func (s *accountService) GetLastFetchInfo() (*models.Account, error) {
-	bytes, err := s.db.Get(BucketAccount, key)
+	bytes, err := s.db.Get(BucketAccount, lastSyncInfoKey)
 	if err == dal.ErrObjectNotFound {
 		return nil, nil
 	} else if err != nil {
@@ -67,40 +105,9 @@ func (s *accountService) SetLastFetchInfo(account *models.Account) error {
 	if err != nil {
 		return errors.Wrap(err, "marshal last sync info")
 	}
-	err = s.db.Put(BucketAccount, key, bytes)
+	err = s.db.Put(BucketAccount, lastSyncInfoKey, bytes)
 	if err != nil {
 		return errors.Wrap(err, "set last sync info")
 	}
 	return nil
-}
-
-func (s *accountService) cachedMe(key string) (*models.Account, bool, error) {
-	bytes, err := s.db.Get(BucketAccount, key)
-	u := models.Account{}
-	// TODO refactor, cacheOrSet(key, setFn): val
-	if err == dal.ErrObjectNotFound {
-		me, err := s.Me()
-		if err != nil {
-			return nil, false, errors.Wrapf(err, "get account s.Me() failed")
-		}
-		bytes, err = json.Marshal(me)
-		if err != nil {
-			return nil, false, errors.Wrapf(err, "marshal account failed")
-		}
-		_ = s.db.Put(BucketAccount, key, bytes)
-		return me, false, nil
-	} else if err != nil {
-		return nil, false, errors.Wrapf(err, "get account in db failed")
-	} else {
-		err = json.Unmarshal(bytes, &u)
-		if err != nil {
-			return nil, false, errors.Wrapf(err, "unmarshal account failed")
-		}
-		return &u, true, nil
-	}
-}
-
-func (s *accountService) CachedMe() (*models.Account, bool, error) {
-	// TODO refactor, cacheOrSet(key, setFn): val
-	return s.cachedMe("me")
 }

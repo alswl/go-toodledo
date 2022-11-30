@@ -2,7 +2,6 @@ package services
 
 import (
 	"encoding/json"
-	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
@@ -78,8 +77,11 @@ func (s *taskLocalExtService) syncWithFn(fnEdited func() ([]*models.Task, error)
 		return err
 	}
 	for _, f := range editedTasks {
+		//start := time.Now()
 		bytes, _ := json.Marshal(f)
 		_ = s.db.Put(TaskBucket, strconv.Itoa(int(f.ID)), bytes)
+		//elapsed := time.Since(start)
+		//logrus.WithField("elapsed", elapsed).WithField("title", f.Title).Info("syncWithFn")
 	}
 
 	tds, _ := fnDeleted()
@@ -103,18 +105,17 @@ func (s *taskLocalExtService) PartialSync(lastEditTime *int32) error {
 }
 
 func (s *taskLocalExtService) FindById(id int64) (*models.Task, error) {
-	all, _, err := s.ListAll()
+	bs, err := s.db.Get(TaskBucket, strconv.Itoa(int(id)))
 	if err != nil {
 		return nil, err
 	}
-	filterHeadOpt := funk.Head(funk.Filter(all, func(t *models.Task) bool {
-		return t.ID == id
-	}))
-	if filterHeadOpt == nil {
-		return nil, common.ErrNotFound
+	var t models.Task
+	err = json.Unmarshal(bs, &t)
+	if err != nil {
+		return nil, err
 	}
-	head := filterHeadOpt.(*models.Task)
-	return head, nil
+
+	return &t, nil
 }
 
 func (s *taskLocalExtService) listAllRemote() ([]*models.Task, error) {

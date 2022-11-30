@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-var GoalBucket = "goals"
+const GoalsBucket = "goals"
 
 type goalCachedService struct {
 	syncLock sync.Mutex
@@ -19,25 +19,13 @@ type goalCachedService struct {
 	accountSvc AccountService
 }
 
-var goalLocalServiceInstance GoalPersistenceService
-var goalLocalServiceOnce sync.Once
-
-func NewGoalCachedService(goalsvc GoalService, accountSvc AccountService, db dal.Backend) GoalPersistenceService {
+func NewGoalCachedService(goalSvc GoalService, accountSvc AccountService, db dal.Backend) GoalPersistenceService {
 	s := goalCachedService{
-		svc:        goalsvc,
+		svc:        goalSvc,
 		db:         db,
 		accountSvc: accountSvc,
 	}
 	return &s
-}
-
-func ProvideGoalCachedService(svc GoalService, accountSvc AccountService, db dal.Backend) GoalPersistenceService {
-	if goalLocalServiceInstance == nil {
-		goalLocalServiceOnce.Do(func() {
-			goalLocalServiceInstance = NewGoalCachedService(svc, accountSvc, db)
-		})
-	}
-	return goalLocalServiceInstance
 }
 
 func (s *goalCachedService) Sync() error {
@@ -53,7 +41,7 @@ func (s *goalCachedService) Sync() error {
 	}
 	for _, f := range all {
 		bytes, _ := json.Marshal(f)
-		_ = s.db.Put(GoalBucket, f.Name, bytes)
+		_ = s.db.Put(GoalsBucket, f.Name, bytes)
 	}
 	return nil
 }
@@ -89,7 +77,7 @@ func (s *goalCachedService) Create(name string) (*models.Goal, error) {
 // ListAll ...
 func (s *goalCachedService) ListAll() ([]*models.Goal, error) {
 	fs := make([]*models.Goal, 0)
-	all, err := s.db.List(GoalBucket)
+	all, err := s.db.List(GoalsBucket)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +123,7 @@ func (s *goalCachedService) FindByID(id int64) (*models.Goal, error) {
 }
 
 func (s *goalCachedService) Clean() error {
-	err := s.db.Truncate(GoalBucket)
+	err := s.db.Truncate(GoalsBucket)
 	if err != nil {
 		return err
 	}

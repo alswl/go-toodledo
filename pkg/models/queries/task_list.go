@@ -1,6 +1,7 @@
 package queries
 
 import (
+	"fmt"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 )
@@ -18,4 +19,8 @@ type TaskListQuery struct {
 	Priority   *priority.Priority
 	Status     *status.Status
 	Incomplete *bool
+}
+
+func (q TaskListQuery) UniqString() string {
+	return fmt.Sprintf("%s-%d-%d-%d-%s-%s-%s-%v", q.Title, q.ContextID, q.FolderID, q.GoalID, q.DueDate, q.Priority, q.Status, q.Incomplete)
 }

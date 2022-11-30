@@ -2,10 +2,12 @@ package app
 
 import (
 	"github.com/alswl/go-toodledo/pkg/fetchers"
+	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/services"
 )
 
 type ToodledoCLIApp struct {
+	// TODO move to services
 	AccountSvc     services.AccountService
 	TaskSvc        services.TaskService
 	FolderSvc      services.FolderService
@@ -14,6 +16,8 @@ type ToodledoCLIApp struct {
 	SavedSearchSvc services.SavedSearchService
 
 	TaskRichSvc services.TaskRichService
+
+	Config models.ToodledoCliConfig
 }
 
 func NewToodledoCLIApp(
@@ -24,6 +28,7 @@ func NewToodledoCLIApp(
 	goalSvc services.GoalService,
 	savedSearchSvc services.SavedSearchService,
 	taskRichSvc services.TaskRichService,
+	config models.ToodledoCliConfig,
 ) *ToodledoCLIApp {
 	return &ToodledoCLIApp{
 		AccountSvc:     accountSvc,
@@ -33,10 +38,12 @@ func NewToodledoCLIApp(
 		GoalSvc:        goalSvc,
 		SavedSearchSvc: savedSearchSvc,
 		TaskRichSvc:    taskRichSvc,
+		Config:         config,
 	}
 }
 
 type ToodledoTUIApp struct {
+	// TODO move to services
 	AccountSvc     services.AccountService
 	TaskSvc        services.TaskService
 	TaskExtSvc     services.TaskPersistenceExtService

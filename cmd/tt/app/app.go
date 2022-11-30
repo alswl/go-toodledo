@@ -33,6 +33,9 @@ var (
 )
 
 type States struct {
+	width  int
+	height int
+
 	// Tasks is available tasks
 	Tasks    []*models.RichTask
 	Contexts []*models.Context
@@ -45,12 +48,13 @@ type RefreshMsg struct {
 }
 
 // Model is the main tt app
+// it was singleton
 type Model struct {
 	taskRichSvc  services.TaskRichService
 	contextSvc   services.ContextService
 	folderSvc    services.FolderService
 	goalSvc      services.GoalService
-	taskSvc      services.TaskExtendedService
+	taskExtSvc   services.TaskExtendedService
 	taskLocalSvc services.TaskPersistenceExtService
 
 	// properties
@@ -67,9 +71,9 @@ type Model struct {
 	//isSidebarOpen bool
 
 	// view
-	tasksPane taskspane.Model
-	sidebar   comsidebar.Model
-	statusBar comstatusbar.Model
+	tasksPanes map[string]*taskspane.Model
+	sidebar    comsidebar.Model
+	statusBar  comstatusbar.Model
 	// TODO help pane
 	//help          help.Model
 	isInputting bool
@@ -134,14 +138,18 @@ func (m *Model) Init() tea.Cmd {
 		})
 		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Goals))
 
+		// TODO using last selected menu
+
 		// tasks
-		tasks, err := m.taskSvc.ListAllByQuery(m.states.query)
+		tasks, err := m.taskExtSvc.ListAllByQuery(m.states.query)
 		if err != nil {
 			m.statusBar.SetStatus("ERROR: " + err.Error())
 		}
 		rts, _ := m.taskRichSvc.RichThem(tasks)
 		m.states.Tasks = rts
-		m.tasksPane, _ = m.tasksPane.UpdateTyped(m.states.Tasks)
+
+		cmd := m.updateTaskPaneByQuery(rts)
+		cmds = append(cmds, cmd)
 		m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
 
 		return nil
@@ -208,11 +216,24 @@ func (m *Model) handleRefresh(isHardRefresh bool) tea.Cmd {
 			}
 			rts, _ := m.taskRichSvc.RichThem(tasks)
 			m.states.Tasks = rts
-			m.tasksPane, _ = m.tasksPane.UpdateTyped(m.states.Tasks)
+
+			_ = m.updateTaskPaneByQuery(rts)
 			return RefreshMsg{}
 		}
 	}
 	return cmd
+}
+
+func (m *Model) handleResize(msg tea.WindowSizeMsg) {
+	m.states.width = msg.Width
+	m.states.height = msg.Height
+	sideBarWidth := msg.Width * 2 / 12
+	m.sidebar.Resize(sideBarWidth, msg.Height-1)
+	taskPaneWidth := msg.Width - sideBarWidth
+	for _, p := range m.tasksPanes {
+		p.Resize(taskPaneWidth, msg.Height-1)
+	}
+	m.statusBar.Resize(msg.Width, 0)
 }
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -224,11 +245,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		sideBarWidth := msg.Width * 2 / 12
-		taskPaneWidth := msg.Width - sideBarWidth
-		m.sidebar.Resize(sideBarWidth, msg.Height-1)
-		m.tasksPane.Resize(taskPaneWidth, msg.Height-1)
-		m.statusBar.Resize(msg.Width, 0)
+		m.handleResize(msg)
 	case RefreshMsg:
 		// nothing, only ui refresh
 		return m, cmd
@@ -269,11 +286,41 @@ func (m *Model) View() string {
 			lipgloss.JoinHorizontal(
 				lipgloss.Top,
 				m.sidebar.View(),
-				m.tasksPane.View(),
+				m.getOrCreateTaskPaneByQuery().View(),
 			),
 			m.statusBar.View(),
 		),
 	)
+}
+
+func (m *Model) getOrCreateTaskPaneByQuery() *taskspane.Model {
+	key := ""
+	if m.states.query != nil {
+		key = m.states.query.UniqString()
+	}
+	if p, ok := m.tasksPanes[key]; ok {
+		return p
+	} else {
+		newP := taskspane.InitModel(m.taskExtSvc, m.states.Tasks, m)
+		//// trigger ui redraw
+		m.tasksPanes[key] = &newP
+		m.handleResize(tea.WindowSizeMsg{
+			Width:  m.states.width,
+			Height: m.states.height,
+		})
+		return &newP
+	}
+}
+
+func (m *Model) updateTaskPaneByQuery(msg tea.Msg) tea.Cmd {
+	key := ""
+	if m.states.query != nil {
+		key = m.states.query.UniqString()
+	}
+	pane := m.getOrCreateTaskPaneByQuery()
+	newM, newMsg := pane.UpdateTyped(msg)
+	m.tasksPanes[key] = &newM
+	return newMsg
 }
 
 func (m *Model) loopFocusPane() {
@@ -292,7 +339,7 @@ func (m *Model) getFocusedModeTyped() components.FocusableInterface {
 	name := m.focused
 	switch name {
 	case "tasks":
-		return &m.tasksPane
+		return m.getOrCreateTaskPaneByQuery()
 	case "sidebar":
 		return &m.sidebar
 	case "statusbar":
@@ -305,7 +352,7 @@ func (m *Model) getFocusedModeTyped() components.FocusableInterface {
 func (m *Model) getFocusedModel() tea.Model {
 	switch m.focused {
 	case "tasks":
-		return m.tasksPane
+		return m.getOrCreateTaskPaneByQuery()
 	case "sidebar":
 		return m.sidebar
 	case "statusbar":
@@ -333,9 +380,7 @@ func (m *Model) handleTaskPane(msg tea.KeyMsg) tea.Cmd {
 		m.focusStatusBar()
 		m.statusBar.FocusFilter()
 	default:
-		var newM taskspane.Model
-		newM, cmd = m.tasksPane.UpdateTyped(msg)
-		m.tasksPane = newM
+		cmd = m.updateTaskPaneByQuery(msg)
 	}
 	return cmd
 }
@@ -347,7 +392,7 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
 
 	// post action in main app
 	switch mm.(type) {
-	case taskspane.Model:
+	case *taskspane.Model:
 		cmd = m.handleTaskPane(msg)
 	case comsidebar.Model:
 		mmTyped := mm.(comsidebar.Model)
@@ -356,7 +401,7 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
 	case comstatusbar.Model:
 		newM, cmd = mm.Update(msg)
 		m.statusBar = newM.(comstatusbar.Model)
-		m.tasksPane.Filter(m.statusBar.GetFilterInput())
+		m.getOrCreateTaskPaneByQuery().Filter(m.statusBar.GetFilterInput())
 
 		// post action
 		switch msg.String() {
@@ -369,6 +414,7 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
 	return cmd
 }
 
+// OnItemChange handle the sidebar menu change
 func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	m.statusBar.SetStatus("tab: " + tab + " item: " + item.Title())
 	m.states.query = &queries.TaskListQuery{}
@@ -386,7 +432,7 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	}
 	rts, _ := m.taskRichSvc.RichThem(tasks)
 	m.states.Tasks = rts
-	m.tasksPane, _ = m.tasksPane.UpdateTyped(m.states.Tasks)
+
 	//m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
 	m.statusBar.SetInfo1(fmt.Sprintf("./%d", len(m.states.Tasks)))
 
@@ -444,7 +490,7 @@ func InitialModel() *Model {
 		contextSvc:   contextSvc,
 		folderSvc:    folderSvc,
 		goalSvc:      goalSvc,
-		taskSvc:      taskExtSvc,
+		taskExtSvc:   taskExtSvc,
 		taskLocalSvc: taskLocalSvc,
 		states:       states,
 		err:          nil,
@@ -453,6 +499,7 @@ func InitialModel() *Model {
 		statusBar:    statusBar,
 		sidebar:      sidebar,
 		isInputting:  false,
+		tasksPanes:   map[string]*taskspane.Model{},
 	}
 
 	m.sidebar.RegisterItemChange(m.OnItemChange)
@@ -482,10 +529,7 @@ func InitialModel() *Model {
 	// TODO using register fun instead of invoke m in New func
 	m.fetcher = fetcher
 
-	taskPane := taskspane.InitModel(taskExtSvc, states.Tasks, &m)
-	m.tasksPane = taskPane
-
-	m.tasksPane.Focus()
+	m.getOrCreateTaskPaneByQuery().Focus()
 
 	return &m
 }

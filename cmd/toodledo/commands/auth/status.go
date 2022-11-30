@@ -24,7 +24,7 @@ func NewStatusCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.WithError(err).Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			me, err := app.AccountSvc.Me()
+			me, _, err := app.AccountSvc.CachedMe()
 			if err != nil {
 				logrus.WithError(err).Error("get auth info status")
 				return

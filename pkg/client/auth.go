@@ -17,10 +17,6 @@ import (
 	"time"
 )
 
-const AuthAccessToken = "auth.access_token"
-const AuthExpiredAt = "auth.expired_at"
-const AuthRefreshToken = "auth.refresh_token"
-
 // SimpleAuth ...
 type SimpleAuth struct {
 	accessToken string
@@ -42,16 +38,16 @@ func NewAuthFromConfig(cfg models.ToodledoConfig) (runtime.ClientAuthInfoWriter,
 	accessToken := cfg.AccessToken
 	rt := cfg.RefreshToken
 	if accessToken == "" {
-		logrus.WithField("key", AuthAccessToken).Error("empty")
-		return nil, fmt.Errorf("%s is empty", AuthAccessToken)
+		logrus.WithField("key", models.AuthAccessToken).Error("empty")
+		return nil, fmt.Errorf("%s is empty", models.AuthAccessToken)
 	}
 	expiredAt := cfg.ExpiredAt
 	if expiredAt == "" {
-		return nil, fmt.Errorf("%s is empty", AuthExpiredAt)
+		return nil, fmt.Errorf("%s is empty", models.AuthExpiredAt)
 	}
 	at, err := time.Parse(time.RFC3339, expiredAt)
 	if err != nil {
-		return nil, fmt.Errorf("%s is invalid", AuthExpiredAt)
+		return nil, fmt.Errorf("%s is invalid", models.AuthExpiredAt)
 	}
 
 	return NewAuthWithRefresh(cfg.ClientId, cfg.ClientSecret, accessToken, rt, at, SaveTokenWithViper)
@@ -83,7 +79,7 @@ func NewAuthWithRefresh(clientId, clientSecret, accessToken, refreshToken string
 	}
 
 	if refreshToken == "" {
-		return nil, fmt.Errorf("%s is empty", AuthRefreshToken)
+		return nil, fmt.Errorf("%s is empty", models.AuthRefreshToken)
 	}
 	newToken, err := regenerate(conf, &token)
 	if err != nil {
@@ -160,9 +156,19 @@ func regenerate(conf *oauth2.Config, oldToken *oauth2.Token) (*oauth2.Token, err
 // TODO refactor
 func SaveTokenWithViper(tok *oauth2.Token) error {
 	// TOTO move to Configs
-	viper.Set(AuthAccessToken, tok.AccessToken)
-	viper.Set(AuthExpiredAt, tok.Expiry.Format(time.RFC3339))
-	viper.Set(AuthRefreshToken, tok.RefreshToken)
+	viper.Set(models.AuthAccessToken, tok.AccessToken)
+	viper.Set(models.AuthExpiredAt, tok.Expiry.Format(time.RFC3339))
+	viper.Set(models.AuthRefreshToken, tok.RefreshToken)
+	err := viper.WriteConfig()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// SaveUserIdWithViper save user id to yaml
+func SaveUserIdWithViper(userID string) error {
+	viper.Set(models.AuthUserId, userID)
 	err := viper.WriteConfig()
 	if err != nil {
 		return err
@@ -171,18 +177,9 @@ func SaveTokenWithViper(tok *oauth2.Token) error {
 }
 
 func CleanAuthWithViper() error {
-	err := utilsviper.Unset(AuthAccessToken)
-	if err != nil {
-		return err
-	}
-	err = utilsviper.Unset(AuthRefreshToken)
-	if err != nil {
-		return err
-	}
-	err = utilsviper.Unset(AuthExpiredAt)
-	if err != nil {
-		return err
-	}
-
+	_ = utilsviper.Unset(models.AuthAccessToken)
+	_ = utilsviper.Unset(models.AuthRefreshToken)
+	_ = utilsviper.Unset(models.AuthExpiredAt)
+	_ = utilsviper.Unset(models.AuthUserId)
 	return nil
 }

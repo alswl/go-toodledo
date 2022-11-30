@@ -1,13 +1,5 @@
 package dal
 
-import (
-	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/pkg/errors"
-	boltdb "go.etcd.io/bbolt"
-	"os"
-	"path/filepath"
-)
-
 // Backend is an interface which describes what a store should support.
 // All methods are thread-safe
 // port from https://github.com/alibaba/pouch/blob/master/pkg/meta/backend.go
@@ -36,33 +28,4 @@ type Backend interface {
 	// Close releases all resources used by the store
 	// It does not make any changes to store.
 	Close() error
-}
-
-// NewBoltDB is used to make bolt metadata store instance.
-func NewBoltDB(config models.ToodledoConfigDatabase) (Backend, error) {
-	//opt := &boltdb.Options{
-	//	Timeout: time.Second * 10,
-	//}
-
-	dir := filepath.Dir(config.DataFile)
-	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
-		if err := os.MkdirAll(dir, 0755); err != nil {
-			return nil, errors.Wrapf(err, "create metadata path, %s", dir)
-		}
-	}
-
-	b := &bolt{}
-
-	db, err := boltdb.Open(config.DataFile, 0600, nil)
-	if err != nil {
-		return nil, errors.Wrapf(err, "open boltdb, %s", config.DataFile)
-	}
-	for _, bucket := range config.Buckets {
-		if err := b.prepare(db, []byte(bucket)); err != nil {
-			return nil, err
-		}
-	}
-	b.db = db
-
-	return b, nil
 }

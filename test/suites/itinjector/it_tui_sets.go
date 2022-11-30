@@ -6,6 +6,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/dal"
+	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/google/wire"
 )
@@ -14,6 +15,7 @@ var IntegrationTestTUISet = wire.NewSet(
 	common.NewCliConfigForTesting,
 	common.NewConfigCliConfig,
 	logging.ProvideLogger,
+	models.NewToodledoConfigDatabaseFromToodledoCliConfig,
 
 	dal.ProvideBackend,
 	client.NewToodledo,

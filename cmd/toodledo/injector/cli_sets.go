@@ -6,6 +6,7 @@ import (
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/dal"
+	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/google/wire"
 )
@@ -13,6 +14,8 @@ import (
 var CLISet = wire.NewSet(
 	common.NewCliConfigFromViper,
 	common.NewConfigCliConfig,
+	models.NewDefaultToodledoConfigDatabase,
+
 	logging.ProvideLogger,
 
 	dal.ProvideBackend,

@@ -21,7 +21,14 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+const defaultTasksCount = 10
+const maxTasksCount = 100
+
+var cmdQ = newDefaultListQuery()
+
 type cmdListQuery struct {
+	Limit int32
+
 	ContextID int64
 	Context   string
 	FolderID  int64
@@ -41,7 +48,12 @@ type cmdListQuery struct {
 	// Tags
 }
 
-var cmdQ = &cmdListQuery{}
+func newDefaultListQuery() *cmdListQuery {
+	// TODO cannot using Limit now, cannot detect 0 is filled or user input.
+	return &cmdListQuery{
+		Limit: 10,
+	}
+}
 
 func (q *cmdListQuery) PrepareIDs(contextSvc services.ContextService, goalSvc services.GoalService,
 	folderSvc services.FolderService) error {
@@ -109,6 +121,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 		Short: "List tasks",
 		Example: heredoc.Doc(`
 			$ toodledo tasks list
+			$ toodledo tasks list --limit 20
 			$ toodledo tasks list --context Work
 			$ toodledo tasks list --context-id 4455
 			$ toodledo tasks list --folder inbox
@@ -128,6 +141,9 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			err = validate.Struct(cmdQ)
 			if err != nil {
 				log.WithError(err).Fatal("validate failed")
+			}
+			if cmdQ.Limit == 0 {
+				cmdQ.Limit = defaultTasksCount
 			}
 			app, err := injector.InitCLIApp()
 			if err != nil {
@@ -150,7 +166,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				appExt.TaskExtSvc,
 				app.AccountSvc,
 			)
-			err = fetcher.Fetch(fetchers.NewNoOpStatusDescriber(), true)
+			err = fetcher.Fetch(fetchers.NewNoOpStatusDescriber(), false)
 			if err != nil {
 				log.WithError(err).Fatal("fetch failed")
 				return
@@ -171,6 +187,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				log.Error(err)
 				return
 			}
+			tasks = tasks[:cmdQ.Limit]
 			sorted, err := services.SortSubTasks(tasks, subtasksview.ModeString2Type(cmdQ.SubTasksMode))
 			rts, _ := taskRichSvc.RichThem(sorted)
 			switch cmdQ.Format {
@@ -186,7 +203,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	err := utils.BindFlagsByQuery(cmd, *cmdQ)
+	err := utils.BindFlagsByQuery(cmd, cmdListQuery{})
 	if err != nil {
 		logrus.WithError(err).Fatal("bind flags failed")
 	}
