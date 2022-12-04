@@ -12,10 +12,11 @@ import (
 )
 
 var CLISet = wire.NewSet(
-	common.NewCliConfigFromViper,
+	common.NewCliConfigMockForTesting,
 	common.NewConfigCliConfig,
-	logging.ProvideLogger,
 	models.NewDefaultToodledoConfigDatabase,
+
+	logging.ProvideLogger,
 
 	dal.ProvideBackend,
 	client.NewToodledo,
@@ -29,9 +30,9 @@ var CLISet = wire.NewSet(
 	services.ProvideTaskLocalExtService,
 	services.ProvideTaskLocalExtServiceIft,
 	services.NewFolderService,
-	services.NewFolderCachedService,
+	services.ProvideFolderCachedService,
 	services.NewContextService,
-	services.NewContextCachedService,
+	services.ProvideContextCachedService,
 	services.NewGoalService,
 	services.NewGoalCachedService,
 	services.NewSavedSearchService,

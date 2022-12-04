@@ -45,13 +45,20 @@ func NewCliConfigForTesting() (models.ToodledoCliConfig, error) {
 // NewCliConfigMockForTesting ...
 func NewCliConfigMockForTesting() (models.ToodledoCliConfig, error) {
 	var conf = models.ToodledoCliConfig{
-		Auth:           models.ToodledoConfig{},
-		Environment:    map[string]*models.ToodledoConfigEnvironment{},
-		DefaultContext: "default",
+		Auth: models.ToodledoConfig{
+			UserID:       "test-user-id",
+			ClientID:     "test-client-id",
+			ClientSecret: "test-client-secret",
+			AccessToken:  "test-access-token",
+			ExpiredAt:    "2099-11-26T01:27:20+08:00",
+			RefreshToken: "test-refresh-token",
+		},
 		Database: models.ToodledoConfigDatabase{
 			DataFile: "tmp.db",
 			Buckets:  nil,
 		},
+		Environment:    map[string]*models.ToodledoConfigEnvironment{},
+		DefaultContext: "default",
 	}
 	return conf, nil
 }

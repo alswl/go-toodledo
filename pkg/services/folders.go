@@ -72,7 +72,6 @@ func (s *folderService) Delete(name string) error {
 	return nil
 }
 
-// Rename ...
 func (s *folderService) Rename(name string, newName string) (*models.Folder, error) {
 	if name == newName {
 		logrus.Error("not changed")
