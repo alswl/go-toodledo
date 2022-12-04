@@ -64,9 +64,7 @@ all: download generate-code fmt test build
 
 .PHONY: install-dev-tools
 install-dev-tools:
-	if ! which golangci-lint > /dev/null; then \
-		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.1
-	fi
+	@bash ./hack/install-dev-tools.sh
 
 .PHONY: download
 download:
