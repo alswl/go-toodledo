@@ -2,6 +2,7 @@ package environments
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -32,11 +33,9 @@ func NewCurrentCmd(f *cmdutil.Factory) *cobra.Command {
 			}
 			if matched, ok := cs[name]; !ok {
 				logrus.WithField("name", name).Error("not found")
-				return
 			} else {
-				fmt.Printf("%s, %s\n", matched.Name, matched.Project)
+				_, _ = fmt.Fprintf(f.IOStreams.Out, "%s, %s\n", matched.Name, matched.Project)
 			}
 		},
 	}
-
 }

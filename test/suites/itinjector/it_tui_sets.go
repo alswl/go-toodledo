@@ -19,7 +19,7 @@ var IntegrationTestTUISet = wire.NewSet(
 
 	dal.ProvideBackend,
 	client.NewToodledo,
-	//client.NewAuthFromConfig,
+	// client.NewAuthFromConfig,
 	client.NewAuthFromConfig,
 	client.NewOAuth2ConfigFromConfigs,
 
@@ -38,7 +38,7 @@ var IntegrationTestTUISet = wire.NewSet(
 	services.NewTaskRichService,
 
 	// wire not support generic now
-	//informers.ProvideTaskInformer,
+	// informers.ProvideTaskInformer,
 
 	app.NewToodledoTUIApp,
 )

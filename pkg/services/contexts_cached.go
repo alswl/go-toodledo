@@ -2,11 +2,12 @@ package services
 
 import (
 	"encoding/json"
+	"sync"
+
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/thoas/go-funk"
-	"sync"
 )
 
 var ContextBucket = "contexts"
@@ -23,7 +24,8 @@ var contextLocalServiceInstance ContextPersistenceService
 var contextLocalServiceOnce sync.Once
 
 // NewContextCachedService ...
-func NewContextCachedService(contextsvc ContextService, accountSvc AccountService, db dal.Backend) ContextPersistenceService {
+func NewContextCachedService(contextsvc ContextService, accountSvc AccountService,
+	db dal.Backend) ContextPersistenceService {
 	s := contextCachedService{
 		svc:        contextsvc,
 		db:         db,
@@ -32,7 +34,8 @@ func NewContextCachedService(contextsvc ContextService, accountSvc AccountServic
 	return &s
 }
 
-func ProvideContextCachedService(svc ContextService, accountSvc AccountService, db dal.Backend) ContextPersistenceService {
+func ProvideContextCachedService(svc ContextService, accountSvc AccountService,
+	db dal.Backend) ContextPersistenceService {
 	if contextLocalServiceInstance == nil {
 		contextLocalServiceOnce.Do(func() {
 			contextLocalServiceInstance = NewContextCachedService(svc, accountSvc, db)
@@ -70,7 +73,7 @@ func (s *contextCachedService) Rename(name string, newName string) (*models.Cont
 }
 
 func (s *contextCachedService) Archive(id int, isArchived bool) (*models.Context, error) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
@@ -107,7 +110,7 @@ func (s *contextCachedService) FindByID(id int64) (*models.Context, error) {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Context) bool {
+	filtered, _ := funk.Filter(fs, func(x *models.Context) bool {
 		return x.ID == id
 	}).([]*models.Context)
 	if len(filtered) == 0 {
@@ -124,7 +127,7 @@ func (s *contextCachedService) Find(name string) (*models.Context, error) {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Context) bool {
+	filtered, _ := funk.Filter(fs, func(x *models.Context) bool {
 		return x.Name == name
 	}).([]*models.Context)
 	if len(filtered) == 0 {

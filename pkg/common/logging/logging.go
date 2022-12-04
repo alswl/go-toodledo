@@ -2,7 +2,6 @@ package logging
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"io"
 	"os"
 	"path"
@@ -11,12 +10,14 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 var formatter = &logrus.TextFormatter{
 	CallerPrettyfier: func(frame *runtime.Frame) (function string, file string) {
 		repoPath := os.Getenv("GOPATH") + "/src/github.com/alswl/go-toodledo"
-		filename := strings.Replace(frame.File, repoPath, "", -1)
+		filename := strings.ReplaceAll(frame.File, repoPath, "")
 		return fmt.Sprintf("%s()", frame.Function), fmt.Sprintf("%s:%d", filename, frame.Line)
 	},
 	TimestampFormat: time.RFC3339,
@@ -41,8 +42,8 @@ func NewLogger() logrus.FieldLogger {
 func NewFileLogger(path string) logrus.FieldLogger {
 	dir, file := filepath.Split(path)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		err := os.MkdirAll(path, os.ModePerm)
-		if err != nil {
+		ierr := os.MkdirAll(path, os.ModePerm)
+		if ierr != nil {
 			log := logrus.New()
 			log.WithField("dir", dir).WithField("file", file).WithError(err).Error("create log dir")
 			return log
@@ -73,8 +74,8 @@ func GetLogger(name string) logrus.FieldLogger {
 	path := path.Join(factory.logRoot, name+".log")
 	dir, file := filepath.Split(path)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		err := os.MkdirAll(path, os.ModePerm)
-		if err != nil {
+		ierr := os.MkdirAll(path, os.ModePerm)
+		if ierr != nil {
 			log := logrus.New()
 			log.WithField("dir", dir).WithField("file", file).WithError(err).Error("create log dir")
 			return log

@@ -6,13 +6,14 @@ import (
 )
 
 // Version ...
-var (
+const (
 	Version   = "0.0.0"
 	Commit    = "UNKNOWN"
 	Package   = "github.com/alswl/toodledo"
 	BuildDate = "UNKNOWN"
-	GoVersion = runtime.Version()
 )
+
+var GoVersion = runtime.Version()
 
 // Message ...
 func Message() string {

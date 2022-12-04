@@ -2,8 +2,10 @@ package models
 
 import (
 	"fmt"
-	"github.com/alswl/go-toodledo/pkg/utils"
+	"strconv"
 	"time"
+
+	"github.com/alswl/go-toodledo/pkg/utils"
 )
 
 type RichTask struct {
@@ -11,9 +13,9 @@ type RichTask struct {
 	TheContext Context `json:"the_context"`
 	TheFolder  Folder  `json:"the_folder"`
 	TheGoal    Goal    `json:"the_goal"`
-	//AddedByUser *Account `json:"added_by_user"`
-	//ParentTask *Task `json:"parent_task"`
-	//PreviousTask *Task `json:"previous_task"`
+	// AddedByUser *Account `json:"added_by_user"`
+	// ParentTask *Task `json:"parent_task"`
+	// PreviousTask *Task `json:"previous_task"`
 
 	// Due
 	// Repeat
@@ -59,20 +61,19 @@ func (t RichTask) TimerString() string {
 		return ""
 	}
 	if t.Timeron == 0 {
-		duration := fmt.Sprintf("%s", time.Duration((t.Timer)*1000*1000*1000))
-		return fmt.Sprintf("%s", duration)
-	} else {
-		now := time.Now().Unix()
-		duration := fmt.Sprintf("%s", time.Duration((now-t.Timeron+t.Timer)*1000*1000*1000))
-		return fmt.Sprintf("> %s", duration)
+		duration := strconv.FormatInt((t.Timer)*1000*1000*1000, 10)
+		return duration
 	}
+	now := time.Now().Unix()
+	duration := strconv.FormatInt((now-t.Timeron+t.Timer)*1000*1000*1000, 10)
+	return fmt.Sprintf("> %s", duration)
 }
 
 func (t RichTask) LengthString() string {
 	if t.Length == 0 {
 		return ""
 	}
-	return fmt.Sprintf("%s", time.Duration(t.Length*1000*1000*1000))
+	return strconv.FormatInt(t.Length*1000*1000*1000, 10)
 }
 
 func (t RichTask) TagString() string {
@@ -82,7 +83,6 @@ func (t RichTask) TagString() string {
 func (t RichTask) CompletedString() string {
 	if t.Task.Completed == 0 {
 		return "[ ]"
-	} else {
-		return "[X]"
 	}
+	return "[X]"
 }

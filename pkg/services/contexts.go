@@ -3,6 +3,8 @@ package services
 import (
 	"errors"
 	"fmt"
+	"strconv"
+
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/context"
 	"github.com/alswl/go-toodledo/pkg/common"
@@ -11,7 +13,6 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
-	"strconv"
 )
 
 // ContextService ...
@@ -25,7 +26,7 @@ type ContextService interface {
 }
 
 // ContextPersistenceService is a cached service
-// it synced interval by fetcher
+// it synced interval by fetcher.
 type ContextPersistenceService interface {
 	Synchronizable
 	ContextService
@@ -102,7 +103,7 @@ func (s *contextService) Find(name string) (*models.Context, error) {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Context) bool {
+	filtered, _ := funk.Filter(fs, func(x *models.Context) bool {
 		return x.Name == name
 	}).([]*models.Context)
 	if len(filtered) == 0 {
@@ -119,7 +120,7 @@ func (s *contextService) FindByID(id int64) (*models.Context, error) {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Context) bool {
+	filtered, _ := funk.Filter(fs, func(x *models.Context) bool {
 		return x.ID == id
 	}).([]*models.Context)
 	if len(filtered) == 0 {
@@ -146,7 +147,7 @@ func FindContextByName(auth runtime.ClientAuthInfoWriter, name string) (*models.
 	if err != nil {
 		return nil, err
 	}
-	filtered := funk.Filter(ts.Payload, func(x *models.Context) bool {
+	filtered, _ := funk.Filter(ts.Payload, func(x *models.Context) bool {
 		return x.Name == name
 	}).([]*models.Context)
 	if len(filtered) == 0 {

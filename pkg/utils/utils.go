@@ -2,33 +2,33 @@ package utils
 
 import (
 	"fmt"
-	"github.com/gobeam/stringy"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"os/exec"
 	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gobeam/stringy"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 // ChinaTimeZone is timezone of China
 // TODO using configuration time zone
 var ChinaTimeZone = time.FixedZone("CST", 8*3600)
 
-// Bool2int ...
-func Bool2int(input bool) (output int) {
+func Bool2int(input bool) int {
+	output := 0
 	if input {
 		output = 1
 	} else {
 		output = 0
 	}
-	return
+	return output
 }
 
-// Bool2ints ...
 func Bool2ints(input bool) (output string) {
 	return strconv.Itoa(Bool2int(input))
 }
@@ -53,7 +53,8 @@ func OpenBrowser(url string) {
 }
 
 // BindFlagsByQuery bind flags to query, the query support basic types, and support `validate:"required"`
-// obj must be a struct
+// obj must be a struct.
+// nolint: exhaustive // TODO
 func BindFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
 	if reflect.ValueOf(obj).Type().Kind() != reflect.Struct {
 		return fmt.Errorf("%s is not a struct", reflect.ValueOf(obj).Type().Kind())
@@ -114,7 +115,8 @@ func BindFlagsByQuery(cmd *cobra.Command, obj interface{}) error {
 }
 
 // FillQueryByFlags fill struct by cmd query
-// obj must be a pointer
+// obj must be a pointer.
+// nolint: exhaustive // TODO
 func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 	if reflect.ValueOf(obj).Type().Kind() != reflect.Ptr {
 		return fmt.Errorf("%s is not a pointer", reflect.ValueOf(obj).Type().Kind())
@@ -126,8 +128,8 @@ func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 		f := getType.Field(i)
 		v := getValue.Field(i)
 		name := stringy.New(f.Name).KebabCase().ToLower()
-		//desc := f.Tag.Get("description")
-		//if desc == "" {
+		// desc := f.Tag.Get("description")
+		// if desc == "" {
 		//	desc = name
 		//}
 		if !v.CanSet() {

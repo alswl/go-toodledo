@@ -2,12 +2,13 @@ package tasks
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 func NewStopCmd(_ *cmdutil.Factory) *cobra.Command {
@@ -33,7 +34,7 @@ func NewStopCmd(_ *cmdutil.Factory) *cobra.Command {
 				logrus.WithField("id", id).WithError(err).Fatal("stop task")
 				return
 			}
-			fmt.Println("stopped")
+			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "stopped")
 		},
 	}
 }

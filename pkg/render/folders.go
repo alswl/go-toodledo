@@ -2,6 +2,7 @@ package render
 
 import (
 	"bytes"
+
 	"github.com/alswl/go-toodledo/pkg/models"
 
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -14,7 +15,7 @@ func Tables4Folder(folders []*models.Folder) string {
 	t := table.NewWriter()
 	t.SetOutputMirror(buf)
 	// TODO Color
-	//t.SetStyle(table.StyleColoredBright)
+	// t.SetStyle(table.StyleColoredBright)
 	t.SetStyle(table.StyleLight)
 	t.Style().Options.DrawBorder = false
 	t.AppendHeader(table.Row{"#", "Name", "Archived"})
@@ -52,7 +53,7 @@ func Tables4Goal(goals []*models.Goal) string {
 	t := table.NewWriter()
 	t.SetOutputMirror(buf)
 	// TODO Color
-	//t.SetStyle(table.StyleColoredBright)
+	// t.SetStyle(table.StyleColoredBright)
 	t.SetStyle(table.StyleLight)
 	t.Style().Options.DrawBorder = false
 	t.AppendHeader(table.Row{"#", "Name", "Level", "Private", "Archived", "Contributes", "Note"})

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/spf13/viper"
 	"github.com/thoas/go-funk"
@@ -32,23 +31,22 @@ func (s *environmentService) ListAll() ([]*models.EnvironmentWithKey, error) {
 	for k, v := range cs {
 		cks = append(cks, &models.EnvironmentWithKey{
 			Key:         k,
-			Environment: &v,
+			Environment: v,
 		})
-		//fmt.Printf("%s: %s, %s\n", k, v.Name, v.Project)
+		// fmt.Printf("%s: %s, %s\n", k, v.Name, v.Project)
 	}
 	return cks, nil
 }
 
-// QueryAllKeys ...
 func (s *environmentService) ListAllKeys() ([]string, error) {
 	cks, err := s.ListAll()
 	if err != nil {
 		return []string{}, err
 	}
-	keys := funk.Map(cks, func(x *models.EnvironmentWithKey) string {
+	keys, _ := funk.Map(cks, func(x *models.EnvironmentWithKey) string {
 		// TODO using description, v2 completions
-		//return fmt.Sprintf("%s", x.Key, x.Name)
-		return fmt.Sprintf("%s", x.Key)
+		// return fmt.Sprintf("%s", x.Key, x.Name)
+		return x.Key
 	}).([]string)
 	return keys, nil
 }

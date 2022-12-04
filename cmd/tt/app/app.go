@@ -3,6 +3,10 @@ package app
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/cmd/tt/components"
 	comsidebar "github.com/alswl/go-toodledo/cmd/tt/components/sidebar"
@@ -20,9 +24,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
-	"strconv"
-	"sync"
-	"time"
 )
 
 var (
@@ -48,7 +49,7 @@ type RefreshMsg struct {
 }
 
 // Model is the main tt app
-// it was singleton
+// it was singleton.
 type Model struct {
 	taskRichSvc   services.TaskRichService
 	contextExtSvc services.ContextPersistenceService
@@ -68,14 +69,14 @@ type Model struct {
 	focused string
 	// TODO ready check
 	ready bool
-	//isSidebarOpen bool
+	// isSidebarOpen bool
 
 	// view
 	tasksPanes map[string]*taskspane.Model
 	sidebar    comsidebar.Model
 	statusBar  comstatusbar.Model
 	// TODO help pane
-	//help          help.Model
+	// help          help.Model
 	isInputting bool
 	fetcher     fetchers.DaemonFetcher
 }
@@ -189,7 +190,7 @@ func (m *Model) Init() tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-// handleCommandMode handles command mode, return false if continue
+// handleCommandMode handles command mode, return false if continue.
 func (m *Model) handleCommandMode(msg tea.KeyMsg) (tea.Cmd, bool) {
 	switch msg.String() {
 	case "tab":
@@ -224,22 +225,20 @@ func (m *Model) handleRefresh(isHardRefresh bool) tea.Cmd {
 	}
 	// this cmd is works like promise
 	cmd := func() tea.Msg {
-		select {
-		case success := <-refreshedChan:
-			if !success {
-				m.statusBar.SetStatus("ERROR: refresh failed")
-				return nil
-			}
-			tasks, ierr := m.taskLocalSvc.ListAllByQuery(m.states.query)
-			if ierr != nil {
-				m.log.WithError(ierr).Error("list tasks")
-			}
-			rts, _ := m.taskRichSvc.RichThem(tasks)
-			m.states.Tasks = rts
-
-			_ = m.updateTaskPaneByQuery(rts)
-			return RefreshMsg{}
+		success := <-refreshedChan
+		if !success {
+			m.statusBar.SetStatus("ERROR: refresh failed")
+			return nil
 		}
+		tasks, ierr := m.taskLocalSvc.ListAllByQuery(m.states.query)
+		if ierr != nil {
+			m.log.WithError(ierr).Error("list tasks")
+		}
+		rts, _ := m.taskRichSvc.RichThem(tasks)
+		m.states.Tasks = rts
+
+		_ = m.updateTaskPaneByQuery(rts)
+		return RefreshMsg{}
 	}
 	return cmd
 }
@@ -247,7 +246,9 @@ func (m *Model) handleRefresh(isHardRefresh bool) tea.Cmd {
 func (m *Model) handleResize(msg tea.WindowSizeMsg) {
 	m.states.width = msg.Width
 	m.states.height = msg.Height
-	sideBarWidth := msg.Width * 2 / 12
+	const twoColumns = 2
+	const totalColumns = 12
+	sideBarWidth := msg.Width * twoColumns / totalColumns
 	m.sidebar.Resize(sideBarWidth, msg.Height-1)
 	taskPaneWidth := msg.Width - sideBarWidth
 	for _, p := range m.tasksPanes {
@@ -263,31 +264,30 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// 3. focused component
 
 	var cmd tea.Cmd
-	switch msg := msg.(type) {
+	switch typedMsg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.handleResize(msg)
+		m.handleResize(typedMsg)
 	case RefreshMsg:
 		// nothing, only ui refresh
 		return m, cmd
 	case tea.KeyMsg: // handle event bubble
 		// 1. global keymap
-		if funk.ContainsString([]string{"ctrl+c"}, msg.String()) {
-			switch msg.String() {
-			case "ctrl+c":
+		if funk.ContainsString([]string{"ctrl+c"}, typedMsg.String()) {
+			if typedMsg.String() == "ctrl+c" {
 				return m, tea.Quit
 			}
 		}
 
 		// 2. main app, command mode
 		if !m.isInputting {
-			newCmd, isContinue := m.handleCommandMode(msg)
+			newCmd, isContinue := m.handleCommandMode(typedMsg)
 			if !isContinue {
 				return m, newCmd
 			}
 		}
 
 		// 3. sub focused component
-		cmd = m.updateFocusedModel(msg)
+		cmd = m.updateFocusedModel(typedMsg)
 
 		// normal keypress
 	}
@@ -320,16 +320,15 @@ func (m *Model) getOrCreateTaskPaneByQuery() *taskspane.Model {
 	}
 	if p, ok := m.tasksPanes[key]; ok {
 		return p
-	} else {
-		newP := taskspane.InitModel(m.taskExtSvc, m.states.Tasks, m)
-		//// trigger ui redraw
-		m.tasksPanes[key] = &newP
-		m.handleResize(tea.WindowSizeMsg{
-			Width:  m.states.width,
-			Height: m.states.height,
-		})
-		return &newP
 	}
+	newP := taskspane.InitModel(m.taskExtSvc, m.states.Tasks, m)
+	//// trigger ui redraw
+	m.tasksPanes[key] = &newP
+	m.handleResize(tea.WindowSizeMsg{
+		Width:  m.states.width,
+		Height: m.states.height,
+	})
+	return &newP
 }
 
 func (m *Model) updateTaskPaneByQuery(msg tea.Msg) tea.Cmd {
@@ -377,7 +376,6 @@ func (m *Model) getFocusedModel() tea.Model {
 		return m.sidebar
 	case "statusbar":
 		return m.statusBar
-
 	}
 	panic("unreachable")
 }
@@ -411,16 +409,15 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
 	mm := m.getFocusedModel()
 
 	// post action in main app
-	switch mm.(type) {
+	switch typedMM := mm.(type) {
 	case *taskspane.Model:
 		cmd = m.handleTaskPane(msg)
 	case comsidebar.Model:
-		mmTyped := mm.(comsidebar.Model)
-		m.sidebar, cmd = mmTyped.UpdateTyped(msg)
+		m.sidebar, cmd = typedMM.UpdateTyped(msg)
 		return cmd
 	case comstatusbar.Model:
 		newM, cmd = mm.Update(msg)
-		m.statusBar = newM.(comstatusbar.Model)
+		m.statusBar, _ = newM.(comstatusbar.Model)
 		m.getOrCreateTaskPaneByQuery().Filter(m.statusBar.GetFilterInput())
 
 		// post action
@@ -434,7 +431,7 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
 	return cmd
 }
 
-// OnItemChange handle the sidebar menu change
+// OnItemChange handle the sidebar menu change.
 func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	m.statusBar.SetStatus("tab: " + tab + " item: " + item.Title())
 	m.states.query = &queries.TaskListQuery{}
@@ -453,7 +450,7 @@ func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
 	rts, _ := m.taskRichSvc.RichThem(tasks)
 	m.states.Tasks = rts
 
-	//m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
+	// m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
 	m.statusBar.SetInfo1(fmt.Sprintf("./%d", len(m.states.Tasks)))
 
 	return nil

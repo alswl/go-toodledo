@@ -2,6 +2,7 @@ package environments
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -45,8 +46,7 @@ func NewSwitchCmd(f *cmdutil.Factory) *cobra.Command {
 			}
 			viper.Set(DefaultEnvironmentKey, name)
 			_ = viper.WriteConfig()
-			fmt.Println("Done")
+			_, _ = fmt.Fprintln(f.IOStreams.Out, "Switch successfully")
 		},
 	}
-
 }

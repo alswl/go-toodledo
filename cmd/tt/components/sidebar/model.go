@@ -20,9 +20,9 @@ var defaultTabs = []string{
 	constants.Contexts,
 	constants.Folders,
 	constants.Goals,
-	//"Priority",
-	//"Tags",
-	//"Search",
+	// "Priority",
+	// "Tags",
+	// "Search",
 }
 
 type Model struct {
@@ -66,7 +66,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// refresh
 	case []models.Context:
 		m.Contexts = msg
-		for i, _ := range m.contextList.Items() {
+		for i := range m.contextList.Items() {
 			m.contextList.RemoveItem(i)
 		}
 		for _, c := range m.Contexts {
@@ -74,7 +74,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case []models.Folder:
 		m.Folders = msg
-		for i, _ := range m.folderList.Items() {
+		for i := range m.folderList.Items() {
 			m.folderList.RemoveItem(i)
 		}
 		for _, c := range m.Folders {
@@ -82,7 +82,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case []models.Goal:
 		m.Goals = msg
-		for i, _ := range m.goalList.Items() {
+		for i := range m.goalList.Items() {
 			m.goalList.RemoveItem(i)
 		}
 		for _, c := range m.Goals {
@@ -92,21 +92,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		changed := false
 		currentItem0 := m.getVisibleList().SelectedItem()
-		currentItem := currentItem0.(Item)
+		currentItem, _ := currentItem0.(Item)
 		newItem := currentItem
 		switch msg.String() {
 		case "h":
 			m.updateTab(-1)
-			newItem = m.getVisibleList().SelectedItem().(Item)
+			newItem, _ = m.getVisibleList().SelectedItem().(Item)
 			changed = true
 		case "l":
 			m.updateTab(+1)
-			newItem = m.getVisibleList().SelectedItem().(Item)
+			newItem, _ = m.getVisibleList().SelectedItem().(Item)
 			changed = true
 		default:
 			// dirty event handle without differ
 			cmd = m.updateVisibleList(msg)
-			newItem = m.getVisibleList().SelectedItem().(Item)
+			newItem, _ = m.getVisibleList().SelectedItem().(Item)
 			if newItem.id != currentItem.id {
 				changed = true
 			}
@@ -140,7 +140,7 @@ func (m Model) View() string {
 	if m.IsFocused() {
 		style = styles.FocusedPaneStyle.Copy()
 	}
-	//return style.
+	// return style.
 	//	Width(m.Viewport.Width).
 	//	Height(m.Viewport.Height).
 	//	Render(wrap.String(
@@ -214,7 +214,7 @@ func InitModel(p Properties) Model {
 		folderList:              common.NewSimpleList(),
 		goalList:                common.NewSimpleList(),
 	}
-	//if len(m.list.Items()) > 0 {
+	// if len(m.list.Items()) > 0 {
 	//	m.list.Select(0)
 	//}
 	m.Blur()

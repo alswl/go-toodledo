@@ -1,13 +1,14 @@
 package fetchers
 
 import (
+	"sync"
+
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/sirupsen/logrus"
-	"sync"
 )
 
 // StatusDescriber is a interface for describe the status of fetcher
-// it gets progress from syncer, and invoke registered callback
+// it gets progress from syncer, and invoke registered callback.
 type StatusDescriber interface {
 	Progress() (int, int)
 	SetProgress(current int, total int)
@@ -28,8 +29,8 @@ type statusDescriber struct {
 	lock    sync.Mutex
 	current int
 	total   int
-	err     error
-	message string
+	// err     error
+	// message string
 
 	syncingFn func() error
 	successFn func() error
@@ -83,9 +84,9 @@ func (s *statusDescriber) Syncing() {
 func (s *statusDescriber) Error(err error) {
 	if s.errorFn != nil {
 		go func() {
-			err := s.errorFn(err)
-			if err != nil {
-				s.log.WithError(err).Error("errorFn")
+			ierr := s.errorFn(err)
+			if ierr != nil {
+				s.log.WithError(ierr).Error("errorFn")
 			}
 		}()
 	}

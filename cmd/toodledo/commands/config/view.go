@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/spf13/cobra"
@@ -20,7 +21,7 @@ func NewViewCmd(f *cmdutil.Factory) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			settings := viper.AllSettings()
 			bs, _ := yaml.Marshal(settings)
-			fmt.Println(string(bs))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, (string)(bs))
 		},
 	}
 }

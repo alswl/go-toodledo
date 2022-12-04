@@ -1,8 +1,9 @@
 package sidebar
 
 import (
-	"github.com/charmbracelet/bubbles/list"
 	"testing"
+
+	"github.com/charmbracelet/bubbles/list"
 )
 
 func TestSidebar(t *testing.T) {
@@ -38,5 +39,5 @@ func TestSidebar(t *testing.T) {
 		contextList: list.New(items, list.NewDefaultDelegate(), 0, 0),
 	}
 	view := m.View()
-	println(view)
+	t.Log(view)
 }

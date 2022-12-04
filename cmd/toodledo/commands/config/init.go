@@ -3,6 +3,7 @@ package config
 import (
 	"bytes"
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -45,7 +46,7 @@ you can register your own app here: https://api.toodledo.com/3/account/doc_regis
 			if initOpts.Endpoint != "" {
 				config.Endpoint = initOpts.Endpoint
 			}
-			config.Auth.ClientId = clientID
+			config.Auth.ClientID = clientID
 			config.Auth.ClientSecret = clientSecret
 			bs, _ := yaml.Marshal(config)
 			_ = viper.ReadConfig(bytes.NewBuffer(bs))
@@ -54,7 +55,7 @@ you can register your own app here: https://api.toodledo.com/3/account/doc_regis
 				logrus.WithError(err).Fatal("write config file")
 				return
 			}
-			fmt.Println("ok")
+			_, _ = fmt.Fprintln(f.IOStreams.Out, "ok")
 		},
 	}
 	cmd.Flags().StringVarP(&initOpts.Endpoint, "endpoint", "e", "https://api.toodledo.com", "toodledo api hostname")

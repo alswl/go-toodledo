@@ -1,9 +1,10 @@
 package tasks
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/thoas/go-funk"
-	"testing"
 )
 
 func TestIsZero(t *testing.T) {

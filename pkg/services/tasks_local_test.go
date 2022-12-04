@@ -1,20 +1,23 @@
-package services
+package services_test
 
 import (
 	"encoding/json"
+	"testing"
+	"time"
+
+	"github.com/alswl/go-toodledo/pkg/services"
+
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	mockdal "github.com/alswl/go-toodledo/test/mock/dal"
 	mockservices "github.com/alswl/go-toodledo/test/mock/services"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
-	"time"
 )
 
 func TestListAllByQueryNotDown(t *testing.T) {
 	backend := mockdal.Backend{}
-	var bytes = [][]byte{}
+	var bytes [][]byte
 	task := models.Task{
 		Title: "task",
 	}
@@ -28,13 +31,12 @@ func TestListAllByQueryNotDown(t *testing.T) {
 	bytes = append(bytes, marshal)
 
 	backend.On("List", mock.Anything).Return(bytes, nil)
-	s := newTaskLocalExtService(&mockservices.TaskService{}, &mockservices.AccountService{}, &backend)
+	s := services.NewTaskLocalExtService(&mockservices.TaskService{}, &mockservices.AccountService{}, &backend)
 
 	query, err := s.ListAllByQuery(&queries.TaskListQuery{})
 	assert.NoError(t, err)
 	assert.NotNil(t, query)
 	assert.Len(t, query, 1)
-
 }
 
 func TestListAllByQueryDoneToday(t *testing.T) {
@@ -53,11 +55,10 @@ func TestListAllByQueryDoneToday(t *testing.T) {
 	bytes = append(bytes, marshal)
 
 	backend.On("List", mock.Anything).Return(bytes, nil)
-	s := newTaskLocalExtService(&mockservices.TaskService{}, &mockservices.AccountService{}, &backend)
+	s := services.NewTaskLocalExtService(&mockservices.TaskService{}, &mockservices.AccountService{}, &backend)
 
 	query, err := s.ListAllByQuery(&queries.TaskListQuery{})
 	assert.NoError(t, err)
 	assert.NotNil(t, query)
 	assert.Len(t, query, 2)
-
 }

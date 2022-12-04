@@ -2,6 +2,7 @@ package goals
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -34,7 +35,7 @@ func NewRenameCmd(f *cmdutil.Factory) *cobra.Command {
 			}
 
 			renamed, _ := svc.Rename(name, newName)
-			fmt.Print(render.Tables4Goal([]*models.Goal{renamed}))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4Goal([]*models.Goal{renamed}))
 		},
 	}
 }

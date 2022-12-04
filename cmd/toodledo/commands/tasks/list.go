@@ -3,6 +3,7 @@ package tasks
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -22,10 +23,10 @@ import (
 )
 
 const defaultTasksCount = 10
-const maxTasksCount = 100
 
 var cmdQ = newDefaultListQuery()
 
+// nolint: lll // ignore long line length
 type cmdListQuery struct {
 	Limit int32
 
@@ -50,8 +51,9 @@ type cmdListQuery struct {
 
 func newDefaultListQuery() *cmdListQuery {
 	// TODO cannot using Limit now, cannot detect 0 is filled or user input.
+	const limit = 10
 	return &cmdListQuery{
-		Limit: 10,
+		Limit: limit,
 	}
 }
 
@@ -92,11 +94,11 @@ func (q *cmdListQuery) ToQuery() (*queries.TaskListQuery, error) {
 	query.GoalID = q.GoalID
 	query.DueDate = q.DueDate
 	if q.Priority != "" {
-		p := tpriority.PriorityString2Type(q.Priority)
+		p := tpriority.String2Type(q.Priority)
 		query.Priority = &p
 	}
 	if q.Status != "" {
-		s := tstatus.StatusString2Type(q.Status)
+		s := tstatus.String2Type(q.Status)
 		query.Status = &s
 	}
 	// TODO validate incomplete and complete
@@ -188,17 +190,17 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 			tasks = tasks[:cmdQ.Limit]
-			sorted, err := services.SortSubTasks(tasks, subtasksview.ModeString2Type(cmdQ.SubTasksMode))
+			sorted, _ := services.SortSubTasks(tasks, subtasksview.ModeString2Type(cmdQ.SubTasksMode))
 			rts, _ := taskRichSvc.RichThem(sorted)
 			switch cmdQ.Format {
 			case "json":
 				bs, _ := json.Marshal(rts)
-				fmt.Println(string(bs))
+				_, _ = fmt.Fprintln(f.IOStreams.Out, (string)(bs))
 			case "yaml":
 				bs, _ := yaml.Marshal(rts)
-				fmt.Println(string(bs))
+				_, _ = fmt.Fprintln(f.IOStreams.Out, (string)(bs))
 			default:
-				fmt.Println(render.Tables4RichTasks(rts))
+				_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4RichTasks(rts))
 			}
 		},
 	}

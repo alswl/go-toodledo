@@ -11,6 +11,6 @@ type Environment struct {
 
 // EnvironmentWithKey ...
 type EnvironmentWithKey struct {
-	*Environment
+	Environment
 	Key string
 }

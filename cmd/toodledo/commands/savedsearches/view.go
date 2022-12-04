@@ -2,6 +2,7 @@ package savedsearches
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -33,7 +34,7 @@ func NewViewCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.WithError(err).Fatal("list saved searches")
 				return
 			}
-			filtered := funk.Filter(all, func(x *models.SavedSearch) bool {
+			filtered, _ := funk.Filter(all, func(x *models.SavedSearch) bool {
 				return x.Name == name
 			}).([]*models.SavedSearch)
 			if len(filtered) == 0 {
@@ -45,7 +46,7 @@ func NewViewCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.WithError(err).Fatal("marshal saved search")
 				return
 			}
-			fmt.Println((string)(bs))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, (string)(bs))
 		},
 	}
 }

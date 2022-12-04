@@ -80,8 +80,7 @@ lint:
 	@echo "ensure integration test with // +build integration tags"
 	@test $$(find test -name '*_test.go' | wc -l) -eq $$(cat $$(find test -name '*_test.go') | grep -E '// ?go:build integration' | wc -l)
 
-	# FIXME enable it
-	# golangci-lint run
+	golangci-lint run
 
 generate-code:
 	@echo -n ''

@@ -2,6 +2,7 @@ package taskspane
 
 import (
 	"fmt"
+
 	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -35,7 +36,8 @@ const defaultPageSize = 20
 
 var (
 	DefaultColumns = []table.Column{
-		table.NewColumn(columnKeyCompleted, "[ ]", 3).WithFiltered(true).WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
+		table.NewColumn(columnKeyCompleted, "[ ]", 3).WithFiltered(true).
+			WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
 		table.NewFlexColumn(columnKeyTitle, "Title", 0).WithFiltered(true),
 		table.NewColumn(columnKeyContext, "Context", 10),
 		table.NewColumn(columnKeyPriority, "Priority", 10),
@@ -58,8 +60,8 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 				columnKeyCompleted: t.CompletedString(),
 				columnKeyTitle:     t.Title,
 				columnKeyContext:   t.TheContext.Name,
-				columnKeyPriority:  tpriority.PriorityValue2Type(t.Priority),
-				columnKeyStatus:    tstatus.StatusValue2Type(t.Status),
+				columnKeyPriority:  tpriority.Value2Type(t.Priority),
+				columnKeyStatus:    tstatus.Value2Type(t.Status),
 				columnKeyGoal:      t.TheGoal.Name,
 				columnKeyDue:       t.DueString(),
 				columnKeyRepeat:    t.RepeatString(),
@@ -81,12 +83,12 @@ type Model struct {
 	components.Focusable
 	components.Resizable
 
-	//app *app.Model
+	// app *app.Model
 
 	// TODO delete? all states is in app. sub models is ephemeral, Or maybe props is using here?
-	//choices  []string         // items on the to-do list
-	//cursor   int              // which to-do list item our cursor is pointing at
-	//selected map[int]struct{} // which to-do items are selected
+	// choices  []string         // items on the to-do list
+	// cursor   int              // which to-do list item our cursor is pointing at
+	// selected map[int]struct{} // which to-do items are selected
 
 	// properties
 	// TODO
@@ -126,7 +128,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.tableModel, cmd = m.tableModel.Update(msg)
 	// TODO if table acting on event, then we need get the result, and ignore continue progress(quit msg)
 	// now cmd is a fun, so we can't get the quit msg
-	//if cmd == tea.Quit() {
+	// if cmd == tea.Quit() {
 	//	return m, cmd
 	//}
 
@@ -144,7 +146,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.tableModel = m.tableModel.WithRows(TasksRenderRows(msg))
 
 	case tea.WindowSizeMsg:
-		//top, right, bottom, left := docStyle.GetMargin()
+		// top, right, bottom, left := docStyle.GetMargin()
 		m.Resize(msg.Width, msg.Height)
 	}
 
@@ -163,9 +165,9 @@ func (m *Model) Resize(width, height int) {
 
 	// remove pane border, table header, and table footer
 	// normal style
-	//tableHeaderHeight := 3
-	//tableFooterHeight := 1
-	//tableBorder := 1
+	// tableHeaderHeight := 3
+	// tableFooterHeight := 1
+	// tableBorder := 1
 
 	// minimal
 	tableHeaderHeight := 1
@@ -174,33 +176,34 @@ func (m *Model) Resize(width, height int) {
 	// patch for bubble-tables bug, table columns calculated
 	fixWidth := len(DefaultColumns) - 1
 
-	m.tableModel = m.tableModel.WithPageSize(height - tableBorder*2 - tableHeaderHeight - tableFooterHeight - paneBorder*2).
+	m.tableModel = m.tableModel.
+		WithPageSize(height - tableBorder*2 - tableHeaderHeight - tableFooterHeight - paneBorder*2).
 		WithTargetWidth(width + fixWidth)
 }
 
-func (m Model) updateFooter() Model {
-	//highlightedRow := m.tableModel.HighlightedRow()
+// func (m Model) updateFooter() Model {
+//	//highlightedRow := m.tableModel.HighlightedRow()
+//
+//	footerText := fmt.Sprintf(
+//		"Pg. %d/%d",
+//		m.tableModel.CurrentPage(),
+//		m.tableModel.MaxPages(),
+//		//highlightedRow.Data[columnKeyID],
+//	)
+//
+//	m.tableModel = m.tableModel.WithStaticFooter(footerText)
+//	return m
+//}
 
-	footerText := fmt.Sprintf(
-		"Pg. %d/%d",
-		m.tableModel.CurrentPage(),
-		m.tableModel.MaxPages(),
-		//highlightedRow.Data[columnKeyID],
-	)
-
-	m.tableModel = m.tableModel.WithStaticFooter(footerText)
-	return m
-}
-
-func (m *Model) tableSizeSmall() {
-	m.tableWidth = m.tableWidth - 10
-	m.tableModel = m.tableModel.WithTargetWidth(m.tableWidth)
-}
-
-func (m *Model) tableSizeGreater() {
-	m.tableWidth = m.tableWidth + 10
-	m.tableModel = m.tableModel.WithTargetWidth(m.tableWidth)
-}
+// func (m *Model) tableSizeSmall() {
+//	m.tableWidth = m.tableWidth - 10
+//	m.tableModel = m.tableModel.WithTargetWidth(m.tableWidth)
+//}
+//
+// func (m *Model) tableSizeGreater() {
+//	m.tableWidth = m.tableWidth + 10
+//	m.tableModel = m.tableModel.WithTargetWidth(m.tableWidth)
+//}
 
 func (m *Model) Filter(input textinput.Model) {
 	m.tableModel = m.tableModel.WithFilterInput(input)
@@ -212,12 +215,12 @@ func (m *Model) handleCompleteToggle() tea.Cmd {
 	if funk.IsZero(row) {
 		return nil
 	}
-	id := row.Data[columnKeyID].(int64)
+	id, _ := row.Data[columnKeyID].(int64)
 	checked := row.Data[columnKeyCompleted]
 
 	// follow ui
 	if checked == "[ ]" {
-		//_, err := m.taskSvc.Complete(id)
+		// _, err := m.taskSvc.Complete(id)
 		err := fmt.Errorf("not implemented")
 		if err != nil {
 			m.parent.Error(err.Error())
@@ -233,13 +236,14 @@ func (m *Model) handleCompleteToggle() tea.Cmd {
 	return m.parent.Refresh(false)
 }
 
+//nolint:unparam // TODO
 func (m *Model) handleTimerToggle() tea.Cmd {
 	row := m.tableModel.HighlightedRow()
 	if funk.IsZero(row) {
 		return nil
 	}
-	id := row.Data[columnKeyID].(int64)
-	t, err := m.taskSvc.FindById(id)
+	id, _ := row.Data[columnKeyID].(int64)
+	t, err := m.taskSvc.FindByID(id)
 	if err != nil {
 		m.parent.Error(err.Error())
 		return nil
@@ -280,12 +284,12 @@ func InitModel(taskSvc services.TaskService, tasks []*models.RichTask, parent pa
 		Focused(true).
 		Filtered(true).
 		// TODO disable filter in table
-		//WithStaticFooter("").
-		//Border(customBorder).
+		// WithStaticFooter("").
+		// Border(customBorder).
 		// TODO flex height
-		//WithNoPagination().
+		// WithNoPagination().
 		WithPageSize(defaultPageSize).
-		//WithNoPagination().
+		// WithNoPagination().
 		WithFooterVisibility(false).
 		WithTargetWidth(DefaultTableWidth).
 		WithKeyMap(keys)

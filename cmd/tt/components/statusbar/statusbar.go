@@ -2,6 +2,7 @@ package statusbar
 
 import (
 	"fmt"
+
 	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -35,8 +36,8 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	if m.filterTextInput.Focused() {
-		input, cmd := m.updateFilterTextInput(msg)
-		return input, cmd
+		input, newCmd := m.updateFilterTextInput(msg)
+		return input, newCmd
 	}
 
 	newM, cmd := m.sb.Update(msg)
@@ -83,16 +84,15 @@ func (m *Model) FocusFilter() {
 
 func (m Model) updateFilterTextInput(msg tea.Msg) (Model, tea.Cmd) {
 	var cmd tea.Cmd
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
+	if msgType, ok := msg.(tea.KeyMsg); ok {
+		switch msgType.String() {
 		case "enter":
 			m.filterTextInput.Blur()
 		case "esc":
 			m.filterTextInput.SetValue("")
 			m.filterTextInput.Blur()
 		default:
-			m.filterTextInput, cmd = m.filterTextInput.Update(msg)
+			m.filterTextInput, cmd = m.filterTextInput.Update(msgType)
 		}
 	}
 

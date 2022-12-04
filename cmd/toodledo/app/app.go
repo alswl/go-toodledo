@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/alswl/go-toodledo/pkg/fetchers"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/services"
 )
@@ -56,7 +55,7 @@ type ToodledoTUIApp struct {
 	SavedSearchSvc services.SavedSearchService
 
 	TaskRichSvc services.TaskRichService
-	fetcher     fetchers.DaemonFetcher
+	// fetcher     fetchers.DaemonFetcher
 }
 
 func NewToodledoTUIApp(

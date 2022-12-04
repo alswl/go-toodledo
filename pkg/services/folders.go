@@ -2,6 +2,8 @@ package services
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/folder"
 	"github.com/alswl/go-toodledo/pkg/common"
@@ -10,7 +12,6 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
-	"strconv"
 )
 
 // FolderService ...
@@ -25,13 +26,13 @@ type FolderService interface {
 }
 
 // FolderPersistenceService is a cached service
-// it synced interval by fetcher
+// it synced interval by fetcher.
 type FolderPersistenceService interface {
 	Synchronizable
 	FolderService
 }
 
-// folderService query folder with remote api
+// folderService query folder with remote api.
 type folderService struct {
 	cli  *client.Toodledo
 	auth runtime.ClientAuthInfoWriter
@@ -103,7 +104,7 @@ func (s *folderService) Find(name string) (*models.Folder, error) {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Folder) bool {
+	filtered, _ := funk.Filter(fs, func(x *models.Folder) bool {
 		return x.Name == name
 	}).([]*models.Folder)
 	if len(filtered) == 0 {
@@ -120,7 +121,7 @@ func (s *folderService) FindByID(id int64) (*models.Folder, error) {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Folder) bool {
+	filtered, _ := funk.Filter(fs, func(x *models.Folder) bool {
 		return x.ID == id
 	}).([]*models.Folder)
 	if len(filtered) == 0 {

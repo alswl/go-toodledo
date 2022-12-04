@@ -1,8 +1,11 @@
-package utils
+package utils_test
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/alswl/go-toodledo/pkg/utils"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestWrapListPointer(t *testing.T) {
@@ -25,7 +28,7 @@ func TestWrapListPointer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, WrapListPointer(tt.args.list), "WrapListPointer(%v)", tt.args.list)
+			assert.Equalf(t, tt.want, utils.WrapListPointer(tt.args.list), "WrapListPointer(%v)", tt.args.list)
 		})
 	}
 }
@@ -50,7 +53,7 @@ func TestUnwrapListPointer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, UnwrapListPointer(tt.args.list), "UnwrapListPointer(%v)", tt.args.list)
+			assert.Equalf(t, tt.want, utils.UnwrapListPointer(tt.args.list), "UnwrapListPointer(%v)", tt.args.list)
 		})
 	}
 }

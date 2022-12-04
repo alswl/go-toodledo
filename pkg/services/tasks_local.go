@@ -2,15 +2,16 @@ package services
 
 import (
 	"encoding/json"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/thoas/go-funk"
-	"strconv"
-	"sync"
-	"time"
 )
 
 var instance TaskPersistenceExtService
@@ -20,7 +21,7 @@ const MaxNumPerRequest = int64(1000)
 
 var TaskBucket = "tasks"
 
-// var _ TaskPersistenceExtService = (*taskLocalExtService)(nil)
+// var _ TaskPersistenceExtService = (*taskLocalExtService)(nil).
 var _ TaskPersistenceExtService = (*taskLocalExtService)(nil)
 
 var _ TaskExtendedService = (*taskLocalExtService)(nil)
@@ -34,13 +35,14 @@ type taskLocalExtService struct {
 	db       dal.Backend
 }
 
-func newTaskLocalExtService(taskSvc TaskService, accountSvc AccountService, db dal.Backend) TaskPersistenceExtService {
+func NewTaskLocalExtService(taskSvc TaskService, accountSvc AccountService, db dal.Backend) TaskPersistenceExtService {
 	return &taskLocalExtService{taskSvc: taskSvc, accountSvc: accountSvc, db: db}
 }
 
-func ProvideTaskLocalExtService(taskSvc TaskService, accountSvc AccountService, db dal.Backend) TaskPersistenceExtService {
+func ProvideTaskLocalExtService(taskSvc TaskService, accountSvc AccountService,
+	db dal.Backend) TaskPersistenceExtService {
 	once.Do(func() {
-		instance = newTaskLocalExtService(taskSvc, accountSvc, db)
+		instance = NewTaskLocalExtService(taskSvc, accountSvc, db)
 	})
 	return instance
 }
@@ -57,7 +59,8 @@ func (s *taskLocalExtService) Clean() error {
 	return nil
 }
 
-func (s *taskLocalExtService) ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+func (s *taskLocalExtService) ListWithChanged(lastEditTime *int32, start, limit int64) (
+	[]*models.Task, *models.PaginatedInfo, error) {
 	return s.taskSvc.ListWithChanged(lastEditTime, start, limit)
 }
 
@@ -65,7 +68,8 @@ func (s *taskLocalExtService) ListDeleted(lastEditTime *int32) ([]*models.TaskDe
 	return s.taskSvc.ListDeleted(lastEditTime)
 }
 
-func (s *taskLocalExtService) syncWithFn(fnEdited func() ([]*models.Task, error), fnDeleted func() ([]*models.TaskDeleted, error)) error {
+func (s *taskLocalExtService) syncWithFn(fnEdited func() ([]*models.Task, error), fnDeleted func() (
+	[]*models.TaskDeleted, error)) error {
 	editedTasks, err := fnEdited()
 	if err != nil {
 		return err
@@ -73,15 +77,12 @@ func (s *taskLocalExtService) syncWithFn(fnEdited func() ([]*models.Task, error)
 	s.syncLock.Lock()
 	defer s.syncLock.Unlock()
 
-	if err != nil {
-		return err
-	}
 	for _, f := range editedTasks {
-		//start := time.Now()
+		// start := time.Now()
 		bytes, _ := json.Marshal(f)
 		_ = s.db.Put(TaskBucket, strconv.Itoa(int(f.ID)), bytes)
-		//elapsed := time.Since(start)
-		//logrus.WithField("elapsed", elapsed).WithField("title", f.Title).Info("syncWithFn")
+		// elapsed := time.Since(start)
+		// logrus.WithField("elapsed", elapsed).WithField("title", f.Title).Info("syncWithFn")
 	}
 
 	tds, _ := fnDeleted()
@@ -104,7 +105,7 @@ func (s *taskLocalExtService) PartialSync(lastEditTime *int32) error {
 	)
 }
 
-func (s *taskLocalExtService) FindById(id int64) (*models.Task, error) {
+func (s *taskLocalExtService) FindByID(id int64) (*models.Task, error) {
 	bs, err := s.db.Get(TaskBucket, strconv.Itoa(int(id)))
 	if err != nil {
 		return nil, err
@@ -135,9 +136,9 @@ func (s *taskLocalExtService) listAllRemote() ([]*models.Task, error) {
 			break
 		}
 		all = append(all, ts...)
-		start = start + limit
+		start += limit
 		// TODO validate
-		//ts = make([]*models.Task, 0)
+		// ts = make([]*models.Task, 0)
 	}
 	return all, nil
 }
@@ -159,15 +160,15 @@ func (s *taskLocalExtService) listChanged(lastEditTime *int32) ([]*models.Task, 
 			break
 		}
 		all = append(all, ts...)
-		start = start + limit
+		start += limit
 		// validate
-		//ts = make([]*models.Task, 0)
+		// ts = make([]*models.Task, 0)
 	}
 	return all, nil
 }
 
 // ListAll returns all tasks from cache, maybe cached missed
-// FIXME avoid cache missed
+// FIXME avoid cache missed.
 func (s *taskLocalExtService) ListAll() ([]*models.Task, int, error) {
 	all, err := s.db.List(TaskBucket)
 	if err != nil {
@@ -204,6 +205,7 @@ func (s *taskLocalExtService) List(start, limit int64) ([]*models.Task, *models.
 }
 
 func (s *taskLocalExtService) ListAllByQuery(query *queries.TaskListQuery) ([]*models.Task, error) {
+	// TODO refactor this
 	all, err := s.db.List(TaskBucket)
 	if err != nil {
 		return nil, err
@@ -218,56 +220,55 @@ func (s *taskLocalExtService) ListAllByQuery(query *queries.TaskListQuery) ([]*m
 		ts = append(ts, &t)
 	}
 	if query.Priority != nil {
-		ts = funk.Filter(ts, func(t *models.Task) bool {
-			return tpriority.PriorityValue2Type(t.Priority) == *query.Priority
+		ts, _ = funk.Filter(ts, func(t *models.Task) bool {
+			return tpriority.Value2Type(t.Priority) == *query.Priority
 		}).([]*models.Task)
 	}
 	if query.Status != nil {
-		ts = funk.Filter(ts, func(t *models.Task) bool {
-			return tstatus.StatusValue2Type(t.Status) == *query.Status
+		ts, _ = funk.Filter(ts, func(t *models.Task) bool {
+			return tstatus.Value2Type(t.Status) == *query.Status
 		}).([]*models.Task)
 	}
 	if query.ContextID == -1 {
 		// None Context
-		ts = funk.Filter(ts, func(t *models.Task) bool {
+		ts, _ = funk.Filter(ts, func(t *models.Task) bool {
 			return t.Context == 0
 		}).([]*models.Task)
 	} else if query.ContextID != 0 {
-		ts = funk.Filter(ts, func(t *models.Task) bool {
+		ts, _ = funk.Filter(ts, func(t *models.Task) bool {
 			return t.Context == query.ContextID
 		}).([]*models.Task)
 	}
 	if query.FolderID == -1 {
 		// None Folder
-		ts = funk.Filter(ts, func(t *models.Task) bool {
+		ts, _ = funk.Filter(ts, func(t *models.Task) bool {
 			return t.Folder == 0
 		}).([]*models.Task)
 	} else if query.FolderID != 0 && query.FolderID != -1 {
-		ts = funk.Filter(ts, func(t *models.Task) bool {
+		ts, _ = funk.Filter(ts, func(t *models.Task) bool {
 			return t.Folder == query.FolderID
 		}).([]*models.Task)
 	}
 	if query.GoalID == -1 {
 		// None Goal
-		ts = funk.Filter(ts, func(t *models.Task) bool {
+		ts, _ = funk.Filter(ts, func(t *models.Task) bool {
 			return t.Goal == 0
 		}).([]*models.Task)
 	} else if query.GoalID != 0 {
-		ts = funk.Filter(ts, func(t *models.Task) bool {
+		ts, _ = funk.Filter(ts, func(t *models.Task) bool {
 			return t.Goal == query.GoalID
 		}).([]*models.Task)
 	}
 	if query.Incomplete != nil {
-		ts = funk.Filter(ts, func(t *models.Task) bool {
+		ts, _ = funk.Filter(ts, func(t *models.Task) bool {
 			if *query.Incomplete {
 				return t.Completed == 0
-			} else {
-				return t.Completed == 1
 			}
+			return t.Completed == 1
 		}).([]*models.Task)
 	} else {
 		// nil Incomplete return incomplete + today complete
-		ts = funk.Filter(ts, func(t *models.Task) bool {
+		ts, _ = funk.Filter(ts, func(t *models.Task) bool {
 			if t.Completed == 0 {
 				return true
 			}
@@ -310,7 +311,7 @@ func (s *taskLocalExtService) Edit(id int64, t *models.TaskEdit) (*models.Task, 
 }
 
 func (s *taskLocalExtService) EditByQuery(_ *queries.TaskEditQuery) (*models.Task, error) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 

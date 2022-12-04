@@ -1,10 +1,13 @@
-package utils
+package utils_test
 
 import (
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/alswl/go-toodledo/pkg/utils"
+
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
 )
 
 type Q struct {
@@ -18,7 +21,7 @@ type Q struct {
 
 func TestGenerateFlagsByQuery(t *testing.T) {
 	cmd := cobra.Command{}
-	err := BindFlagsByQuery(&cmd, Q{})
+	err := utils.BindFlagsByQuery(&cmd, Q{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, `Usage:
@@ -35,7 +38,7 @@ Flags:
 
 func TestFillQueryByFlags(t *testing.T) {
 	cmd := cobra.Command{}
-	err := BindFlagsByQuery(&cmd, Q{})
+	err := utils.BindFlagsByQuery(&cmd, Q{})
 	assert.NoError(t, err)
 
 	q := Q{}
@@ -47,12 +50,12 @@ func TestFillQueryByFlags(t *testing.T) {
 	_ = cmd.Flags().Set("ss", "a")
 	_ = cmd.Flags().Set("ss", "b")
 
-	err = FillQueryByFlags(&cmd, &q)
+	err = utils.FillQueryByFlags(&cmd, &q)
 	assert.NoError(t, err)
 	assert.Equal(t, "test", q.S)
 	assert.Equal(t, 1, q.I)
 	assert.Equal(t, int64(2), q.I64)
-	assert.Equal(t, time.Date(2018, 1, 1, 0, 0, 0, 0, ChinaTimeZone), q.T)
+	assert.Equal(t, time.Date(2018, 1, 1, 0, 0, 0, 0, utils.ChinaTimeZone), q.T)
 	assert.Equal(t, true, q.B)
 	assert.Equal(t, []string{"a", "b"}, q.SS)
 }

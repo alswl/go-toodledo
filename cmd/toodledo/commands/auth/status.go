@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -32,8 +33,7 @@ func NewStatusCmd(f *cmdutil.Factory) *cobra.Command {
 
 			// TODO pretty
 			out, _ := yaml.Marshal(me)
-			fmt.Println((string)(out))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, (string)(out))
 		},
 	}
-
 }

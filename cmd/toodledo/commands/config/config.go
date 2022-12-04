@@ -6,12 +6,12 @@ import (
 )
 
 func NewCmd(f *cmdutil.Factory) *cobra.Command {
-	var Cmd = &cobra.Command{
+	var cmd = &cobra.Command{
 		Use:   "config",
 		Args:  cobra.NoArgs,
 		Short: "Manage config",
 	}
-	Cmd.AddCommand(NewInitCommand(f))
-	Cmd.AddCommand(NewViewCmd(f))
-	return Cmd
+	cmd.AddCommand(NewInitCommand(f))
+	cmd.AddCommand(NewViewCmd(f))
+	return cmd
 }

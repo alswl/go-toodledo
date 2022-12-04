@@ -2,12 +2,13 @@ package render
 
 import (
 	"bytes"
+
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/olekukonko/tablewriter"
 )
 
-// RenderEnvironments ...
-func RenderEnvironments(cks []*models.EnvironmentWithKey) string {
+// Environments ...
+func Environments(cks []*models.EnvironmentWithKey) string {
 	buf := new(bytes.Buffer)
 	table := tablewriter.NewWriter(buf)
 	table.SetHeader([]string{"Key", "Name", "Space", "Project"})

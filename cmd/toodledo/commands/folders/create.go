@@ -2,6 +2,7 @@ package folders
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -34,8 +35,7 @@ func NewCreateCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 
-			fmt.Println(render.Tables4Folder([]*models.Folder{obj}))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4Folder([]*models.Folder{obj}))
 		},
 	}
-
 }

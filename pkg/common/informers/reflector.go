@@ -2,9 +2,12 @@ package informers
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
+
+const maxQueueSize = 100000
 
 type T string
 type U *int64
@@ -37,12 +40,16 @@ type reflector struct {
 	watcher func(ctx context.Context, lastSynced U) ([]T, U, error)
 }
 
-func NewReflector(log logrus.FieldLogger, duration time.Duration, watcher func(ctx context.Context, lastSynced U) ([]T, U, error)) Reflector {
+func NewReflector(
+	log logrus.FieldLogger,
+	duration time.Duration,
+	watcher func(ctx context.Context, lastSynced U) ([]T, U, error),
+) Reflector {
 	return &reflector{
 		log:        log,
 		duration:   duration,
 		ticker:     time.NewTicker(duration),
-		queue:      make(chan T, 100000),
+		queue:      make(chan T, maxQueueSize),
 		notify:     make(chan interface{}),
 		lastSynced: nil,
 		watcher:    watcher,
@@ -70,7 +77,6 @@ func (r *reflector) Run(stop <-chan struct{}) {
 				r.log.WithError(err).Error("reflector list new")
 			}
 		}
-
 	}
 }
 

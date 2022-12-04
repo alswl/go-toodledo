@@ -1,13 +1,16 @@
-package queries
+package queries_test
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/alswl/go-toodledo/pkg/models/queries"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTaskCreateQueryMarshal(t *testing.T) {
-	q := TaskCreateQuery{}
+	q := queries.TaskCreateQuery{}
 	bs, err := json.Marshal(q.ToModel())
 
 	assert.NoError(t, err)

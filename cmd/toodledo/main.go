@@ -1,16 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"os"
+
 	"github.com/alswl/go-toodledo/cmd/toodledo/root"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
-	"os"
 )
 
 func main() {
 	err := logging.InitFactory("/tmp/toodledo", false, false)
+	log := logging.ProvideLogger()
 	if err != nil {
-		fmt.Printf("%+v\n", err)
+		log.Fatal(err)
 		os.Exit(1)
 	}
 

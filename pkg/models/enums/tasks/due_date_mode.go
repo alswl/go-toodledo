@@ -11,10 +11,12 @@ const (
 	DueDateModeOptionally DueDateMode = 3
 )
 
-var DueDateModeAll = []DueDateMode{DueDateModeDueBy, DueDateModeDueOn, DueDateModeDueAfter, DueDateModeOptionally}
+func DueDateModeAll() []DueDateMode {
+	return []DueDateMode{DueDateModeDueBy, DueDateModeDueOn, DueDateModeDueAfter, DueDateModeOptionally}
+}
 
 func DueDateModeValue2Type(input int64) DueDateMode {
-	for _, x := range DueDateModeAll {
+	for _, x := range DueDateModeAll() {
 		if x == DueDateMode(input) {
 			return x
 		}

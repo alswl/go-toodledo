@@ -2,6 +2,7 @@ package contexts
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -31,8 +32,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.Error(err)
 				return
 			}
-			fmt.Println(render.Tables4Context(all))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4Context(all))
 		},
 	}
-
 }

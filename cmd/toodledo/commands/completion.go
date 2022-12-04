@@ -1,9 +1,10 @@
 package commands
 
 import (
+	"os"
+
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func NewCompletionCmd(f *cmdutil.Factory) *cobra.Command {

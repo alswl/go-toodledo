@@ -2,9 +2,10 @@ package iostreams
 
 import (
 	"bytes"
-	"github.com/mattn/go-colorable"
 	"io"
 	"os"
+
+	"github.com/mattn/go-colorable"
 )
 
 type IOStreams struct {

@@ -2,6 +2,8 @@ package tasks
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -16,19 +18,19 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/thoas/go-funk"
-	"strconv"
 )
 
-// cmdEditQuery contains the desired parameters for the task
+// cmdEditQuery contains the desired parameters for the task.
+// nolint: lll // ignore long line length
 type cmdEditQuery struct {
 	// TODO
-	//ContextID int64
+	// ContextID int64
 	Context string
 	// TODO
-	//FolderID int64
+	// FolderID int64
 	Folder string
 	// TODO
-	//GoalID int64
+	// GoalID int64
 	Goal     string
 	Priority string `validate:"omitempty,oneof=Top top High high Medium medium Low low Negative negative"`
 	Status   string `validate:"omitempty,oneof=None NextAction Active Planning Delegated Waiting Hold Postponed Someday Canceled Reference none nextaction active planning delegated waiting hold postponed someday canceled reference"`
@@ -64,8 +66,8 @@ func toQuery(contextSvc services.ContextService, folderSvc services.FolderServic
 		}
 		query.GoalID = goal.ID
 	}
-	query.Priority = tpriority.PriorityString2Type(q.Priority)
-	query.Status = tstatus.StatusString2Type(q.Status)
+	query.Priority = tpriority.String2Type(q.Priority)
+	query.Status = tstatus.String2Type(q.Status)
 	query.DueDate = q.DueDate
 	if q.Title != "" {
 		query.Title = q.Title
@@ -111,7 +113,7 @@ func NewEditCmd(f *cmdutil.Factory) *cobra.Command {
 
 			// fetch task
 			id, _ := strconv.Atoi(args[0])
-			_, err = taskSvc.FindById(int64(id))
+			_, err = taskSvc.FindByID(int64(id))
 			if err != nil {
 				logrus.WithError(err).Fatal("find task")
 				return
@@ -131,7 +133,7 @@ func NewEditCmd(f *cmdutil.Factory) *cobra.Command {
 			}
 
 			rt, _ := taskRichSvc.Rich(newT)
-			fmt.Println(render.Tables4RichTasks([]*models.RichTask{rt}))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4RichTasks([]*models.RichTask{rt}))
 		},
 	}
 	err := utils.BindFlagsByQuery(cmd, cmdEditQuery{})

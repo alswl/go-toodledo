@@ -2,6 +2,7 @@ package goals
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -28,19 +29,19 @@ func NewArchiveCmd(f *cmdutil.Factory) *cobra.Command {
 			svc := app.GoalSvc
 			name := args[0]
 
-			f, err := svc.Find(name)
+			folder, err := svc.Find(name)
 			if err != nil {
 				logrus.Error(err)
 				return
 			}
 
-			newF, err := svc.Archive(int(f.ID), true)
+			newF, err := svc.Archive(int(folder.ID), true)
 			if err != nil {
 				logrus.Error(err)
 				return
 			}
 
-			fmt.Println(render.Tables4Goal([]*models.Goal{newF}))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4Goal([]*models.Goal{newF}))
 		},
 	}
 }

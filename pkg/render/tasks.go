@@ -2,6 +2,7 @@ package render
 
 import (
 	"bytes"
+
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
@@ -16,7 +17,7 @@ func Tables4Task(tasks []*models.Task) string {
 	t := table.NewWriter()
 	t.SetOutputMirror(buf)
 	// TODO Color
-	//t.SetStyle(table.StyleColoredBright)
+	// t.SetStyle(table.StyleColoredBright)
 	t.SetStyle(table.StyleLight)
 	t.Style().Options.DrawBorder = false
 	t.AppendHeader(table.Row{"#", "[X]", "Title", "Status", "Context", "Priority", "Folder", "Goal",
@@ -46,9 +47,9 @@ func Tables4Task(tasks []*models.Task) string {
 			x.ID,
 			completed,
 			x.Title,
-			tstatus.StatusValue2Type(x.Status),
+			tstatus.Value2Type(x.Status),
 			context,
-			tpriority.PriorityValue2Type(x.Priority),
+			tpriority.Value2Type(x.Priority),
 			folder,
 			goal,
 			x.Duedate,
@@ -69,7 +70,7 @@ func Tables4RichTasks(tasks []*models.RichTask) string {
 	t := table.NewWriter()
 	t.SetOutputMirror(buf)
 	// TODO Color
-	//t.SetStyle(table.StyleColoredBright)
+	// t.SetStyle(table.StyleColoredBright)
 	t.SetStyle(table.StyleLight)
 	t.Style().Options.DrawBorder = false
 	t.AppendHeader(table.Row{"#", "[X]", "Title", "Status", "Context", "Priority", "Folder", "Goal",
@@ -80,9 +81,9 @@ func Tables4RichTasks(tasks []*models.RichTask) string {
 			x.ID,
 			x.CompletedString(),
 			x.Title,
-			tstatus.StatusValue2Type(x.Status),
+			tstatus.Value2Type(x.Status),
 			x.TheContext.Name,
-			tpriority.PriorityValue2Type(x.Priority),
+			tpriority.Value2Type(x.Priority),
 			x.TheFolder.Name,
 			x.TheGoal.Name,
 			x.DueString(),

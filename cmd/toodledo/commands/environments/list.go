@@ -2,6 +2,7 @@ package environments
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/render"
@@ -27,8 +28,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 
-			fmt.Print(render.RenderEnvironments(cks))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Environments(cks))
 		},
 	}
-
 }

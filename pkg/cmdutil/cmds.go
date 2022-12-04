@@ -33,5 +33,4 @@ func NewFactory() *Factory {
 		Config:         common.NewCliConfigFromViper,
 		ExecutableName: "toodledo",
 	}
-
 }

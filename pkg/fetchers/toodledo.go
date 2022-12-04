@@ -2,6 +2,7 @@ package fetchers
 
 import (
 	"fmt"
+
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/sirupsen/logrus"
 )
@@ -56,11 +57,6 @@ func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber, isHardRefresh
 	lastFetchInfo, err := s.accountSvc.GetLastFetchInfo()
 	if err != nil {
 		statusDescriber.Error(fmt.Errorf("sync failed"))
-		return err
-	}
-	if err != nil {
-		statusDescriber.Error(fmt.Errorf("get user status failed"))
-		s.log.WithError(err).Error("get user status failed")
 		return err
 	}
 

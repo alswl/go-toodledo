@@ -2,12 +2,13 @@ package services
 
 import (
 	"encoding/json"
+	"strconv"
+	"sync"
+
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/thoas/go-funk"
-	"strconv"
-	"sync"
 )
 
 const GoalsBucket = "goals"
@@ -105,7 +106,7 @@ func (s *goalCachedService) Find(name string) (*models.Goal, error) {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Goal) bool {
+	filtered, _ := funk.Filter(fs, func(x *models.Goal) bool {
 		return x.Name == name
 	}).([]*models.Goal)
 	if len(filtered) == 0 {

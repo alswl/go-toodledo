@@ -2,6 +2,7 @@ package folders
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -28,14 +29,13 @@ func NewRenameCmd(f *cmdutil.Factory) *cobra.Command {
 			svc := app.FolderSvc
 			name := args[0]
 			newName := args[1]
-			f, err := svc.Rename(name, newName)
+			folder, err := svc.Rename(name, newName)
 			if err != nil {
 				logrus.WithError(err).Fatal("rename failed")
 				return
 			}
 
-			fmt.Println(render.Tables4Folder([]*models.Folder{f}))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4Folder([]*models.Folder{folder}))
 		},
 	}
-
 }

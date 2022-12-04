@@ -1,11 +1,12 @@
-package services
+package services_test
 
 import (
 	"encoding/json"
+	"testing"
+
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/utils"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestUnCompleteMarshal(t *testing.T) {

@@ -1,20 +1,23 @@
-package models
+package models_test
 
 import (
-	"github.com/alswl/go-toodledo/pkg/utils"
-	"github.com/stretchr/testify/assert"
-	"github.com/thoas/go-funk"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/alswl/go-toodledo/pkg/models"
+
+	"github.com/alswl/go-toodledo/pkg/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/thoas/go-funk"
 )
 
 func TestRichTask_DueDate(t1 *testing.T) {
 	type fields struct {
-		Task       Task
-		TheContext Context
-		TheFolder  Folder
-		TheGoal    Goal
+		Task       models.Task
+		TheContext models.Context
+		TheFolder  models.Folder
+		TheGoal    models.Goal
 	}
 	tests := []struct {
 		name   string
@@ -24,17 +27,17 @@ func TestRichTask_DueDate(t1 *testing.T) {
 		{
 			name: "",
 			fields: fields{
-				Task:       Task{Duedate: 1645704000},
-				TheContext: Context{},
-				TheFolder:  Folder{},
-				TheGoal:    Goal{},
+				Task:       models.Task{Duedate: 1645704000},
+				TheContext: models.Context{},
+				TheFolder:  models.Folder{},
+				TheGoal:    models.Goal{},
 			},
 			want: time.Date(2022, 02, 24, 20, 0, 0, 0, utils.ChinaTimeZone),
 		},
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := RichTask{
+			t := models.RichTask{
 				Task:       tt.fields.Task,
 				TheContext: tt.fields.TheContext,
 				TheFolder:  tt.fields.TheFolder,
@@ -49,10 +52,10 @@ func TestRichTask_DueDate(t1 *testing.T) {
 
 func TestRichTask_Due(t1 *testing.T) {
 	type fields struct {
-		Task       Task
-		TheContext Context
-		TheFolder  Folder
-		TheGoal    Goal
+		Task       models.Task
+		TheContext models.Context
+		TheFolder  models.Folder
+		TheGoal    models.Goal
 	}
 	tests := []struct {
 		name   string
@@ -62,27 +65,27 @@ func TestRichTask_Due(t1 *testing.T) {
 		{
 			name: "",
 			fields: fields{
-				Task:       Task{Duedate: 1645704000, Duetime: 2*60*60 + 1*60},
-				TheContext: Context{},
-				TheFolder:  Folder{},
-				TheGoal:    Goal{},
+				Task:       models.Task{Duedate: 1645704000, Duetime: 2*60*60 + 1*60},
+				TheContext: models.Context{},
+				TheFolder:  models.Folder{},
+				TheGoal:    models.Goal{},
 			},
 			want: "2022-02-24 02:01",
 		},
 		{
 			name: "",
 			fields: fields{
-				Task:       Task{},
-				TheContext: Context{},
-				TheFolder:  Folder{},
-				TheGoal:    Goal{},
+				Task:       models.Task{},
+				TheContext: models.Context{},
+				TheFolder:  models.Folder{},
+				TheGoal:    models.Goal{},
 			},
 			want: "",
 		},
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := RichTask{
+			t := models.RichTask{
 				Task:       tt.fields.Task,
 				TheContext: tt.fields.TheContext,
 				TheFolder:  tt.fields.TheFolder,
@@ -96,30 +99,30 @@ func TestRichTask_Due(t1 *testing.T) {
 }
 
 func TestRIchTask_Timer(t *testing.T) {
-	var task = RichTask{}
+	var task = models.RichTask{}
 	task.Timer = 5
 	task.Timeron = time.Date(2022, 11, 06, 13, 00, 00, 0, utils.ChinaTimeZone).Unix()
 	assert.NotNil(t, task.TimerString())
 }
 
 func TestFunkIsEmpty(t *testing.T) {
-	var pointerNil *int = nil
+	var pointerNil *int
 	assert.True(t, funk.IsEmpty(pointerNil))
-	var ten int = int(10)
+	var ten = 10
 	var pointerTen = &ten
 	assert.False(t, funk.IsEmpty(pointerTen))
-	var zero int = int(0)
+	var zero = 0
 	var pointerZero = &zero
 	assert.True(t, funk.IsEmpty(pointerZero))
 }
 
 func TestFunkIsZero(t *testing.T) {
-	var pointerNil *int = nil
+	var pointerNil *int
 	assert.True(t, funk.IsZero(pointerNil))
-	var ten int = int(10)
+	var ten = 10
 	var pointerTen = &ten
 	assert.False(t, funk.IsZero(pointerTen))
-	var zero int = int(0)
+	var zero = 0
 	var pointerZero = &zero
 	// NOTICE, 0 is not zero
 	assert.False(t, funk.IsZero(pointerZero))

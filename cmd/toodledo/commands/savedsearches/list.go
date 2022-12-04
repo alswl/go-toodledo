@@ -2,6 +2,7 @@ package savedsearches
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -31,7 +32,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 
-			fmt.Println(render.Tables4SavedSearches(all))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4SavedSearches(all))
 		},
 	}
 }

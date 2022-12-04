@@ -2,6 +2,7 @@ package goals
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -31,7 +32,7 @@ func NewDeleteCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.WithError(err).Error("delete goal")
 				return
 			}
-			fmt.Println("done")
+			_, _ = fmt.Fprintln(f.IOStreams.Out, "done")
 		},
 	}
 }

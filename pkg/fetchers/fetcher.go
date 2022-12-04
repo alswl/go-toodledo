@@ -2,12 +2,13 @@ package fetchers
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // DaemonFetcher is a interface for one fetcher
-// it runs in background and fetch data from remote
+// it runs in background and fetch data from remote.
 type DaemonFetcher interface {
 	Start(context.Context)
 	// Stop the fetcher
@@ -18,32 +19,37 @@ type DaemonFetcher interface {
 	UIRefresh() chan bool
 }
 
-// FetchFn fetch data
+// FetchFn fetch data.
 type FetchFn func(sd StatusDescriber, isHardRefresh bool) error
 
 type intervalDaemonFetcher struct {
-	ticker        *time.Ticker
-	stop          chan struct{}
-	fetchNow      chan bool
-	fetchForceNow chan bool
-	uiRefresh     chan bool
-	refreshed     chan bool
+	ticker   *time.Ticker
+	stop     chan struct{}
+	fetchNow chan bool
+	// fetchForceNow chan bool
+	uiRefresh chan bool
+	refreshed chan bool
 
 	log             logrus.FieldLogger
 	fn              FetchFn
 	statusDescriber StatusDescriber
 }
 
-func NewSimpleFetcher(log logrus.FieldLogger, interval time.Duration, fn FetchFn, statusDescriber StatusDescriber) DaemonFetcher {
+func NewSimpleFetcher(
+	log logrus.FieldLogger,
+	interval time.Duration,
+	fn FetchFn,
+	statusDescriber StatusDescriber,
+) DaemonFetcher {
 	return &intervalDaemonFetcher{
 		ticker:          time.NewTicker(interval),
 		stop:            make(chan struct{}),
 		log:             log,
 		fn:              fn,
-		fetchNow:        make(chan bool, 0),
+		fetchNow:        make(chan bool),
 		statusDescriber: statusDescriber,
-		uiRefresh:       make(chan bool, 0),
-		refreshed:       make(chan bool, 0),
+		uiRefresh:       make(chan bool),
+		refreshed:       make(chan bool),
 	}
 }
 
@@ -82,7 +88,7 @@ func (s *intervalDaemonFetcher) Start(ctx context.Context) {
 }
 
 // fetch is used to fetch data from remote
-// it was synchronized
+// it was synchronized.
 func (s *intervalDaemonFetcher) fetch(hardRefresh bool) error {
 	return s.fn(s.statusDescriber, hardRefresh)
 }
@@ -93,7 +99,7 @@ func (s *intervalDaemonFetcher) Stop() {
 	s.log.Info("fetcher stopped")
 }
 
-// Notify is used to notify fetcher to fetch data now
+// Notify is used to notify fetcher to fetch data now.
 func (s *intervalDaemonFetcher) Notify(isHardRefresh bool) (chan bool, error) {
 	s.log.WithField("isHardRefresh", isHardRefresh).Info("Notify")
 	s.fetchNow <- isHardRefresh

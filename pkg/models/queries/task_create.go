@@ -1,12 +1,13 @@
 package queries
 
 import (
+	"strings"
+	"time"
+
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
-	"strings"
-	"time"
 )
 
 type TaskWritePartialQuery struct {
@@ -21,18 +22,18 @@ type TaskWritePartialQuery struct {
 	DueTime int64
 
 	Length int64
-	//Location     int64
+	// Location     int64
 	Note     string
 	Parent   int64
 	Priority priority.Priority
-	//Remind
-	//Repeat iCal RRULE
+	// Remind
+	// Repeat iCal RRULE
 	Star    bool
 	Status  status.Status
 	Tag     []string
 	Timer   int64
 	TimerOn time.Time
-	//Via string
+	// Via string
 }
 
 // TaskCreateQuery is query model of Task
@@ -41,14 +42,14 @@ type TaskWritePartialQuery struct {
 // title
 // optional:
 // folder, context, goal, location, priority, status,star, duration, remind,
-// starttime, duetime, completed, duedatemod, repeat, tag, duedate, startdate, note, parent, meta
+// starttime, duetime, completed, duedatemod, repeat, tag, duedate, startdate, note, parent, meta.
 type TaskCreateQuery struct {
 	TaskWritePartialQuery
 
 	Title string `description:"" validate:"required"`
 }
 
-// ToModel converts TaskCreateQuery to Task
+// ToModel converts TaskCreateQuery to Task.
 func (q *TaskCreateQuery) ToModel() *models.Task {
 	t := &models.Task{
 		Title:   q.Title,
@@ -92,7 +93,7 @@ func (q *TaskCreateQuery) ToModel() *models.Task {
 	return t
 }
 
-// TaskCreateQueryBuilder is the builder of TaskCreateQuery
+// TaskCreateQueryBuilder is the builder of TaskCreateQuery.
 type TaskCreateQueryBuilder struct {
 	query TaskCreateQuery
 }
@@ -101,103 +102,103 @@ func NewTaskCreateQueryBuilder() *TaskCreateQueryBuilder {
 	return &TaskCreateQueryBuilder{}
 }
 
-// WithTitle sets Title
+// WithTitle sets Title.
 func (b *TaskCreateQueryBuilder) WithTitle(title string) *TaskCreateQueryBuilder {
 	b.query.Title = title
 	return b
 }
 
-// WithContextID sets ContextID
+// WithContextID sets ContextID.
 func (b *TaskCreateQueryBuilder) WithContextID(contextID int64) *TaskCreateQueryBuilder {
 	b.query.ContextID = contextID
 	return b
 }
 
-// WithFolderID sets FolderID
+// WithFolderID sets FolderID.
 func (b *TaskCreateQueryBuilder) WithFolderID(folderID int64) *TaskCreateQueryBuilder {
 	b.query.FolderID = folderID
 	return b
 }
 
-// WithGoalID sets GoalID
+// WithGoalID sets GoalID.
 func (b *TaskCreateQueryBuilder) WithGoalID(goalID int64) *TaskCreateQueryBuilder {
 	b.query.GoalID = goalID
 	return b
 }
 
-// WithDueDate sets DueDate
+// WithDueDate sets DueDate.
 func (b *TaskCreateQueryBuilder) WithDueDate(dueDate string) *TaskCreateQueryBuilder {
 	b.query.DueDate = dueDate
 	return b
 }
 
-// WithDueTime sets DueTime
+// WithDueTime sets DueTime.
 func (b *TaskCreateQueryBuilder) WithDueTime(dueTime int64) *TaskCreateQueryBuilder {
 	b.query.DueTime = dueTime
 	return b
 }
 
-// WithDueDateMode sets DueDateMode
+// WithDueDateMode sets DueDateMode.
 func (b *TaskCreateQueryBuilder) WithDueDateMode(dueDateMode tasks.DueDateMode) *TaskCreateQueryBuilder {
 	b.query.DueDateMode = dueDateMode
 	return b
 }
 
-// WithLength sets Length
+// WithLength sets Length.
 func (b *TaskCreateQueryBuilder) WithLength(length int64) *TaskCreateQueryBuilder {
 	b.query.Length = length
 	return b
 }
 
-// WithNote sets Note
+// WithNote sets Note.
 func (b *TaskCreateQueryBuilder) WithNote(note string) *TaskCreateQueryBuilder {
 	b.query.Note = note
 	return b
 }
 
-// WithParent sets Parent
+// WithParent sets Parent.
 func (b *TaskCreateQueryBuilder) WithParent(parent int64) *TaskCreateQueryBuilder {
 	b.query.Parent = parent
 	return b
 }
 
-// WithPriority sets Priority
+// WithPriority sets Priority.
 func (b *TaskCreateQueryBuilder) WithPriority(priority priority.Priority) *TaskCreateQueryBuilder {
 	b.query.Priority = priority
 	return b
 }
 
-// WithStar sets Star
+// WithStar sets Star.
 func (b *TaskCreateQueryBuilder) WithStar(star bool) *TaskCreateQueryBuilder {
 	b.query.Star = star
 	return b
 }
 
-// WithStatus sets Status
+// WithStatus sets Status.
 func (b *TaskCreateQueryBuilder) WithStatus(status status.Status) *TaskCreateQueryBuilder {
 	b.query.Status = status
 	return b
 }
 
-// WithTag sets Tag
+// WithTag sets Tag.
 func (b *TaskCreateQueryBuilder) WithTag(tag string) *TaskCreateQueryBuilder {
 	b.query.Tag = append(b.query.Tag, tag)
 	return b
 }
 
-// WithTimer sets Timer
+// WithTimer sets Timer.
 func (b *TaskCreateQueryBuilder) WithTimer(timer int64) *TaskCreateQueryBuilder {
 	b.query.Timer = timer
 	return b
 }
 
-// WithTimerOne sets TimeOne
+// WithTimerOne sets TimeOne.
 func (b *TaskCreateQueryBuilder) WithTimerOne(timerOne time.Time) *TaskCreateQueryBuilder {
 	b.query.TimerOn = timerOne
 	return b
 }
 
-// Build returns TaskCreateQuery
+// Build returns TaskCreateQuery.
 func (b *TaskCreateQueryBuilder) Build() *TaskCreateQuery {
 	return &b.query
 }

@@ -2,12 +2,13 @@ package browse
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	utilsos "github.com/alswl/go-toodledo/pkg/utils/os"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 type Options struct {

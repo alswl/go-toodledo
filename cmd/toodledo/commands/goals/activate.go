@@ -2,6 +2,7 @@ package goals
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -40,7 +41,7 @@ func NewActivateCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 
-			fmt.Println(render.Tables4Goal([]*models.Goal{newG}))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4Goal([]*models.Goal{newG}))
 		},
 	}
 }

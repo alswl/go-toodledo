@@ -2,14 +2,15 @@ package common
 
 import (
 	"fmt"
+	"os"
+	"path"
+
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
-	"path"
 )
 
 // NewConfigCliConfig ...
@@ -17,7 +18,7 @@ func NewConfigCliConfig(cfg models.ToodledoCliConfig) (models.ToodledoConfig, er
 	return cfg.Auth, nil
 }
 
-// NewCliConfigFromViper build Configs from viper
+// NewCliConfigFromViper build Configs from viper.
 func NewCliConfigFromViper() (models.ToodledoCliConfig, error) {
 	var conf = models.NewToodledoCliConfig()
 	err := viper.Unmarshal(&conf)
@@ -35,7 +36,7 @@ func NewCliConfigForTesting() (models.ToodledoCliConfig, error) {
 	viper.AddConfigPath(path.Join(home, ".config", "toodledo"))
 	viper.SetConfigName("toodledo-test")
 	viper.AutomaticEnv()
-	if err := viper.ReadInConfig(); err != nil {
+	if err = viper.ReadInConfig(); err != nil {
 		return models.ToodledoCliConfig{}, errors.Wrapf(err, "failed to read config")
 	}
 	return NewCliConfigFromViper()
@@ -56,7 +57,7 @@ func NewCliConfigMockForTesting() (models.ToodledoCliConfig, error) {
 }
 
 // InitViper init viper with cfgFile or cfgDirInHome
-// it must be called before viper.GetXXX, usually it was called in init()
+// it must be called before viper.GetXXX, usually it was called in init().
 func InitViper(cfgFile string, cfgDirInHome string, cfgName string) {
 	if cfgFile != "" {
 		// Use config file from the flag.

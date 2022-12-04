@@ -17,6 +17,7 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 		list,
 		NewCreateCmd(f),
 		NewDeleteCmd(f),
+		NewViewCmd(f),
 		NewDoneCmd(f),
 		NewReopenCmd(f),
 		NewEditorCmd(f),

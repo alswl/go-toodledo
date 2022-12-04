@@ -8,9 +8,9 @@ import (
 var (
 	// color {{{
 	// from gh-dash
-	// my
+	// my.
 	borderColor = lipgloss.AdaptiveColor{Light: "#212F3D", Dark: "#D5D8DC"}
-	// }}}
+	// }}}.
 
 	EmptyStyle = lipgloss.NewStyle().Padding(0, 0).Margin(0, 0)
 
@@ -39,5 +39,5 @@ var (
 		BottomRight: "",
 		BottomLeft:  "",
 	}
-	// }}}
+	// }}}.
 )

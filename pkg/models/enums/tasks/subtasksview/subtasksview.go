@@ -9,20 +9,24 @@ const (
 	Indented Mode = 2
 )
 
-var ModeAll = []Mode{
-	Inline,
-	Hidden,
-	Indented,
+func ModeAll() []Mode {
+	return []Mode{
+		Inline,
+		Hidden,
+		Indented,
+	}
 }
 
-var ModeMap = map[string]Mode{
-	"inline":   Inline,
-	"hidden":   Hidden,
-	"indented": Indented,
+func ModeMap() map[string]Mode {
+	return map[string]Mode{
+		"inline":   Inline,
+		"hidden":   Hidden,
+		"indented": Indented,
+	}
 }
 
 func ModeValue2Type(input int64) Mode {
-	for _, x := range ModeAll {
+	for _, x := range ModeAll() {
 		if x == Mode(input) {
 			return x
 		}
@@ -31,7 +35,7 @@ func ModeValue2Type(input int64) Mode {
 }
 
 func ModeString2Type(input string) Mode {
-	for k, v := range ModeMap {
+	for k, v := range ModeMap() {
 		if k == input {
 			return v
 		}

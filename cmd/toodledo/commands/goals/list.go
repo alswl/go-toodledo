@@ -2,6 +2,7 @@ package goals
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -12,7 +13,7 @@ import (
 )
 
 type ListOpts struct {
-	//noCache bool
+	// noCache bool
 	WithArchived bool
 }
 
@@ -45,7 +46,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 
-			fmt.Println(render.Tables4Goal(goals))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4Goal(goals))
 		},
 	}
 	cmd.Flags().BoolVarP(&listOpts.WithArchived, "with-archived", "a", false, "list all goals including archived")

@@ -2,6 +2,7 @@ package folders
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -27,13 +28,12 @@ func NewViewCmd(f *cmdutil.Factory) *cobra.Command {
 			}
 			svc := app.FolderSvc
 			name := args[0]
-			f, err := svc.Find(name)
+			folder, err := svc.Find(name)
 			if err != nil {
 				logrus.WithError(err).Fatal()
 				return
 			}
-			fmt.Println(render.Tables4Folder([]*models.Folder{f}))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4Folder([]*models.Folder{folder}))
 		},
 	}
-
 }

@@ -23,7 +23,7 @@ type taskRichService struct {
 
 // NewTaskRichService returns a new TaskRichService.
 // it will not cache the attribute when rich the task, and query the attribute from remote
-// Please use the NewTaskRichPersistenceService first
+// Please use the NewTaskRichPersistenceService first.
 func NewTaskRichService(
 	taskSvc TaskService,
 	folderSvc FolderService,
@@ -41,7 +41,7 @@ func NewTaskRichService(
 }
 
 // NewTaskRichPersistenceService returns a new TaskRichCachedService.
-// svc inside will cache the attribute when rich the task
+// svc inside will cache the attribute when rich the task.
 func NewTaskRichPersistenceService(
 	taskSvc TaskPersistenceExtService,
 	folderSvc FolderPersistenceService,
@@ -60,7 +60,7 @@ func NewTaskRichPersistenceService(
 
 func (s *taskRichService) Find(id int64) (*models.RichTask, error) {
 	// FIXME deprecated, using Rich()
-	t, err := s.taskSvc.FindById(id)
+	t, err := s.taskSvc.FindByID(id)
 	if err != nil {
 		return nil, err
 	}

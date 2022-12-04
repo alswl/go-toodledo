@@ -1,12 +1,13 @@
 package tasks
 
 import (
+	"reflect"
+	"testing"
+
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	mockservices "github.com/alswl/go-toodledo/test/mock/services"
 	"github.com/stretchr/testify/mock"
-	"reflect"
-	"testing"
 )
 
 func Test_cmdQuery_ToQuery(t *testing.T) {

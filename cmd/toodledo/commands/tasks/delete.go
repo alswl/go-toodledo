@@ -2,12 +2,13 @@ package tasks
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 func NewDeleteCmd(f *cmdutil.Factory) *cobra.Command {
@@ -33,7 +34,7 @@ func NewDeleteCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.Fatal(err)
 				return
 			}
-			fmt.Println("done")
+			_, _ = fmt.Fprintln(f.IOStreams.Out, "done")
 		},
 	}
 }

@@ -1,15 +1,20 @@
 package dal
 
 import (
-	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/pkg/errors"
-	boltdb "go.etcd.io/bbolt"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/pkg/errors"
+	boltdb "go.etcd.io/bbolt"
 )
 
+const perm0755 = 0755
+const perm0600 = 0600
+
 var instance Backend
+
 var once sync.Once
 
 // bolt is port from https://github.com/alibaba/pouch/blob/master/pkg/meta/boltdb.go
@@ -20,25 +25,25 @@ type bolt struct {
 
 // NewBoltDB is used to make bolt metadata store instance.
 func NewBoltDB(config models.ToodledoConfigDatabase) (Backend, error) {
-	//opt := &boltdb.Options{
+	// opt := &boltdb.Options{
 	//	Timeout: time.Second * 10,
 	//}
 
 	dir := filepath.Dir(config.DataFile)
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
-		if err := os.MkdirAll(dir, 0755); err != nil {
+		if err = os.MkdirAll(dir, perm0755); err != nil {
 			return nil, errors.Wrapf(err, "create metadata path, %s", dir)
 		}
 	}
 
 	b := &bolt{}
 
-	db, err := boltdb.Open(config.DataFile, 0600, nil)
+	db, err := boltdb.Open(config.DataFile, perm0600, nil)
 	if err != nil {
 		return nil, errors.Wrapf(err, "open boltdb, %s", config.DataFile)
 	}
 	for _, bucket := range config.Buckets {
-		if err := b.prepare(db, []byte(bucket)); err != nil {
+		if err = b.prepare(db, []byte(bucket)); err != nil {
 			return nil, err
 		}
 	}
@@ -156,7 +161,8 @@ func (b *bolt) Get(bucket string, key string) ([]byte, error) {
 
 // List returns all metadata in boltdb.
 func (b *bolt) List(bucket string) ([][]byte, error) {
-	values := make([][]byte, 0, 20)
+	const defSize = 20
+	values := make([][]byte, 0, defSize)
 
 	b.Lock()
 	defer b.Unlock()

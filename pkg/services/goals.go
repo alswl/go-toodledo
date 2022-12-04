@@ -3,6 +3,8 @@ package services
 import (
 	"errors"
 	"fmt"
+	"strconv"
+
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/goal"
 	"github.com/alswl/go-toodledo/pkg/common"
@@ -10,7 +12,6 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
-	"strconv"
 )
 
 type GoalService interface {
@@ -26,7 +27,7 @@ type GoalService interface {
 }
 
 // GoalPersistenceService is a cached service
-// it synced interval by fetcher
+// it synced interval by fetcher.
 type GoalPersistenceService interface {
 	Synchronizable
 	GoalService
@@ -35,7 +36,7 @@ type GoalPersistenceService interface {
 type goalService struct {
 	cli  *client.Toodledo
 	auth runtime.ClientAuthInfoWriter
-	//log  *logrus.Logger
+	// log  *logrus.Logger
 }
 
 // NewGoalService ...
@@ -50,7 +51,7 @@ func (s *goalService) Find(name string) (*models.Goal, error) {
 	if err != nil {
 		return nil, err
 	}
-	filtered := funk.Filter(ts.Payload, func(x *models.Goal) bool {
+	filtered, _ := funk.Filter(ts.Payload, func(x *models.Goal) bool {
 		return x.Name == name
 	}).([]*models.Goal)
 	if len(filtered) == 0 {
@@ -66,7 +67,7 @@ func (s *goalService) FindByID(id int64) (*models.Goal, error) {
 	if err != nil {
 		return nil, err
 	}
-	filtered := funk.Filter(ts, func(x *models.Goal) bool {
+	filtered, _ := funk.Filter(ts, func(x *models.Goal) bool {
 		return x.ID == id
 	}).([]*models.Goal)
 	if len(filtered) == 0 {

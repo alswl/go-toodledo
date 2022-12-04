@@ -2,6 +2,8 @@ package root
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/auth"
 	"github.com/alswl/go-toodledo/cmd/toodledo/commands/browse"
@@ -18,7 +20,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 var (

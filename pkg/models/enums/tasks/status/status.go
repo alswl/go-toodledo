@@ -19,22 +19,23 @@ const (
 	Reference  Status = 10
 )
 
-// StatusAll ...
-var StatusAll = []Status{
-	None,
-	NextAction,
-	Active,
-	Planning,
-	Delegated,
-	Waiting,
-	Hold,
-	Postponed,
-	Someday,
-	Canceled,
-	Reference,
+func All() []Status {
+	return []Status{
+		None,
+		NextAction,
+		Active,
+		Planning,
+		Delegated,
+		Waiting,
+		Hold,
+		Postponed,
+		Someday,
+		Canceled,
+		Reference,
+	}
 }
 
-var StatusMap = map[string]Status{
+var mapping = map[string]Status{
 	"none":        None,
 	"next_action": NextAction,
 	"nextaction":  NextAction,
@@ -49,9 +50,9 @@ var StatusMap = map[string]Status{
 	"reference":   Reference,
 }
 
-// StatusValue2Type ...
-func StatusValue2Type(input int64) Status {
-	for _, x := range StatusAll {
+// Value2Type ...
+func Value2Type(input int64) Status {
+	for _, x := range All() {
 		if x == Status(input) {
 			return x
 		}
@@ -59,8 +60,8 @@ func StatusValue2Type(input int64) Status {
 	return None
 }
 
-func StatusString2Type(input string) Status {
-	for k, v := range StatusMap {
+func String2Type(input string) Status {
+	for k, v := range mapping {
 		if k == input {
 			return v
 		}

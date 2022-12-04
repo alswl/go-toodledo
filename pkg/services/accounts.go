@@ -2,12 +2,15 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
+
+	"github.com/pkg/errors"
+
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/account"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/go-openapi/runtime"
-	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
@@ -57,38 +60,40 @@ func (s *accountService) CachedMe() (*models.Account, bool, error) {
 	bytes, err := s.db.Get(BucketAccount, meKey)
 	u := models.Account{}
 	// TODO refactor, cacheOrSet(key, setFn): val
-	if err == dal.ErrObjectNotFound {
-		me, err := s.Me()
-		if err != nil {
-			return nil, false, errors.Wrapf(err, "get account s.Me() failed")
-		}
-		bytes, err = json.Marshal(me)
-		if err != nil {
-			return nil, false, errors.Wrapf(err, "marshal account failed")
-		}
-		_ = s.db.Put(BucketAccount, meKey, bytes)
-		return me, false, nil
-	} else if err != nil {
-		return nil, false, errors.Wrapf(err, "get account in db failed")
-	} else {
-		err = json.Unmarshal(bytes, &u)
-		if err != nil {
-			return nil, false, errors.Wrapf(err, "unmarshal account failed")
-		}
-		// TODO check user id for local config
-		userID := viper.GetString(models.AuthUserId)
-		if u.Userid != userID {
-			return nil, false, errors.Errorf("user id not match, local %s, remote %s, please auth logout", userID, u.Userid)
-		}
 
-		return &u, true, nil
+	if err != nil {
+		if errors.Is(err, dal.ErrObjectNotFound) {
+			me, ierr := s.Me()
+			if ierr != nil {
+				return nil, false, errors.Wrapf(ierr, "get account s.Me() failed")
+			}
+			bytes, ierr = json.Marshal(me)
+			if ierr != nil {
+				return nil, false, errors.Wrapf(ierr, "marshal account failed")
+			}
+			_ = s.db.Put(BucketAccount, meKey, bytes)
+			return me, false, nil
+		}
+		return nil, false, errors.Wrapf(err, "get account in db failed")
 	}
+	err = json.Unmarshal(bytes, &u)
+	if err != nil {
+		return nil, false, errors.Wrapf(err, "unmarshal account failed")
+	}
+	// TODO check user id for local config
+	userID := viper.GetString(models.AuthUserID)
+	if u.Userid != userID {
+		return nil, false, errors.Errorf("user id not match, local %s, remote %s, please auth logout", userID, u.Userid)
+	}
+
+	return &u, true, nil
 }
 
 func (s *accountService) GetLastFetchInfo() (*models.Account, error) {
 	bytes, err := s.db.Get(BucketAccount, lastSyncInfoKey)
-	if err == dal.ErrObjectNotFound {
-		return nil, nil
+	if errors.Is(err, dal.ErrObjectNotFound) {
+		// FIXME global not found
+		return nil, fmt.Errorf("not found")
 	} else if err != nil {
 		return nil, errors.Wrap(err, "get last sync info")
 	}

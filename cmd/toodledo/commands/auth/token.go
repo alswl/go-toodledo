@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/client"
@@ -50,14 +51,13 @@ func NewTokenCmd(f *cmdutil.Factory) *cobra.Command {
 				log.Error(err)
 				return
 			}
-			err = client.SaveUserIdWithViper(me.Userid)
+			err = client.SaveUserIDWithViper(me.Userid)
 			if err != nil {
 				log.Error(err)
 				return
 			}
-			fmt.Printf("You are logged in as %s(%s)\n", me.Userid, me.Email)
-			fmt.Println("ok")
+			_, _ = fmt.Fprintf(f.IOStreams.Out, "You are logged in as %s(%s)\n", me.Userid, me.Email)
+			_, _ = fmt.Fprintln(f.IOStreams.Out, "ok")
 		},
 	}
-
 }

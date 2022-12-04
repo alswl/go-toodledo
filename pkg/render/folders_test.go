@@ -1,8 +1,9 @@
 package render
 
 import (
-	"github.com/alswl/go-toodledo/pkg/models"
 	"testing"
+
+	"github.com/alswl/go-toodledo/pkg/models"
 )
 
 func TestTablesRender(t *testing.T) {

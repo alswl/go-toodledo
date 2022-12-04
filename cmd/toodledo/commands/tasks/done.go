@@ -2,6 +2,8 @@ package tasks
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -9,7 +11,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
 func NewDoneCmd(f *cmdutil.Factory) *cobra.Command {
@@ -35,7 +36,7 @@ func NewDoneCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.WithField("id", id).WithError(err).Fatal("complete task")
 				return
 			}
-			fmt.Println(render.Tables4Task([]*models.Task{newTReturned}))
+			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4Task([]*models.Task{newTReturned}))
 		},
 	}
 }

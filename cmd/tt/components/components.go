@@ -33,7 +33,7 @@ type ResizeInterface interface {
 
 // Resizable managed the size of the component,
 // Viewpoint is inner viewport of the component, which is used to render the content
-// Viewport' size is the size of the component minus the border size
+// Viewport' size is the size of the component minus the border size.
 type Resizable struct {
 	Height   int
 	Width    int
@@ -55,7 +55,7 @@ type Refreshable interface {
 	Refresh(isHardRefresh bool) tea.Cmd
 }
 
-// Notifier is a component that can notify to the parent component
+// Notifier is a component that can notify to the parent component.
 type Notifier interface {
 	Info(msg string)
 	Warn(msg string)

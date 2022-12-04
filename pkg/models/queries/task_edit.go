@@ -1,12 +1,13 @@
 package queries
 
 import (
-	"github.com/alswl/go-toodledo/pkg/models"
 	"strings"
 	"time"
+
+	"github.com/alswl/go-toodledo/pkg/models"
 )
 
-// TaskEditQuery is edit query model of Task
+// TaskEditQuery is edit query model of Task.
 type TaskEditQuery struct {
 	TaskWritePartialQuery
 
@@ -14,7 +15,7 @@ type TaskEditQuery struct {
 	Title string `description:""`
 }
 
-// ToModel converts TaskCreateQuery to Task
+// ToModel converts TaskCreateQuery to Task.
 func (q *TaskEditQuery) ToModel() *models.Task {
 	t := &models.Task{
 		ID:      q.ID,

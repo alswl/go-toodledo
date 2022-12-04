@@ -20,7 +20,7 @@ var CLISet = wire.NewSet(
 
 	dal.ProvideBackend,
 	client.NewToodledo,
-	//client.NewAuthFromViper,
+	// client.NewAuthFromViper,
 	client.NewAuthFromConfig,
 	client.NewOAuth2ConfigFromViper,
 
@@ -39,7 +39,7 @@ var CLISet = wire.NewSet(
 	services.NewTaskRichPersistenceService,
 
 	// wire not support generic now
-	//informers.ProvideTaskInformer,
+	// informers.ProvideTaskInformer,
 
 	app.NewToodledoCLIApp,
 )

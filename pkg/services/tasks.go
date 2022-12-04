@@ -3,6 +3,9 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/task"
 	"github.com/alswl/go-toodledo/pkg/common"
@@ -14,18 +17,16 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
 	pointerutil "k8s.io/utils/pointer"
-	"strconv"
-	"time"
 )
 
 var DefaultFieldsInResponse = "folder,star,context,tag,goal,repeat,startdate,starttime,duedate,duetime,priority,length"
 
 type TaskService interface {
-	FindById(id int64) (*models.Task, error)
+	FindByID(id int64) (*models.Task, error)
 	List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error)
 	ListAll() ([]*models.Task, int, error)
 	// TODO
-	//ListAllAfter(after *time.Time) ([]*models.Task, error)
+	// ListAllAfter(after *time.Time) ([]*models.Task, error)
 	// Create is simple create with only title, it was deprecated
 	Create(title string) (*models.Task, error)
 	CreateByQuery(query *queries.TaskCreateQuery) (*models.Task, error)
@@ -58,7 +59,7 @@ type TaskPersistenceExtService interface {
 
 var _ TaskService = (*taskService)(nil)
 
-// taskService is the implementation of TaskService by client
+// taskService is the implementation of TaskService by client.
 type taskService struct {
 	cli    *client.Toodledo
 	auth   runtime.ClientAuthInfoWriter
@@ -74,9 +75,9 @@ func (s *taskService) ListAll() ([]*models.Task, int, error) {
 	return []*models.Task{}, 0, nil
 }
 
-func (s *taskService) FindById(id int64) (*models.Task, error) {
+func (s *taskService) FindByID(id int64) (*models.Task, error) {
 	p := task.NewGetTasksGetPhpParams()
-	fields := enums.TaskFields2String(enums.GeneralTaskFields)
+	fields := enums.TaskFields2String(enums.GeneralTaskFields())
 	p.SetFields(&fields)
 	p.SetID(&id)
 
@@ -85,10 +86,10 @@ func (s *taskService) FindById(id int64) (*models.Task, error) {
 		return nil, err
 	}
 	// TODO using multiple kind of payload item
-	if err != nil || len(res.Payload) == 1 {
+	if len(res.Payload) == 1 {
 		return nil, common.ErrNotFound
 	}
-	//_ := res.Payload[0].(models.PaginatedInfo)
+	// _ := res.Payload[0].(models.PaginatedInfo)
 	bytes, _ := json.Marshal(res.Payload[1])
 	var t models.Task
 	_ = json.Unmarshal(bytes, &t)
@@ -99,20 +100,20 @@ func (s *taskService) List(start, limit int64) ([]*models.Task, *models.Paginate
 	return s.ListWithChanged(nil, start, limit)
 }
 
-func (s *taskService) ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
+func (s *taskService) ListWithChanged(lastEditTime *int32, start, limit int64) ([]*models.Task,
+	*models.PaginatedInfo, error) {
 	// TODO using TaskQuery,before, after,start,limit
 	p := task.NewGetTasksGetPhpParams()
-	fields := enums.TaskFields2String(enums.GeneralTaskFields)
+	fields := enums.TaskFields2String(enums.GeneralTaskFields())
 	p.SetFields(&fields)
 	comp := int64(-1)
 	p.SetComp(&comp)
 	num := limit
 	p.SetNum(&num)
-	start_ := &start
-	p.SetStart(start_)
+	startPtr := &start
+	p.SetStart(startPtr)
 	if lastEditTime != nil {
-		lastEditTime_ := int64(*lastEditTime)
-		p.After = &lastEditTime_
+		p.After = utils.WrapPointerInt64((int64)(utils.UnwrapPointerInt32(lastEditTime)))
 	}
 
 	res, err := s.cli.Task.GetTasksGetPhp(p, s.auth)
@@ -132,8 +133,7 @@ func (s *taskService) ListWithChanged(lastEditTime *int32, start, limit int64) (
 func (s *taskService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
 	p := task.NewGetTasksDeletedPhpParams()
 	if lastEditTime != nil {
-		lastEditTime_ := int64(*lastEditTime)
-		p.After = &lastEditTime_
+		p.After = utils.WrapPointerInt64((int64)(utils.UnwrapPointerInt32(lastEditTime)))
 	}
 
 	res, err := s.cli.Task.GetTasksDeletedPhp(p, s.auth)
@@ -176,7 +176,7 @@ func (s *taskService) Create(title string) (*models.Task, error) {
 	bytesS := (string)(bytes)
 	p := task.NewPostTasksAddPhpParams()
 	p.Tasks = &bytesS
-	p.Fields = pointerutil.String(enums.TaskFields2String(enums.GeneralTaskFields))
+	p.Fields = pointerutil.String(enums.TaskFields2String(enums.GeneralTaskFields()))
 	resp, err := s.cli.Task.PostTasksAddPhp(p, s.auth)
 	if err != nil {
 		return nil, err
@@ -191,7 +191,7 @@ func (s *taskService) Create(title string) (*models.Task, error) {
 // DeleteBatch ...
 func (s *taskService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error) {
 	p := task.NewPostTasksDeletePhpParams()
-	idsString := funk.Map(ids, func(x int64) string {
+	idsString, _ := funk.Map(ids, func(x int64) string {
 		return strconv.Itoa(int(x))
 	}).([]string)
 	bytes, _ := json.Marshal(idsString)
@@ -202,23 +202,22 @@ func (s *taskService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteIte
 		logrus.WithField("resp", resp).WithError(err).Error("delete batch request failed")
 		return nil, nil, err
 	}
-	success := funk.Filter(resp.Payload, func(x *models.TaskDeleteItem) bool {
+	success, _ := funk.Filter(resp.Payload, func(x *models.TaskDeleteItem) bool {
 		return x.Ref == ""
 	}).([]*models.TaskDeleteItem)
-	successIds := funk.Map(success, func(x *models.TaskDeleteItem) int64 {
+	successIds, _ := funk.Map(success, func(x *models.TaskDeleteItem) int64 {
 		return x.ID
 	}).([]int64)
 
-	failed := funk.Filter(resp.Payload, func(x *models.TaskDeleteItem) bool {
+	failed, _ := funk.Filter(resp.Payload, func(x *models.TaskDeleteItem) bool {
 		return x.Ref != ""
 	}).([]*models.TaskDeleteItem)
 	return successIds, failed, nil
-
 }
 
 // Delete ...
 func (s *taskService) Delete(id int64) error {
-	t, err := s.FindById(id)
+	t, err := s.FindByID(id)
 	if err != nil {
 		return err
 	}
@@ -268,7 +267,7 @@ func (s *taskService) EditByQuery(query *queries.TaskEditQuery) (*models.Task, e
 }
 
 func (s *taskService) Complete(id int64) (*models.Task, error) {
-	_, err := s.FindById(id)
+	_, err := s.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -278,7 +277,7 @@ func (s *taskService) Complete(id int64) (*models.Task, error) {
 }
 
 func (s *taskService) UnComplete(id int64) (*models.Task, error) {
-	_, err := s.FindById(id)
+	_, err := s.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +287,7 @@ func (s *taskService) UnComplete(id int64) (*models.Task, error) {
 }
 
 func (s *taskService) Start(id int64) error {
-	t, err := s.FindById(id)
+	t, err := s.FindByID(id)
 	if err != nil {
 		return err
 	}
@@ -303,7 +302,7 @@ func (s *taskService) Start(id int64) error {
 }
 
 func (s *taskService) Stop(id int64) error {
-	t, err := s.FindById(id)
+	t, err := s.FindByID(id)
 	if err != nil {
 		return err
 	}

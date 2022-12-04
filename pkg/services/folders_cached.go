@@ -2,11 +2,12 @@ package services
 
 import (
 	"encoding/json"
+	"sync"
+
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/thoas/go-funk"
-	"sync"
 )
 
 var FolderBucket = "folders"
@@ -22,7 +23,8 @@ type folderCachedService struct {
 var folderLocalServiceInstance FolderPersistenceService
 var folderLocalServiceOnce sync.Once
 
-func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService, db dal.Backend) FolderPersistenceService {
+func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService,
+	db dal.Backend) FolderPersistenceService {
 	s := folderCachedService{
 		svc:        folderSvc,
 		db:         db,
@@ -108,7 +110,7 @@ func (s *folderCachedService) Find(name string) (*models.Folder, error) {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Folder) bool {
+	filtered, _ := funk.Filter(fs, func(x *models.Folder) bool {
 		return x.Name == name
 	}).([]*models.Folder)
 	if len(filtered) == 0 {
@@ -124,7 +126,7 @@ func (s *folderCachedService) FindByID(id int64) (*models.Folder, error) {
 		return nil, err
 	}
 
-	filtered := funk.Filter(fs, func(x *models.Folder) bool {
+	filtered, _ := funk.Filter(fs, func(x *models.Folder) bool {
 		return x.ID == id
 	}).([]*models.Folder)
 	if len(filtered) == 0 {

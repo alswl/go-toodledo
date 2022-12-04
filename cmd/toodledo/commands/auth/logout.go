@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/client"
@@ -37,8 +38,7 @@ func NewLogoutCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 
-			fmt.Println("Logout successfully")
+			_, _ = fmt.Fprintln(f.IOStreams.Out, "Logout successfully")
 		},
 	}
-
 }

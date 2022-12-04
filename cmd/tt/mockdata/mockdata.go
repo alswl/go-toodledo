@@ -7,10 +7,11 @@ import (
 )
 
 func AllTasksMock() ([]*models.RichTask, error) {
-	tasks := make([]models.RichTask, 500)
+	const defaultCount = 500
+	tasks := make([]models.RichTask, defaultCount)
 	_ = faker.FakeData(&tasks)
 
-	ts := funk.Map(tasks, func(x models.RichTask) *models.RichTask {
+	ts, _ := funk.Map(tasks, func(x models.RichTask) *models.RichTask {
 		return &x
 	}).([]*models.RichTask)
 
@@ -18,7 +19,8 @@ func AllTasksMock() ([]*models.RichTask, error) {
 }
 
 func ListContexts() []models.Context {
-	contexts := make([]models.Context, 10)
+	const size = 10
+	contexts := make([]models.Context, size)
 	_ = faker.FakeData(&contexts)
 	return contexts
 }

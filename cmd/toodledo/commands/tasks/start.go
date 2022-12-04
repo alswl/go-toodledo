@@ -2,15 +2,16 @@ package tasks
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"strconv"
 )
 
-func NewStartCmd(_ *cmdutil.Factory) *cobra.Command {
+func NewStartCmd(f *cmdutil.Factory) *cobra.Command {
 	return &cobra.Command{
 		Use:     "start",
 		Args:    cobra.ExactArgs(1),
@@ -33,7 +34,7 @@ func NewStartCmd(_ *cmdutil.Factory) *cobra.Command {
 				logrus.WithField("id", id).WithError(err).Fatal("start task")
 				return
 			}
-			fmt.Println("started")
+			_, _ = fmt.Fprintln(f.IOStreams.Out, "started")
 		},
 	}
 }

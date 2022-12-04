@@ -176,7 +176,7 @@ func (_m *TaskExtendedService) EditByQuery(query *queries.TaskEditQuery) (*model
 }
 
 // FindById provides a mock function with given fields: id
-func (_m *TaskExtendedService) FindById(id int64) (*models.Task, error) {
+func (_m *TaskExtendedService) FindByID(id int64) (*models.Task, error) {
 	ret := _m.Called(id)
 
 	var r0 *models.Task

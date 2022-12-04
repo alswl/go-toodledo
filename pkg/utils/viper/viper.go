@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/spf13/viper"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 // Unset the key of viper, and write configs
@@ -28,8 +29,8 @@ func Unset(vars ...string) error {
 				// Last part so delete.
 				delete(vals, k)
 			default:
-				m, ok := v.(map[string]interface{})
-				if !ok {
+				m, iok := v.(map[string]interface{})
+				if !iok {
 					return fmt.Errorf("unsupported type: %T for %q", v, strings.Join(parts[0:i], "."))
 				}
 				vals = m
