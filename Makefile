@@ -60,19 +60,25 @@ VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
 
 # TODO using k8s makefile style
 
-
-.PHONY: fmt build container test integration-test push clean lint download generate-code compress
-
 all: download generate-code fmt test build
 
+.PHONY: install-dev-tools
+install-dev-tools:
+	if ! which golangci-lint > /dev/null; then \
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.1
+	fi
+
+.PHONY: download
 download:
 	go mod download
 
+.PHONY: fmt
 fmt:
 	gofmt -w ./pkg/ ./test/ ./cmd/
 	go fmt ./pkg/... ./cmd/...
 	go vet ./pkg/... ./cmd/...
 
+.PHONY: lint
 lint:
 	@echo "gofmt ensure"
 	@test $$(gofmt -l ./pkg/ ./test/ ./cmd/ | wc -l) -eq 0
@@ -82,6 +88,7 @@ lint:
 
 	golangci-lint run
 
+.PHONY: generate-code
 generate-code:
 	@echo -n ''
 
@@ -91,6 +98,7 @@ generate-docs:
 	mkdir -p docs/commands
 	go run ./cmd/gendocs/main.go
 
+.PHONY: generate-code-enum
 generate-code-enum:
 	# go install golang.org/x/tools/cmd/stringer
 	@echo generate stringer for enums
@@ -99,15 +107,18 @@ generate-code-enum:
 	@(cd pkg/models/enums/tasks/status; go generate)
 	@(cd pkg/models/enums/tasks/subtasksview; go generate)
 
+.PHONY: generate-code-swagger
 generate-code-swagger:
 	@(cd pkg; rm client/zz_generated_*.go;rm client/*/zz_generated_*.go; rm models/zz_generated_*.go; swagger generate client -f ../api/swagger.yaml -A toodledo --template-dir ../api/templates --allow-template-override -C ../api/config.yaml)
 
+.PHONY: generate-code-mockery
 generate-code-mockery:
 	@echo generate mock of interfaces for testing
 	@rm -rf test/mock
 	@(cd pkg && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
 	@(cd cmd && mockery --all --keeptree --case=underscore --packageprefix=mock --output=../test/mock)
 
+.PHONY: generate-code-wire
 generate-code-wire:
 	@echo generate wire
 	@(cd cmd/toodledo/injector; $$GOPATH/bin/wire)
@@ -121,6 +132,7 @@ generate-code-wire:
 	#diff cmd/toodledo/injector/sets.go test/suites/itinjector/sets.go || true
 	@(cd test/suites/itinjector; $$GOPATH/bin/wire)
 
+.PHONY: build
 build:
 	@for target in $(TARGETS); do                                                             \
 	  GOOS=$(GOOS) GOARCH=$(GOARCH) go build -v -o $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) \
@@ -132,11 +144,13 @@ build:
 	  cp $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) $(OUTPUT_DIR)/$${target}-$(VERSION);      \
 	done
 
+.PHONY: compress
 compress:
 	@for target in $(TARGETS); do   \
 	  upx $(OUTPUT_DIR)/$${target}; \
 	done
 
+.PHONY: container
 container:
 	@for target in $(TARGETS); do                                                      \
 	  for registry in $(REGISTRIES); do                                                \
@@ -147,6 +161,7 @@ container:
 	  done                                                                             \
 	done
 
+.PHONY: push
 push: container
 	@for target in $(TARGETS); do                                                      \
 	  for registry in $(REGISTRIES); do                                                \
@@ -155,11 +170,14 @@ push: container
 	  done                                                                             \
 	done
 
+.PHONY: test
 test: lint
 	@go test -tags=\!integration ./...
 
+.PHONY: integration-test
 integration-test:
 	@go test -tags=integration ./...
 
+.PHONY: clean
 clean:
 	@rm -vrf ${OUTPUT_DIR}/*

@@ -29,5 +29,8 @@ jobs:
     - name: Build
       run: make build
 
-    - name: Test
-      run: make test
+    - name: Lint and Test
+      run: |
+        make install-dev-tools
+        make lint
+        make test
