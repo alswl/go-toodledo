@@ -28,7 +28,7 @@ func InitCLIBackend() (dal.Backend, error) {
 }
 
 func InitCLIOption() (models.ToodledoCliConfig, error) {
-	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	toodledoCliConfig, err := common.NewCliConfigMockForTesting()
 	if err != nil {
 		return models.ToodledoCliConfig{}, err
 	}
@@ -37,7 +37,7 @@ func InitCLIOption() (models.ToodledoCliConfig, error) {
 
 func InitCLIApp() (*app.ToodledoCLIApp, error) {
 	toodledo := client.NewToodledo()
-	toodledoCliConfig, err := common.NewCliConfigFromViper()
+	toodledoCliConfig, err := common.NewCliConfigMockForTesting()
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,8 @@ func InitCLIApp() (*app.ToodledoCLIApp, error) {
 	goalService := services.NewGoalService(toodledo, clientAuthInfoWriter)
 	savedSearchService := services.NewSavedSearchService(toodledo, clientAuthInfoWriter)
 	taskPersistenceExtService := services.ProvideTaskLocalExtService(taskService, accountService, backend)
-	folderPersistenceService := services.NewFolderCachedService(folderService, accountService, backend)
-	contextPersistenceService := services.NewContextCachedService(contextService, accountService, backend)
+	folderPersistenceService := services.ProvideFolderCachedService(folderService, accountService, backend)
+	contextPersistenceService := services.ProvideContextCachedService(contextService, accountService, backend)
 	goalPersistenceService := services.NewGoalCachedService(goalService, accountService, backend)
 	taskRichService := services.NewTaskRichPersistenceService(taskPersistenceExtService, folderPersistenceService, contextPersistenceService, goalPersistenceService, fieldLogger)
 	toodledoCLIApp := app.NewToodledoCLIApp(accountService, taskService, folderService, contextService, goalService, savedSearchService, taskRichService, toodledoCliConfig)
