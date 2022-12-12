@@ -13,6 +13,20 @@ type DaemonFetcher struct {
 	mock.Mock
 }
 
+// Fetch provides a mock function with given fields: isHardRefresh
+func (_m *DaemonFetcher) Fetch(isHardRefresh bool) error {
+	ret := _m.Called(isHardRefresh)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(bool) error); ok {
+		r0 = rf(isHardRefresh)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Notify provides a mock function with given fields: isHardRefresh
 func (_m *DaemonFetcher) Notify(isHardRefresh bool) (chan bool, error) {
 	ret := _m.Called(isHardRefresh)
