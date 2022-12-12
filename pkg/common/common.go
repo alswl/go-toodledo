@@ -5,22 +5,20 @@ import (
 	"os"
 	"path"
 
-	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/mitchellh/go-homedir"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 // NewConfigCliConfig ...
-func NewConfigCliConfig(cfg models.ToodledoCliConfig) (models.ToodledoConfig, error) {
+func NewConfigCliConfig(cfg ToodledoCliConfig) (ToodledoConfig, error) {
 	return cfg.Auth, nil
 }
 
 // NewCliConfigFromViper build Configs from viper.
-func NewCliConfigFromViper() (models.ToodledoCliConfig, error) {
-	var conf = models.NewToodledoCliConfig()
+func NewCliConfigFromViper() (ToodledoCliConfig, error) {
+	var conf = NewToodledoCliConfig()
 	err := viper.Unmarshal(&conf)
 	if err != nil {
 		return conf, err
@@ -30,22 +28,22 @@ func NewCliConfigFromViper() (models.ToodledoCliConfig, error) {
 }
 
 // NewCliConfigForTesting ...
-func NewCliConfigForTesting() (models.ToodledoCliConfig, error) {
+func NewCliConfigForTesting() (ToodledoCliConfig, error) {
 	home, err := homedir.Dir()
 	cobra.CheckErr(err)
 	viper.AddConfigPath(path.Join(home, ".config", "toodledo"))
 	viper.SetConfigName("toodledo-test")
 	viper.AutomaticEnv()
 	if err = viper.ReadInConfig(); err != nil {
-		return models.ToodledoCliConfig{}, errors.Wrapf(err, "failed to read config")
+		return ToodledoCliConfig{}, fmt.Errorf("failed to read config: %w", err)
 	}
 	return NewCliConfigFromViper()
 }
 
 // NewCliConfigMockForTesting ...
-func NewCliConfigMockForTesting() (models.ToodledoCliConfig, error) {
-	var conf = models.ToodledoCliConfig{
-		Auth: models.ToodledoConfig{
+func NewCliConfigMockForTesting() (ToodledoCliConfig, error) {
+	var conf = ToodledoCliConfig{
+		Auth: ToodledoConfig{
 			UserID:       "test-user-id",
 			ClientID:     "test-client-id",
 			ClientSecret: "test-client-secret",
@@ -53,11 +51,11 @@ func NewCliConfigMockForTesting() (models.ToodledoCliConfig, error) {
 			ExpiredAt:    "2099-11-26T01:27:20+08:00",
 			RefreshToken: "test-refresh-token",
 		},
-		Database: models.ToodledoConfigDatabase{
+		Database: ToodledoConfigDatabase{
 			DataFile: "tmp.db",
 			Buckets:  nil,
 		},
-		Environment:    map[string]*models.ToodledoConfigEnvironment{},
+		Environment:    map[string]*ToodledoConfigEnvironment{},
 		DefaultContext: "default",
 	}
 	return conf, nil

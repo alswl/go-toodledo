@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/services"
 )
 
@@ -16,7 +16,7 @@ type ToodledoCLIApp struct {
 
 	TaskRichSvc services.TaskRichService
 
-	Config models.ToodledoCliConfig
+	Config common.ToodledoCliConfig
 }
 
 func NewToodledoCLIApp(
@@ -27,7 +27,7 @@ func NewToodledoCLIApp(
 	goalSvc services.GoalService,
 	savedSearchSvc services.SavedSearchService,
 	taskRichSvc services.TaskRichService,
-	config models.ToodledoCliConfig,
+	config common.ToodledoCliConfig,
 ) *ToodledoCLIApp {
 	return &ToodledoCLIApp{
 		AccountSvc:     accountSvc,

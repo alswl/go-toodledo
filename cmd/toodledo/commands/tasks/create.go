@@ -14,7 +14,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/alswl/go-toodledo/pkg/utils"
 	"github.com/go-playground/validator/v10"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -46,21 +45,21 @@ func (q *cmdCreateQuery) ToQuery(contextSvc services.ContextService, folderSvc s
 	if q.Context != "" {
 		context, err := contextSvc.Find(q.Context)
 		if err != nil {
-			return nil, errors.Wrap(err, "find context")
+			return nil, fmt.Errorf("find context: %w", err)
 		}
 		query.ContextID = context.ID
 	}
 	if q.Folder != "" {
 		folder, err := folderSvc.Find(q.Folder)
 		if err != nil {
-			return nil, errors.Wrap(err, "find folder")
+			return nil, fmt.Errorf("find folder: %w", err)
 		}
 		query.FolderID = folder.ID
 	}
 	if q.Goal != "" {
 		goal, err := goalSvc.Find(q.Goal)
 		if err != nil {
-			return nil, errors.Wrap(err, "find goal")
+			return nil, fmt.Errorf("find goal: %w", err)
 		}
 		query.GoalID = goal.ID
 	}

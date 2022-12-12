@@ -6,7 +6,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/dal"
-	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/google/wire"
 )
@@ -15,7 +14,7 @@ var TUISet = wire.NewSet(
 	common.NewCliConfigFromViper,
 	common.NewConfigCliConfig,
 	logging.ProvideLogger,
-	models.NewToodledoConfigDatabaseFromToodledoCliConfig,
+	common.NewToodledoConfigDatabaseFromToodledoCliConfig,
 
 	dal.ProvideBackend,
 	client.NewToodledo,

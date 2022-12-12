@@ -3,8 +3,9 @@ package folders
 import (
 	"testing"
 
-	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/iostreams"
+
+	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
 	mockservices "github.com/alswl/go-toodledo/test/mock/services"
 	"github.com/alswl/go-toodledo/test/suites/itinjector"

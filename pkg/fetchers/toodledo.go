@@ -1,7 +1,10 @@
 package fetchers
 
 import (
+	"errors"
 	"fmt"
+
+	"github.com/alswl/go-toodledo/pkg/common"
 
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/sirupsen/logrus"
@@ -49,13 +52,13 @@ func NewToodledoFetchFnPartial(
 func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber, isHardRefresh bool) error {
 	statusDescriber.Syncing()
 
-	me, _, err := s.accountSvc.CachedMe()
+	me, err := s.accountSvc.Me()
 	if err != nil {
 		statusDescriber.Error(fmt.Errorf("auth failed"))
 		return err
 	}
 	lastFetchInfo, err := s.accountSvc.GetLastFetchInfo()
-	if err != nil {
+	if err != nil && !errors.Is(err, common.ErrNotFound) {
 		statusDescriber.Error(fmt.Errorf("sync failed"))
 		return err
 	}

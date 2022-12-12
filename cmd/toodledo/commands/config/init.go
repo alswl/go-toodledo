@@ -6,7 +6,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
-	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,7 +42,7 @@ you can register your own app here: https://api.toodledo.com/3/account/doc_regis
 				return
 			}
 
-			config := models.NewToodledoCliConfig()
+			config := common.NewToodledoCliConfig()
 			if initOpts.Endpoint != "" {
 				config.Endpoint = initOpts.Endpoint
 			}

@@ -16,9 +16,9 @@ import (
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/alswl/go-toodledo/pkg/utils"
 	"github.com/go-playground/validator/v10"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/thoas/go-funk"
 	"sigs.k8s.io/yaml"
 )
 
@@ -63,7 +63,7 @@ func (q *cmdListQuery) PrepareIDs(contextSvc services.ContextService, goalSvc se
 		// TODO case sensitive
 		c, err := contextSvc.Find(q.Context)
 		if err != nil {
-			return errors.Wrap(err, "get context by name")
+			return fmt.Errorf("get context by name: %w", err)
 		}
 		q.ContextID = c.ID
 	}
@@ -71,7 +71,7 @@ func (q *cmdListQuery) PrepareIDs(contextSvc services.ContextService, goalSvc se
 		// TODO case sensitive
 		f, err := folderSvc.Find(q.Folder)
 		if err != nil {
-			return errors.Wrap(err, "get folder by name")
+			return fmt.Errorf("get folder by name: %w", err)
 		}
 		q.FolderID = f.ID
 	}
@@ -79,7 +79,7 @@ func (q *cmdListQuery) PrepareIDs(contextSvc services.ContextService, goalSvc se
 		// TODO case sensitive
 		g, err := goalSvc.Find(q.Goal)
 		if err != nil {
-			return errors.Wrap(err, "get goal by name")
+			return fmt.Errorf("get goal by name: %w", err)
 		}
 		q.GoalID = g.ID
 	}
@@ -189,7 +189,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				log.Error(err)
 				return
 			}
-			tasks = tasks[:cmdQ.Limit]
+			tasks = tasks[:funk.MinInt32([]int32{cmdQ.Limit, int32(len(tasks))})]
 			sorted, _ := services.SortSubTasks(tasks, subtasksview.ModeString2Type(cmdQ.SubTasksMode))
 			rts, _ := taskRichSvc.RichThem(sorted)
 			switch cmdQ.Format {

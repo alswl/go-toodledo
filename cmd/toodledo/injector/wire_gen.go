@@ -12,14 +12,13 @@ import (
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/dal"
-	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/services"
 )
 
 // Injectors from injector.go:
 
 func InitCLIBackend() (dal.Backend, error) {
-	toodledoConfigDatabase := models.NewDefaultToodledoConfigDatabase()
+	toodledoConfigDatabase := common.NewDefaultToodledoConfigDatabase()
 	backend, err := dal.ProvideBackend(toodledoConfigDatabase)
 	if err != nil {
 		return nil, err
@@ -27,10 +26,10 @@ func InitCLIBackend() (dal.Backend, error) {
 	return backend, nil
 }
 
-func InitCLIOption() (models.ToodledoCliConfig, error) {
+func InitCLIOption() (common.ToodledoCliConfig, error) {
 	toodledoCliConfig, err := common.NewCliConfigFromViper()
 	if err != nil {
-		return models.ToodledoCliConfig{}, err
+		return common.ToodledoCliConfig{}, err
 	}
 	return toodledoCliConfig, nil
 }
@@ -49,7 +48,7 @@ func InitCLIApp() (*app.ToodledoCLIApp, error) {
 	if err != nil {
 		return nil, err
 	}
-	toodledoConfigDatabase := models.NewDefaultToodledoConfigDatabase()
+	toodledoConfigDatabase := common.NewDefaultToodledoConfigDatabase()
 	backend, err := dal.ProvideBackend(toodledoConfigDatabase)
 	if err != nil {
 		return nil, err
@@ -84,7 +83,7 @@ func InitTUIApp() (*app.ToodledoTUIApp, error) {
 	if err != nil {
 		return nil, err
 	}
-	toodledoConfigDatabase := models.NewToodledoConfigDatabaseFromToodledoCliConfig(toodledoCliConfig)
+	toodledoConfigDatabase := common.NewToodledoConfigDatabaseFromToodledoCliConfig(toodledoCliConfig)
 	backend, err := dal.ProvideBackend(toodledoConfigDatabase)
 	if err != nil {
 		return nil, err

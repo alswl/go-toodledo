@@ -2,10 +2,13 @@ package fetchers
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/sirupsen/logrus"
 )
+
+const defaultFetchQueueSize = 1
 
 // DaemonFetcher is a interface for one fetcher
 // it runs in background and fetch data from remote.
@@ -14,7 +17,11 @@ type DaemonFetcher interface {
 	// Stop the fetcher
 	// TODO using ch to stop
 	Stop()
+	// Notify is used to notify fetcher to fetch data now.
+	// isHardRefresh is used to indicate whether to clean cache.
+	// return a chan to notify whether fetch success.
 	Notify(isHardRefresh bool) (chan bool, error)
+	Fetch(isHardRefresh bool) error
 	// UIRefresh is used to notify ui app to refresh
 	UIRefresh() chan bool
 }
@@ -22,13 +29,18 @@ type DaemonFetcher interface {
 // FetchFn fetch data.
 type FetchFn func(sd StatusDescriber, isHardRefresh bool) error
 
+type FetchPromise struct {
+	Done          chan bool
+	IsHardRefresh bool
+}
+
 type intervalDaemonFetcher struct {
 	ticker   *time.Ticker
 	stop     chan struct{}
-	fetchNow chan bool
+	fetchNow chan *FetchPromise
 	// fetchForceNow chan bool
 	uiRefresh chan bool
-	refreshed chan bool
+	// refreshed chan bool
 
 	log             logrus.FieldLogger
 	fn              FetchFn
@@ -41,15 +53,23 @@ func NewSimpleFetcher(
 	fn FetchFn,
 	statusDescriber StatusDescriber,
 ) DaemonFetcher {
+	var ticker *time.Ticker
+	if interval == 0 {
+		// do not run ticker
+		ticker = time.NewTicker(1 * time.Second)
+		ticker.Stop()
+	} else {
+		ticker = time.NewTicker(interval)
+	}
 	return &intervalDaemonFetcher{
-		ticker:          time.NewTicker(interval),
+		ticker:          ticker,
 		stop:            make(chan struct{}),
 		log:             log,
 		fn:              fn,
-		fetchNow:        make(chan bool),
+		fetchNow:        make(chan *FetchPromise, defaultFetchQueueSize),
 		statusDescriber: statusDescriber,
 		uiRefresh:       make(chan bool),
-		refreshed:       make(chan bool),
+		//refreshed:       make(chan bool, defaultRefreshQueueSize),
 	}
 }
 
@@ -63,20 +83,27 @@ func (s *intervalDaemonFetcher) run(ctx context.Context) {
 		case <-s.stop:
 			s.log.Info("fetcher stopped, stop chan")
 			break
-		case isHardRefresh := <-s.fetchNow:
-			s.log.WithField("ifHardRefresh", isHardRefresh).Info("fetcher now")
-			err := s.fetch(isHardRefresh)
+		case promise := <-s.fetchNow:
+			s.log.WithField("ifHardRefresh", promise.IsHardRefresh).Info("fetcher now")
+			err := s.Fetch(promise.IsHardRefresh)
 			if err != nil {
 				s.log.Errorf("fetcher fetch error: %v", err)
-				s.refreshed <- false
+				promise.Done <- false
+				// s.refreshed <- false
 			}
-			s.refreshed <- true
+			go func() {
+				// TODO maybe leaks
+				promise.Done <- true
+			}()
+			// s.refreshed <- true
+			s.log.WithField("isHardRefresh", promise.IsHardRefresh).Info("fetcher now done")
 		case <-s.ticker.C:
 			s.log.Info("fetcher tick")
-			err := s.fetch(false)
+			err := s.Fetch(false)
 			if err != nil {
 				s.log.Errorf("fetcher fetch error: %v", err)
 			}
+			s.log.Info("fetcher tick done")
 			s.UIRefresh() <- false
 		}
 	}
@@ -87,9 +114,9 @@ func (s *intervalDaemonFetcher) Start(ctx context.Context) {
 	go s.run(ctx)
 }
 
-// fetch is used to fetch data from remote
+// Fetch is used to fetch data from remote
 // it was synchronized.
-func (s *intervalDaemonFetcher) fetch(hardRefresh bool) error {
+func (s *intervalDaemonFetcher) Fetch(hardRefresh bool) error {
 	return s.fn(s.statusDescriber, hardRefresh)
 }
 
@@ -102,8 +129,20 @@ func (s *intervalDaemonFetcher) Stop() {
 // Notify is used to notify fetcher to fetch data now.
 func (s *intervalDaemonFetcher) Notify(isHardRefresh bool) (chan bool, error) {
 	s.log.WithField("isHardRefresh", isHardRefresh).Info("Notify")
-	s.fetchNow <- isHardRefresh
-	return s.refreshed, nil
+	promise := &FetchPromise{
+		Done:          make(chan bool),
+		IsHardRefresh: isHardRefresh,
+	}
+
+	select {
+	case s.fetchNow <- promise:
+		return promise.Done, nil
+	default:
+		s.log.Info("fetcher is busy")
+		return nil, fmt.Errorf("fetcher is busy")
+	}
+	// TODO using specific channel for fetch
+	// return s.refreshed, nil
 }
 
 func (s *intervalDaemonFetcher) UIRefresh() chan bool {

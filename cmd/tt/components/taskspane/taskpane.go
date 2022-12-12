@@ -1,19 +1,14 @@
 package taskspane
 
 import (
-	"fmt"
-
 	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
-	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/charmbracelet/bubbles/textinput"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
-	"github.com/thoas/go-funk"
 )
 
 const (
@@ -29,10 +24,9 @@ const (
 	columnKeyLength    = "length"
 	columnKeyTimer     = "timer"
 	columnKeyTag       = "tag"
+	defaultTableWidth  = 120
+	defaultPageSize    = 20
 )
-
-const DefaultTableWidth = 120
-const defaultPageSize = 20
 
 var (
 	DefaultColumns = []table.Column{
@@ -77,85 +71,6 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 type parent interface {
 	components.Refreshable
 	components.Notifier
-}
-
-type Model struct {
-	components.Focusable
-	components.Resizable
-
-	// app *app.Model
-
-	// TODO delete? all states is in app. sub models is ephemeral, Or maybe props is using here?
-	// choices  []string         // items on the to-do list
-	// cursor   int              // which to-do list item our cursor is pointing at
-	// selected map[int]struct{} // which to-do items are selected
-
-	// properties
-	// TODO
-
-	// view
-	// TODO table should be only view mode (without filter mode)
-	tableModel table.Model
-	tableWidth int
-
-	taskSvc services.TaskService
-	parent  parent
-}
-
-func (m Model) Init() tea.Cmd {
-	// Just return `nil`, which means "no I/O right now, please."
-	return nil
-}
-
-func (m Model) View() string {
-	m.Viewport.SetContent(
-		m.tableModel.View(),
-	)
-
-	style := styles.PaneStyle.Copy()
-	if m.IsFocused() {
-		style = styles.FocusedPaneStyle.Copy()
-	}
-	return style.Render(m.Viewport.View())
-}
-
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var (
-		cmd tea.Cmd
-	)
-
-	// children first, bubble blow up model
-	m.tableModel, cmd = m.tableModel.Update(msg)
-	// TODO if table acting on event, then we need get the result, and ignore continue progress(quit msg)
-	// now cmd is a fun, so we can't get the quit msg
-	// if cmd == tea.Quit() {
-	//	return m, cmd
-	//}
-
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "x":
-			cmd = m.handleCompleteToggle()
-		case "enter":
-			cmd = m.handleTimerToggle()
-		}
-
-	case []*models.RichTask:
-		// update tasks(render new table)
-		m.tableModel = m.tableModel.WithRows(TasksRenderRows(msg))
-
-	case tea.WindowSizeMsg:
-		// top, right, bottom, left := docStyle.GetMargin()
-		m.Resize(msg.Width, msg.Height)
-	}
-
-	return m, cmd
-}
-
-func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
-	newM, cmd := m.Update(msg)
-	return newM.(Model), cmd
 }
 
 func (m *Model) Resize(width, height int) {
@@ -207,105 +122,4 @@ func (m *Model) Resize(width, height int) {
 
 func (m *Model) Filter(input textinput.Model) {
 	m.tableModel = m.tableModel.WithFilterInput(input)
-}
-
-func (m *Model) handleCompleteToggle() tea.Cmd {
-	// done or undone
-	row := m.tableModel.HighlightedRow()
-	if funk.IsZero(row) {
-		return nil
-	}
-	id, _ := row.Data[columnKeyID].(int64)
-	checked := row.Data[columnKeyCompleted]
-
-	// follow ui
-	if checked == "[ ]" {
-		// _, err := m.taskSvc.Complete(id)
-		err := fmt.Errorf("not implemented")
-		if err != nil {
-			m.parent.Error(err.Error())
-			return nil
-		}
-	} else {
-		_, err := m.taskSvc.UnComplete(id)
-		if err != nil {
-			m.parent.Error(err.Error())
-			return nil
-		}
-	}
-	return m.parent.Refresh(false)
-}
-
-//nolint:unparam // TODO
-func (m *Model) handleTimerToggle() tea.Cmd {
-	row := m.tableModel.HighlightedRow()
-	if funk.IsZero(row) {
-		return nil
-	}
-	id, _ := row.Data[columnKeyID].(int64)
-	t, err := m.taskSvc.FindByID(id)
-	if err != nil {
-		m.parent.Error(err.Error())
-		return nil
-	}
-	if t.Completed > 0 {
-		m.parent.Warn("can't start timer on completed task")
-		return nil
-	}
-
-	if t.Timeron == 0 {
-		// start timer
-		err = m.taskSvc.Start(id)
-		if err != nil {
-			m.parent.Error(err.Error())
-			return nil
-		}
-	} else {
-		// stop timer
-		err = m.taskSvc.Stop(id)
-		if err != nil {
-			m.parent.Error(err.Error())
-			return nil
-		}
-	}
-	return nil
-}
-
-func InitModel(taskSvc services.TaskService, tasks []*models.RichTask, parent parent) Model {
-	keys := table.DefaultKeyMap()
-	keys.RowDown.SetKeys("j", "down")
-	keys.RowUp.SetKeys("k", "up")
-
-	tb := table.New(DefaultColumns).
-		WithRows(TasksRenderRows(tasks)).
-		HeaderStyle(styles.PaneStyle.Copy().Bold(true).BorderStyle(styles.EmptyBorderStyle)).
-		Border(styles.EmptyTableBorderStyle).
-		SelectableRows(false).
-		Focused(true).
-		Filtered(true).
-		// TODO disable filter in table
-		// WithStaticFooter("").
-		// Border(customBorder).
-		// TODO flex height
-		// WithNoPagination().
-		WithPageSize(defaultPageSize).
-		// WithNoPagination().
-		WithFooterVisibility(false).
-		WithTargetWidth(DefaultTableWidth).
-		WithKeyMap(keys)
-
-	m := Model{
-		taskSvc: taskSvc,
-		parent:  parent,
-		//choices:    nil,
-		//cursor:     0,
-		//selected:   nil,
-		tableModel: tb,
-		tableWidth: DefaultTableWidth,
-		//props:      app.GetStates(),
-	}
-
-	m.Blur()
-
-	return m
 }

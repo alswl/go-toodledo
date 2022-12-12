@@ -1,4 +1,4 @@
-package models
+package common
 
 import (
 	"os"
@@ -49,6 +49,7 @@ type ToodledoCliConfig struct {
 	Database       ToodledoConfigDatabase                `mapstructure:"database omitempty"  yaml:"database omitempty"`
 	Environment    map[string]*ToodledoConfigEnvironment `mapstructure:"environments  omitempty" yaml:"environment omitempty"`
 	DefaultContext string                                `mapstructure:"default-environment" yaml:"defaultContext omitempty"`
+	AutoRefresh    string                                `mapstructure:"auto-refresh" yaml:"autoRefresh omitempty"`
 }
 
 func NewToodledoCliConfig() ToodledoCliConfig {
@@ -58,6 +59,7 @@ func NewToodledoCliConfig() ToodledoCliConfig {
 		Database:       NewDefaultToodledoConfigDatabase(),
 		Environment:    map[string]*ToodledoConfigEnvironment{},
 		DefaultContext: "",
+		AutoRefresh:    "1m",
 	}
 }
 

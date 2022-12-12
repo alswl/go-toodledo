@@ -14,7 +14,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/alswl/go-toodledo/pkg/utils"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/thoas/go-funk"
@@ -48,21 +47,21 @@ func toQuery(contextSvc services.ContextService, folderSvc services.FolderServic
 	if q.Context != "" {
 		context, err := contextSvc.Find(q.Context)
 		if err != nil {
-			return nil, errors.Wrap(err, "find context")
+			return nil, fmt.Errorf("find context failed: %w", err)
 		}
 		query.ContextID = context.ID
 	}
 	if q.Folder != "" {
 		folder, err := folderSvc.Find(q.Folder)
 		if err != nil {
-			return nil, errors.Wrap(err, "find folder")
+			return nil, fmt.Errorf("find folder failed: %w", err)
 		}
 		query.FolderID = folder.ID
 	}
 	if q.Goal != "" {
 		goal, err := goalSvc.Find(q.Goal)
 		if err != nil {
-			return nil, errors.Wrap(err, "find goal")
+			return nil, fmt.Errorf("find goal failed: %w", err)
 		}
 		query.GoalID = goal.ID
 	}

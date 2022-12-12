@@ -2,9 +2,10 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/alswl/go-toodledo/pkg/common"
 
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/client/account"
@@ -32,6 +33,8 @@ func CurrentUser(svc AccountService) (*models.Account, error) {
 type AccountService interface {
 	Me() (*models.Account, error)
 	CachedMe() (*models.Account, bool, error)
+	// GetLastFetchInfo return last fetch info in db
+	// lastFetchInfo maybe nil if never sync
 	GetLastFetchInfo() (*models.Account, error)
 	SetLastFetchInfo(account *models.Account) error
 }
@@ -65,25 +68,25 @@ func (s *accountService) CachedMe() (*models.Account, bool, error) {
 		if errors.Is(err, dal.ErrObjectNotFound) {
 			me, ierr := s.Me()
 			if ierr != nil {
-				return nil, false, errors.Wrapf(ierr, "get account s.Me() failed")
+				return nil, false, fmt.Errorf("get account s.Me() failed: %w", ierr)
 			}
 			bytes, ierr = json.Marshal(me)
 			if ierr != nil {
-				return nil, false, errors.Wrapf(ierr, "marshal account failed")
+				return nil, false, fmt.Errorf("marshal account failed: %w", ierr)
 			}
 			_ = s.db.Put(BucketAccount, meKey, bytes)
 			return me, false, nil
 		}
-		return nil, false, errors.Wrapf(err, "get account in db failed")
+		return nil, false, fmt.Errorf("get account in db failed: %w", err)
 	}
 	err = json.Unmarshal(bytes, &u)
 	if err != nil {
-		return nil, false, errors.Wrapf(err, "unmarshal account failed")
+		return nil, false, fmt.Errorf("unmarshal account failed: %w", err)
 	}
 	// TODO check user id for local config
-	userID := viper.GetString(models.AuthUserID)
+	userID := viper.GetString(common.AuthUserID)
 	if u.Userid != userID {
-		return nil, false, errors.Errorf("user id not match, local %s, remote %s, please auth logout", userID, u.Userid)
+		return nil, false, fmt.Errorf("user id not match, local %s, remote %s, please auth logout", userID, u.Userid)
 	}
 
 	return &u, true, nil
@@ -92,15 +95,14 @@ func (s *accountService) CachedMe() (*models.Account, bool, error) {
 func (s *accountService) GetLastFetchInfo() (*models.Account, error) {
 	bytes, err := s.db.Get(BucketAccount, lastSyncInfoKey)
 	if errors.Is(err, dal.ErrObjectNotFound) {
-		// FIXME global not found
-		return nil, fmt.Errorf("not found")
+		return nil, common.ErrNotFound
 	} else if err != nil {
-		return nil, errors.Wrap(err, "get last sync info")
+		return nil, fmt.Errorf("get last sync info failed: %w", err)
 	}
 	u := models.Account{}
 	err = json.Unmarshal(bytes, &u)
 	if err != nil {
-		return nil, errors.Wrap(err, "unmarshal last sync info")
+		return nil, fmt.Errorf("unmarshal last sync info failed: %w", err)
 	}
 	return &u, nil
 }
@@ -108,11 +110,11 @@ func (s *accountService) GetLastFetchInfo() (*models.Account, error) {
 func (s *accountService) SetLastFetchInfo(account *models.Account) error {
 	bytes, err := json.Marshal(account)
 	if err != nil {
-		return errors.Wrap(err, "marshal last sync info")
+		return fmt.Errorf("marshal last sync info failed: %w", err)
 	}
 	err = s.db.Put(BucketAccount, lastSyncInfoKey, bytes)
 	if err != nil {
-		return errors.Wrap(err, "set last sync info")
+		return fmt.Errorf("set last sync info failed: %w", err)
 	}
 	return nil
 }

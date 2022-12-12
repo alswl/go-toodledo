@@ -7,7 +7,7 @@ import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/client"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
-	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -26,7 +26,7 @@ func NewLogoutCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.Fatal(err)
 				return
 			}
-			err = models.CleanDatabase(opt.Database)
+			err = common.CleanDatabase(opt.Database)
 			if err != nil {
 				logrus.Fatal(err)
 				return

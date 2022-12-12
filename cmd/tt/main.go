@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/alswl/go-toodledo/cmd/tt/app"
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
@@ -15,16 +17,21 @@ func init() {
 
 func main() {
 	err := logging.InitFactory("/tmp/tt", false, false)
-	log := logging.ProvideLogger()
+	stdLog := logrus.StandardLogger()
 	if err != nil {
-		log.Fatal(err)
+		stdLog.WithError(err).Error("failed to init logging factory")
 		os.Exit(1)
 	}
 
 	// TODO full screen
-	p := tea.NewProgram(app.InitialModel(), tea.WithAltScreen())
+	mainModel, err := app.InitialModel()
+	if err != nil {
+		stdLog.WithError(err).Fatal("failed to initialize model")
+		os.Exit(1)
+	}
+	p := tea.NewProgram(mainModel, tea.WithAltScreen())
 	if err = p.Start(); err != nil {
-		log.Fatal(err)
+		stdLog.WithError(err).Fatal("failed to start program")
 		os.Exit(1)
 	}
 }

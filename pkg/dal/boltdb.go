@@ -1,12 +1,15 @@
 package dal
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
 
-	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/pkg/errors"
+	"github.com/mitchellh/go-homedir"
+
+	"github.com/alswl/go-toodledo/pkg/common"
+
 	boltdb "go.etcd.io/bbolt"
 )
 
@@ -24,23 +27,28 @@ type bolt struct {
 }
 
 // NewBoltDB is used to make bolt metadata store instance.
-func NewBoltDB(config models.ToodledoConfigDatabase) (Backend, error) {
+func NewBoltDB(config common.ToodledoConfigDatabase) (Backend, error) {
 	// opt := &boltdb.Options{
 	//	Timeout: time.Second * 10,
 	//}
+	dataFile := config.DataFile
+	if !filepath.IsAbs(dataFile) {
+		home, _ := homedir.Dir()
+		dataFile = filepath.Join(home, ".config", "toodledo", dataFile)
+	}
 
-	dir := filepath.Dir(config.DataFile)
+	dir := filepath.Dir(dataFile)
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, perm0755); err != nil {
-			return nil, errors.Wrapf(err, "create metadata path, %s", dir)
+			return nil, fmt.Errorf("create metadata path, %s", dir)
 		}
 	}
 
 	b := &bolt{}
 
-	db, err := boltdb.Open(config.DataFile, perm0600, nil)
+	db, err := boltdb.Open(dataFile, perm0600, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, "open boltdb, %s", config.DataFile)
+		return nil, fmt.Errorf("open boltdb, %s", dataFile)
 	}
 	for _, bucket := range config.Buckets {
 		if err = b.prepare(db, []byte(bucket)); err != nil {
@@ -52,7 +60,7 @@ func NewBoltDB(config models.ToodledoConfigDatabase) (Backend, error) {
 	return b, nil
 }
 
-func ProvideBackend(config models.ToodledoConfigDatabase) (Backend, error) {
+func ProvideBackend(config common.ToodledoConfigDatabase) (Backend, error) {
 	var err error
 	once.Do(func() {
 		instance, err = NewBoltDB(config)
@@ -74,7 +82,7 @@ func (b *bolt) prepare(db *boltdb.DB, bucket []byte) error {
 	return db.Update(func(tx *boltdb.Tx) error {
 		_, err := tx.CreateBucketIfNotExists(bucket)
 		if err != nil {
-			return errors.Wrap(err, "create bucket in boltdb")
+			return fmt.Errorf("create bucket in boltdb, %s", bucket)
 		}
 		return nil
 	})
@@ -118,7 +126,7 @@ func (b *bolt) Put(bucket, key string, value []byte) error {
 			return ErrBucketNotFound
 		}
 		if err := bkt.Put([]byte(key), value); err != nil {
-			return errors.Wrapf(err, "put key %s in boltdb", key)
+			return fmt.Errorf("put key %s in boltdb", key)
 		}
 		return nil
 	})
@@ -193,7 +201,7 @@ func (b *bolt) Truncate(bucket string) error {
 
 		err := tx.DeleteBucket([]byte(bucket))
 		if err != nil {
-			return errors.Wrapf(err, "truncate %s in boltdb", bucket)
+			return fmt.Errorf("truncate %s in boltdb", bucket)
 		}
 		return nil
 	})
