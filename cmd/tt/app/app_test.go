@@ -3,7 +3,8 @@ package app
 import (
 	"testing"
 
-	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
+	"github.com/alswl/go-toodledo/pkg/ui/taskspane"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/stretchr/testify/assert"
 )

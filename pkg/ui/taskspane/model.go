@@ -1,17 +1,17 @@
 package taskspane
 
 import (
-	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/ui"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/evertras/bubble-table/table"
 	"github.com/thoas/go-funk"
 )
 
 type Model struct {
-	components.Focusable
-	components.Resizable
+	ui.Focusable
+	ui.Resizable
 
 	// app *app.Model
 

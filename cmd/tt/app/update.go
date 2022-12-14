@@ -3,10 +3,11 @@ package app
 import (
 	"fmt"
 
-	"github.com/alswl/go-toodledo/cmd/tt/components"
-	comsidebar "github.com/alswl/go-toodledo/cmd/tt/components/sidebar"
-	comstatusbar "github.com/alswl/go-toodledo/cmd/tt/components/statusbar"
-	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
+	"github.com/alswl/go-toodledo/pkg/ui"
+	"github.com/alswl/go-toodledo/pkg/ui/sidebar"
+	comstatusbar "github.com/alswl/go-toodledo/pkg/ui/statusbar"
+	"github.com/alswl/go-toodledo/pkg/ui/taskspane"
+
 	"github.com/alswl/go-toodledo/pkg/models/constants"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	tea "github.com/charmbracelet/bubbletea"
@@ -80,7 +81,7 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
 	case *taskspane.Model:
 		cmd = m.handleTaskPane(msg)
 
-	case comsidebar.Model:
+	case sidebar.Model:
 		m.sidebar, cmd = typedMM.UpdateTyped(msg)
 		return cmd
 
@@ -146,7 +147,7 @@ func (m *Model) focusStatusBar() {
 	m.focus("statusbar")
 }
 
-func (m *Model) getFocusedModeTyped() components.FocusableInterface {
+func (m *Model) getFocusedModeTyped() ui.FocusableInterface {
 	name := m.focused
 	switch name {
 	case "tasks":
@@ -179,7 +180,7 @@ func (m *Model) getFocusedModel() tea.Model {
 }
 
 // OnItemChange handle the sidebar menu change.
-func (m *Model) OnItemChange(tab string, item comsidebar.Item) error {
+func (m *Model) OnItemChange(tab string, item sidebar.Item) error {
 	m.statusBar.SetStatus("tab: " + tab + " item: " + item.Title())
 	m.states.query = &queries.TaskListQuery{}
 	switch tab {

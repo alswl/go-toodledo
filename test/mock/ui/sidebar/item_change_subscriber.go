@@ -3,7 +3,7 @@
 package mocksidebar
 
 import (
-	sidebar "github.com/alswl/go-toodledo/cmd/tt/components/sidebar"
+	sidebar "github.com/alswl/go-toodledo/pkg/ui/sidebar"
 	mock "github.com/stretchr/testify/mock"
 )
 

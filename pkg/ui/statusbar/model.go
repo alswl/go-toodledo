@@ -1,8 +1,8 @@
 package statusbar
 
 import (
-	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
+	"github.com/alswl/go-toodledo/pkg/ui"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -11,7 +11,7 @@ import (
 
 type Model struct {
 	sb statusbar.Bubble
-	components.Focusable
+	ui.Focusable
 
 	// states
 	mode   string

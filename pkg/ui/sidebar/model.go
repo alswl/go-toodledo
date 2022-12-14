@@ -1,12 +1,12 @@
 package sidebar
 
 import (
-	"github.com/alswl/go-toodledo/cmd/tt/components"
-	"github.com/alswl/go-toodledo/cmd/tt/components/common"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/constants"
+	"github.com/alswl/go-toodledo/pkg/ui"
+	"github.com/alswl/go-toodledo/pkg/ui/common"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -26,8 +26,8 @@ var defaultTabs = []string{
 }
 
 type Model struct {
-	components.Focusable
-	components.Resizable
+	ui.Focusable
+	ui.Resizable
 
 	// props
 	log        logrus.FieldLogger

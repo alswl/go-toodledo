@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	comsidebar "github.com/alswl/go-toodledo/pkg/ui/sidebar"
+	comstatusbar "github.com/alswl/go-toodledo/pkg/ui/statusbar"
+	"github.com/alswl/go-toodledo/pkg/ui/taskspane"
+
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
-	comsidebar "github.com/alswl/go-toodledo/cmd/tt/components/sidebar"
-	comstatusbar "github.com/alswl/go-toodledo/cmd/tt/components/statusbar"
-	"github.com/alswl/go-toodledo/cmd/tt/components/taskspane"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/fetchers"
 	"github.com/alswl/go-toodledo/pkg/models"

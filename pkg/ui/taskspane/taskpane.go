@@ -1,11 +1,11 @@
 package taskspane
 
 import (
-	"github.com/alswl/go-toodledo/cmd/tt/components"
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
+	"github.com/alswl/go-toodledo/pkg/ui"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
@@ -69,8 +69,8 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 }
 
 type parent interface {
-	components.Refreshable
-	components.Notifier
+	ui.Refreshable
+	ui.Notifier
 }
 
 func (m *Model) Resize(width, height int) {
