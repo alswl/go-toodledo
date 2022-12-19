@@ -13,3 +13,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.sb = newM
 	return m, cmd
 }
+
+func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
+	newM, cmd := m.Update(msg)
+	return newM.(Model), cmd
+}

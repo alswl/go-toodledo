@@ -3,10 +3,14 @@ package app
 import (
 	"fmt"
 
+	"github.com/alswl/go-toodledo/pkg/ui/detail"
+
+	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/ui"
 	"github.com/alswl/go-toodledo/pkg/ui/sidebar"
 	comstatusbar "github.com/alswl/go-toodledo/pkg/ui/statusbar"
 	"github.com/alswl/go-toodledo/pkg/ui/taskspane"
+	"github.com/alswl/go-toodledo/pkg/utils"
 
 	"github.com/alswl/go-toodledo/pkg/models/constants"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
@@ -45,34 +49,30 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// normal keypress
 
-	case RefreshMsg:
+	case models.FetchTasksMsg:
 		// trigger refresh
-		cmd = m.Refresh(typedMsg.isHardRefresh)
+		cmd = m.FetchTasks(typedMsg.IsHardRefresh)
 
-	case RefreshTasks:
-		// callback of refresh
-		tasks, ierr := m.taskLocalSvc.ListAllByQuery(m.states.query)
-		if ierr != nil {
-			m.log.WithError(ierr).Error("list tasks")
-		}
-		rts, _ := m.taskRichSvc.RichThem(tasks)
-		m.states.Tasks = rts
+	case models.RefreshPropertiesMsg:
+		cmd = m.ReloadProperties()
 
-		_ = m.updateTaskPane(rts)
-		m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks reload: %d", len(tasks)))
-		// return nil
+	case models.RefreshTasksMsg:
+		// refresh tasks(ui)
+		cmd = m.ReloadTasks()
 		return m, cmd
+	case models.ReturnMsg:
+		// return from sub component
+		m.states.taskDetailID = 0
+		m.focus("tasks")
 
 	case tea.WindowSizeMsg:
-		// TODO should return m
-		m.handleResize(typedMsg)
+		cmd = m.handleResize(typedMsg)
 	}
 	return m, cmd
 }
 
 // updateFocusedModel updates sub model.
 func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
-	var newM tea.Model
 	var cmd tea.Cmd
 	mm := m.getFocusedModel()
 
@@ -86,8 +86,9 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
 		return cmd
 
 	case comstatusbar.Model:
-		newM, cmd = mm.Update(msg)
-		m.statusBar, _ = newM.(comstatusbar.Model)
+		var newM comstatusbar.Model
+		newM, cmd = typedMM.UpdateTyped(msg)
+		m.statusBar = newM
 		m.getOrCreateTaskPaneByQuery().Filter(m.statusBar.GetFilterInput())
 
 		// post action
@@ -97,6 +98,10 @@ func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
 			m.focus("tasks")
 		}
 		return cmd
+	case detail.Model:
+		var newM detail.Model
+		newM, cmd = typedMM.UpdateTyped(msg)
+		m.taskDetail = newM
 	}
 	return cmd
 }
@@ -109,10 +114,10 @@ func (m *Model) handleCommandMode(msg tea.KeyMsg) (tea.Cmd, bool) {
 		m.loopFocusPane()
 		return nil, false
 	case "r":
-		cmd := m.Refresh(false)
+		cmd := m.FetchTasks(false)
 		return cmd, false
 	case "R":
-		cmd := m.Refresh(true)
+		cmd := m.FetchTasks(true)
 		return cmd, false
 	}
 	return nil, true
@@ -130,19 +135,42 @@ func (m *Model) loopFocusPane() {
 	m.focus(nextPane)
 }
 
-func (m *Model) handleResize(msg tea.WindowSizeMsg) {
-	m.states.width = msg.Width
-	m.states.height = msg.Height
+// handleResize handles window resize event.
+// once the app started, it will be called with msg.
+func (m *Model) handleResize(msg tea.WindowSizeMsg) tea.Cmd {
+	var cmds []tea.Cmd
+	var cmd tea.Cmd
+	m.states.width = int64(msg.Width)
+	m.states.height = int64(msg.Height)
 	const twoColumns = 2
 	const totalColumns = 12
 	sideBarWidth := msg.Width * twoColumns / totalColumns
+	mainPaneWidth := msg.Width - sideBarWidth
+
 	m.sidebar.Resize(sideBarWidth, msg.Height-1)
-	taskPaneWidth := msg.Width - sideBarWidth
+	m.sidebar, cmd = m.sidebar.UpdateTyped(msg)
+	cmds = append(cmds, cmd)
+
 	for _, p := range m.tasksPanes {
-		p.Resize(taskPaneWidth, msg.Height-1)
+		p.Resize(mainPaneWidth, msg.Height-1)
+		// FIXME resize msg will cause wrong height calculation
+		// find a way to fix it, and enable this msg
+		// var newCmd tea.Cmd
+		// newPane, newCmd := p.UpdateTyped(msg)
+		// m.tasksPanes[key] = &newPane
+		// cmds = append(cmds, newCmd)
 	}
 	m.statusBar.Resize(msg.Width, 0)
+	m.statusBar, cmd = m.statusBar.UpdateTyped(msg)
+	cmds = append(cmds, cmd)
+
+	m.taskDetail.Resize(mainPaneWidth, msg.Height)
+	m.taskDetail, cmd = m.taskDetail.UpdateTyped(msg)
+
+	cmds = append(cmds, cmd)
+	return tea.Batch(cmds...)
 }
+
 func (m *Model) focusStatusBar() {
 	m.focus("statusbar")
 }
@@ -156,6 +184,8 @@ func (m *Model) getFocusedModeTyped() ui.FocusableInterface {
 		return &m.sidebar
 	case "statusbar":
 		return &m.statusBar
+	case "detail":
+		return &m.taskDetail
 	default:
 		panic("unreachable")
 	}
@@ -175,6 +205,8 @@ func (m *Model) getFocusedModel() tea.Model {
 		return m.sidebar
 	case "statusbar":
 		return m.statusBar
+	case "detail":
+		return m.taskDetail
 	}
 	panic("unreachable")
 }
@@ -214,4 +246,70 @@ func (m *Model) Warn(msg string) {
 
 func (m *Model) Error(msg string) {
 	m.statusBar.Error(msg)
+}
+
+func (m *Model) ReloadProperties() tea.Cmd {
+	cs, err := m.contextExtSvc.ListAll()
+	if err != nil {
+		m.err = err
+		return nil
+	}
+	m.states.Contexts = cs
+	// Contexts are first tab in sidebar
+	m.states.Contexts = append([]*models.Context{{
+		ID:   0,
+		Name: "All",
+	}}, cs...)
+	m.states.Contexts = append(m.states.Contexts, &models.Context{
+		ID:   -1,
+		Name: "None",
+	})
+	fs, err := m.folderExtSvc.ListAll()
+	if err != nil {
+		m.err = err
+		return nil
+	}
+	// folders
+	m.states.Folders = fs
+	m.states.Folders = append([]*models.Folder{{
+		ID:   0,
+		Name: "All",
+	}}, fs...)
+	m.states.Folders = append(m.states.Folders, &models.Folder{
+		ID:   -1,
+		Name: "None",
+	})
+
+	gs, err := m.goalExtSvc.ListAll()
+	if err != nil {
+		m.err = err
+	}
+	// goals
+	m.states.Goals = gs
+	m.states.Goals = append([]*models.Goal{{
+		ID:   0,
+		Name: "All",
+	}}, gs...)
+	m.states.Goals = append(m.states.Goals, &models.Goal{
+		ID:   -1,
+		Name: "None",
+	})
+
+	m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Contexts))
+	m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Folders))
+	m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Goals))
+
+	return nil
+}
+
+// ReloadTasks refresh local ui.
+func (m *Model) ReloadTasks() tea.Cmd {
+	tasks, err := m.taskExtSvc.ListAllByQuery(m.states.query)
+	if err != nil {
+		m.statusBar.SetStatus("ERROR: " + err.Error())
+	}
+	rts, _ := m.taskRichSvc.RichThem(tasks)
+	m.states.Tasks = rts
+	cmd := m.updateTaskPane(rts)
+	return cmd
 }

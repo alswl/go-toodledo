@@ -5,14 +5,17 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
+	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
+
 	"github.com/alswl/go-toodledo/pkg/utils"
 )
 
 type RichTask struct {
 	Task
-	TheContext Context `json:"the_context"`
-	TheFolder  Folder  `json:"the_folder"`
-	TheGoal    Goal    `json:"the_goal"`
+	TheContext *Context `json:"the_context"`
+	TheFolder  *Folder  `json:"the_folder"`
+	TheGoal    *Goal    `json:"the_goal"`
 	// AddedByUser *Account `json:"added_by_user"`
 	// ParentTask *Task `json:"parent_task"`
 	// PreviousTask *Task `json:"previous_task"`
@@ -76,6 +79,10 @@ func (t RichTask) LengthString() string {
 	return strconv.FormatInt(t.Length*1000*1000*1000, 10)
 }
 
+func (t RichTask) PriorityString() string {
+	return priority.Value2Type(t.Priority).String()
+}
+
 func (t RichTask) TagString() string {
 	return t.Tag
 }
@@ -85,4 +92,52 @@ func (t RichTask) CompletedString() string {
 		return "[ ]"
 	}
 	return "[X]"
+}
+
+// ThatContext returns the context of the task
+// if the context is not set, it returns a default context.
+func (t RichTask) ThatContext() Context {
+	if t.TheContext == nil {
+		return Context{}
+	}
+	return *t.TheContext
+}
+
+// ThatFolder returns the folder of the task
+// if the folder is not set, it returns a default folder.
+func (t RichTask) ThatFolder() Folder {
+	if t.TheFolder == nil {
+		return Folder{}
+	}
+	return *t.TheFolder
+}
+
+// ThatGoal returns the goal of the task
+// if the goal is not set, it returns a default goal.
+func (t RichTask) ThatGoal() Goal {
+	if t.TheGoal == nil {
+		return Goal{}
+	}
+	return *t.TheGoal
+}
+
+func (t RichTask) AddedString() string {
+	return time.Unix(t.Added, 0).Format("2006-01-02 15:04:05")
+}
+
+func (t RichTask) StarString() string {
+	return strconv.FormatBool(t.Star == 1)
+}
+
+func (t RichTask) StatusString() string {
+	return status.Value2Type(t.Status).String()
+}
+
+func (t RichTask) ModifiedString() string {
+	return time.Unix(t.Modified, 0).Format("2006-01-02 15:04:05")
+}
+
+func (t RichTask) Link() string {
+	// TODO endpoint configurable
+	return fmt.Sprintf("https://www.toodledo.com/tasks/index.php?#task_%d", t.ID)
 }

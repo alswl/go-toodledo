@@ -9,31 +9,31 @@ import (
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
-	switch msg := msg.(type) {
+	switch typedMsg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h, v := styles.EmptyStyle.GetFrameSize()
-		m.contextList.SetSize(msg.Width-h, msg.Height-v)
+		m.contextList.SetSize(typedMsg.Width-h, typedMsg.Height-v)
 	// refresh
 	case []models.Context:
-		m.Contexts = msg
-		for i := range m.contextList.Items() {
-			m.contextList.RemoveItem(i)
+		m.Contexts = typedMsg
+		for range m.contextList.Items() {
+			m.contextList.RemoveItem(0)
 		}
 		for _, c := range m.Contexts {
 			m.contextList.InsertItem(len(m.contextList.Items()), Item{c.ID, c.Name})
 		}
 	case []models.Folder:
-		m.Folders = msg
-		for i := range m.folderList.Items() {
-			m.folderList.RemoveItem(i)
+		m.Folders = typedMsg
+		for range m.folderList.Items() {
+			m.folderList.RemoveItem(0)
 		}
 		for _, c := range m.Folders {
 			m.folderList.InsertItem(len(m.folderList.Items()), Item{c.ID, c.Name})
 		}
 	case []models.Goal:
-		m.Goals = msg
-		for i := range m.goalList.Items() {
-			m.goalList.RemoveItem(i)
+		m.Goals = typedMsg
+		for range m.goalList.Items() {
+			m.goalList.RemoveItem(0)
 		}
 		for _, c := range m.Goals {
 			m.goalList.InsertItem(len(m.goalList.Items()), Item{c.ID, c.Name})
@@ -44,7 +44,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		currentItem0 := m.getVisibleList().SelectedItem()
 		currentItem, _ := currentItem0.(Item)
 		newItem := currentItem
-		switch msg.String() {
+		switch typedMsg.String() {
 		case "h":
 			m.updateTab(-1)
 			newItem, _ = m.getVisibleList().SelectedItem().(Item)
@@ -55,7 +55,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			changed = true
 		default:
 			// dirty event handle without differ
-			cmd = m.updateVisibleList(msg)
+			cmd = m.updateVisibleList(typedMsg)
 			newItem, _ = m.getVisibleList().SelectedItem().(Item)
 			if newItem.id != currentItem.id {
 				changed = true

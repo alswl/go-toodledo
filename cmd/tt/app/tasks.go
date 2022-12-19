@@ -3,6 +3,8 @@ package app
 import (
 	"fmt"
 
+	"github.com/alswl/go-toodledo/pkg/models"
+
 	"github.com/alswl/go-toodledo/pkg/ui/taskspane"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -18,17 +20,12 @@ func (m *Model) getOrCreateTaskPaneByQuery() *taskspane.Model {
 	if p, ok := m.tasksPanes[key]; ok {
 		return p
 	}
-	newP := taskspane.InitModel(m.states.Tasks, m)
-	// trigger ui redraw
+	newP := taskspane.InitModel(m.states.Tasks, m.states.width, m.states.height-1)
 	m.tasksPanes[key] = &newP
-	m.handleResize(tea.WindowSizeMsg{
-		Width:  m.states.width,
-		Height: m.states.height,
-	})
 	return &newP
 }
 
-func (m *Model) Refresh(isHardRefresh bool) tea.Cmd {
+func (m *Model) FetchTasks(isHardRefresh bool) tea.Cmd {
 	// detect refresh in progress
 	ok := refreshLock.TryLock()
 	if !ok {
@@ -46,7 +43,7 @@ func (m *Model) Refresh(isHardRefresh bool) tea.Cmd {
 			m.statusBar.SetStatus(fmt.Sprintf("ERROR: refresh failed, %s", err.Error()))
 			return nil
 		}
-		return RefreshTasks{}
+		return models.RefreshTasksMsg{}
 	}
 }
 
@@ -58,6 +55,7 @@ func (m *Model) handleTaskPane(msg tea.KeyMsg) tea.Cmd {
 		m.focusStatusBar()
 		m.statusBar.FocusFilter()
 	default:
+		// TODO inline
 		cmd = m.updateTaskPane(msg)
 	}
 	return cmd
@@ -79,6 +77,10 @@ func (m *Model) updateTaskPane(msg tea.Msg) tea.Cmd {
 			cmd = m.handleCompleteToggle(pane)
 		case "enter":
 			cmd = m.handleTimerToggle(pane)
+		case "o":
+			// open task detail pane
+			m.focus("detail")
+			cmd = m.handleOpenTask(pane)
 		default:
 			newM, cmd = pane.UpdateTyped(msg)
 			m.tasksPanes[paneKey] = &newM
@@ -115,7 +117,7 @@ func (m *Model) handleCompleteToggle(pane *taskspane.Model) tea.Cmd {
 				return nil
 			}
 		}
-		return RefreshMsg{false}
+		return models.FetchTasksMsg{IsHardRefresh: false}
 	}
 }
 
@@ -153,6 +155,6 @@ func (m *Model) handleTimerToggle(pane *taskspane.Model) tea.Cmd {
 				return nil
 			}
 		}
-		return RefreshMsg{false}
+		return models.FetchTasksMsg{IsHardRefresh: false}
 	}
 }

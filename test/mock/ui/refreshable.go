@@ -13,7 +13,7 @@ type Refreshable struct {
 }
 
 // Refresh provides a mock function with given fields: isHardRefresh
-func (_m *Refreshable) Refresh(isHardRefresh bool) tea.Cmd {
+func (_m *Refreshable) FetchTasks(isHardRefresh bool) tea.Cmd {
 	ret := _m.Called(isHardRefresh)
 
 	var r0 tea.Cmd

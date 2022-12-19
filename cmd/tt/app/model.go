@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	comsidebar "github.com/alswl/go-toodledo/pkg/ui/sidebar"
-	comstatusbar "github.com/alswl/go-toodledo/pkg/ui/statusbar"
+	uidetail "github.com/alswl/go-toodledo/pkg/ui/detail"
+	uisidebar "github.com/alswl/go-toodledo/pkg/ui/sidebar"
+	uistatusbar "github.com/alswl/go-toodledo/pkg/ui/statusbar"
 	"github.com/alswl/go-toodledo/pkg/ui/taskspane"
 
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
@@ -18,22 +19,20 @@ import (
 )
 
 type States struct {
-	width  int
-	height int
+	width  int64
+	height int64
 
 	// Tasks is available tasks
 	Tasks    []*models.RichTask
 	Contexts []*models.Context
 	Folders  []*models.Folder
 	Goals    []*models.Goal
-	query    *queries.TaskListQuery
-}
 
-type RefreshMsg struct {
-	isHardRefresh bool
-}
+	// query is current query of task pane
+	query *queries.TaskListQuery
 
-type RefreshTasks struct {
+	// taskDetailID is current task id of detail pane
+	taskDetailID int64
 }
 
 // Model is the main tt app
@@ -45,6 +44,7 @@ type Model struct {
 	goalExtSvc    services.GoalPersistenceService
 	taskExtSvc    services.TaskExtendedService
 	taskLocalSvc  services.TaskPersistenceExtService
+	fetcher       fetchers.DaemonFetcher
 
 	// properties
 	log logrus.FieldLogger
@@ -55,17 +55,16 @@ type Model struct {
 	// focused model: tasks, sidebar, statusbar
 	focused string
 	// TODO ready check
-	ready bool
-	// isSidebarOpen bool
+	ready       bool
+	isInputting bool
 
 	// view
 	tasksPanes map[string]*taskspane.Model
-	sidebar    comsidebar.Model
-	statusBar  comstatusbar.Model
+	sidebar    uisidebar.Model
+	statusBar  uistatusbar.Model
+	taskDetail uidetail.Model
 	// TODO help pane
 	// help          help.Model
-	isInputting bool
-	fetcher     fetchers.DaemonFetcher
 }
 
 func InitialModel() (*Model, error) {
@@ -102,13 +101,13 @@ func InitialModel() (*Model, error) {
 	}
 
 	// status bar
-	statusBar := comstatusbar.NewDefault()
+	statusBar := uistatusbar.NewDefault()
 	statusBar.SetMode("tasks")
 	statusBar.SetInfo1(fmt.Sprintf("./%d", len(states.Tasks)))
 	statusBar.SetInfo2("HELP(h)")
 
 	// task pane
-	sidebar := comsidebar.InitModel(comsidebar.Properties{})
+	sidebar := uisidebar.InitModel(uisidebar.Properties{})
 
 	// main app
 	m := Model{

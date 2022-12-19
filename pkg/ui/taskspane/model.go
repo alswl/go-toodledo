@@ -28,7 +28,7 @@ type Model struct {
 	tableModel table.Model
 	tableWidth int
 
-	parent parent
+	// parent parent
 }
 
 func (m Model) Init() tea.Cmd {
@@ -36,7 +36,7 @@ func (m Model) Init() tea.Cmd {
 	return nil
 }
 
-func InitModel(tasks []*models.RichTask, parent parent) Model {
+func InitModel(tasks []*models.RichTask, width, height int64) Model {
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
@@ -60,7 +60,7 @@ func InitModel(tasks []*models.RichTask, parent parent) Model {
 		WithKeyMap(keys)
 
 	m := Model{
-		parent: parent,
+		//parent: parent,
 		//choices:    nil,
 		//cursor:     0,
 		//selected:   nil,
@@ -68,6 +68,7 @@ func InitModel(tasks []*models.RichTask, parent parent) Model {
 		tableWidth: defaultTableWidth,
 		//props:      app.GetStates(),
 	}
+	m.Resize(int(width), int(height))
 
 	m.Blur()
 

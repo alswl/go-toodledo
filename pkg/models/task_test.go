@@ -15,9 +15,9 @@ import (
 func TestRichTask_DueDate(t1 *testing.T) {
 	type fields struct {
 		Task       models.Task
-		TheContext models.Context
-		TheFolder  models.Folder
-		TheGoal    models.Goal
+		TheContext *models.Context
+		TheFolder  *models.Folder
+		TheGoal    *models.Goal
 	}
 	tests := []struct {
 		name   string
@@ -28,9 +28,9 @@ func TestRichTask_DueDate(t1 *testing.T) {
 			name: "",
 			fields: fields{
 				Task:       models.Task{Duedate: 1645704000},
-				TheContext: models.Context{},
-				TheFolder:  models.Folder{},
-				TheGoal:    models.Goal{},
+				TheContext: &models.Context{},
+				TheFolder:  &models.Folder{},
+				TheGoal:    &models.Goal{},
 			},
 			want: time.Date(2022, 02, 24, 20, 0, 0, 0, utils.ChinaTimeZone),
 		},
@@ -87,9 +87,9 @@ func TestRichTask_Due(t1 *testing.T) {
 		t1.Run(tt.name, func(t1 *testing.T) {
 			t := models.RichTask{
 				Task:       tt.fields.Task,
-				TheContext: tt.fields.TheContext,
-				TheFolder:  tt.fields.TheFolder,
-				TheGoal:    tt.fields.TheGoal,
+				TheContext: &tt.fields.TheContext,
+				TheFolder:  &tt.fields.TheFolder,
+				TheGoal:    &tt.fields.TheGoal,
 			}
 			if got := t.DueString(); got != tt.want {
 				t1.Errorf("DueString() = %v, want %v", got, tt.want)

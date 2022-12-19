@@ -83,9 +83,9 @@ func (s *taskRichService) Rich(t *models.Task) (*models.RichTask, error) {
 
 	rt := &models.RichTask{
 		Task:       *t,
-		TheContext: *context,
-		TheFolder:  *folder,
-		TheGoal:    *goal,
+		TheContext: context,
+		TheFolder:  folder,
+		TheGoal:    goal,
 	}
 	return rt, nil
 }

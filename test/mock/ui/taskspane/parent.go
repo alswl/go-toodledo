@@ -24,7 +24,7 @@ func (_m *parent) Info(msg string) {
 }
 
 // Refresh provides a mock function with given fields: isHardRefresh
-func (_m *parent) Refresh(isHardRefresh bool) tea.Cmd {
+func (_m *parent) FetchTasks(isHardRefresh bool) tea.Cmd {
 	ret := _m.Called(isHardRefresh)
 
 	var r0 tea.Cmd

@@ -2,12 +2,11 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/alswl/go-toodledo/pkg/utils"
+
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -27,98 +26,43 @@ var refreshLock sync.Mutex
 func (m *Model) Init() tea.Cmd {
 	var cmds []tea.Cmd
 
+	cmds = append(cmds, m.ReloadProperties())
+	// using default first now
+	// FIXME using last saved view
+	m.states.query.ContextID = m.states.Contexts[0].ID
+	cmds = append(cmds, m.ReloadTasks())
+
+	// tasks
+	// m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
+
 	// states init
 	cmds = append(cmds, func() tea.Msg {
-		err := m.contextExtSvc.Sync()
-		if err != nil {
-			m.err = err
+		ierr := m.contextExtSvc.Sync()
+		if ierr != nil {
+			m.err = ierr
 			return nil
 		}
-		err = m.contextExtSvc.Sync()
-		if err != nil {
-			m.err = err
+		ierr = m.contextExtSvc.Sync()
+		if ierr != nil {
+			m.err = ierr
 			return nil
 		}
-		cs, err := m.contextExtSvc.ListAll()
-		if err != nil {
-			m.err = err
+		ierr = m.folderExtSvc.Sync()
+		if ierr != nil {
+			m.err = ierr
 			return nil
 		}
-		err = m.folderExtSvc.Sync()
-		if err != nil {
-			m.err = err
+		ierr = m.goalExtSvc.Sync()
+		if ierr != nil {
+			m.err = ierr
 			return nil
 		}
-		fs, err := m.folderExtSvc.ListAll()
-		if err != nil {
-			m.err = err
-			return nil
-		}
-		err = m.goalExtSvc.Sync()
-		if err != nil {
-			m.err = err
-			return nil
-		}
-		gs, err := m.goalExtSvc.ListAll()
-		if err != nil {
-			m.err = err
-		}
 
-		// Contexts are first tab in sidebar
-		m.states.Contexts = cs
-		m.states.Contexts = append([]*models.Context{{
-			ID:   0,
-			Name: "All",
-		}}, cs...)
-		m.states.Contexts = append(m.states.Contexts, &models.Context{
-			ID:   -1,
-			Name: "None",
-		})
-		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Contexts))
-		// using default first now
-		m.states.query.ContextID = m.states.Contexts[0].ID
-
-		// folders
-		m.states.Folders = fs
-		m.states.Folders = append([]*models.Folder{{
-			ID:   0,
-			Name: "All",
-		}}, fs...)
-		m.states.Folders = append(m.states.Folders, &models.Folder{
-			ID:   -1,
-			Name: "None",
-		})
-		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Folders))
-
-		// goals
-		m.states.Goals = gs
-		m.states.Goals = append([]*models.Goal{{
-			ID:   0,
-			Name: "All",
-		}}, gs...)
-		m.states.Goals = append(m.states.Goals, &models.Goal{
-			ID:   -1,
-			Name: "None",
-		})
-		m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Goals))
-
-		// TODO using last selected menu
-
-		// tasks
-		tasks, err := m.taskExtSvc.ListAllByQuery(m.states.query)
-		if err != nil {
-			m.statusBar.SetStatus("ERROR: " + err.Error())
-		}
-		rts, _ := m.taskRichSvc.RichThem(tasks)
-		m.states.Tasks = rts
-
-		cmds = append(cmds, m.updateTaskPane(rts))
-		m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
-
-		return nil
+		return models.RefreshPropertiesMsg{}
 	})
 
 	// daemon fetcher sstart
+	// XXX using tae.Every
 	cmds = append(cmds, func() tea.Msg {
 		m.fetcher.Start(context.Background())
 		return nil
@@ -126,7 +70,7 @@ func (m *Model) Init() tea.Cmd {
 
 	// refresh at start
 	cmds = append(cmds, func() tea.Msg {
-		return m.Refresh(false)
+		return models.FetchTasksMsg{IsHardRefresh: false}
 	})
 
 	return tea.Batch(cmds...)

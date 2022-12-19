@@ -5,7 +5,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
-	"github.com/alswl/go-toodledo/pkg/ui"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/evertras/bubble-table/table"
@@ -48,15 +47,23 @@ var (
 func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	var rows []table.Row
 	for _, t := range tasks {
+		context := t.TheContext
+		if context == nil {
+			context = &models.Context{Name: "<->"}
+		}
+		goal := t.TheGoal
+		if goal == nil {
+			goal = &models.Goal{Name: "<->"}
+		}
 		rows = append(rows, table.NewRow(
 			table.RowData{
 				columnKeyID:        t.ID,
 				columnKeyCompleted: t.CompletedString(),
 				columnKeyTitle:     t.Title,
-				columnKeyContext:   t.TheContext.Name,
+				columnKeyContext:   context.Name,
 				columnKeyPriority:  tpriority.Value2Type(t.Priority),
 				columnKeyStatus:    tstatus.Value2Type(t.Status),
-				columnKeyGoal:      t.TheGoal.Name,
+				columnKeyGoal:      goal.Name,
 				columnKeyDue:       t.DueString(),
 				columnKeyRepeat:    t.RepeatString(),
 				columnKeyLength:    t.LengthString(),
@@ -68,12 +75,10 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 	return rows
 }
 
-type parent interface {
-	ui.Refreshable
-	ui.Notifier
-}
-
 func (m *Model) Resize(width, height int) {
+	if width <= 0 || height <= 0 {
+		return
+	}
 	// remove status bar height
 	m.Resizable.Resize(width, height, styles.PaneStyle.GetBorderStyle())
 	paneBorder := 1

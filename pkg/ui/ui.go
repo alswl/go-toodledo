@@ -7,7 +7,9 @@ import (
 )
 
 type FocusableInterface interface {
+	// TODO add return tea.Cmd
 	Focus()
+	// TODO add return tea.Cmd
 	Blur()
 }
 
@@ -40,19 +42,16 @@ type Resizable struct {
 	Viewport viewport.Model
 }
 
-func NewResizable(width, height int) Resizable {
-	return Resizable{Viewport: viewport.Model{Width: width, Height: height}}
-}
-
 func (r *Resizable) Resize(width, height int, border lipgloss.Border) {
 	r.Width = width
 	r.Height = height
-	r.Viewport.Width = width - lipgloss.Width(border.Right+border.Top)
+	r.Viewport.YPosition = lipgloss.Width(border.Top)
+	r.Viewport.Width = width - lipgloss.Width(border.Left+border.Right)
 	r.Viewport.Height = height - lipgloss.Width(border.Bottom+border.Top)
 }
 
 type Refreshable interface {
-	Refresh(isHardRefresh bool) tea.Cmd
+	FetchTasks(isHardRefresh bool) tea.Cmd
 }
 
 // Notifier is a component that can notify to the parent component.
