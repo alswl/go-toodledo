@@ -45,9 +45,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		// 3. sub focused component
-		cmd = m.updateFocusedModel(typedMsg)
-
-		// normal keypress
+		cmd = m.keyPressFocusedModel(typedMsg)
 
 	case models.FetchTasksMsg:
 		// trigger refresh
@@ -60,6 +58,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// refresh tasks(ui)
 		cmd = m.ReloadTasks()
 		return m, cmd
+
 	case models.ReturnMsg:
 		// return from sub component
 		m.states.taskDetailID = 0
@@ -67,12 +66,16 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		cmd = m.handleResize(typedMsg)
+	default:
+		// all others message broadcast to sub component
+		m.statusBar, cmd = m.statusBar.UpdateTyped(msg)
+		// TODO pane task and sidebar
 	}
 	return m, cmd
 }
 
-// updateFocusedModel updates sub model.
-func (m *Model) updateFocusedModel(msg tea.KeyMsg) tea.Cmd {
+// keyPressFocusedModel updates sub model.
+func (m *Model) keyPressFocusedModel(msg tea.KeyMsg) tea.Cmd {
 	var cmd tea.Cmd
 	mm := m.getFocusedModel()
 

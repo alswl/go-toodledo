@@ -33,6 +33,7 @@ func (m *Model) FetchTasks(isHardRefresh bool) tea.Cmd {
 		return nil
 	}
 	defer refreshLock.Unlock()
+	m.statusBar.StartSpinner()
 
 	// io blocking in msg
 	return func() tea.Msg {
@@ -43,6 +44,7 @@ func (m *Model) FetchTasks(isHardRefresh bool) tea.Cmd {
 			m.statusBar.SetStatus(fmt.Sprintf("ERROR: refresh failed, %s", err.Error()))
 			return nil
 		}
+		m.statusBar.StopSpinner()
 		return models.RefreshTasksMsg{}
 	}
 }

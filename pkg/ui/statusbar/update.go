@@ -9,12 +9,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return input, newCmd
 	}
 
-	newM, cmd := m.sb.Update(msg)
-	m.sb = newM
+	switch typedMsg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.Resize(typedMsg.Width, typedMsg.Height)
+	default:
+		m.spinner, cmd = m.spinner.Update(msg)
+	}
+
 	return m, cmd
 }
 
 func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
 	newM, cmd := m.Update(msg)
 	return newM.(Model), cmd
+}
+
+func (m *Model) StartSpinner() {
+	m.loading = true
+}
+
+func (m *Model) StopSpinner() {
+	m.loading = false
 }

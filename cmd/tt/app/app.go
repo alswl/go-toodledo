@@ -73,5 +73,8 @@ func (m *Model) Init() tea.Cmd {
 		return models.FetchTasksMsg{IsHardRefresh: false}
 	})
 
+	// statusbar Init // TODO should I call it manually?
+	cmds = append(cmds, m.statusBar.Init())
+
 	return tea.Batch(cmds...)
 }

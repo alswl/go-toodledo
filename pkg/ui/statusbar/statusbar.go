@@ -6,7 +6,7 @@ import (
 )
 
 func (m *Model) Resize(width, _ int) {
-	m.sb.SetSize(width)
+	m.Width = width
 }
 
 func (m *Model) SetMode(mode string) {

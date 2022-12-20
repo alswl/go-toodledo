@@ -18,9 +18,9 @@ require (
 	github.com/gobeam/stringy v0.0.5
 	github.com/google/wire v0.5.0
 	github.com/jedib0t/go-pretty/v6 v6.2.4
-	github.com/knipferrc/teacup v0.1.1
 	github.com/mattn/go-colorable v0.1.2
 	github.com/mitchellh/go-homedir v1.0.0
+	github.com/muesli/reflow v0.3.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.4.0
@@ -89,7 +89,6 @@ require (
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/muesli/ansi v0.0.0-20211031195517-c9f0611b6c70 // indirect
 	github.com/muesli/cancelreader v0.2.0 // indirect
-	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.11.1-0.20220212125758-44cd13922739 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect

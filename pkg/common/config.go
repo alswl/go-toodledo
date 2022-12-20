@@ -4,6 +4,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/charmbracelet/lipgloss"
+
 	"github.com/mitchellh/go-homedir"
 )
 
@@ -88,4 +90,10 @@ func CleanDatabase(db ToodledoConfigDatabase) error {
 	// remove files
 	_ = os.Remove(file)
 	return nil
+}
+
+// ColorConfig.
+type ColorConfig struct {
+	Foreground lipgloss.AdaptiveColor
+	Background lipgloss.AdaptiveColor
 }
