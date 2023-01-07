@@ -100,6 +100,7 @@ func InitTUIApp() (*app.ToodledoTUIApp, error) {
 	goalPersistenceService := services.NewGoalCachedService(goalService, accountService, backend)
 	savedSearchService := services.NewSavedSearchService(toodledo, clientAuthInfoWriter)
 	taskRichService := services.NewTaskRichPersistenceService(taskPersistenceExtService, folderPersistenceService, contextPersistenceService, goalPersistenceService, fieldLogger)
-	toodledoTUIApp := app.NewToodledoTUIApp(accountService, taskService, taskPersistenceExtService, folderService, folderPersistenceService, contextService, contextPersistenceService, goalService, goalPersistenceService, savedSearchService, taskRichService)
+	settingService := services.NewSettingService(fieldLogger, backend)
+	toodledoTUIApp := app.NewToodledoTUIApp(accountService, taskService, taskPersistenceExtService, folderService, folderPersistenceService, contextService, contextPersistenceService, goalService, goalPersistenceService, savedSearchService, taskRichService, settingService)
 	return toodledoTUIApp, nil
 }

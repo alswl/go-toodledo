@@ -12,5 +12,3 @@ func (i Item) Title() string { return i.title }
 func (i Item) Description() string { return "" }
 
 func (i Item) FilterValue() string { return i.title }
-
-type ItemChangeSubscriber func(tab string, item Item) error

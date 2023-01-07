@@ -7,6 +7,9 @@ import (
 )
 
 func TestSidebar(t *testing.T) {
+	// set CI not works
+	// t.Setenv("CI", "true")
+	// os.Setenv("CI", "true")
 	items := []list.Item{
 		Item{title: "Raspberry Pi’s"},
 		Item{title: "Nutella"},
@@ -34,10 +37,33 @@ func TestSidebar(t *testing.T) {
 	}
 
 	m := Model{
-		isCollapsed: false,
-		currentTab:  "bar",
+		states:      NewStates(),
 		contextList: list.New(items, list.NewDefaultDelegate(), 0, 0),
 	}
+	m.Resize(40, 20)
 	view := m.View()
 	t.Log(view)
+	// TODO render view include un-printable chars
+	//	assert.Equal(t, `┌──────────────────────────────────────┐
+	// │<Contexts>                            │
+	// │   List                               │
+	// │                                      │
+	// │  23 items                            │
+	// │                                      │
+	// │                                      │
+	// │  1/23                                │
+	// │                                      │
+	// │  ↑/k up • ↓/j down • / filter • q    │
+	// │quit • ? more                         │
+	// │                                      │
+	// │                                      │
+	// │                                      │
+	// │                                      │
+	// │                                      │
+	// │                                      │
+	// │                                      │
+	// │                                      │
+	// │                                      │
+	// └──────────────────────────────────────┘
+	// `, view)
 }

@@ -35,6 +35,7 @@ var TUISet = wire.NewSet(
 	services.NewGoalCachedService,
 	services.NewSavedSearchService,
 	services.NewTaskRichPersistenceService,
+	services.NewSettingService,
 
 	// wire not support generic now
 	// informers.ProvideTaskInformer,

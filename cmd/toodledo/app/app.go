@@ -53,6 +53,7 @@ type ToodledoTUIApp struct {
 	GoalSvc        services.GoalService
 	GoalExtSvc     services.GoalPersistenceService
 	SavedSearchSvc services.SavedSearchService
+	SettingSvc     services.SettingService
 
 	TaskRichSvc services.TaskRichService
 	// fetcher     fetchers.DaemonFetcher
@@ -70,6 +71,7 @@ func NewToodledoTUIApp(
 	goalCachedSvc services.GoalPersistenceService,
 	savedSearchSvc services.SavedSearchService,
 	taskRichSvc services.TaskRichService,
+	settingSvc services.SettingService,
 ) *ToodledoTUIApp {
 	return &ToodledoTUIApp{
 		AccountSvc:     accountSvc,
@@ -83,5 +85,6 @@ func NewToodledoTUIApp(
 		GoalExtSvc:     goalCachedSvc,
 		SavedSearchSvc: savedSearchSvc,
 		TaskRichSvc:    taskRichSvc,
+		SettingSvc:     settingSvc,
 	}
 }

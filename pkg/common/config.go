@@ -20,7 +20,7 @@ const (
 )
 
 func DefaultBuckets() []string {
-	return []string{"folders", "contexts", "tasks", "auth", "account", "goals"}
+	return []string{"folders", "contexts", "tasks", "auth", "account", "goals", "settings"}
 }
 
 // ToodledoConfigEnvironment ...

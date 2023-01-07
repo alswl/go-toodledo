@@ -3,6 +3,8 @@ package app
 import (
 	"fmt"
 
+	"gopkg.in/yaml.v3"
+
 	"github.com/alswl/go-toodledo/pkg/ui/detail"
 
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -17,6 +19,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/thoas/go-funk"
 )
+
+const lastQueryKey = "last-query"
+const sidebarStatesKey = "sidebar-states"
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// FIXME do not using pointer
@@ -52,7 +57,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd = m.FetchTasks(typedMsg.IsHardRefresh)
 
 	case models.RefreshPropertiesMsg:
-		cmd = m.ReloadProperties()
+		cmd = m.ReloadDependencies()
 
 	case models.RefreshTasksMsg:
 		// refresh tasks(ui)
@@ -143,8 +148,8 @@ func (m *Model) loopFocusPane() {
 func (m *Model) handleResize(msg tea.WindowSizeMsg) tea.Cmd {
 	var cmds []tea.Cmd
 	var cmd tea.Cmd
-	m.states.width = int64(msg.Width)
-	m.states.height = int64(msg.Height)
+	m.Width = msg.Width
+	m.Height = msg.Height
 	const twoColumns = 2
 	const totalColumns = 12
 	sideBarWidth := msg.Width * twoColumns / totalColumns
@@ -236,6 +241,19 @@ func (m *Model) OnItemChange(tab string, item sidebar.Item) error {
 	// m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
 	m.statusBar.SetInfo1(fmt.Sprintf("./%d", len(m.states.Tasks)))
 
+	// save sidebar for restore
+	bytes, _ := yaml.Marshal(m.states.query)
+	err = m.settingSvc.Put(lastQueryKey, string(bytes))
+	if err != nil {
+		m.log.WithError(err).Error("put last query failed")
+	}
+	states := m.sidebar.GetStates()
+	bytes, _ = yaml.Marshal(states)
+	err = m.settingSvc.Put(sidebarStatesKey, string(bytes))
+	if err != nil {
+		m.log.WithError(err).Error("put sidebar states failed")
+	}
+
 	return nil
 }
 
@@ -251,7 +269,7 @@ func (m *Model) Error(msg string) {
 	m.statusBar.Error(msg)
 }
 
-func (m *Model) ReloadProperties() tea.Cmd {
+func (m *Model) ReloadDependencies() tea.Cmd {
 	cs, err := m.contextExtSvc.ListAll()
 	if err != nil {
 		m.err = err

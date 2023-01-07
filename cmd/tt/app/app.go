@@ -5,6 +5,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/alswl/go-toodledo/pkg/models/queries"
+
+	"github.com/alswl/go-toodledo/pkg/ui/sidebar"
+	"gopkg.in/yaml.v3"
+
 	"github.com/alswl/go-toodledo/pkg/models"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -26,10 +31,12 @@ var refreshLock sync.Mutex
 func (m *Model) Init() tea.Cmd {
 	var cmds []tea.Cmd
 
-	cmds = append(cmds, m.ReloadProperties())
+	cmds = append(cmds, m.ReloadDependencies())
+
 	// using default first now
-	// FIXME using last saved view
-	m.states.query.ContextID = m.states.Contexts[0].ID
+	// if len(m.states.Contexts) > 0 {
+	//	m.states.query.ContextID = m.states.Contexts[0].ID
+	//}
 	cmds = append(cmds, m.ReloadTasks())
 
 	// tasks
@@ -75,6 +82,30 @@ func (m *Model) Init() tea.Cmd {
 
 	// statusbar Init // TODO should I call it manually?
 	cmds = append(cmds, m.statusBar.Init())
+
+	// update last sidebar setting
+	cmds = append(cmds, func() tea.Msg {
+		bs, err := m.settingSvc.Find(sidebarStatesKey)
+		if err != nil {
+			m.log.WithError(err).Error("get sidebar states failed")
+			return nil
+		}
+		states := sidebar.NewStates()
+		err = yaml.Unmarshal([]byte(bs), &states)
+		if err != nil {
+			m.log.WithError(err).Error("unmarshal sidebar states failed")
+			return nil
+		}
+		var cmd tea.Cmd
+		m.sidebar, cmd = m.sidebar.UpdateTyped(states)
+		return cmd
+	})
+	query := queries.TaskListQuery{}
+	lastQuery, err := m.settingSvc.Find(lastQueryKey)
+	if err == nil {
+		_ = yaml.Unmarshal([]byte(lastQuery), &query)
+	}
+	m.states.query = &query
 
 	return tea.Batch(cmds...)
 }

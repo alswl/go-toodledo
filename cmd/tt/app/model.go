@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/alswl/go-toodledo/pkg/ui"
+
 	uidetail "github.com/alswl/go-toodledo/pkg/ui/detail"
 	uisidebar "github.com/alswl/go-toodledo/pkg/ui/sidebar"
 	uistatusbar "github.com/alswl/go-toodledo/pkg/ui/statusbar"
@@ -19,9 +21,6 @@ import (
 )
 
 type States struct {
-	width  int64
-	height int64
-
 	// Tasks is available tasks
 	Tasks    []*models.RichTask
 	Contexts []*models.Context
@@ -35,15 +34,29 @@ type States struct {
 	taskDetailID int64
 }
 
+func NewStates() *States {
+	return &States{
+		Tasks:        []*models.RichTask{},
+		Contexts:     []*models.Context{},
+		Folders:      []*models.Folder{},
+		Goals:        []*models.Goal{},
+		query:        queries.NewTaskListQuery(),
+		taskDetailID: 0,
+	}
+}
+
 // Model is the main tt app
 // it was singleton.
 type Model struct {
+	ui.Resizable
+
 	taskRichSvc   services.TaskRichService
 	contextExtSvc services.ContextPersistenceService
 	folderExtSvc  services.FolderPersistenceService
 	goalExtSvc    services.GoalPersistenceService
 	taskExtSvc    services.TaskExtendedService
 	taskLocalSvc  services.TaskPersistenceExtService
+	settingSvc    services.SettingService
 	fetcher       fetchers.DaemonFetcher
 
 	// properties
@@ -79,26 +92,12 @@ func InitialModel() (*Model, error) {
 	if err != nil {
 		return nil, err
 	}
-	accountSvc := app.AccountSvc
-	taskExtSvc := app.TaskExtSvc
-	taskLocalSvc := app.TaskExtSvc
-	taskRichSvc := app.TaskRichSvc
-	contextSvc := app.ContextExtSvc
-	folderSvc := app.FolderExtSvc
-	goalSvc := app.GoalExtSvc
-
-	_, _, err = accountSvc.CachedMe()
+	_, _, err = app.AccountSvc.CachedMe()
 	if err != nil {
 		return nil, err
 	}
 
-	states := &States{
-		Tasks:    []*models.RichTask{},
-		Contexts: []*models.Context{},
-		Folders:  []*models.Folder{},
-		Goals:    []*models.Goal{},
-		query:    &queries.TaskListQuery{},
-	}
+	states := NewStates()
 
 	// status bar
 	statusBar := uistatusbar.NewDefault()
@@ -107,17 +106,19 @@ func InitialModel() (*Model, error) {
 	statusBar.SetInfo2("HELP(h)")
 
 	// task pane
+	// XXX sidebar should read query and load specific menu
 	sidebar := uisidebar.InitModel(uisidebar.Properties{})
 
 	// main app
 	m := Model{
 		log:           log,
-		taskRichSvc:   taskRichSvc,
-		contextExtSvc: contextSvc,
-		folderExtSvc:  folderSvc,
-		goalExtSvc:    goalSvc,
-		taskExtSvc:    taskExtSvc,
-		taskLocalSvc:  taskLocalSvc,
+		taskRichSvc:   app.TaskRichSvc,
+		contextExtSvc: app.ContextExtSvc,
+		folderExtSvc:  app.FolderExtSvc,
+		goalExtSvc:    app.GoalExtSvc,
+		taskExtSvc:    app.TaskExtSvc,
+		taskLocalSvc:  app.TaskExtSvc,
+		settingSvc:    app.SettingSvc,
 		states:        states,
 		err:           nil,
 		focused:       "tasks",

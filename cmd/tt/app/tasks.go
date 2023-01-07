@@ -20,7 +20,7 @@ func (m *Model) getOrCreateTaskPaneByQuery() *taskspane.Model {
 	if p, ok := m.tasksPanes[key]; ok {
 		return p
 	}
-	newP := taskspane.InitModel(m.states.Tasks, m.states.width, m.states.height-1)
+	newP := taskspane.InitModel(m.states.Tasks, m.Width, m.Height-1)
 	m.tasksPanes[key] = &newP
 	return &newP
 }

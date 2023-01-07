@@ -35,6 +35,7 @@ var IntegrationTestTUISet = wire.NewSet(
 	services.NewGoalCachedService,
 	services.NewSavedSearchService,
 	services.NewTaskRichService,
+	services.NewSettingService,
 
 	// wire not support generic now
 	// informers.ProvideTaskInformer,

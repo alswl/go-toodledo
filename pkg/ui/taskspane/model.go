@@ -36,7 +36,7 @@ func (m Model) Init() tea.Cmd {
 	return nil
 }
 
-func InitModel(tasks []*models.RichTask, width, height int64) Model {
+func InitModel(tasks []*models.RichTask, width, height int) Model {
 	keys := table.DefaultKeyMap()
 	keys.RowDown.SetKeys("j", "down")
 	keys.RowUp.SetKeys("k", "up")
@@ -68,7 +68,7 @@ func InitModel(tasks []*models.RichTask, width, height int64) Model {
 		tableWidth: defaultTableWidth,
 		//props:      app.GetStates(),
 	}
-	m.Resize(int(width), int(height))
+	m.Resize(width, height)
 
 	m.Blur()
 

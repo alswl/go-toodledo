@@ -22,6 +22,10 @@ type TaskListQuery struct {
 	Incomplete *bool
 }
 
+func NewTaskListQuery() *TaskListQuery {
+	return &TaskListQuery{}
+}
+
 func (q TaskListQuery) UniqString() string {
 	return fmt.Sprintf(
 		"%s-%d-%d-%d-%s-%s-%s-%v",
