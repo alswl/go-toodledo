@@ -2,6 +2,9 @@ package app
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/alswl/go-toodledo/pkg/utils/editor"
 
 	"gopkg.in/yaml.v3"
 
@@ -333,4 +336,68 @@ func (m *Model) ReloadTasks() tea.Cmd {
 	m.states.Tasks = rts
 	cmd := m.updateTaskPane(rts)
 	return cmd
+}
+
+func (m *Model) handleEditTask(pane *taskspane.Model) tea.Cmd {
+	id, err := pane.Selected()
+	if err != nil {
+		return nil
+	}
+	t, err := m.taskLocalSvc.FindByID(id)
+	if err != nil {
+		return nil
+	}
+	e, err := editor.NewDefaultEditor()
+	if err != nil {
+		return nil
+	}
+	tmpFilePath := fmt.Sprintf("/tmp/tt-task-editor-%d.yaml", t.ID)
+	tmpFile, err := os.OpenFile(tmpFilePath, os.O_CREATE|os.O_RDWR, 0755)
+	if err != nil {
+		return nil
+	}
+	bs, _ := yaml.Marshal(t)
+	_, err = tmpFile.Write(bs)
+	if err != nil {
+		return nil
+	}
+	err = tmpFile.Close()
+	if err != nil {
+		return nil
+	}
+	err = e.Launch(tmpFilePath)
+	if err != nil {
+		return nil
+	}
+	tmpFile, err = os.OpenFile(tmpFilePath, os.O_RDONLY, 0644)
+	if err != nil {
+		return nil
+	}
+	defer func() {
+		err = tmpFile.Close()
+		if err != nil {
+			return
+		}
+	}()
+	var newBs []byte
+	newBs, err = os.ReadFile(tmpFilePath)
+	if err != nil {
+		return nil
+	}
+
+	var inputT models.TaskEdit
+	err = yaml.Unmarshal(newBs, &inputT)
+	if err != nil {
+		return nil
+	}
+	return tea.Batch(
+		tea.ClearScreen,
+		func() tea.Msg {
+			_, ierr := m.taskLocalSvc.Edit(id, &inputT)
+			if ierr != nil {
+				return nil
+			}
+			return models.FetchTasksMsg{IsHardRefresh: false}
+		},
+	)
 }

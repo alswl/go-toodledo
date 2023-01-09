@@ -30,8 +30,8 @@ func main() {
 		os.Exit(1)
 	}
 	p := tea.NewProgram(mainModel, tea.WithAltScreen())
-	if err = p.Start(); err != nil {
-		stdLog.WithError(err).Fatal("failed to start program")
+	if _, ierr := p.Run(); ierr != nil {
+		stdLog.WithError(ierr).Fatal("failed to start program")
 		os.Exit(1)
 	}
 }

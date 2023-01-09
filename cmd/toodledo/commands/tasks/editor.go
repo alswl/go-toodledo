@@ -10,10 +10,10 @@ import (
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/render"
+	"github.com/alswl/go-toodledo/pkg/utils/editor"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
-	"k8s.io/kubectl/pkg/cmd/util/editor"
 )
 
 func NewEditorCmd(f *cmdutil.Factory) *cobra.Command {
@@ -45,7 +45,11 @@ func NewEditorCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 
-			e := editor.NewDefaultEditor([]string{})
+			e, err := editor.NewDefaultEditor()
+			if err != nil {
+				logrus.WithError(err).Fatal("find EDITOR")
+				return
+			}
 			tmpFilePath := fmt.Sprintf("/tmp/toodledo-task-editor-%d.yaml", t.ID)
 			tmpFile, err := os.OpenFile(tmpFilePath, os.O_CREATE|os.O_RDWR, 0755)
 			if err != nil {
@@ -79,13 +83,14 @@ func NewEditorCmd(f *cmdutil.Factory) *cobra.Command {
 				logrus.WithError(err).Fatal("open file")
 				return
 			}
-			_, err = tmpFile.Read(bs)
+			var newBs []byte
+			newBs, err = os.ReadFile(tmpFilePath)
 			if err != nil {
 				logrus.WithError(err).Fatal("read file")
 				return
 			}
 			var inputT models.TaskEdit
-			err = yaml.Unmarshal(bs, &inputT)
+			err = yaml.Unmarshal(newBs, &inputT)
 			if err != nil {
 				logrus.WithError(err).Fatal("unmarshal yaml")
 				return

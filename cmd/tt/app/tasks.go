@@ -82,7 +82,9 @@ func (m *Model) updateTaskPane(msg tea.Msg) tea.Cmd {
 		case "o":
 			// open task detail pane
 			m.focus("detail")
-			cmd = m.handleOpenTask(pane)
+			cmd = m.handleOpenTaskDetail(pane)
+		case "e":
+			cmd = m.handleEditTask(pane)
 		default:
 			newM, cmd = pane.UpdateTyped(msg)
 			m.tasksPanes[paneKey] = &newM

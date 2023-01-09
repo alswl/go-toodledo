@@ -6,7 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func (m *Model) handleOpenTask(pane *taskspane.Model) tea.Cmd {
+func (m *Model) handleOpenTaskDetail(pane *taskspane.Model) tea.Cmd {
 	id, err := pane.Selected()
 	if err != nil {
 		m.log.WithField("pane", pane).WithError(err).Warn("get selected task")
