@@ -37,9 +37,9 @@ var (
 		table.NewColumn(columnKeyStatus, "Status", 10),
 		table.NewColumn(columnKeyGoal, "Goal", 10),
 		table.NewColumn(columnKeyDue, "DueString", 10),
-		table.NewColumn(columnKeyRepeat, "Repeat", 5),
-		table.NewColumn(columnKeyLength, "Length", 5),
-		table.NewColumn(columnKeyTimer, "Timer", 5),
+		table.NewColumn(columnKeyRepeat, "Repeat", 10),
+		table.NewColumn(columnKeyLength, "Length", 10),
+		table.NewColumn(columnKeyTimer, "Timer", 10),
 		table.NewColumn(columnKeyTag, "Tag", 10),
 	}
 )

@@ -18,7 +18,11 @@ import (
 // Injectors from itinjector.go:
 
 func InitCLIBackend() (dal.Backend, error) {
-	toodledoConfigDatabase := common.NewDefaultToodledoConfigDatabase()
+	toodledoCliConfig, err := common.NewCliConfigMockForTesting()
+	if err != nil {
+		return nil, err
+	}
+	toodledoConfigDatabase := common.NewToodledoConfigDatabaseFromToodledoCliConfig(toodledoCliConfig)
 	backend, err := dal.ProvideBackend(toodledoConfigDatabase)
 	if err != nil {
 		return nil, err
@@ -48,7 +52,7 @@ func InitCLIApp() (*app.ToodledoCLIApp, error) {
 	if err != nil {
 		return nil, err
 	}
-	toodledoConfigDatabase := common.NewDefaultToodledoConfigDatabase()
+	toodledoConfigDatabase := common.NewToodledoConfigDatabaseFromToodledoCliConfig(toodledoCliConfig)
 	backend, err := dal.ProvideBackend(toodledoConfigDatabase)
 	if err != nil {
 		return nil, err

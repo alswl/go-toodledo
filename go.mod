@@ -26,6 +26,7 @@ require (
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
+	github.com/teambition/rrule-go v1.8.1
 	github.com/thoas/go-funk v0.9.0
 	go.etcd.io/bbolt v1.3.6
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8

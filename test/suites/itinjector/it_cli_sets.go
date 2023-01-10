@@ -13,7 +13,7 @@ import (
 var CLISet = wire.NewSet(
 	common.NewCliConfigMockForTesting,
 	common.NewConfigCliConfig,
-	common.NewDefaultToodledoConfigDatabase,
+	common.NewToodledoConfigDatabaseFromToodledoCliConfig,
 
 	logging.ProvideLogger,
 

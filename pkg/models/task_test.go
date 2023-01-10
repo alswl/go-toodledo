@@ -102,6 +102,7 @@ func TestRIchTask_Timer(t *testing.T) {
 	var task = models.RichTask{}
 	task.Timer = 5
 	task.Timeron = time.Date(2022, 11, 06, 13, 00, 00, 0, utils.ChinaTimeZone).Unix()
+	t.Log(task.TimerString())
 	assert.NotNil(t, task.TimerString())
 }
 

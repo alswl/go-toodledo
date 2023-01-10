@@ -5,10 +5,14 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/teambition/rrule-go"
+
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 
 	"github.com/alswl/go-toodledo/pkg/utils"
+	utilsrrule "github.com/alswl/go-toodledo/pkg/utils/rrule"
+	utilstime "github.com/alswl/go-toodledo/pkg/utils/time"
 )
 
 type RichTask struct {
@@ -56,27 +60,36 @@ func (t RichTask) DueString() string {
 }
 
 func (t RichTask) RepeatString() string {
-	return t.Task.Repeat
+	if t.Task.Repeat == "" {
+		return ""
+	}
+	r, err := rrule.StrToRRule(t.Task.Repeat)
+	if err != nil {
+		// TODO log
+		return "."
+	}
+	return utilsrrule.ParseToodledoRRule(*r)
 }
 
 func (t RichTask) TimerString() string {
 	if t.Timer == 0 && t.Timeron == 0 {
 		return ""
 	}
+	d := utilstime.ParseTimeStampToDuration(t.Timeron)
+	readableDuration := utilstime.ParseDurationToReadable(d)
 	if t.Timeron == 0 {
-		duration := strconv.FormatInt((t.Timer)*1000*1000*1000, 10)
-		return duration
+		return readableDuration
 	}
-	now := time.Now().Unix()
-	duration := strconv.FormatInt((now-t.Timeron+t.Timer)*1000*1000*1000, 10)
-	return fmt.Sprintf("> %s", duration)
+
+	return fmt.Sprintf("%s+", readableDuration)
 }
 
 func (t RichTask) LengthString() string {
 	if t.Length == 0 {
 		return ""
 	}
-	return strconv.FormatInt(t.Length*1000*1000*1000, 10)
+	d := utilstime.ParseTimeStampToDuration(t.Length)
+	return utilstime.ParseDurationToReadable(d)
 }
 
 func (t RichTask) PriorityString() string {
