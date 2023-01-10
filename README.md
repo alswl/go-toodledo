@@ -1,5 +1,8 @@
 # go-toodledo
 
+[![Build Status](https://github.com/bykof/go-plantuml/actions/workflows/test.yml/badge.svg)](https://github.com/alswl/go-toodledo/actions/workflows/go.yml/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/alswl/go-toodledo)](https://goreportcard.com/report/github.com/alswl/go-toodledo)
+
 Go CLI / TUI / SDK for Toodledo.
 
 Status: CLI Stable / SDK Stable / TUI under development
