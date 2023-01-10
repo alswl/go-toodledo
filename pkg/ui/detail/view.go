@@ -16,9 +16,9 @@ func (m Model) View() string {
 }
 
 func (m Model) genContent() string {
-	repeatRow := "Repeat:"
+	repeatString := ""
 	if m.task.Repeat != "" {
-		repeatRow = fmt.Sprintf("Repeat: %s (%s)", m.task.RepeatString(), m.task.Repeat)
+		repeatString = fmt.Sprintf("%s (%s)", m.task.RepeatString(), m.task.Repeat)
 	}
 	return lipgloss.JoinVertical(
 		lipgloss.Top,
@@ -32,7 +32,7 @@ func (m Model) genContent() string {
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Status: ")+m.task.StatusString(),
 
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Due: ")+m.task.DueString(),
-		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render(repeatRow),
+		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Repeat: ")+repeatString,
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Priority: ")+m.task.PriorityString(),
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Length: ")+m.task.LengthString(),
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Timer: ")+m.task.TimerString(),
@@ -41,7 +41,6 @@ func (m Model) genContent() string {
 
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Note: ")+m.task.Note,
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Added: ")+m.task.AddedString(),
-		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Completed: ")+m.task.CompletedString(),
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Modified: ")+m.task.ModifiedString(),
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Via: ")+m.task.Via,
 	)
