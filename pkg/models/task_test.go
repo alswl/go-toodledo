@@ -128,3 +128,14 @@ func TestFunkIsZero(t *testing.T) {
 	// NOTICE, 0 is not zero
 	assert.False(t, funk.IsZero(pointerZero))
 }
+
+func TestRichTask_LengthString(t *testing.T) {
+	var m models.RichTask
+	assert.Equal(t, "", m.LengthString())
+
+	m.Length = 1
+	assert.Equal(t, "1m", m.LengthString())
+
+	m.Length = 30
+	assert.Equal(t, "30m", m.LengthString())
+}

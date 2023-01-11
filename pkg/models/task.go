@@ -75,7 +75,8 @@ func (t RichTask) TimerString() string {
 	if t.Timer == 0 && t.Timeron == 0 {
 		return ""
 	}
-	d := utilstime.ParseTimeStampToDuration(t.Timeron)
+	// nolint:gomnd
+	d := utilstime.ParseTimeStampToDuration(t.Timeron * 60)
 	readableDuration := utilstime.ParseDurationToReadable(d)
 	if t.Timeron == 0 {
 		return readableDuration
@@ -88,7 +89,7 @@ func (t RichTask) LengthString() string {
 	if t.Length == 0 {
 		return ""
 	}
-	d := utilstime.ParseTimeStampToDuration(t.Length)
+	d := time.Duration(t.Length) * time.Minute
 	return utilstime.ParseDurationToReadable(d)
 }
 

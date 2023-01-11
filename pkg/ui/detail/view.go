@@ -20,6 +20,15 @@ func (m Model) genContent() string {
 	if m.task.Repeat != "" {
 		repeatString = fmt.Sprintf("%s (%s)", m.task.RepeatString(), m.task.Repeat)
 	}
+	length := ""
+	if m.task.Length != 0 {
+		length = m.task.LengthString() + fmt.Sprintf(" (%d) ", m.task.Length)
+	}
+	timer := ""
+	if m.task.Timer != 0 || m.task.Timeron != 0 {
+		timer = m.task.TimerString() + fmt.Sprintf(" (%d) ", m.task.Timer)
+	}
+
 	return lipgloss.JoinVertical(
 		lipgloss.Top,
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Link: ")+m.task.Link(),
@@ -34,8 +43,8 @@ func (m Model) genContent() string {
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Due: ")+m.task.DueString(),
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Repeat: ")+repeatString,
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Priority: ")+m.task.PriorityString(),
-		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Length: ")+m.task.LengthString(),
-		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Timer: ")+m.task.TimerString(),
+		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Length: ")+length,
+		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Timer: ")+timer,
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Tag: ")+m.task.TagString(),
 		lipgloss.NewStyle().Width(defaultColumnLabelWidth).Render("Star: ")+m.task.StarString(),
 
