@@ -2,6 +2,7 @@ package models_test
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -105,6 +106,7 @@ func TestRIchTask_Timer(t *testing.T) {
 	t.Log(task.TimerString())
 	assert.NotNil(t, task.TimerString())
 	assert.Contains(t, task.TimerString(), "*")
+	assert.False(t, strings.HasSuffix(task.TimerString(), "s"))
 }
 
 func TestRichTask_TimerNotRunning(t *testing.T) {

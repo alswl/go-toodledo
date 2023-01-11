@@ -1,6 +1,9 @@
 package statusbar
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
+)
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
@@ -26,8 +29,12 @@ func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
 
 func (m *Model) StartSpinner() {
 	m.loading = true
+	m.spinner.Tick()
 }
 
 func (m *Model) StopSpinner() {
 	m.loading = false
+	newSpinner := spinner.New()
+	newSpinner.Style = m.spinner.Style
+	m.spinner = newSpinner
 }

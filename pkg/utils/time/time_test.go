@@ -34,6 +34,11 @@ func TestParseDurationToReadableShort(t *testing.T) {
 			args: args{duration: time.Minute * 122},
 			want: "2h",
 		},
+		{
+			name: "",
+			args: args{duration: time.Second * 61},
+			want: "1m",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

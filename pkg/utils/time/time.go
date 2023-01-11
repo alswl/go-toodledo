@@ -51,6 +51,7 @@ func ParseDurationToReadableShort(duration time.Duration) string {
 
 // ParseDurationToReadable return human-readable duration.
 func ParseDurationToReadable(duration time.Duration) string {
+	duration = duration.Round(time.Minute)
 	s := duration.String()
 
 	if strings.HasSuffix(s, "m0s") {
