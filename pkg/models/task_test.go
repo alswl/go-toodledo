@@ -104,6 +104,14 @@ func TestRIchTask_Timer(t *testing.T) {
 	task.Timeron = time.Date(2022, 11, 06, 13, 00, 00, 0, utils.ChinaTimeZone).Unix()
 	t.Log(task.TimerString())
 	assert.NotNil(t, task.TimerString())
+	assert.Contains(t, task.TimerString(), "*")
+}
+
+func TestRichTask_TimerNotRunning(t *testing.T) {
+	var task = models.RichTask{}
+	task.Timer = 100
+	task.Timeron = 0
+	assert.Equal(t, "1m40s", task.TimerString())
 }
 
 func TestFunkIsEmpty(t *testing.T) {

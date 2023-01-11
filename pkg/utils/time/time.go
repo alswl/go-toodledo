@@ -5,12 +5,20 @@ import (
 	"time"
 )
 
-func ParseTimeStampToDuration(ts int64) time.Duration {
+// ParseTimestampToDuration parse ts to time stamp.
+func ParseTimestampToDuration(ts int64) time.Duration {
 	now := time.Now()
 	return now.Sub(time.Unix(ts, 0))
 }
 
-func ParseDurationToReadable(duration time.Duration) string {
+// ParseDurationInSecondToDuration parse ts to time stamp.
+func ParseDurationInSecondToDuration(second int64) time.Duration {
+	return time.Duration(second) * time.Second
+}
+
+// ParseDurationToReadableShort return human-readable duration.
+// it only returns main unit, so it was no accurate.
+func ParseDurationToReadableShort(duration time.Duration) string {
 	s := ""
 	// nolint: gocritic
 	if duration < time.Minute {
@@ -32,6 +40,19 @@ func ParseDurationToReadable(duration time.Duration) string {
 		// nolint: gomnd
 		s = duration.Round(time.Hour * 24 * 365).String()
 	}
+	if strings.HasSuffix(s, "m0s") {
+		s = s[:len(s)-2]
+	}
+	if strings.HasSuffix(s, "h0m") {
+		s = s[:len(s)-2]
+	}
+	return s
+}
+
+// ParseDurationToReadable return human-readable duration.
+func ParseDurationToReadable(duration time.Duration) string {
+	s := duration.String()
+
 	if strings.HasSuffix(s, "m0s") {
 		s = s[:len(s)-2]
 	}

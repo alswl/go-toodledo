@@ -71,18 +71,26 @@ func (t RichTask) RepeatString() string {
 	return utilsrrule.ParseToodledoRRule(*r)
 }
 
+// TimerString return the timer string of the task
+// if timer is on, * will be added in the front.
 func (t RichTask) TimerString() string {
 	if t.Timer == 0 && t.Timeron == 0 {
 		return ""
 	}
 	// nolint:gomnd
-	d := utilstime.ParseTimeStampToDuration(t.Timeron * 60)
+	d := time.Duration(t.Timer) * time.Second
+	now := time.Now()
+	if t.Timeron != 0 {
+		// TODO using user time zone
+		timerOn := time.Unix(t.Timeron, 0).In(utils.ChinaTimeZone)
+		d += now.Sub(timerOn)
+	}
 	readableDuration := utilstime.ParseDurationToReadable(d)
 	if t.Timeron == 0 {
 		return readableDuration
 	}
 
-	return fmt.Sprintf("%s+", readableDuration)
+	return fmt.Sprintf("*%s", readableDuration)
 }
 
 func (t RichTask) LengthString() string {
