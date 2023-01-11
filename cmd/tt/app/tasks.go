@@ -41,7 +41,7 @@ func (m *Model) FetchTasks(isHardRefresh bool) tea.Cmd {
 		m.log.WithField("hard", isHardRefresh).Info("refreshing done")
 		if err != nil {
 			m.log.WithError(err).Error("refresh failed")
-			m.statusBar.SetStatus(fmt.Sprintf("ERROR: refresh failed, %s", err.Error()))
+			m.statusBar.SetMessage(fmt.Sprintf("ERROR: refresh failed, %s", err.Error()))
 			return nil
 		}
 		m.statusBar.StopSpinner()
@@ -55,7 +55,11 @@ func (m *Model) handleTaskPane(msg tea.KeyMsg) tea.Cmd {
 	case "/":
 		m.isInputting = true
 		m.focusStatusBar()
-		m.statusBar.FocusFilter()
+		m.statusBar.FocusInputSearch()
+	case "n":
+		m.isInputting = true
+		m.focusStatusBar()
+		m.statusBar.FocusInputNew()
 	default:
 		// TODO inline
 		cmd = m.updateTaskPane(msg)

@@ -68,14 +68,18 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 
 	case models.ReturnMsg:
-		// return from sub component
+		// return from subcomponent
 		m.states.taskDetailID = 0
 		m.focus("tasks")
 
+	case models.ErrorMsg:
+		m.statusBar.SetMessage("ERROR: " + typedMsg.Error)
+
 	case tea.WindowSizeMsg:
 		cmd = m.handleResize(typedMsg)
+
 	default:
-		// all others message broadcast to sub component
+		// all others message broadcast to subcomponent
 		m.statusBar, cmd = m.statusBar.UpdateTyped(msg)
 		// TODO pane task and sidebar
 	}
@@ -100,15 +104,35 @@ func (m *Model) keyPressFocusedModel(msg tea.KeyMsg) tea.Cmd {
 		var newM comstatusbar.Model
 		newM, cmd = typedMM.UpdateTyped(msg)
 		m.statusBar = newM
-		m.getOrCreateTaskPaneByQuery().Filter(m.statusBar.GetFilterInput())
+		if m.statusBar.GetMode() == comstatusbar.ModeSearch {
+			m.getOrCreateTaskPaneByQuery().Filter(m.statusBar.GetInput())
+		}
 
 		// post action
 		switch msg.String() {
-		case "enter", "esc":
+		case "enter":
+			// filter
+			if m.statusBar.GetMode() == comstatusbar.ModeSearch {
+				m.isInputting = false
+				m.focus("tasks")
+			} else if m.statusBar.GetMode() == comstatusbar.ModeNew {
+				m.isInputting = false
+				m.focus("tasks")
+				cmd = func() tea.Msg {
+					_, err := m.taskLocalSvc.Create(m.statusBar.GetInputText())
+					if err != nil {
+						return models.ErrorMsg{Error: "Created failed"}
+					}
+					return models.RefreshTasksMsg{}
+				}
+			}
+		case "esc":
+			// filter
 			m.isInputting = false
 			m.focus("tasks")
 		}
 		return cmd
+
 	case detail.Model:
 		var newM detail.Model
 		newM, cmd = typedMM.UpdateTyped(msg)
@@ -224,7 +248,7 @@ func (m *Model) getFocusedModel() tea.Model {
 
 // OnItemChange handle the sidebar menu change.
 func (m *Model) OnItemChange(tab string, item sidebar.Item) error {
-	m.statusBar.SetStatus("tab: " + tab + " item: " + item.Title())
+	m.statusBar.SetMessage("tab: " + tab + " item: " + item.Title())
 	m.states.query = &queries.TaskListQuery{}
 	switch tab {
 	case constants.Contexts:
@@ -236,12 +260,12 @@ func (m *Model) OnItemChange(tab string, item sidebar.Item) error {
 	}
 	tasks, err := m.taskLocalSvc.ListAllByQuery(m.states.query)
 	if err != nil {
-		m.statusBar.SetStatus("ERROR: " + err.Error())
+		m.statusBar.SetMessage("ERROR: " + err.Error())
 	}
 	rts, _ := m.taskRichSvc.RichThem(tasks)
 	m.states.Tasks = rts
 
-	// m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
+	// m.statusBar.SetMessage(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
 	m.statusBar.SetInfo1(fmt.Sprintf("./%d", len(m.states.Tasks)))
 
 	// save sidebar for restore
@@ -275,8 +299,9 @@ func (m *Model) Error(msg string) {
 func (m *Model) ReloadDependencies() tea.Cmd {
 	cs, err := m.contextExtSvc.ListAll()
 	if err != nil {
-		m.err = err
-		return nil
+		return func() tea.Msg {
+			return models.ErrorMsg{Error: err.Error()}
+		}
 	}
 	m.states.Contexts = cs
 	// Contexts are first tab in sidebar
@@ -290,8 +315,9 @@ func (m *Model) ReloadDependencies() tea.Cmd {
 	})
 	fs, err := m.folderExtSvc.ListAll()
 	if err != nil {
-		m.err = err
-		return nil
+		return func() tea.Msg {
+			return models.ErrorMsg{Error: err.Error()}
+		}
 	}
 	// folders
 	m.states.Folders = fs
@@ -306,7 +332,9 @@ func (m *Model) ReloadDependencies() tea.Cmd {
 
 	gs, err := m.goalExtSvc.ListAll()
 	if err != nil {
-		m.err = err
+		return func() tea.Msg {
+			return models.ErrorMsg{Error: err.Error()}
+		}
 	}
 	// goals
 	m.states.Goals = gs
@@ -330,7 +358,7 @@ func (m *Model) ReloadDependencies() tea.Cmd {
 func (m *Model) ReloadTasks() tea.Cmd {
 	tasks, err := m.taskExtSvc.ListAllByQuery(m.states.query)
 	if err != nil {
-		m.statusBar.SetStatus("ERROR: " + err.Error())
+		m.statusBar.SetMessage("ERROR: " + err.Error())
 	}
 	rts, _ := m.taskRichSvc.RichThem(tasks)
 	m.states.Tasks = rts

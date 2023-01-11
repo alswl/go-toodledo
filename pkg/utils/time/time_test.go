@@ -61,7 +61,7 @@ func TestParseDurationToReadable(t *testing.T) {
 		{
 			name: "",
 			args: args{duration: time.Second * 10},
-			want: "10s",
+			want: "0m",
 		},
 		{
 			name: "",

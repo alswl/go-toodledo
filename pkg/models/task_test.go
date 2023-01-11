@@ -113,7 +113,7 @@ func TestRichTask_TimerNotRunning(t *testing.T) {
 	var task = models.RichTask{}
 	task.Timer = 100
 	task.Timeron = 0
-	assert.Equal(t, "1m40s", task.TimerString())
+	assert.Equal(t, "2m", task.TimerString())
 }
 
 func TestFunkIsEmpty(t *testing.T) {

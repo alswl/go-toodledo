@@ -64,7 +64,7 @@ type Model struct {
 
 	// states TODO
 	states *States
-	err    error
+	// err    error
 	// focused model: tasks, sidebar, statusbar
 	focused string
 	// TODO ready check
@@ -72,6 +72,7 @@ type Model struct {
 	isInputting bool
 
 	// view
+	// TODO ptr or not
 	tasksPanes map[string]*taskspane.Model
 	sidebar    uisidebar.Model
 	statusBar  uistatusbar.Model
@@ -101,9 +102,9 @@ func InitialModel() (*Model, error) {
 
 	// status bar
 	statusBar := uistatusbar.NewDefault()
-	statusBar.SetMode("tasks")
+	statusBar.SetMode(uistatusbar.ModeDefault)
 	statusBar.SetInfo1(fmt.Sprintf("./%d", len(states.Tasks)))
-	statusBar.SetInfo2("HELP(h)")
+	// statusBar.SetInfo2("HELP(h)")
 
 	// task pane
 	// XXX sidebar should read query and load specific menu
@@ -120,7 +121,6 @@ func InitialModel() (*Model, error) {
 		taskLocalSvc:  app.TaskExtSvc,
 		settingSvc:    app.SettingSvc,
 		states:        states,
-		err:           nil,
 		focused:       "tasks",
 		ready:         false,
 		statusBar:     statusBar,
@@ -133,16 +133,16 @@ func InitialModel() (*Model, error) {
 
 	// init fetcher
 	describer := fetchers.NewStatusDescriber(func() error {
-		// TODO using register fun instead of invoke m in New func
-		m.statusBar.SetStatus("fetching...")
+		//// TODO using register fun instead of invoke m in ModeNew func
+		m.statusBar.SetMessage("fetching...")
 		return nil
 	}, func() error {
-		// TODO using register fun instead of invoke m in New func
-		m.statusBar.SetStatus("fetching done")
+		// TODO using register fun instead of invoke m in ModeNew func
+		m.statusBar.SetMessage("fetch done")
 		return nil
 	}, func(err error) error {
-		// TODO using register fun instead of invoke m in New func
-		m.statusBar.SetStatus("fetching error: " + err.Error())
+		// TODO using register fun instead of invoke m in ModeNew func
+		m.statusBar.SetMessage("fetch error: " + err.Error())
 		return nil
 	})
 	duration, err := time.ParseDuration(config.AutoRefresh)
@@ -158,7 +158,7 @@ func InitialModel() (*Model, error) {
 		app.TaskExtSvc,
 		app.AccountSvc,
 	), describer)
-	// TODO using register fun instead of invoke m in New func
+	// TODO using register fun instead of invoke m in ModeNew func
 	m.fetcher = fetcher
 
 	m.getOrCreateTaskPaneByQuery().Focus()

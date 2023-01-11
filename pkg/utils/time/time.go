@@ -54,6 +54,9 @@ func ParseDurationToReadable(duration time.Duration) string {
 	duration = duration.Round(time.Minute)
 	s := duration.String()
 
+	if s == "0s" {
+		return "0m"
+	}
 	if strings.HasSuffix(s, "m0s") {
 		s = s[:len(s)-2]
 	}

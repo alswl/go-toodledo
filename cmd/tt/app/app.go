@@ -40,29 +40,25 @@ func (m *Model) Init() tea.Cmd {
 	cmds = append(cmds, m.ReloadTasks())
 
 	// tasks
-	// m.statusBar.SetStatus(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
+	// m.statusBar.SetMessage(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
 
 	// states init
 	cmds = append(cmds, func() tea.Msg {
 		ierr := m.contextExtSvc.Sync()
 		if ierr != nil {
-			m.err = ierr
-			return nil
+			return models.ErrorMsg{Error: ierr.Error()}
 		}
 		ierr = m.contextExtSvc.Sync()
 		if ierr != nil {
-			m.err = ierr
-			return nil
+			return models.ErrorMsg{Error: ierr.Error()}
 		}
 		ierr = m.folderExtSvc.Sync()
 		if ierr != nil {
-			m.err = ierr
-			return nil
+			return models.ErrorMsg{Error: ierr.Error()}
 		}
 		ierr = m.goalExtSvc.Sync()
 		if ierr != nil {
-			m.err = ierr
-			return nil
+			return models.ErrorMsg{Error: ierr.Error()}
 		}
 
 		return models.RefreshPropertiesMsg{}

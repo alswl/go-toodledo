@@ -6,11 +6,6 @@ import (
 )
 
 func (m *Model) View() string {
-	if m.err != nil {
-		m.statusBar.SetMode("ERROR")
-		m.statusBar.SetStatus(m.err.Error())
-	}
-
 	taskPane := m.getOrCreateTaskPaneByQuery()
 	statusBar := m.statusBar.View()
 

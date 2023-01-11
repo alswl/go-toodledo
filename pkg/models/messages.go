@@ -20,3 +20,7 @@ type RefreshUIMsg struct {
 // ReturnMsg is a message for return.
 type ReturnMsg struct {
 }
+
+type ErrorMsg struct {
+	Error string
+}

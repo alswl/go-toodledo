@@ -47,7 +47,7 @@ func (m Model) simpleView() string {
 		Height(Height).
 		Width(m.Width - width(modeC) - width(info1C) - width(info2C) - width(spinnerView)).
 		Render(truncate.StringWithTail(
-			m.status,
+			m.message,
 			uint(m.Width-width(modeC)-width(info1C)-width(info2C)-width(spinnerView)-defaultColumPaddingFour),
 			"..."),
 		)
@@ -63,20 +63,18 @@ func (m Model) simpleView() string {
 
 func (m Model) View() string {
 	// search mode
-	if m.filterTextInput.Focused() {
-		m.mode = "Search"
-		m.status = m.filterTextInput.View()
+	if m.input.Focused() {
+		m.message = m.input.View()
 		m.info1 = ""
-		m.info2 = ""
 		return m.simpleView()
 	}
 
 	// display mode
 	// append filter indicator TODO move mode to update?
-	mode := m.mode
-	if m.filterTextInput.Value() != "" {
-		mode = fmt.Sprintf("%s /", m.filterTextInput.Value())
+	message := m.message
+	if m.input.Value() != "" {
+		message = fmt.Sprintf("/%s ", m.input.Value())
 	}
-	m.SetMode(mode)
+	m.SetMessage(message)
 	return m.simpleView()
 }
