@@ -135,7 +135,8 @@ func (t RichTask) ThatGoal() Goal {
 }
 
 func (t RichTask) AddedString() string {
-	return time.Unix(t.Added, 0).Format("2006-01-02 15:04:05")
+	// TODO use user time zone
+	return time.Unix(t.Added, 0).In(utils.ChinaTimeZone).Format("2006-01-02 15:04:05")
 }
 
 func (t RichTask) StarString() string {
@@ -147,7 +148,8 @@ func (t RichTask) StatusString() string {
 }
 
 func (t RichTask) ModifiedString() string {
-	return time.Unix(t.Modified, 0).Format("2006-01-02 15:04:05")
+	// TODO use user time zone
+	return time.Unix(t.Modified, 0).In(utils.ChinaTimeZone).Format("2006-01-02 15:04:05")
 }
 
 func (t RichTask) Link() string {
