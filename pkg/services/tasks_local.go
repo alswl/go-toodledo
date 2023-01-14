@@ -29,17 +29,21 @@ var _ Synchronizable = (*taskLocalExtService)(nil)
 
 type taskLocalExtService struct {
 	taskSvc    TaskService
-	accountSvc AccountService
+	accountSvc AccountExtService
 
 	syncLock sync.Mutex
 	db       dal.Backend
 }
 
-func NewTaskLocalExtService(taskSvc TaskService, accountSvc AccountService, db dal.Backend) TaskPersistenceExtService {
+func NewTaskLocalExtService(
+	taskSvc TaskService,
+	accountSvc AccountExtService,
+	db dal.Backend,
+) TaskPersistenceExtService {
 	return &taskLocalExtService{taskSvc: taskSvc, accountSvc: accountSvc, db: db}
 }
 
-func ProvideTaskLocalExtService(taskSvc TaskService, accountSvc AccountService,
+func ProvideTaskLocalExtService(taskSvc TaskService, accountSvc AccountExtService,
 	db dal.Backend) TaskPersistenceExtService {
 	once.Do(func() {
 		instance = NewTaskLocalExtService(taskSvc, accountSvc, db)
@@ -47,7 +51,11 @@ func ProvideTaskLocalExtService(taskSvc TaskService, accountSvc AccountService,
 	return instance
 }
 
-func ProvideTaskLocalExtServiceIft(taskSvc TaskService, accountSvc AccountService, db dal.Backend) TaskExtendedService {
+func ProvideTaskLocalExtServiceIft(
+	taskSvc TaskService,
+	accountSvc AccountExtService,
+	db dal.Backend,
+) TaskExtendedService {
 	return ProvideTaskLocalExtService(taskSvc, accountSvc, db)
 }
 

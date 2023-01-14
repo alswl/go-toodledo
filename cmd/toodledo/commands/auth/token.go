@@ -6,7 +6,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
-	"github.com/alswl/go-toodledo/pkg/client"
+	"github.com/alswl/go-toodledo/pkg/client0"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -26,7 +26,7 @@ func NewTokenCmd(f *cmdutil.Factory) *cobra.Command {
 				log.WithField("args[0]", code).Error("url format error")
 				return
 			}
-			conf, err := client.NewOAuth2ConfigFromViper()
+			conf, err := client0.NewOAuth2ConfigFromViper()
 			if err != nil {
 				log.Error(err)
 				return
@@ -36,7 +36,7 @@ func NewTokenCmd(f *cmdutil.Factory) *cobra.Command {
 				log.Error(err)
 				return
 			}
-			err = client.SaveTokenWithViper(tok)
+			err = client0.SaveTokenWithViper(tok)
 			if err != nil {
 				log.Error(err)
 				return
@@ -51,7 +51,7 @@ func NewTokenCmd(f *cmdutil.Factory) *cobra.Command {
 				log.Error(err)
 				return
 			}
-			err = client.SaveUserIDWithViper(me.Userid)
+			err = client0.SaveUserIDWithViper(me.Userid)
 			if err != nil {
 				log.Error(err)
 				return

@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/task"
+	"github.com/alswl/go-toodledo/pkg/client0"
+	"github.com/alswl/go-toodledo/pkg/client0/task"
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/enums"
@@ -61,12 +61,12 @@ var _ TaskService = (*taskService)(nil)
 
 // taskService is the implementation of TaskService by client.
 type taskService struct {
-	cli    *client.Toodledo
+	cli    *client0.Toodledo
 	auth   runtime.ClientAuthInfoWriter
 	logger logrus.FieldLogger
 }
 
-func NewTaskService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter, logger logrus.FieldLogger) TaskService {
+func NewTaskService(cli *client0.Toodledo, auth runtime.ClientAuthInfoWriter, logger logrus.FieldLogger) TaskService {
 	return &taskService{cli: cli, auth: auth, logger: logger}
 }
 
@@ -167,7 +167,6 @@ func (s *taskService) CreateByQuery(query *queries.TaskCreateQuery) (*models.Tas
 	return resp.Payload[0], err
 }
 
-// Create ...
 func (s *taskService) Create(title string) (*models.Task, error) {
 	t := models.Task{
 		Title: title,
@@ -188,7 +187,6 @@ func (s *taskService) Create(title string) (*models.Task, error) {
 	return resp.Payload[0], err
 }
 
-// DeleteBatch ...
 func (s *taskService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteItem, error) {
 	p := task.NewPostTasksDeletePhpParams()
 	idsString, _ := funk.Map(ids, func(x int64) string {
@@ -215,7 +213,6 @@ func (s *taskService) DeleteBatch(ids []int64) ([]int64, []*models.TaskDeleteIte
 	return successIds, failed, nil
 }
 
-// Delete ...
 func (s *taskService) Delete(id int64) error {
 	t, err := s.FindByID(id)
 	if err != nil {

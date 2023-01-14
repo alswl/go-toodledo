@@ -23,7 +23,6 @@ func DefaultBuckets() []string {
 	return []string{"folders", "contexts", "tasks", "auth", "account", "goals", "settings"}
 }
 
-// ToodledoConfigEnvironment ...
 type ToodledoConfigEnvironment struct {
 	Name    string `mapstructure:"name"`
 	Folder  string `mapstructure:"folder"`
@@ -42,7 +41,7 @@ type ToodledoConfig struct {
 	RefreshToken string `mapstructure:"refresh_token" yaml:"refresh_token"`
 }
 
-// ToodledoCliConfig is configuration for toodledo cli.
+// ToodledoCliConfig is configuration for toodledo cli and tui.
 //
 //nolint:lll // model tags
 type ToodledoCliConfig struct {
@@ -92,7 +91,6 @@ func CleanDatabase(db ToodledoConfigDatabase) error {
 	return nil
 }
 
-// ColorConfig.
 type ColorConfig struct {
 	Foreground lipgloss.AdaptiveColor
 	Background lipgloss.AdaptiveColor

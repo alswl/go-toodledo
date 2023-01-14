@@ -5,7 +5,6 @@ import (
 	"strings"
 )
 
-// Priority ...
 type Priority int
 
 const (
@@ -17,7 +16,6 @@ const (
 	Top    Priority = 3
 )
 
-// PriorityAll ...
 var PriorityAll = []Priority{
 	Negative,
 	Low,

@@ -49,22 +49,8 @@ func (m *Model) FetchTasks(isHardRefresh bool) tea.Cmd {
 	}
 }
 
-func (m *Model) handleTaskPane(msg tea.KeyMsg) tea.Cmd {
-	var cmd tea.Cmd
-	switch msg.String() {
-	case "/":
-		m.isInputting = true
-		m.focusStatusBar()
-		m.statusBar.FocusInputSearch()
-	case "n":
-		m.isInputting = true
-		m.focusStatusBar()
-		m.statusBar.FocusInputNew()
-	default:
-		// TODO inline
-		cmd = m.updateTaskPane(msg)
-	}
-	return cmd
+func (m *Model) handleTaskPaneKeyPress(msg tea.KeyMsg) tea.Cmd {
+	return m.updateTaskPane(msg)
 }
 
 func (m *Model) updateTaskPane(msg tea.Msg) tea.Cmd {
@@ -85,7 +71,7 @@ func (m *Model) updateTaskPane(msg tea.Msg) tea.Cmd {
 			cmd = m.handleTimerToggle(pane)
 		case "o":
 			// open task detail pane
-			m.focus("detail")
+			m.focus(detailModel)
 			cmd = m.handleOpenTaskDetail(pane)
 		case "e":
 			cmd = m.handleEditTask(pane)

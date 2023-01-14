@@ -2,10 +2,8 @@ package enums
 
 import "strings"
 
-// TaskField ...
 type TaskField string
 
-// TaskFieldID ...
 const (
 	TaskFieldID              TaskField = "id"
 	TaskFieldTitle           TaskField = "title"
@@ -96,7 +94,6 @@ func FullTaskFields() []TaskField {
 	)
 }
 
-// TaskFields2String ...
 func TaskFields2String(fields []TaskField) string {
 	var fs []string
 	for _, f := range fields {

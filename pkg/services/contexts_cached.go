@@ -17,14 +17,13 @@ type contextCachedService struct {
 
 	svc        ContextService
 	db         dal.Backend
-	accountSvc AccountService
+	accountSvc AccountExtService
 }
 
 var contextLocalServiceInstance ContextPersistenceService
 var contextLocalServiceOnce sync.Once
 
-// NewContextCachedService ...
-func NewContextCachedService(contextsvc ContextService, accountSvc AccountService,
+func NewContextCachedService(contextsvc ContextService, accountSvc AccountExtService,
 	db dal.Backend) ContextPersistenceService {
 	s := contextCachedService{
 		svc:        contextsvc,
@@ -34,7 +33,7 @@ func NewContextCachedService(contextsvc ContextService, accountSvc AccountServic
 	return &s
 }
 
-func ProvideContextCachedService(svc ContextService, accountSvc AccountService,
+func ProvideContextCachedService(svc ContextService, accountSvc AccountExtService,
 	db dal.Backend) ContextPersistenceService {
 	if contextLocalServiceInstance == nil {
 		contextLocalServiceOnce.Do(func() {
@@ -66,7 +65,6 @@ func (s *contextCachedService) PartialSync(lastEditTime *int32) error {
 	return s.Sync()
 }
 
-// Rename ...
 func (s *contextCachedService) Rename(name string, newName string) (*models.Context, error) {
 	_ = s.Clean()
 	return s.svc.Rename(name, newName)
@@ -77,19 +75,16 @@ func (s *contextCachedService) Archive(id int, isArchived bool) (*models.Context
 	panic("implement me")
 }
 
-// Delete ...
 func (s *contextCachedService) Delete(name string) error {
 	_ = s.Clean()
 	return s.svc.Delete(name)
 }
 
-// Create ...
 func (s *contextCachedService) Create(name string) (*models.Context, error) {
 	_ = s.Clean()
 	return s.svc.Create(name)
 }
 
-// ListAll ...
 func (s *contextCachedService) ListAll() ([]*models.Context, error) {
 	fs := make([]*models.Context, 0)
 	all, err := s.db.List(ContextBucket)
@@ -120,7 +115,6 @@ func (s *contextCachedService) FindByID(id int64) (*models.Context, error) {
 	return f, nil
 }
 
-// Find ...
 func (s *contextCachedService) Find(name string) (*models.Context, error) {
 	fs, err := s.ListAll()
 	if err != nil {
@@ -137,7 +131,6 @@ func (s *contextCachedService) Find(name string) (*models.Context, error) {
 	return f, nil
 }
 
-// LocalClear ...
 func (s *contextCachedService) Clean() error {
 	err := s.db.Truncate(ContextBucket)
 	if err != nil {

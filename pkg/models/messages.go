@@ -21,6 +21,6 @@ type RefreshUIMsg struct {
 type ReturnMsg struct {
 }
 
-type ErrorMsg struct {
-	Error string
+type StatusMsg struct {
+	Message string
 }

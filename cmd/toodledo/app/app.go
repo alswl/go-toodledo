@@ -7,7 +7,7 @@ import (
 
 type ToodledoCLIApp struct {
 	// TODO move to services
-	AccountSvc     services.AccountService
+	AccountSvc     services.AccountExtService
 	TaskSvc        services.TaskService
 	FolderSvc      services.FolderService
 	ContextSvc     services.ContextService
@@ -20,7 +20,7 @@ type ToodledoCLIApp struct {
 }
 
 func NewToodledoCLIApp(
-	accountSvc services.AccountService,
+	accountSvc services.AccountExtService,
 	taskSvc services.TaskService,
 	folderSvc services.FolderService,
 	contextSvc services.ContextService,
@@ -43,7 +43,7 @@ func NewToodledoCLIApp(
 
 type ToodledoTUIApp struct {
 	// TODO move to services
-	AccountSvc     services.AccountService
+	AccountSvc     services.AccountExtService
 	TaskSvc        services.TaskService
 	TaskExtSvc     services.TaskPersistenceExtService
 	FolderSvc      services.FolderService
@@ -60,7 +60,7 @@ type ToodledoTUIApp struct {
 }
 
 func NewToodledoTUIApp(
-	accountSvc services.AccountService,
+	accountSvc services.AccountExtService,
 	taskSvc services.TaskService,
 	taskExtSvc services.TaskPersistenceExtService,
 	folderSvc services.FolderService,

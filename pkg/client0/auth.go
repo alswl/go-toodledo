@@ -1,4 +1,4 @@
-package client
+package client0
 
 import (
 	"context"
@@ -19,17 +19,16 @@ import (
 	"time"
 )
 
-// SimpleAuth ...
 type SimpleAuth struct {
 	accessToken string
 }
 
 // NewAuthByToken is simple runtime.ClientAuthInfoWriter with accessToken.
+// TODO accessToken cannot refresh
 func NewAuthByToken(accessToken string) runtime.ClientAuthInfoWriter {
 	return &SimpleAuth{accessToken: accessToken}
 }
 
-// AuthenticateRequest ...
 func (a *SimpleAuth) AuthenticateRequest(request runtime.ClientRequest, registry strfmt.Registry) error {
 	_ = request.SetQueryParam("access_token", a.accessToken)
 	return nil
@@ -94,8 +93,7 @@ func NewAuthWithRefresh(clientID, clientSecret, accessToken, refreshToken string
 	return NewAuthByToken(newToken.AccessToken), nil
 }
 
-// NewToodledo ...
-func NewToodledo() *Toodledo {
+func NewToodledoClient() *Toodledo {
 	debug := os.Getenv("DEBUG") != "" || os.Getenv("SWAGGER_DEBUG") != ""
 
 	transportConfig := openapiclient.New(DefaultHost, DefaultBasePath, []string{"https"})
@@ -120,6 +118,8 @@ func NewOAuth2ConfigFromConfigs(cfg common.ToodledoConfig) (*oauth2.Config, erro
 	return conf, nil
 }
 
+// NewOAuth2ConfigFromViper get oauth2 config from viper.
+// oauth2.Config presumes a login user.
 func NewOAuth2ConfigFromViper() (*oauth2.Config, error) {
 	// TODO delete, 3 usage left
 	clientID := viper.GetString("auth.client_id")

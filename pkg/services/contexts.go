@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/context"
+	"github.com/alswl/go-toodledo/pkg/client0"
+	"github.com/alswl/go-toodledo/pkg/client0/context"
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/go-openapi/runtime"
@@ -15,7 +15,6 @@ import (
 	"github.com/thoas/go-funk"
 )
 
-// ContextService ...
 type ContextService interface {
 	Find(name string) (*models.Context, error)
 	FindByID(id int64) (*models.Context, error)
@@ -33,16 +32,14 @@ type ContextPersistenceService interface {
 }
 
 type contextService struct {
-	cli  *client.Toodledo
+	cli  *client0.Toodledo
 	auth runtime.ClientAuthInfoWriter
 }
 
-// NewContextService ...
-func NewContextService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) ContextService {
+func NewContextService(cli *client0.Toodledo, auth runtime.ClientAuthInfoWriter) ContextService {
 	return &contextService{cli: cli, auth: auth}
 }
 
-// Create ...
 func (s *contextService) Create(name string) (*models.Context, error) {
 	params := context.NewPostContextsAddPhpParams()
 	params.SetName(name)
@@ -54,7 +51,6 @@ func (s *contextService) Create(name string) (*models.Context, error) {
 	return resp.Payload[0], nil
 }
 
-// Delete ...
 func (s *contextService) Delete(name string) error {
 	f, err := s.Find(name)
 	if err != nil {
@@ -71,7 +67,6 @@ func (s *contextService) Delete(name string) error {
 	return nil
 }
 
-// Rename ...
 func (s *contextService) Rename(name string, newName string) (*models.Context, error) {
 	if name == newName {
 		logrus.Error("not changed")
@@ -95,7 +90,6 @@ func (s *contextService) Rename(name string, newName string) (*models.Context, e
 	return resp.Payload[0], nil
 }
 
-// Find ...
 func (s *contextService) Find(name string) (*models.Context, error) {
 	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
 	fs, err := s.ListAll()
@@ -130,9 +124,8 @@ func (s *contextService) FindByID(id int64) (*models.Context, error) {
 	return f, nil
 }
 
-// ListAll ...
 func (s *contextService) ListAll() ([]*models.Context, error) {
-	cli := client.NewHTTPClient(strfmt.NewFormats())
+	cli := client0.NewHTTPClient(strfmt.NewFormats())
 	ts, err := cli.Context.GetContextsGetPhp(context.NewGetContextsGetPhpParams(), s.auth)
 	if err != nil {
 		return nil, err
@@ -142,7 +135,7 @@ func (s *contextService) ListAll() ([]*models.Context, error) {
 
 // TODO using wire
 func FindContextByName(auth runtime.ClientAuthInfoWriter, name string) (*models.Context, error) {
-	cli := client.NewHTTPClient(strfmt.NewFormats())
+	cli := client0.NewHTTPClient(strfmt.NewFormats())
 	ts, err := cli.Context.GetContextsGetPhp(context.NewGetContextsGetPhpParams(), auth)
 	if err != nil {
 		return nil, err

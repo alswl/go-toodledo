@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
+	"github.com/alswl/go-toodledo/pkg/common/terminal"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/constants"
-	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -28,8 +28,7 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 			if len(args) != 0 {
 				return nil, cobra.ShellCompDirectiveNoFileComp
 			}
-			cSrv := services.NewEnvironmentService()
-			keys, err := cSrv.ListAllKeys()
+			keys, err := terminal.ListAllKeys()
 			if err != nil {
 				logrus.Warn(err)
 				return nil, cobra.ShellCompDirectiveNoFileComp
@@ -54,8 +53,7 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 		},
 	}).RegisterFlagCompletionFunc(constants.ArgEnvironment,
 		func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-			cSrv := services.NewEnvironmentService()
-			cks, err := cSrv.ListAll()
+			cks, err := terminal.ListAll()
 			if err != nil {
 				logrus.Warn(err)
 				return []string{}, cobra.ShellCompDirectiveDefault

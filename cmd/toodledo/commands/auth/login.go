@@ -5,7 +5,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
-	"github.com/alswl/go-toodledo/pkg/client"
+	"github.com/alswl/go-toodledo/pkg/client0"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	utilsos "github.com/alswl/go-toodledo/pkg/utils/os"
 	"github.com/sirupsen/logrus"
@@ -31,7 +31,7 @@ func NewLoginCmd(f *cmdutil.Factory) *cobra.Command {
 				}
 			}
 
-			conf, err := client.NewOAuth2ConfigFromViper()
+			conf, err := client0.NewOAuth2ConfigFromViper()
 			if err != nil {
 				logrus.WithError(err).Fatal("init toodledo config, using `toodledo config init` to set up.")
 				return

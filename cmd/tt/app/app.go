@@ -20,8 +20,8 @@ const defaultAutoSyncDuration = 5 * time.Minute
 
 var (
 	switchAllowedPanes = []string{
-		"tasks",
-		"sidebar",
+		mainModel,
+		sidebarModel,
 	}
 )
 
@@ -46,19 +46,19 @@ func (m *Model) Init() tea.Cmd {
 	cmds = append(cmds, func() tea.Msg {
 		ierr := m.contextExtSvc.Sync()
 		if ierr != nil {
-			return models.ErrorMsg{Error: ierr.Error()}
+			return models.StatusMsg{Message: ierr.Error()}
 		}
 		ierr = m.contextExtSvc.Sync()
 		if ierr != nil {
-			return models.ErrorMsg{Error: ierr.Error()}
+			return models.StatusMsg{Message: ierr.Error()}
 		}
 		ierr = m.folderExtSvc.Sync()
 		if ierr != nil {
-			return models.ErrorMsg{Error: ierr.Error()}
+			return models.StatusMsg{Message: ierr.Error()}
 		}
 		ierr = m.goalExtSvc.Sync()
 		if ierr != nil {
-			return models.ErrorMsg{Error: ierr.Error()}
+			return models.StatusMsg{Message: ierr.Error()}
 		}
 
 		return models.RefreshPropertiesMsg{}

@@ -17,13 +17,13 @@ type folderCachedService struct {
 
 	svc        FolderService
 	db         dal.Backend
-	accountSvc AccountService
+	accountSvc AccountExtService
 }
 
 var folderLocalServiceInstance FolderPersistenceService
 var folderLocalServiceOnce sync.Once
 
-func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService,
+func NewFolderCachedService(folderSvc FolderService, accountSvc AccountExtService,
 	db dal.Backend) FolderPersistenceService {
 	s := folderCachedService{
 		svc:        folderSvc,
@@ -33,7 +33,11 @@ func NewFolderCachedService(folderSvc FolderService, accountSvc AccountService,
 	return &s
 }
 
-func ProvideFolderCachedService(svc FolderService, accountSvc AccountService, db dal.Backend) FolderPersistenceService {
+func ProvideFolderCachedService(
+	svc FolderService,
+	accountSvc AccountExtService,
+	db dal.Backend,
+) FolderPersistenceService {
 	if folderLocalServiceInstance == nil {
 		folderLocalServiceOnce.Do(func() {
 			folderLocalServiceInstance = NewFolderCachedService(svc, accountSvc, db)
@@ -64,31 +68,26 @@ func (s *folderCachedService) PartialSync(lastEditTime *int32) error {
 	return s.Sync()
 }
 
-// Rename ...
 func (s *folderCachedService) Rename(name string, newName string) (*models.Folder, error) {
 	_ = s.Clean()
 	return s.svc.Rename(name, newName)
 }
 
-// Archive ...
 func (s *folderCachedService) Archive(id int, isArchived bool) (*models.Folder, error) {
 	_ = s.Clean()
 	return s.svc.Archive(id, isArchived)
 }
 
-// Delete ...
 func (s *folderCachedService) Delete(name string) error {
 	_ = s.Clean()
 	return s.svc.Delete(name)
 }
 
-// Create ...
 func (s *folderCachedService) Create(name string) (*models.Folder, error) {
 	_ = s.Clean()
 	return s.svc.Create(name)
 }
 
-// ListAll ...
 func (s *folderCachedService) ListAll() ([]*models.Folder, error) {
 	fs := make([]*models.Folder, 0)
 	all, err := s.db.List(FolderBucket)
@@ -103,7 +102,6 @@ func (s *folderCachedService) ListAll() ([]*models.Folder, error) {
 	return fs, nil
 }
 
-// Find ...
 func (s *folderCachedService) Find(name string) (*models.Folder, error) {
 	fs, err := s.ListAll()
 	if err != nil {

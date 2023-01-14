@@ -1,6 +1,6 @@
 package models
 
-// Environment ...
+// Environment is a model for environment.
 type Environment struct {
 	Name            string `json:"name,omitempty"`
 	Space           string `json:"space,omitempty"`
@@ -9,7 +9,6 @@ type Environment struct {
 	DefaultAssigner string `json:"default-assigner,omitempty"`
 }
 
-// EnvironmentWithKey ...
 type EnvironmentWithKey struct {
 	Environment
 	Key string

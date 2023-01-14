@@ -3,7 +3,7 @@ package folders
 import (
 	"fmt"
 
-	"github.com/alswl/go-toodledo/cmd/toodledo/app"
+	"github.com/alswl/go-toodledo/pkg/services"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
@@ -14,8 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func renameFn(f *cmdutil.Factory, app *app.ToodledoCLIApp, _ *cobra.Command, args []string) {
-	svc := app.FolderSvc
+func renameFn(f *cmdutil.Factory, svc services.FolderService, _ *cobra.Command, args []string) {
 	name := args[0]
 	newName := args[1]
 	folder, err := svc.Rename(name, newName)
@@ -36,12 +35,12 @@ func NewRenameCmd(f *cmdutil.Factory) *cobra.Command {
 			$ toodledo folder rename reading new-name
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			cli, err := injector.InitCLIApp()
+			app, err := injector.InitCLIApp()
 			if err != nil {
 				logrus.Fatal("login required, using `toodledo auth login` to login.")
 				return
 			}
-			renameFn(f, cli, cmd, args)
+			renameFn(f, app.FolderSvc, cmd, args)
 		},
 	}
 }

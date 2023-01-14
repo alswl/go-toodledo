@@ -18,10 +18,10 @@ type goalCachedService struct {
 
 	svc        GoalService
 	db         dal.Backend
-	accountSvc AccountService
+	accountSvc AccountExtService
 }
 
-func NewGoalCachedService(goalSvc GoalService, accountSvc AccountService, db dal.Backend) GoalPersistenceService {
+func NewGoalCachedService(goalSvc GoalService, accountSvc AccountExtService, db dal.Backend) GoalPersistenceService {
 	s := goalCachedService{
 		svc:        goalSvc,
 		db:         db,
@@ -52,25 +52,21 @@ func (s *goalCachedService) PartialSync(lastEditTime *int32) error {
 	return s.Sync()
 }
 
-// Rename ...
 func (s *goalCachedService) Rename(name string, newName string) (*models.Goal, error) {
 	_ = s.Clean()
 	return s.svc.Rename(name, newName)
 }
 
-// Archive ...
 func (s *goalCachedService) Archive(id int, isArchived bool) (*models.Goal, error) {
 	_ = s.Clean()
 	return s.svc.Archive(id, isArchived)
 }
 
-// Delete ...
 func (s *goalCachedService) Delete(name string) error {
 	_ = s.Clean()
 	return s.svc.Delete(name)
 }
 
-// Create ...
 func (s *goalCachedService) Create(name string) (*models.Goal, error) {
 	_ = s.Clean()
 	return s.svc.Create(name)

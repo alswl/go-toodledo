@@ -1,4 +1,4 @@
-package services
+package terminal
 
 import (
 	"github.com/alswl/go-toodledo/pkg/models"
@@ -6,22 +6,7 @@ import (
 	"github.com/thoas/go-funk"
 )
 
-// EnvironmentService ...
-type EnvironmentService interface {
-	ListAll() ([]*models.EnvironmentWithKey, error)
-	ListAllKeys() ([]string, error)
-}
-
-type environmentService struct {
-}
-
-// NewEnvironmentService ...
-func NewEnvironmentService() EnvironmentService {
-	return &environmentService{}
-}
-
-// ListAll ...
-func (s *environmentService) ListAll() ([]*models.EnvironmentWithKey, error) {
+func ListAll() ([]*models.EnvironmentWithKey, error) {
 	var cks []*models.EnvironmentWithKey
 	var cs map[string]models.Environment
 	err := viper.UnmarshalKey("environments", &cs)
@@ -38,8 +23,8 @@ func (s *environmentService) ListAll() ([]*models.EnvironmentWithKey, error) {
 	return cks, nil
 }
 
-func (s *environmentService) ListAllKeys() ([]string, error) {
-	cks, err := s.ListAll()
+func ListAllKeys() ([]string, error) {
+	cks, err := ListAll()
 	if err != nil {
 		return []string{}, err
 	}

@@ -32,7 +32,6 @@ func Bool2ints(input bool) (output string) {
 	return strconv.Itoa(Bool2int(input))
 }
 
-// OpenBrowser ...
 func OpenBrowser(url string) {
 	var err error
 

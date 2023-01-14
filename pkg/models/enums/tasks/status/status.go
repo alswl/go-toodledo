@@ -1,10 +1,8 @@
 //go:generate stringer -type=Status
 package status
 
-// Status ...
 type Status int
 
-// StatusNone ...
 const (
 	None       Status = 0
 	NextAction Status = 1
@@ -50,7 +48,6 @@ var mapping = map[string]Status{
 	"reference":   Reference,
 }
 
-// Value2Type ...
 func Value2Type(input int64) Status {
 	for _, x := range All() {
 		if x == Status(input) {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/folder"
+	"github.com/alswl/go-toodledo/pkg/client0"
+	"github.com/alswl/go-toodledo/pkg/client0/folder"
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/go-openapi/runtime"
@@ -14,7 +14,6 @@ import (
 	"github.com/thoas/go-funk"
 )
 
-// FolderService ...
 type FolderService interface {
 	Find(name string) (*models.Folder, error)
 	FindByID(id int64) (*models.Folder, error)
@@ -34,16 +33,14 @@ type FolderPersistenceService interface {
 
 // folderService query folder with remote api.
 type folderService struct {
-	cli  *client.Toodledo
+	cli  *client0.Toodledo
 	auth runtime.ClientAuthInfoWriter
 }
 
-// NewFolderService ...
-func NewFolderService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) FolderService {
+func NewFolderService(cli *client0.Toodledo, auth runtime.ClientAuthInfoWriter) FolderService {
 	return &folderService{cli: cli, auth: auth}
 }
 
-// Create ...
 func (s *folderService) Create(name string) (*models.Folder, error) {
 	params := folder.NewPostFoldersAddPhpParams()
 	params.SetName(name)
@@ -55,7 +52,6 @@ func (s *folderService) Create(name string) (*models.Folder, error) {
 	return resp.Payload[0], nil
 }
 
-// Delete ...
 func (s *folderService) Delete(name string) error {
 	f, err := s.Find(name)
 	if err != nil {
@@ -95,7 +91,6 @@ func (s *folderService) Rename(name string, newName string) (*models.Folder, err
 	return resp.Payload[0], nil
 }
 
-// Find ...
 func (s *folderService) Find(name string) (*models.Folder, error) {
 	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
 	fs, err := s.ListAll()
@@ -130,9 +125,8 @@ func (s *folderService) FindByID(id int64) (*models.Folder, error) {
 	return f, nil
 }
 
-// ListAll ...
 func (s *folderService) ListAll() ([]*models.Folder, error) {
-	cli := client.NewHTTPClient(strfmt.NewFormats())
+	cli := client0.NewHTTPClient(strfmt.NewFormats())
 	ts, err := cli.Folder.GetFoldersGetPhp(folder.NewGetFoldersGetPhpParams(), s.auth)
 	if err != nil {
 		return nil, err
@@ -140,10 +134,9 @@ func (s *folderService) ListAll() ([]*models.Folder, error) {
 	return ts.Payload, nil
 }
 
-// Archive ...
 func (s *folderService) Archive(id int, isArchived bool) (*models.Folder, error) {
 	// TODO test
-	cli := client.NewHTTPClient(strfmt.NewFormats())
+	cli := client0.NewHTTPClient(strfmt.NewFormats())
 	p := folder.NewPostFoldersEditPhpParams()
 	p.SetID(strconv.Itoa(id))
 	archived := int64(0)

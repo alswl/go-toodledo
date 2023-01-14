@@ -13,7 +13,7 @@ func Test_cache_ListAll(t *testing.T) {
 	app, err := itinjector.InitTUIApp()
 	assert.Nil(t, err)
 	assert.NotNil(t, app)
-	svc, err := itinjector.InitFolderService()
+	svc := app.FolderSvc
 	assert.NoError(t, err)
 	all, err := svc.ListAll()
 	assert.Nil(t, err)

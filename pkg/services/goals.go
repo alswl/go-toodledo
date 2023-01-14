@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/goal"
+	"github.com/alswl/go-toodledo/pkg/client0"
+	"github.com/alswl/go-toodledo/pkg/client0/goal"
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/go-openapi/runtime"
@@ -34,17 +34,15 @@ type GoalPersistenceService interface {
 }
 
 type goalService struct {
-	cli  *client.Toodledo
+	cli  *client0.Toodledo
 	auth runtime.ClientAuthInfoWriter
 	// log  *logrus.Logger
 }
 
-// NewGoalService ...
-func NewGoalService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) GoalService {
+func NewGoalService(cli *client0.Toodledo, auth runtime.ClientAuthInfoWriter) GoalService {
 	return &goalService{cli: cli, auth: auth}
 }
 
-// Find ...
 func (s *goalService) Find(name string) (*models.Goal, error) {
 	logrus.Warn("FindByID is implemented with ListALl(), it's deprecated, please using cache")
 	ts, err := s.cli.Goal.GetGoalsGetPhp(goal.NewGetGoalsGetPhpParams(), s.auth)
@@ -77,7 +75,6 @@ func (s *goalService) FindByID(id int64) (*models.Goal, error) {
 	return f, nil
 }
 
-// Archive ...
 func (s *goalService) Archive(id int, isArchived bool) (*models.Goal, error) {
 	p := goal.NewPostGoalsEditPhpParams()
 	p.SetID(strconv.Itoa(id))
@@ -93,7 +90,6 @@ func (s *goalService) Archive(id int, isArchived bool) (*models.Goal, error) {
 	return res.Payload[0], nil
 }
 
-// Create ...
 func (s *goalService) Create(name string) (*models.Goal, error) {
 	params := goal.NewPostGoalsAddPhpParams()
 	params.SetName(name)
@@ -105,7 +101,6 @@ func (s *goalService) Create(name string) (*models.Goal, error) {
 	return res.Payload[0], nil
 }
 
-// Delete ...
 func (s *goalService) Delete(name string) error {
 	g, err := s.Find(name)
 	if err != nil {
@@ -122,7 +117,6 @@ func (s *goalService) Delete(name string) error {
 	return nil
 }
 
-// Rename ...
 func (s *goalService) Rename(name string, newName string) (*models.Goal, error) {
 	if name == newName {
 		logrus.Error("not changed")

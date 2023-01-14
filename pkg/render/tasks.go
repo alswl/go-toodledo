@@ -10,7 +10,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Tables4Task ...
 func Tables4Task(tasks []*models.Task) string {
 	var output string
 	buf := bytes.NewBufferString(output)

@@ -153,6 +153,11 @@ linters-settings:
     # Default: 5
     # TODO
     min-complexity: 10
+    
+  revive:
+    rules:
+      - name: indent-error-flow
+        disabled: true
 
 linters:
   disable-all: true

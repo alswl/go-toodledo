@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/alswl/go-toodledo/pkg/client"
-	"github.com/alswl/go-toodledo/pkg/client/saved_search"
+	"github.com/alswl/go-toodledo/pkg/client0"
+	"github.com/alswl/go-toodledo/pkg/client0/saved_search"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/go-openapi/runtime"
 	"github.com/sirupsen/logrus"
@@ -13,11 +13,11 @@ type SavedSearchService interface {
 }
 
 type savedSearchService struct {
-	cli  *client.Toodledo
+	cli  *client0.Toodledo
 	auth runtime.ClientAuthInfoWriter
 }
 
-func NewSavedSearchService(cli *client.Toodledo, auth runtime.ClientAuthInfoWriter) SavedSearchService {
+func NewSavedSearchService(cli *client0.Toodledo, auth runtime.ClientAuthInfoWriter) SavedSearchService {
 	return &savedSearchService{cli: cli, auth: auth}
 }
 

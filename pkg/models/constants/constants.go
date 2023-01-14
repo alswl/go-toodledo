@@ -1,6 +1,5 @@
 package constants
 
-// ArgEnvironment ...
 const ArgEnvironment = "environment"
 
 const Contexts = "Contexts"

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	tea "github.com/charmbracelet/bubbletea"
+
 	"github.com/alswl/go-toodledo/pkg/ui"
 
 	uidetail "github.com/alswl/go-toodledo/pkg/ui/detail"
@@ -19,6 +21,17 @@ import (
 	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/sirupsen/logrus"
 )
+
+const mainModel = "main"
+
+// taskModels is a list of task models
+// tasksModels is not focusable, it was controlled by main
+// const tasksModels = "tasksModels".
+const sidebarModel = "sidebar"
+const statusbarModel = "statusbar"
+const detailModel = "detail"
+
+var _ tea.Model = (*Model)(nil)
 
 type States struct {
 	// Tasks is available tasks
@@ -49,6 +62,7 @@ func NewStates() *States {
 // it was singleton.
 type Model struct {
 	ui.Resizable
+	ui.Focusable
 
 	taskRichSvc   services.TaskRichService
 	contextExtSvc services.ContextPersistenceService
@@ -65,10 +79,13 @@ type Model struct {
 	// states TODO
 	states *States
 	// err    error
-	// focused model: tasks, sidebar, statusbar
+	// focused model: main, tasks, sidebar, statusbar
+	// focused *ui.Focusable
 	focused string
+
 	// TODO ready check
-	ready       bool
+	ready bool
+	// TODO remove this, using focus to statusbar
 	isInputting bool
 
 	// view
@@ -121,7 +138,7 @@ func InitialModel() (*Model, error) {
 		taskLocalSvc:  app.TaskExtSvc,
 		settingSvc:    app.SettingSvc,
 		states:        states,
-		focused:       "tasks",
+		focused:       mainModel,
 		ready:         false,
 		statusBar:     statusBar,
 		sidebar:       sidebar,

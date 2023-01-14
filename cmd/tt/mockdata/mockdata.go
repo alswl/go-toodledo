@@ -7,6 +7,7 @@ import (
 )
 
 func AllTasksMock() ([]*models.RichTask, error) {
+	// TODO no works now
 	const defaultCount = 500
 	tasks := make([]models.RichTask, defaultCount)
 	_ = faker.FakeData(&tasks)

@@ -117,9 +117,9 @@ func (m *Model) Info(msg string) {
 }
 
 func (m *Model) Warn(msg string) {
-	m.Info(msg)
+	m.SetMessage("Warn: " + msg)
 }
 
 func (m *Model) Error(msg string) {
-	m.Info(msg)
+	m.SetMessage("Error: " + msg)
 }

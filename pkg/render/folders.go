@@ -8,7 +8,6 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
-// Tables4Folder ...
 func Tables4Folder(folders []*models.Folder) string {
 	var output string
 	buf := bytes.NewBufferString(output)
@@ -28,7 +27,6 @@ func Tables4Folder(folders []*models.Folder) string {
 	return buf.String()
 }
 
-// Tables4Context ...
 func Tables4Context(contexts []*models.Context) string {
 	var output string
 	buf := bytes.NewBufferString(output)
@@ -46,7 +44,6 @@ func Tables4Context(contexts []*models.Context) string {
 	return buf.String()
 }
 
-// Tables4Goal ...
 func Tables4Goal(goals []*models.Goal) string {
 	var output string
 	buf := bytes.NewBufferString(output)

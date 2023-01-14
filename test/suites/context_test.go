@@ -10,9 +10,12 @@ import (
 )
 
 func Test_contextService_Get(t *testing.T) {
+	app, err := itinjector.InitCLIApp()
+	assert.NoError(t, err)
+
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	svc, _ := itinjector.InitContextService()
+	svc := app.ContextSvc
 
 	contexts, err := svc.ListAll()
 	assert.NoError(t, err)
@@ -20,9 +23,12 @@ func Test_contextService_Get(t *testing.T) {
 }
 
 func Test_contextService_Add(t *testing.T) {
+	app, err := itinjector.InitCLIApp()
+	assert.NoError(t, err)
+
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	svc, _ := itinjector.InitContextService()
+	svc := app.ContextSvc
 
 	context, err := svc.Create("test-123")
 	assert.NoError(t, err)
@@ -30,9 +36,12 @@ func Test_contextService_Add(t *testing.T) {
 }
 
 func Test_contextService_Edit(t *testing.T) {
+	app, err := itinjector.InitCLIApp()
+	assert.NoError(t, err)
+
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	svc, _ := itinjector.InitContextService()
+	svc := app.ContextSvc
 
 	context, err := svc.Rename("test-123", "test-5")
 	assert.NoError(t, err)
@@ -40,10 +49,13 @@ func Test_contextService_Edit(t *testing.T) {
 }
 
 func Test_contextService_Delete(t *testing.T) {
+	app, err := itinjector.InitCLIApp()
+	assert.NoError(t, err)
+
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
-	svc, _ := itinjector.InitContextService()
+	svc := app.ContextSvc
 
-	err := svc.Delete("test-5")
+	err = svc.Delete("test-5")
 	assert.NoError(t, err)
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
-	"github.com/alswl/go-toodledo/pkg/client"
+	"github.com/alswl/go-toodledo/pkg/client0"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/sirupsen/logrus"
@@ -32,7 +32,7 @@ func NewLogoutCmd(f *cmdutil.Factory) *cobra.Command {
 				return
 			}
 
-			err = client.CleanAuthWithViper()
+			err = client0.CleanAuthWithViper()
 			if err != nil {
 				logrus.Error(err)
 				return

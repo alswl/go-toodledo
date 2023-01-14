@@ -31,7 +31,7 @@ func TestListAllByQueryNotDown(t *testing.T) {
 	bytes = append(bytes, marshal)
 
 	backend.On("List", mock.Anything).Return(bytes, nil)
-	s := services.NewTaskLocalExtService(&mockservices.TaskService{}, &mockservices.AccountService{}, &backend)
+	s := services.NewTaskLocalExtService(&mockservices.TaskService{}, &mockservices.AccountExtService{}, &backend)
 
 	query, err := s.ListAllByQuery(&queries.TaskListQuery{})
 	assert.NoError(t, err)
@@ -55,7 +55,7 @@ func TestListAllByQueryDoneToday(t *testing.T) {
 	bytes = append(bytes, marshal)
 
 	backend.On("List", mock.Anything).Return(bytes, nil)
-	s := services.NewTaskLocalExtService(&mockservices.TaskService{}, &mockservices.AccountService{}, &backend)
+	s := services.NewTaskLocalExtService(&mockservices.TaskService{}, &mockservices.AccountExtService{}, &backend)
 
 	query, err := s.ListAllByQuery(&queries.TaskListQuery{})
 	assert.NoError(t, err)

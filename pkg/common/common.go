@@ -11,8 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// NewConfigCliConfig ...
-func NewConfigCliConfig(cfg ToodledoCliConfig) (ToodledoConfig, error) {
+func NewConfigFromCliConfig(cfg ToodledoCliConfig) (ToodledoConfig, error) {
 	return cfg.Auth, nil
 }
 
@@ -27,7 +26,6 @@ func NewCliConfigFromViper() (ToodledoCliConfig, error) {
 	return conf, nil
 }
 
-// NewCliConfigForTesting ...
 func NewCliConfigForTesting() (ToodledoCliConfig, error) {
 	home, err := homedir.Dir()
 	cobra.CheckErr(err)
@@ -40,7 +38,6 @@ func NewCliConfigForTesting() (ToodledoCliConfig, error) {
 	return NewCliConfigFromViper()
 }
 
-// NewCliConfigMockForTesting ...
 func NewCliConfigMockForTesting() (ToodledoCliConfig, error) {
 	var conf = ToodledoCliConfig{
 		Auth: ToodledoConfig{

@@ -6,26 +6,25 @@ package itinjector
 import (
 	"github.com/alswl/go-toodledo/cmd/toodledo/app"
 	"github.com/alswl/go-toodledo/pkg/common"
-	"github.com/alswl/go-toodledo/pkg/dal"
 	"github.com/google/wire"
 )
 
-func InitCLIBackend() (dal.Backend, error) {
-	wire.Build(CLISet)
-	return nil, nil
-}
+//func InitSimpleService() (*services.SimpleServices, error) {
+//	wire.Build(CLISet, IntegrationTestTUISet)
+//	return nil, nil
+//}
 
 func InitCLIOption() (common.ToodledoCliConfig, error) {
-	wire.Build(CLISet)
+	wire.Build(CommonSet)
 	return common.ToodledoCliConfig{}, nil
 }
 
 func InitCLIApp() (*app.ToodledoCLIApp, error) {
-	wire.Build(CLISet)
+	wire.Build(CLISet, CommonSet)
 	return nil, nil
 }
 
 func InitTUIApp() (*app.ToodledoTUIApp, error) {
-	wire.Build(IntegrationTestTUISet)
+	wire.Build(IntegrationTestTUISet, CommonSet)
 	return nil, nil
 }

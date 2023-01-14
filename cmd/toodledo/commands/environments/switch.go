@@ -5,8 +5,8 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
+	"github.com/alswl/go-toodledo/pkg/common/terminal"
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -24,8 +24,7 @@ func NewSwitchCmd(f *cmdutil.Factory) *cobra.Command {
 			if len(args) != 0 {
 				return nil, cobra.ShellCompDirectiveNoFileComp
 			}
-			cSrv := services.NewEnvironmentService()
-			keys, err := cSrv.ListAllKeys()
+			keys, err := terminal.ListAllKeys()
 			if err != nil {
 				logrus.Warn(err)
 				return nil, cobra.ShellCompDirectiveNoFileComp

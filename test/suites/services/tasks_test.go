@@ -11,19 +11,20 @@ import (
 )
 
 func TestTaskServiceFindById(t *testing.T) {
-	_, err := itinjector.InitTUIApp()
+	app, err := itinjector.InitTUIApp()
 	assert.NotNil(t, err)
-	svc, err := itinjector.InitTaskService()
+	svc := app.TaskSvc
 	assert.NotNil(t, err)
 
-	task, err := svc.FindById(273321713)
+	task, err := svc.FindByID(273321713)
 	assert.NoError(t, err)
 	assert.NotNil(t, task)
 }
 
 func TestTaskListDeleted(t *testing.T) {
-	svc, err := itinjector.InitTaskService()
+	app, err := itinjector.InitTUIApp()
 	assert.NoError(t, err)
+	svc := app.TaskSvc
 
 	time := time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
 	unix := int32(time.Unix())

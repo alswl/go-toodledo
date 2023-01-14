@@ -13,7 +13,7 @@ import (
 )
 
 func TestRenameFn(t *testing.T) {
-	app, err := itinjector.InitCLIApp()
+	_, err := itinjector.InitCLIApp()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -22,9 +22,8 @@ func TestRenameFn(t *testing.T) {
 		IOStreams: ios,
 	}
 	folderSvc := mockservices.NewFolderService(t)
-	app.FolderSvc = folderSvc
 	folderSvc.On("Rename", "reading", "new-name").Return(&models.Folder{Name: "new-name"}, nil)
 
-	renameFn(f, app, nil, []string{"reading", "new-name"})
+	renameFn(f, folderSvc, nil, []string{"reading", "new-name"})
 	assert.Equal(t, " # │ NAME     │ ARCHIVED \n───┼──────────┼──────────\n 0 │ new-name │        0 \n\n", stdout.String())
 }

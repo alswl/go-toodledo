@@ -17,7 +17,7 @@ type ToodledoFetchFunc struct {
 	contextPstSvc services.ContextPersistenceService
 	goalPstSvc    services.GoalPersistenceService
 	taskPstExtSvc services.TaskPersistenceExtService
-	accountSvc    services.AccountService
+	accountSvc    services.AccountExtService
 }
 
 func NewToodledoFetchFunc(
@@ -26,7 +26,7 @@ func NewToodledoFetchFunc(
 	contextPstSvc services.ContextPersistenceService,
 	goalPstSvc services.GoalPersistenceService,
 	taskPstSvc services.TaskPersistenceExtService,
-	accountSvc services.AccountService,
+	accountSvc services.AccountExtService,
 ) *ToodledoFetchFunc {
 	return &ToodledoFetchFunc{
 		log:           log,
@@ -44,7 +44,7 @@ func NewToodledoFetchFnPartial(
 	contextSvc services.ContextPersistenceService,
 	goalSvc services.GoalPersistenceService,
 	taskSvc services.TaskPersistenceExtService,
-	accountSvc services.AccountService,
+	accountSvc services.AccountExtService,
 ) FetchFn {
 	return NewToodledoFetchFunc(log, folderSvc, contextSvc, goalSvc, taskSvc, accountSvc).Fetch
 }
@@ -57,7 +57,7 @@ func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber, isHardRefresh
 		statusDescriber.Error(fmt.Errorf("auth failed"))
 		return err
 	}
-	lastFetchInfo, err := s.accountSvc.GetLastFetchInfo()
+	lastFetchInfo, err := s.accountSvc.FindLastFetchInfo()
 	if err != nil && !errors.Is(err, common.ErrNotFound) {
 		statusDescriber.Error(fmt.Errorf("sync failed"))
 		return err
@@ -112,7 +112,7 @@ func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber, isHardRefresh
 		}
 	}
 
-	err = s.accountSvc.SetLastFetchInfo(me)
+	err = s.accountSvc.ModifyLastFetchInfo(me)
 	if err != nil {
 		statusDescriber.Error(fmt.Errorf("set last fetch info failed"))
 		s.log.WithError(err).Error("set last fetch info")
