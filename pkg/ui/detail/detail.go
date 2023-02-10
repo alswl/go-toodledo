@@ -16,8 +16,10 @@ type Model struct {
 	task models.RichTask
 }
 
-func New(task models.RichTask) *Model {
-	return &Model{task: task}
+func InitModel(task models.RichTask, width, height int) *Model {
+	m := &Model{task: task}
+	m.Resize(width, height)
+	return m
 }
 
 func (m Model) Init() tea.Cmd {

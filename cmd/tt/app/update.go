@@ -4,23 +4,21 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/alswl/go-toodledo/pkg/ui/primarypane"
+
 	"github.com/alswl/go-toodledo/pkg/utils/editor"
 
 	"gopkg.in/yaml.v3"
-
-	"github.com/alswl/go-toodledo/pkg/ui/detail"
 
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/ui"
 	"github.com/alswl/go-toodledo/pkg/ui/sidebar"
 	comstatusbar "github.com/alswl/go-toodledo/pkg/ui/statusbar"
-	"github.com/alswl/go-toodledo/pkg/ui/taskspane"
 	"github.com/alswl/go-toodledo/pkg/utils"
 
 	"github.com/alswl/go-toodledo/pkg/models/constants"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/thoas/go-funk"
 )
 
 const lastQueryKey = "last-query"
@@ -49,24 +47,36 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case models.RefreshTasksMsg:
 		// refresh tasks(ui)
-		cmd = m.ReloadTasks()
+		cmd = m.LoadTasks()
 		return m, cmd
 
-	case models.ReturnMsg:
-		// return from subcomponent
-		m.states.taskDetailID = 0
-		m.focus(mainModel)
-
 	case models.StatusMsg:
-		m.statusBar.SetMessage(typedMsg.Message)
+		m.statusBar.SetMessage(typedMsg)
+
+	case models.SidebarItemChangeMsg:
+		err := m.OnItemChange(typedMsg.Tab(), typedMsg.Item())
+		if err != nil {
+			m.statusBar.Error(err.Error())
+			return m, cmd
+		}
+		return m, func() tea.Msg {
+			return models.RefreshTasksMsg{}
+		}
 
 	case tea.WindowSizeMsg:
 		cmd = m.handleResize(typedMsg)
 
 	default:
 		// all others message broadcast to subcomponent
-		m.statusBar, cmd = m.statusBar.UpdateTyped(msg)
-		// TODO pane task and sidebar
+		mm := m.getFocusedModel()
+		switch focused := mm.(type) {
+		case *Model:
+			// TODO
+		case primarypane.Model:
+			m.primaryPane, cmd = focused.UpdateTyped(msg)
+		case sidebar.Model:
+			m.statusBar, cmd = m.statusBar.UpdateTyped(msg)
+		}
 	}
 	return m, cmd
 }
@@ -85,16 +95,13 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (Model, tea.Cmd) {
 		if !typedMM.isInputting {
 			cmd, isContinue = typedMM.handleCommandMode(msg)
 			if isContinue {
-				cmd = m.handleTaskPaneKeyPress(msg)
+				// XXX using message
+				cmd = m.primaryPane.UpdateTaskPane(msg)
 				return m, cmd
 			} else {
 				return *typedMM, cmd
 			}
 		}
-
-	case *taskspane.Model:
-		cmd = m.handleTaskPaneKeyPress(msg)
-		return m, cmd
 
 	case sidebar.Model:
 		var isContinue bool
@@ -103,6 +110,22 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (Model, tea.Cmd) {
 			m.sidebar, cmd = typedMM.UpdateTyped(msg)
 			return m, cmd
 		} else {
+			return m, cmd
+		}
+
+	case primarypane.Model:
+		// primary default is tasks table
+		if typedMM.Focused() == ui.PrimaryModel || typedMM.Focused() == ui.TasksTableModel {
+			var isContinue bool
+			cmd, isContinue = m.handleCommandMode(msg)
+			if isContinue {
+				m.primaryPane, cmd = typedMM.UpdateTyped(msg)
+				return m, cmd
+			} else {
+				return m, cmd
+			}
+		} else {
+			m.primaryPane, cmd = typedMM.UpdateTyped(msg)
 			return m, cmd
 		}
 
@@ -116,10 +139,10 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (Model, tea.Cmd) {
 			// filter
 			if previousMode == comstatusbar.ModeSearch {
 				m.isInputting = false
-				m.focus(mainModel)
+				m.focus(ui.PrimaryModel)
 			} else if previousMode == comstatusbar.ModeNew {
 				m.isInputting = false
-				m.focus(mainModel)
+				m.focus(ui.PrimaryModel)
 				input := m.statusBar.GetInputText()
 				cmd = func() tea.Msg {
 					task, err := m.taskLocalSvc.Create(input)
@@ -134,7 +157,7 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (Model, tea.Cmd) {
 		case "esc":
 			// filter
 			m.isInputting = false
-			m.focus(mainModel)
+			m.focus(ui.PrimaryModel)
 			// TODO controlled component or self-control component?
 			m.statusBar.SetMode(comstatusbar.ModeDefault)
 			m.statusBar.SetInfo1("")
@@ -144,15 +167,11 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (Model, tea.Cmd) {
 		newM, cmd = typedMM.UpdateTyped(msg)
 		m.statusBar = newM
 		if m.statusBar.GetMode() == comstatusbar.ModeSearch {
-			m.getOrCreateTaskPaneByQuery().Filter(m.statusBar.GetInput())
+			// TODO using update
+			m.primaryPane.GetOrCreateTaskPaneByQuery().Filter(m.statusBar.GetInput())
 		}
 		cmds = append(cmds, cmd)
 		return m, tea.Batch(cmds...)
-
-	case detail.Model:
-		var newM detail.Model
-		newM, cmd = typedMM.UpdateTyped(msg)
-		m.taskDetail = newM
 	}
 	return m, cmd
 }
@@ -174,26 +193,18 @@ func (m *Model) handleCommandMode(msg tea.KeyMsg) (tea.Cmd, bool) {
 		return cmd, false
 	case "/":
 		m.isInputting = true
-		m.focusStatusBar()
+		m.focus(statusbarModel)
 		m.statusBar.FocusInputSearch()
 	case "n":
 		m.isInputting = true
-		m.focusStatusBar()
+		m.focus(statusbarModel)
 		m.statusBar.FocusInputNew()
 	}
 	return nil, true
 }
 
 func (m *Model) loopFocusPane() {
-	// only allowed switchAllowedPanes, not support status bar
-	if !funk.ContainsString(switchAllowedPanes, m.focused) {
-		return
-	}
-
-	currentIdx := funk.IndexOf(switchAllowedPanes, m.focused)
-	nextPane := switchAllowedPanes[(currentIdx+1)%len(switchAllowedPanes)]
-
-	m.focus(nextPane)
+	m.focus(m.Next())
 }
 
 // handleResize handles window resize event.
@@ -208,45 +219,33 @@ func (m *Model) handleResize(msg tea.WindowSizeMsg) tea.Cmd {
 	sideBarWidth := msg.Width * twoColumns / totalColumns
 	mainPaneWidth := msg.Width - sideBarWidth
 
+	m.primaryPane, cmd = m.primaryPane.UpdateTyped(tea.WindowSizeMsg{
+		Width:  mainPaneWidth,
+		Height: msg.Height,
+	})
+	cmds = append(cmds, cmd)
+
 	m.sidebar.Resize(sideBarWidth, msg.Height-1)
 	m.sidebar, cmd = m.sidebar.UpdateTyped(msg)
 	cmds = append(cmds, cmd)
 
-	for _, p := range m.tasksPanes {
-		p.Resize(mainPaneWidth, msg.Height-1)
-		// FIXME resize msg will cause wrong height calculation
-		// find a way to fix it, and enable this msg
-		// var newCmd tea.Cmd
-		// newPane, newCmd := p.UpdateTyped(msg)
-		// m.tasksPanes[key] = &newPane
-		// cmds = append(cmds, newCmd)
-	}
 	m.statusBar.Resize(msg.Width, 0)
 	m.statusBar, cmd = m.statusBar.UpdateTyped(msg)
 	cmds = append(cmds, cmd)
-
-	m.taskDetail.Resize(mainPaneWidth, msg.Height)
-	m.taskDetail, cmd = m.taskDetail.UpdateTyped(msg)
 
 	cmds = append(cmds, cmd)
 	return tea.Batch(cmds...)
 }
 
-func (m *Model) focusStatusBar() {
-	m.focus(statusbarModel)
-}
-
 func (m *Model) getFocusedModeTyped() ui.FocusableInterface {
-	name := m.focused
+	name := m.Focused()
 	switch name {
-	// case tasksModels:
-	//	return m.getOrCreateTaskPaneByQuery()
+	case ui.PrimaryModel:
+		return &m.primaryPane
 	case sidebarModel:
 		return &m.sidebar
 	case statusbarModel:
 		return &m.statusBar
-	case detailModel:
-		return &m.taskDetail
 	default:
 		return m
 	}
@@ -254,27 +253,25 @@ func (m *Model) getFocusedModeTyped() ui.FocusableInterface {
 
 func (m *Model) focus(next string) {
 	m.getFocusedModeTyped().Blur()
-	m.focused = next
+	m.FocusChild(next)
 	m.getFocusedModeTyped().Focus()
 }
 
 func (m *Model) getFocusedModel() tea.Model {
-	switch m.focused {
-	// case tasksModels:
-	//	return m.getOrCreateTaskPaneByQuery()
+	switch m.Focused() {
 	case sidebarModel:
 		return m.sidebar
 	case statusbarModel:
 		return m.statusBar
-	case detailModel:
-		return m.taskDetail
+	case ui.PrimaryModel:
+		return m.primaryPane
 	default:
 		return m
 	}
 }
 
 // OnItemChange handle the sidebar menu change.
-func (m *Model) OnItemChange(tab string, item sidebar.Item) error {
+func (m *Model) OnItemChange(tab string, item models.Item) error {
 	m.states.query = &queries.TaskListQuery{}
 	switch tab {
 	case constants.Contexts:
@@ -286,13 +283,14 @@ func (m *Model) OnItemChange(tab string, item sidebar.Item) error {
 	}
 	tasks, err := m.taskLocalSvc.ListAllByQuery(m.states.query)
 	if err != nil {
-		m.statusBar.SetMessage("ERROR: " + err.Error())
+		m.statusBar.Error(err.Error())
 	}
 	rts, _ := m.taskRichSvc.RichThem(tasks)
 	m.states.Tasks = rts
 
-	// m.statusBar.SetMessage(fmt.Sprintf("INFO: tasksModels: %d", len(tasksModels)))
-	m.statusBar.SetInfo1(fmt.Sprintf("./%d", len(m.states.Tasks)))
+	table := m.primaryPane.GetOrCreateTaskPaneByQuery()
+	page, pageSize := table.CurrentAndTotalPage()
+	m.statusBar.SetInfo2(fmt.Sprintf("%d/%d", page, pageSize))
 
 	// save sidebar for restore
 	bytes, _ := yaml.Marshal(m.states.query)
@@ -380,23 +378,19 @@ func (m *Model) ReloadDependencies() tea.Cmd {
 	return nil
 }
 
-// ReloadTasks refresh local ui.
-func (m *Model) ReloadTasks() tea.Cmd {
+// LoadTasks refresh local ui.
+func (m *Model) LoadTasks() tea.Cmd {
 	tasks, err := m.taskExtSvc.ListAllByQuery(m.states.query)
 	if err != nil {
-		m.statusBar.SetMessage("ERROR: " + err.Error())
+		m.statusBar.Error(err.Error())
 	}
 	rts, _ := m.taskRichSvc.RichThem(tasks)
 	m.states.Tasks = rts
-	cmd := m.updateTaskPane(rts)
+	cmd := m.primaryPane.UpdateTaskPane(rts)
 	return cmd
 }
 
-func (m *Model) handleEditTask(pane *taskspane.Model) tea.Cmd {
-	id, err := pane.Selected()
-	if err != nil {
-		return nil
-	}
+func (m *Model) handleEditTask(id int64) tea.Cmd {
 	t, err := m.taskLocalSvc.FindByID(id)
 	if err != nil {
 		return nil

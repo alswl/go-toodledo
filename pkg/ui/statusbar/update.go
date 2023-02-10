@@ -65,12 +65,10 @@ func (m Model) updateTextInput(msg tea.Msg) (Model, tea.Cmd) {
 }
 func (m *Model) FocusInputSearch() {
 	m.mode = ModeSearch
-	m.info2 = "Type any word to search and press enter"
 	m.input.Focus()
 }
 
 func (m *Model) FocusInputNew() {
 	m.mode = ModeNew
-	m.info2 = "Type a new name and press enter"
 	m.input.Focus()
 }

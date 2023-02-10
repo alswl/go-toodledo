@@ -1,4 +1,4 @@
-package taskspane
+package taskstablepane
 
 import (
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
@@ -13,13 +13,6 @@ type Model struct {
 	ui.Focusable
 	ui.Resizable
 
-	// app *app.Model
-
-	// TODO delete? all states is in app. sub models is ephemeral, Or maybe props is using here?
-	// choices  []string         // items on the to-do list
-	// cursor   int              // which to-do list item our cursor is pointing at
-	// selected map[int]struct{} // which to-do items are selected
-
 	// properties
 	// TODO
 
@@ -27,8 +20,6 @@ type Model struct {
 	// TODO table should be only view mode (without filter mode)
 	tableModel table.Model
 	tableWidth int
-
-	// parent parent
 }
 
 func (m Model) Init() tea.Cmd {
@@ -82,4 +73,14 @@ func (m Model) Selected() (int64, error) {
 	}
 	id, _ := row.Data[columnKeyID].(int64)
 	return id, nil
+}
+
+func (m Model) CurrentAndTotalPage() (int, int) {
+	rows := m.tableModel.TotalRows()
+	size := m.tableModel.PageSize()
+	all := (rows + size - 1) / size
+	if all == 0 {
+		all = 1 // first page is 1
+	}
+	return m.tableModel.CurrentPage(), all
 }

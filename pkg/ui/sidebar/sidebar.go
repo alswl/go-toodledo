@@ -14,13 +14,13 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) View() string {
 	tabName := defaultTabs[m.states.CurrentTabIndex]
-	tabRender := styles.EmptyStyle.Render("<" + tabName + ">")
+	tabRender := styles.NoStyle.Render("<" + tabName + ">")
 
 	m.Viewport.SetContent(
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			tabRender,
-			styles.EmptyStyle.Render(m.currentList().View()),
+			styles.NoStyle.Render(m.currentList().View()),
 		),
 	)
 	style := styles.PaneStyle.Copy()
@@ -38,6 +38,11 @@ func (m Model) View() string {
 
 func (m *Model) Resize(width, height int) {
 	m.Resizable.Resize(width, height, styles.PaneStyle.GetBorderStyle())
+	for _, l := range []*list.Model{&m.contextList, &m.folderList, &m.goalList} {
+		l.SetWidth(m.Viewport.Width)
+		l.SetHeight(m.Viewport.Height)
+	}
+	m.Viewport.SetContent(m.View())
 }
 
 func (m *Model) currentList() *list.Model {
@@ -55,10 +60,6 @@ func (m *Model) currentList() *list.Model {
 		panic("unknown tab")
 	}
 	return l
-}
-
-func (m *Model) RegisterItemChange(onItemChange ItemChangeSubscriber) {
-	m.onItemChangeSubscribers = append(m.onItemChangeSubscribers, onItemChange)
 }
 
 func (m Model) GetStates() States {

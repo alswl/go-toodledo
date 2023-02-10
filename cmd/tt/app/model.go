@@ -1,35 +1,37 @@
 package app
 
 import (
-	"fmt"
+	"sync"
 	"time"
+
+	"github.com/alswl/go-toodledo/pkg/models/queries"
+	"github.com/alswl/go-toodledo/pkg/ui/primarypane"
 
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/alswl/go-toodledo/pkg/ui"
 
-	uidetail "github.com/alswl/go-toodledo/pkg/ui/detail"
-	uisidebar "github.com/alswl/go-toodledo/pkg/ui/sidebar"
-	uistatusbar "github.com/alswl/go-toodledo/pkg/ui/statusbar"
-	"github.com/alswl/go-toodledo/pkg/ui/taskspane"
-
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/fetchers"
 	"github.com/alswl/go-toodledo/pkg/models"
-	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/services"
+	uisidebar "github.com/alswl/go-toodledo/pkg/ui/sidebar"
+	uistatusbar "github.com/alswl/go-toodledo/pkg/ui/statusbar"
 	"github.com/sirupsen/logrus"
 )
 
-const mainModel = "main"
+// const mainModel = "main"
 
-// taskModels is a list of task models
-// tasksModels is not focusable, it was controlled by main
-// const tasksModels = "tasksModels".
 const sidebarModel = "sidebar"
 const statusbarModel = "statusbar"
-const detailModel = "detail"
+const defaultAutoSyncDuration = 5 * time.Minute
+const EnvTTNoFetch = "TT_NO_FETCH"
+
+// TODO move it
+var refreshLock sync.Mutex
+
+// const defaultSyncTimeout = 2 * 60 * time.Second.
 
 var _ tea.Model = (*Model)(nil)
 
@@ -42,19 +44,15 @@ type States struct {
 
 	// query is current query of task pane
 	query *queries.TaskListQuery
-
-	// taskDetailID is current task id of detail pane
-	taskDetailID int64
 }
 
 func NewStates() *States {
 	return &States{
-		Tasks:        []*models.RichTask{},
-		Contexts:     []*models.Context{},
-		Folders:      []*models.Folder{},
-		Goals:        []*models.Goal{},
-		query:        queries.NewTaskListQuery(),
-		taskDetailID: 0,
+		Tasks:    []*models.RichTask{},
+		Contexts: []*models.Context{},
+		Folders:  []*models.Folder{},
+		Goals:    []*models.Goal{},
+		query:    queries.NewTaskListQuery(),
 	}
 }
 
@@ -63,6 +61,7 @@ func NewStates() *States {
 type Model struct {
 	ui.Resizable
 	ui.Focusable
+	ui.Containerized
 
 	taskRichSvc   services.TaskRichService
 	contextExtSvc services.ContextPersistenceService
@@ -78,10 +77,6 @@ type Model struct {
 
 	// states TODO
 	states *States
-	// err    error
-	// focused model: main, tasks, sidebar, statusbar
-	// focused *ui.Focusable
-	focused string
 
 	// TODO ready check
 	ready bool
@@ -89,11 +84,9 @@ type Model struct {
 	isInputting bool
 
 	// view
-	// TODO ptr or not
-	tasksPanes map[string]*taskspane.Model
-	sidebar    uisidebar.Model
-	statusBar  uistatusbar.Model
-	taskDetail uidetail.Model
+	primaryPane primarypane.Model
+	sidebar     uisidebar.Model
+	statusBar   uistatusbar.Model
 	// TODO help pane
 	// help          help.Model
 }
@@ -120,8 +113,6 @@ func InitialModel() (*Model, error) {
 	// status bar
 	statusBar := uistatusbar.NewDefault()
 	statusBar.SetMode(uistatusbar.ModeDefault)
-	statusBar.SetInfo1(fmt.Sprintf("./%d", len(states.Tasks)))
-	// statusBar.SetInfo2("HELP(h)")
 
 	// task pane
 	// XXX sidebar should read query and load specific menu
@@ -138,36 +129,49 @@ func InitialModel() (*Model, error) {
 		taskLocalSvc:  app.TaskExtSvc,
 		settingSvc:    app.SettingSvc,
 		states:        states,
-		focused:       mainModel,
-		ready:         false,
-		statusBar:     statusBar,
-		sidebar:       sidebar,
-		isInputting:   false,
-		tasksPanes:    map[string]*taskspane.Model{},
+		Containerized: *ui.NewContainerized(ui.PrimaryModel, []string{
+			ui.PrimaryModel,
+			sidebarModel,
+		}),
+		ready:       false,
+		statusBar:   statusBar,
+		sidebar:     sidebar,
+		isInputting: false,
 	}
 
-	m.sidebar.RegisterItemChange(m.OnItemChange)
+	primaryPane := primarypane.InitModel(
+		*primarypane.NewProperties(
+			m.states.query,
+			m.states.Tasks,
+			m.handleCompleteToggle,
+			m.handleTimerToggle,
+			m.handleEditTask,
+		), m.taskRichSvc,
+		m.Width,
+		m.Height,
+	)
+	m.primaryPane = primaryPane
 
 	// init fetcher
 	describer := fetchers.NewStatusDescriber(func() error {
 		//// TODO using register fun instead of invoke m in ModeNew func
-		m.statusBar.SetMessage("fetching...")
+		m.statusBar.Info("fetching...")
 		return nil
 	}, func() error {
 		// TODO using register fun instead of invoke m in ModeNew func
-		m.statusBar.SetMessage("fetch done")
+		m.statusBar.Info("fetch done")
 		return nil
 	}, func(err error) error {
 		// TODO using register fun instead of invoke m in ModeNew func
-		m.statusBar.SetMessage("fetch error: " + err.Error())
+		m.statusBar.Error("fetch error: " + err.Error())
 		return nil
 	})
-	duration, err := time.ParseDuration(config.AutoRefresh)
+	interval, err := time.ParseDuration(config.AutoRefresh)
 	if err != nil {
 		log.WithField("duration", config.AutoRefresh).Error("parse duration error")
-		duration = defaultAutoSyncDuration
+		interval = defaultAutoSyncDuration
 	}
-	fetcher := fetchers.NewSimpleFetcher(log, duration, fetchers.NewToodledoFetchFnPartial(
+	fetcher := fetchers.NewSimpleFetcher(log, interval, fetchers.NewToodledoFetchFnPartial(
 		log,
 		app.FolderExtSvc,
 		app.ContextExtSvc,
@@ -178,7 +182,7 @@ func InitialModel() (*Model, error) {
 	// TODO using register fun instead of invoke m in ModeNew func
 	m.fetcher = fetcher
 
-	m.getOrCreateTaskPaneByQuery().Focus()
+	m.primaryPane.Focus()
 
 	return &m, nil
 }

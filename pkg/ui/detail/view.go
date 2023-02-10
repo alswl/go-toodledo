@@ -11,8 +11,11 @@ import (
 func (m Model) View() string {
 	m.Viewport.SetContent(m.genContent())
 	style := styles.PaneStyle.Copy()
+	if m.IsFocused() {
+		style = styles.FocusedPaneStyle.Copy()
+	}
 
-	return style.Render(m.Viewport.View())
+	return style.Width(m.Width).Render(m.Viewport.View())
 }
 
 func (m Model) genContent() string {

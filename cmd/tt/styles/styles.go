@@ -12,13 +12,12 @@ var (
 	borderColor = lipgloss.AdaptiveColor{Light: "#212F3D", Dark: "#D5D8DC"}
 	// }}}.
 
-	EmptyStyle = lipgloss.NewStyle().Padding(0, 0).Margin(0, 0)
+	NoStyle = lipgloss.NewStyle().Padding(0, 0).Margin(0, 0)
 
-	PaneStyle = EmptyStyle.Copy().
+	PaneStyle = NoStyle.Copy().
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(borderColor)
-	// TODO more color
-	FocusedPaneStyle = PaneStyle.Copy()
+	FocusedPaneStyle = PaneStyle.Copy().BorderForeground(lipgloss.AdaptiveColor{Dark: "#F25D94", Light: "#F25D94"})
 	EmptyBorderStyle = lipgloss.Border{
 		Top:         "",
 		Bottom:      "",

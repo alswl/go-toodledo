@@ -62,7 +62,7 @@ func (m Model) simpleView() string {
 }
 
 func (m Model) View() string {
-	// search mode
+	// input mode
 	if m.input.Focused() {
 		m.message = m.input.View()
 		m.info1 = ""
@@ -75,6 +75,6 @@ func (m Model) View() string {
 	if m.input.Value() != "" {
 		message = fmt.Sprintf("/%s ", m.input.Value())
 	}
-	m.SetMessage(message)
+	m.Info(message)
 	return m.simpleView()
 }

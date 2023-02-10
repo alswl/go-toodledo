@@ -6,22 +6,16 @@ import (
 )
 
 func (m *Model) View() string {
-	taskPane := m.getOrCreateTaskPaneByQuery()
 	statusBar := m.statusBar.View()
 
 	left := m.sidebar.View()
-	var right string
-	if m.states.taskDetailID != 0 {
-		right = m.taskDetail.View()
-	} else {
-		right = taskPane.View()
-	}
+	right := m.primaryPane.View()
 	mainFrame := lipgloss.JoinHorizontal(
 		lipgloss.Top,
 		left,
 		right,
 	)
-	return styles.EmptyStyle.Render(
+	return styles.NoStyle.Render(
 		lipgloss.JoinVertical(
 			lipgloss.Top,
 			mainFrame,

@@ -21,9 +21,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.task = msgTyped
 	case tea.WindowSizeMsg:
 		m.Resize(msgTyped.Width, msgTyped.Height)
-		// viewport must set content in every sizing
-		// example, https://github.com/charmbracelet/bubbletea/blob/master/examples/pager/main.go#L74
-		m.Viewport.SetContent(m.genContent())
 	}
 	m.Viewport, cmd = m.Viewport.Update(msg)
 
@@ -44,4 +41,7 @@ func (m *Model) Resize(width, height int) {
 	fixedWidth := width - paneBorder*twoSide
 	fixedHeight := height - paneBorder*1 // TODO ? 1 or 2
 	m.Resizable.Resize(fixedWidth, fixedHeight, styles.PaneStyle.GetBorderStyle())
+	// viewport must set content in every sizing
+	// example, https://github.com/charmbracelet/bubbletea/blob/master/examples/pager/main.go#L74
+	m.Viewport.SetContent(m.genContent())
 }

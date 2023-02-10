@@ -15,7 +15,7 @@ func TestView(t *testing.T) {
 	view := m.View()
 	assert.Equal(t, " \x1b[;m\x1b[0m  \x1b[;m\x1b[0m  \x1b[;m\x1b[0m  \x1b[;m\x1b[0m ", view)
 
-	m.SetMessage("status")
+	m.Info("status")
 	m.SetMode("mode")
 	m.SetInfo1("info1")
 	m.SetInfo2("info2")
@@ -25,7 +25,7 @@ func TestView(t *testing.T) {
 
 func TestLoadingView(t *testing.T) {
 	m := NewDefault()
-	m.SetMessage("status")
+	m.Info("status")
 	m.SetMode("mode")
 	m.SetInfo1("info1")
 	m.SetInfo2("info2")

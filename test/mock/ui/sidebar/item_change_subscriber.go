@@ -3,7 +3,7 @@
 package mocksidebar
 
 import (
-	sidebar "github.com/alswl/go-toodledo/pkg/ui/sidebar"
+	"github.com/alswl/go-toodledo/pkg/models"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,11 +13,11 @@ type ItemChangeSubscriber struct {
 }
 
 // Execute provides a mock function with given fields: tab, item
-func (_m *ItemChangeSubscriber) Execute(tab string, item sidebar.Item) error {
+func (_m *ItemChangeSubscriber) Execute(tab string, item models.Item) error {
 	ret := _m.Called(tab, item)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, sidebar.Item) error); ok {
+	if rf, ok := ret.Get(0).(func(string, models.Item) error); ok {
 		r0 = rf(tab, item)
 	} else {
 		r0 = ret.Error(0)

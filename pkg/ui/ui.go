@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/thoas/go-funk"
 )
 
 type FocusableInterface interface {
@@ -59,4 +60,41 @@ type Notifier interface {
 	Info(msg string)
 	Warn(msg string)
 	Error(msg string)
+}
+
+// ContainerizedInterface is a component that can contain other components.
+type ContainerizedInterface interface {
+	Focused() string
+	Next() string
+	FocusChild(string)
+	Children() []string
+}
+
+type Containerized struct {
+	focused  string
+	children []string
+}
+
+func NewContainerized(focused string, children []string) *Containerized {
+	return &Containerized{focused: focused, children: children}
+}
+
+func (c *Containerized) Focused() string {
+	return c.focused
+}
+
+func (c *Containerized) Next() string {
+	if !funk.ContainsString(c.Children(), c.Focused()) {
+		return ""
+	}
+
+	currentIdx := funk.IndexOf(c.Children(), c.Focused())
+	return c.Children()[(currentIdx+1)%len(c.Children())]
+}
+
+func (c *Containerized) Children() []string {
+	return c.children
+}
+func (c *Containerized) FocusChild(child string) {
+	c.focused = child
 }

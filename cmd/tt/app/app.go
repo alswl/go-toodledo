@@ -2,8 +2,7 @@ package app
 
 import (
 	"context"
-	"sync"
-	"time"
+	"os"
 
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 
@@ -15,35 +14,24 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-// const defaultSyncTimeout = 2 * 60 * time.Second.
-const defaultAutoSyncDuration = 5 * time.Minute
-
-var (
-	switchAllowedPanes = []string{
-		mainModel,
-		sidebarModel,
-	}
-)
-
-// TODO move it
-var refreshLock sync.Mutex
-
 func (m *Model) Init() tea.Cmd {
 	var cmds []tea.Cmd
 
 	cmds = append(cmds, m.ReloadDependencies())
 
-	// using default first now
-	// if len(m.states.Contexts) > 0 {
-	//	m.states.query.ContextID = m.states.Contexts[0].ID
-	//}
-	cmds = append(cmds, m.ReloadTasks())
-
-	// tasks
-	// m.statusBar.SetMessage(fmt.Sprintf("INFO: tasks: %d", len(tasks)))
+	query := queries.TaskListQuery{}
+	lastQuery, err := m.settingSvc.Find(lastQueryKey)
+	if err == nil {
+		_ = yaml.Unmarshal([]byte(lastQuery), &query)
+	}
+	m.states.query = &query
+	cmds = append(cmds, m.LoadTasks())
 
 	// states init
 	cmds = append(cmds, func() tea.Msg {
+		if os.Getenv(EnvTTNoFetch) != "" {
+			return nil
+		}
 		ierr := m.contextExtSvc.Sync()
 		if ierr != nil {
 			return models.StatusMsg{Message: ierr.Error()}
@@ -64,15 +52,21 @@ func (m *Model) Init() tea.Cmd {
 		return models.RefreshPropertiesMsg{}
 	})
 
-	// daemon fetcher sstart
+	// daemon fetcher start
 	// XXX using tae.Every
 	cmds = append(cmds, func() tea.Msg {
+		if os.Getenv(EnvTTNoFetch) != "" {
+			return nil
+		}
 		m.fetcher.Start(context.Background())
 		return nil
 	})
 
 	// refresh at start
 	cmds = append(cmds, func() tea.Msg {
+		if os.Getenv(EnvTTNoFetch) != "" {
+			return nil
+		}
 		return models.FetchTasksMsg{IsHardRefresh: false}
 	})
 
@@ -81,27 +75,21 @@ func (m *Model) Init() tea.Cmd {
 
 	// update last sidebar setting
 	cmds = append(cmds, func() tea.Msg {
-		bs, err := m.settingSvc.Find(sidebarStatesKey)
-		if err != nil {
-			m.log.WithError(err).Error("get sidebar states failed")
+		bs, ierr := m.settingSvc.Find(sidebarStatesKey)
+		if ierr != nil {
+			m.log.WithError(ierr).Error("get sidebar states failed")
 			return nil
 		}
 		states := sidebar.NewStates()
-		err = yaml.Unmarshal([]byte(bs), &states)
-		if err != nil {
-			m.log.WithError(err).Error("unmarshal sidebar states failed")
+		ierr = yaml.Unmarshal([]byte(bs), &states)
+		if ierr != nil {
+			m.log.WithError(ierr).Error("unmarshal sidebar states failed")
 			return nil
 		}
 		var cmd tea.Cmd
 		m.sidebar, cmd = m.sidebar.UpdateTyped(states)
 		return cmd
 	})
-	query := queries.TaskListQuery{}
-	lastQuery, err := m.settingSvc.Find(lastQueryKey)
-	if err == nil {
-		_ = yaml.Unmarshal([]byte(lastQuery), &query)
-	}
-	m.states.query = &query
 
 	return tea.Batch(cmds...)
 }

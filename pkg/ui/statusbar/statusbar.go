@@ -3,6 +3,7 @@ package statusbar
 import (
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/common"
+	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/ui"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -44,7 +45,7 @@ type Model struct {
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.spinner.Tick
+	return nil
 }
 
 func NewDefault() Model {
@@ -92,8 +93,27 @@ func (m Model) GetMode() string {
 	return m.mode
 }
 
-func (m *Model) SetMessage(message string) {
-	m.message = message
+func (m *Model) SetMessage(message models.StatusMsg) {
+	if message.ClearMode {
+		m.mode = ""
+	} else if message.Mode != "" {
+		m.mode = message.Mode
+	}
+	if message.ClearMessage {
+		m.message = ""
+	} else if message.Message != "" {
+		m.message = message.Message
+	}
+	if message.ClearInfo1 {
+		m.info1 = ""
+	} else if message.Info1 != "" {
+		m.info1 = message.Info1
+	}
+	if message.ClearInfo2 {
+		m.info2 = ""
+	} else if message.Info2 != "" {
+		m.info2 = message.Info2
+	}
 }
 
 func (m *Model) SetInfo1(msg string) {
@@ -113,13 +133,15 @@ func (m Model) GetInput() textinput.Model {
 }
 
 func (m *Model) Info(msg string) {
-	m.SetMessage(msg)
+	m.SetMessage(models.StatusMsg{
+		Message: msg,
+	})
 }
 
 func (m *Model) Warn(msg string) {
-	m.SetMessage("Warn: " + msg)
+	m.Info("Warn: " + msg)
 }
 
 func (m *Model) Error(msg string) {
-	m.SetMessage("Error: " + msg)
+	m.Info("Error: " + msg)
 }

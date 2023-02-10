@@ -5,25 +5,8 @@ import (
 
 	"github.com/alswl/go-toodledo/pkg/models"
 
-	"github.com/alswl/go-toodledo/pkg/ui/taskspane"
-
 	tea "github.com/charmbracelet/bubbletea"
 )
-
-// getOrCreateTaskPaneByQuery returns the task pane by query.
-// app holds a map of task panes, and the key is the query string.
-func (m *Model) getOrCreateTaskPaneByQuery() *taskspane.Model {
-	key := ""
-	if m.states.query != nil {
-		key = m.states.query.UniqString()
-	}
-	if p, ok := m.tasksPanes[key]; ok {
-		return p
-	}
-	newP := taskspane.InitModel(m.states.Tasks, m.Width, m.Height-1)
-	m.tasksPanes[key] = &newP
-	return &newP
-}
 
 func (m *Model) FetchTasks(isHardRefresh bool) tea.Cmd {
 	// detect refresh in progress
@@ -41,7 +24,7 @@ func (m *Model) FetchTasks(isHardRefresh bool) tea.Cmd {
 		m.log.WithField("hard", isHardRefresh).Info("refreshing done")
 		if err != nil {
 			m.log.WithError(err).Error("refresh failed")
-			m.statusBar.SetMessage(fmt.Sprintf("ERROR: refresh failed, %s", err.Error()))
+			m.statusBar.Error(fmt.Sprintf("refresh failed, %s", err.Error()))
 			return nil
 		}
 		m.statusBar.StopSpinner()
@@ -49,49 +32,7 @@ func (m *Model) FetchTasks(isHardRefresh bool) tea.Cmd {
 	}
 }
 
-func (m *Model) handleTaskPaneKeyPress(msg tea.KeyMsg) tea.Cmd {
-	return m.updateTaskPane(msg)
-}
-
-func (m *Model) updateTaskPane(msg tea.Msg) tea.Cmd {
-	paneKey := ""
-	if m.states.query != nil {
-		paneKey = m.states.query.UniqString()
-	}
-	pane := m.getOrCreateTaskPaneByQuery()
-
-	var cmd tea.Cmd
-	var newM taskspane.Model
-	switch msgType := msg.(type) {
-	case tea.KeyMsg:
-		switch msgType.String() {
-		case "x":
-			cmd = m.handleCompleteToggle(pane)
-		case "enter":
-			cmd = m.handleTimerToggle(pane)
-		case "o":
-			// open task detail pane
-			m.focus(detailModel)
-			cmd = m.handleOpenTaskDetail(pane)
-		case "e":
-			cmd = m.handleEditTask(pane)
-		default:
-			newM, cmd = pane.UpdateTyped(msg)
-			m.tasksPanes[paneKey] = &newM
-		}
-	default:
-		newM, cmd = pane.UpdateTyped(msg)
-		m.tasksPanes[paneKey] = &newM
-	}
-
-	return cmd
-}
-
-func (m *Model) handleCompleteToggle(pane *taskspane.Model) tea.Cmd {
-	id, err := pane.Selected()
-	if err != nil {
-		m.log.WithError(err).Warn("get selected task")
-	}
+func (m *Model) handleCompleteToggle(id int64) tea.Cmd {
 	task, err := m.taskLocalSvc.FindByID(id)
 	if err != nil {
 		return nil
@@ -115,11 +56,7 @@ func (m *Model) handleCompleteToggle(pane *taskspane.Model) tea.Cmd {
 	}
 }
 
-func (m *Model) handleTimerToggle(pane *taskspane.Model) tea.Cmd {
-	id, err := pane.Selected()
-	if err != nil {
-		m.log.WithError(err).Warn("get selected task")
-	}
+func (m *Model) handleTimerToggle(id int64) tea.Cmd {
 	t, err := m.taskLocalSvc.FindByID(id)
 	if err != nil {
 		return nil

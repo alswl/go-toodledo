@@ -25,7 +25,8 @@ type Properties struct {
 type States struct {
 	IsCollapsed bool
 	// CurrentTabIndex is the index of the defaultTabs
-	CurrentTabIndex      int
+	CurrentTabIndex int
+	// ItemIndexReadonlyMap show current list's item index
 	ItemIndexReadonlyMap map[string]int64
 
 	Contexts []models.Context
@@ -44,7 +45,7 @@ func NewStates() *States {
 	}
 }
 
-type ItemChangeSubscriber func(tab string, item Item) error
+type ItemChangeSubscriber func(tab string, item models.Item) error
 
 type Model struct {
 	ui.Focusable
@@ -60,24 +61,17 @@ type Model struct {
 	contextList list.Model
 	folderList  list.Model
 	goalList    list.Model
-
-	// handler
-	onItemChangeSubscribers []ItemChangeSubscriber
 }
 
 func InitModel(p Properties) Model {
 	m := Model{
-		log:                     logging.GetLogger("tt"),
-		properties:              p,
-		states:                  NewStates(),
-		onItemChangeSubscribers: []ItemChangeSubscriber{},
-		contextList:             common.NewSimpleList(),
-		folderList:              common.NewSimpleList(),
-		goalList:                common.NewSimpleList(),
+		log:         logging.GetLogger("tt"),
+		properties:  p,
+		states:      NewStates(),
+		contextList: common.NewSimpleList(),
+		folderList:  common.NewSimpleList(),
+		goalList:    common.NewSimpleList(),
 	}
-	// if len(m.list.Items()) > 0 {
-	//	m.list.Select(0)
-	//}
 	m.Blur()
 	return m
 }

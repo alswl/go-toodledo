@@ -12,7 +12,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch typedMsg := msg.(type) {
 	case tea.WindowSizeMsg:
-		h, v := styles.EmptyStyle.GetFrameSize()
+		h, v := styles.NoStyle.GetFrameSize()
 		m.contextList.SetSize(typedMsg.Width-h, typedMsg.Height-v)
 	// refresh menus
 	case []models.Context:
@@ -21,7 +21,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.contextList.RemoveItem(0)
 		}
 		for _, c := range m.states.Contexts {
-			m.contextList.InsertItem(len(m.contextList.Items()), Item{c.ID, c.Name})
+			m.contextList.InsertItem(len(m.contextList.Items()), models.NewItem(c.ID, c.Name))
 		}
 	case []models.Folder:
 		m.states.Folders = typedMsg
@@ -29,7 +29,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.folderList.RemoveItem(0)
 		}
 		for _, c := range m.states.Folders {
-			m.folderList.InsertItem(len(m.folderList.Items()), Item{c.ID, c.Name})
+			m.folderList.InsertItem(len(m.folderList.Items()), models.NewItem(c.ID, c.Name))
 		}
 	case []models.Goal:
 		m.states.Goals = typedMsg
@@ -37,7 +37,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.goalList.RemoveItem(0)
 		}
 		for _, c := range m.states.Goals {
-			m.goalList.InsertItem(len(m.goalList.Items()), Item{c.ID, c.Name})
+			m.goalList.InsertItem(len(m.goalList.Items()), models.NewItem(c.ID, c.Name))
 		}
 	case *States:
 		// restore current tab and item
@@ -46,7 +46,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		id := typedMsg.ItemIndexReadonlyMap[currentList.Title]
 		for i, item := range currentList.Items() {
 			// nolint: errcheck
-			typedItem := item.(Item)
+			typedItem := item.(models.Item)
 			if typedItem.ID() == id {
 				currentList.Select(i)
 				break
@@ -58,36 +58,35 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		currentList := m.currentList()
 		currentItem0 := currentList.SelectedItem()
-		currentItem, _ := currentItem0.(Item)
+		currentItem, _ := currentItem0.(models.Item)
 		newItem := currentItem
 		// changed indicates whether the main ui should refresh query
 		changed := false
 		switch typedMsg.String() {
 		case "h":
 			m.updateTab(-1)
-			newItem, _ = currentList.SelectedItem().(Item)
-			m.states.ItemIndexReadonlyMap[currentList.Title] = newItem.id
+			currentList = m.currentList()
+			newItem, _ = currentList.SelectedItem().(models.Item)
+			m.states.ItemIndexReadonlyMap[currentList.Title] = newItem.ID()
 			changed = true
 		case "l":
 			m.updateTab(+1)
-			newItem, _ = currentList.SelectedItem().(Item)
-			m.states.ItemIndexReadonlyMap[currentList.Title] = newItem.id
+			currentList = m.currentList()
+			newItem, _ = currentList.SelectedItem().(models.Item)
+			m.states.ItemIndexReadonlyMap[currentList.Title] = newItem.ID()
 			changed = true
 		default:
 			// other event handle
 			cmd = m.updateCurrentList(typedMsg)
-			newItem, _ = currentList.SelectedItem().(Item)
-			m.states.ItemIndexReadonlyMap[currentList.Title] = newItem.id
-			if newItem.id != currentItem.id {
+			newItem, _ = currentList.SelectedItem().(models.Item)
+			m.states.ItemIndexReadonlyMap[currentList.Title] = newItem.ID()
+			if newItem.ID() != currentItem.ID() {
 				changed = true
 			}
 		}
 		if changed {
-			for _, sub := range m.onItemChangeSubscribers {
-				err := sub(defaultTabs[m.states.CurrentTabIndex], newItem)
-				if err != nil {
-					m.log.WithError(err).Error("failed to change item")
-				}
+			cmd = func() tea.Msg {
+				return *models.NewSidebarItemChangeMsg(defaultTabs[m.states.CurrentTabIndex], newItem)
 			}
 		}
 	}

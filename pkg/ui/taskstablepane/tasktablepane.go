@@ -1,4 +1,4 @@
-package taskspane
+package taskstablepane
 
 import (
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
@@ -99,6 +99,7 @@ func (m *Model) Resize(width, height int) {
 	m.tableModel = m.tableModel.
 		WithPageSize(height - tableBorder*2 - tableHeaderHeight - tableFooterHeight - paneBorder*2).
 		WithTargetWidth(width + fixWidth)
+	m.Viewport.SetContent(m.View())
 }
 
 // func (m Model) updateFooter() Model {
