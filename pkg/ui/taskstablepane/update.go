@@ -15,7 +15,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msgType := msg.(type) {
 	case []*models.RichTask:
 		// update tasks(render new table)
-		m.tableModel = m.tableModel.WithRows(TasksRenderRows(msgType))
+		m.tableModel = m.tableModel.WithRows(RenderTasksRows(msgType))
 
 	case tea.WindowSizeMsg:
 		// top, right, bottom, left := docStyle.GetMargin()

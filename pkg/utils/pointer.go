@@ -39,3 +39,14 @@ func WrapPointerInt(value int) *int {
 func UnwrapPointerInt32(value *int32) int32 {
 	return *value
 }
+
+func WrapPointerString(value string) *string {
+	return &value
+}
+
+func UnwrapPointerString(value *string) string {
+	if value == nil {
+		return ""
+	}
+	return *value
+}

@@ -1,6 +1,8 @@
 package taskstablepane
 
 import (
+	"time"
+
 	"github.com/alswl/go-toodledo/cmd/tt/styles"
 	"github.com/alswl/go-toodledo/pkg/models"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
@@ -44,7 +46,7 @@ var (
 	}
 )
 
-func TasksRenderRows(tasks []*models.RichTask) []table.Row {
+func RenderTasksRows(tasks []*models.RichTask) []table.Row {
 	var rows []table.Row
 	for _, t := range tasks {
 		context := t.TheContext
@@ -55,16 +57,47 @@ func TasksRenderRows(tasks []*models.RichTask) []table.Row {
 		if goal == nil {
 			goal = &models.Goal{Name: "<->"}
 		}
+
+		title := t.Title
+		titleStyled := table.NewStyledCell(title, styles.NoStyle)
+		if t.Timeron != 0 {
+			titleStyled = table.NewStyledCell(title, styles.ProcessingStyle)
+		}
+
+		priority := tpriority.Value2Type(t.Priority)
+		priorityStyled := table.NewStyledCell(priority.String(), styles.NoStyle)
+		if priority == tpriority.Top {
+			priorityStyled = table.NewStyledCell(priority.String(), styles.ErrorStyle)
+		} else if priority == tpriority.High {
+			priorityStyled = table.NewStyledCell(priority.String(), styles.WarningStyle)
+		}
+
+		status := tstatus.Value2Type(t.Status)
+		statusStyled := table.NewStyledCell(status.String(), styles.NoStyle)
+		if status == tstatus.NextAction {
+			statusStyled = table.NewStyledCell(status.String(), styles.ErrorStyle)
+		} else if status == tstatus.Active {
+			statusStyled = table.NewStyledCell(status.String(), styles.WarningStyle)
+		}
+
+		due := t.DueString()
+		dueStyled := table.NewStyledCell(due, styles.NoStyle)
+		if t.Duedate < time.Now().Unix() {
+			dueStyled = table.NewStyledCell(due, styles.ErrorStyle)
+		} else if t.Duedate < time.Now().AddDate(0, 0, 1).Unix() {
+			dueStyled = table.NewStyledCell(due, styles.WarningStyle)
+		}
+
 		rows = append(rows, table.NewRow(
 			table.RowData{
 				columnKeyID:        t.ID,
 				columnKeyCompleted: t.CompletedString(),
-				columnKeyTitle:     t.Title,
+				columnKeyTitle:     titleStyled,
 				columnKeyContext:   context.Name,
-				columnKeyPriority:  tpriority.Value2Type(t.Priority),
-				columnKeyStatus:    tstatus.Value2Type(t.Status),
+				columnKeyPriority:  priorityStyled,
+				columnKeyStatus:    statusStyled,
 				columnKeyGoal:      goal.Name,
-				columnKeyDue:       t.DueString(),
+				columnKeyDue:       dueStyled,
 				columnKeyRepeat:    t.RepeatString(),
 				columnKeyLength:    t.LengthString(),
 				columnKeyTimer:     t.TimerString(),

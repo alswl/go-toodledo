@@ -86,38 +86,4 @@ More commands usage can be found in the [Manual](./docs/toodledo.md).
 `tt` is a full-featured TUI app(under actively development).
 You can get the development version from `cmd/tt`.
 
-```
-┌──────────────────────┐┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│<Contexts>            ││[ ]                                       Title   Context  Priority    Status      Goal DueStringRepe…Leng…Timer       Tag│
-││ All                 ││[ ]Access your tasks anywhere with the Toodled…              Medium      None                                             │
-│  a                   ││[ ]   Bookmark your task list (CTRL+D or CMD+D)                High      None                                             │
-│  b                   ││[ ]               Visit our How-to Video Guides              Medium      None                                             │
-│  computer            ││[ ]Import your tasks from your previous task m…              Medium      None                                             │
-│  home                ││[ ]            Create your first recurring task                High      None                                             │
-│  mobile              ││[ ]        Create a new task on your to-do list                 Top      None                                             │
-│  outing              ││[ ]                                         abc                 Low      None                                             │
-│  work                ││[ ]                            next-action item      home      HighNextAction         b2022-03-03FREQ…6000…               │
-│  None                ││[ ]                                       abc2x      home      HighNextAction         c                                   │
-│                      ││[ ]                                     abc-low      home       Low      None                                             │
-│                      ││[ ]                                     abc-due              Medium      None          2022-01-30                         │
-│                      ││[ ]                                   abc-due-2              Medium      None          2022-01-31                         │
-│                      ││[ ]                                    work-t-1      work       LowNextAction                                             │
-│                      ││[ ]                                       new-2                 Low      None         d                                   │
-│                      ││[ ]                                       new-5                 Low      None         d                                   │
-│                      ││[ ]                                     new-7-3                 Low      None         d                                   │
-│                      ││[ ]                                     cooking      home    Medium      None                                             │
-│                      ││[ ]                                    cooking2      home    Medium      None                                             │
-│                      ││[ ]                                    cooking2      home    Medium      None                                             │
-│                      ││[ ]                                    cooking2      home    Medium      None                                             │
-│                      ││[ ]                                    cooking2      home    Medium      None                                             │
-│                      ││[ ]                                    cooking3      home    Medium      None                                             │
-│                      ││[ ]                                    cooking3      home    Medium      None    goal-b                                   │
-│                      ││[ ]                                 cooking a-4         a    MediumNextAction    goal-b                    4490…          │
-│                      ││[ ]                                      红楼梦                 Low      None                                             │
-│                      ││[ ]                                      写作文                 Low      None                                             │
-│                      ││[ ]                                      item-a                 Low      None                              2136…          │
-│                      ││[ ]                                  没有 foldr                 Low      None                                             │
-│                      ││[ ]                                 context a-1         a       Low      None                                             │
-└──────────────────────┘└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
- tasks  INFO: tasks: 41                                                                                                                ./0  HELP(h)
-```
+![snapshot](./docs/assets/tt.png)

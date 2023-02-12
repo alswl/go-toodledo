@@ -308,7 +308,7 @@ func (s *taskService) Stop(id int64) error {
 	}
 
 	_, err = s.Edit(id, &models.TaskEdit{
-		Timer:   t.Timer + time.Now().Unix() - t.Timeron,
+		Timer:   utils.WrapPointerInt64(t.Timer + time.Now().Unix() - t.Timeron),
 		Timeron: utils.WrapPointerInt64(0),
 	})
 	return err

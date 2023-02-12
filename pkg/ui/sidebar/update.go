@@ -63,6 +63,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// changed indicates whether the main ui should refresh query
 		changed := false
 		switch typedMsg.String() {
+		case "/":
+			// do nothing on `/` filter, disable filter feature
 		case "h":
 			m.updateTab(-1)
 			currentList = m.currentList()

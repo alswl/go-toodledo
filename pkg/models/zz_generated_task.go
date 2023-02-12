@@ -93,7 +93,7 @@ type Task struct {
 	// 2 = High
 	// 3 = Top
 	//
-	Priority int64 `json:"priority,omitempty"`
+	Priority int64 `json:"priority"`
 
 	// A read-only field that contains the id number of the task that this task is a reference to. This is useful for tasks that are created from another task.
 	Ref string `json:"ref,omitempty"`
@@ -122,7 +122,7 @@ type Task struct {
 	Sharedwith int64 `json:"sharedwith,omitempty"`
 
 	// A boolean (0 or 1) that indicates if the task has a star or not.
-	Star int64 `json:"star,omitempty"`
+	Star int64 `json:"star"`
 
 	// A GMT unix timestamp for when the task starts. The time component of this timestamp will always be noon.
 	Startdate int64 `json:"startdate,omitempty"`
@@ -143,7 +143,7 @@ type Task struct {
 	// 9 = Canceled
 	// 10 = Reference
 	//
-	Status int64 `json:"status,omitempty"`
+	Status int64 `json:"status"`
 
 	// A comma separated string listing the tags assigned to this task. Up to 250 characters.
 	Tag string `json:"tag,omitempty"`
@@ -169,7 +169,7 @@ type Task struct {
 	// 8: Import Tools
 	// 9: Twitter
 	//
-	Via string `json:"via,omitempty"`
+	Via string `json:"via"`
 }
 
 // Validate validates this task

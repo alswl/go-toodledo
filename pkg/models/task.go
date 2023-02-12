@@ -34,7 +34,7 @@ func (t RichTask) TheDueDate() time.Time {
 		return time.Time{}
 	}
 	// TODO get timezone from toodledo
-	return time.Unix(t.Duedate, 0).In(utils.ChinaTimeZone)
+	return time.Unix(t.Duedate, 0).In(utils.DefaultTimeZone)
 }
 
 func (t RichTask) TheDueTime() time.Time {
@@ -82,7 +82,7 @@ func (t RichTask) TimerString() string {
 	now := time.Now()
 	if t.Timeron != 0 {
 		// TODO using user time zone
-		timerOn := time.Unix(t.Timeron, 0).In(utils.ChinaTimeZone)
+		timerOn := time.Unix(t.Timeron, 0).In(utils.DefaultTimeZone)
 		d += now.Sub(timerOn)
 	}
 	readableDuration := utilstime.ParseDurationToReadable(d)
@@ -145,7 +145,7 @@ func (t RichTask) ThatGoal() Goal {
 
 func (t RichTask) AddedString() string {
 	// TODO use user time zone
-	return time.Unix(t.Added, 0).In(utils.ChinaTimeZone).Format("2006-01-02 15:04:05")
+	return time.Unix(t.Added, 0).In(utils.DefaultTimeZone).Format("2006-01-02 15:04:05")
 }
 
 func (t RichTask) StarString() string {
@@ -158,7 +158,7 @@ func (t RichTask) StatusString() string {
 
 func (t RichTask) ModifiedString() string {
 	// TODO use user time zone
-	return time.Unix(t.Modified, 0).In(utils.ChinaTimeZone).Format("2006-01-02 15:04:05")
+	return time.Unix(t.Modified, 0).In(utils.DefaultTimeZone).Format("2006-01-02 15:04:05")
 }
 
 func (t RichTask) Link() string {

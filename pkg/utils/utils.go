@@ -14,9 +14,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ChinaTimeZone is timezone of China
-// TODO using configuration time zone
-var ChinaTimeZone = time.FixedZone("CST", 8*3600)
+// DefaultTimeZone is the default timezone
+// FIXME using configuration time zone.
+var DefaultTimeZone = asiaShanghaiTimeZone
+var asiaShanghaiTimeZone = time.FixedZone("CST", 8*3600)
 
 func Bool2int(input bool) int {
 	output := 0
@@ -140,7 +141,7 @@ func FillQueryByFlags(cmd *cobra.Command, obj interface{}) error {
 				if err != nil {
 					return fmt.Errorf("get %s: %w", name, err)
 				}
-				parsed, err := time.ParseInLocation("2006-01-02", get, ChinaTimeZone)
+				parsed, err := time.ParseInLocation("2006-01-02", get, DefaultTimeZone)
 				// if err, not set value
 				if err == nil {
 					v.Set(reflect.ValueOf(parsed))

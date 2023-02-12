@@ -33,7 +33,7 @@ func InitModel(tasks []*models.RichTask, width, height int) Model {
 	keys.RowUp.SetKeys("k", "up")
 
 	tb := table.New(DefaultColumns).
-		WithRows(TasksRenderRows(tasks)).
+		WithRows(RenderTasksRows(tasks)).
 		HeaderStyle(styles.PaneStyle.Copy().Bold(true).BorderStyle(styles.EmptyBorderStyle)).
 		Border(styles.EmptyTableBorderStyle).
 		SelectableRows(false).

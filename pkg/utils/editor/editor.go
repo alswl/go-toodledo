@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/sirupsen/logrus"
 )
 
 const DefaultEditor = "vi"
@@ -72,6 +74,15 @@ func (editor *Editor) Launch(filepath string) error {
 	}
 
 	return nil
+}
+
+func (editor *Editor) CleanScience(filepath string) {
+	if _, err := os.Stat(filepath); err == nil {
+		err = os.Remove(filepath)
+		if err != nil {
+			logrus.WithError(err).Fatal("remove tmp file")
+		}
+	}
 }
 
 func (err *Error) Error() string {

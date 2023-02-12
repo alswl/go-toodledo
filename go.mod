@@ -18,6 +18,7 @@ require (
 	github.com/gobeam/stringy v0.0.5
 	github.com/google/wire v0.5.0
 	github.com/jedib0t/go-pretty/v6 v6.2.4
+	github.com/jinzhu/copier v0.3.5
 	github.com/mattn/go-colorable v0.1.2
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/muesli/reflow v0.3.0

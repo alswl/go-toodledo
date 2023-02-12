@@ -33,7 +33,7 @@ func TestRichTask_DueDate(t1 *testing.T) {
 				TheFolder:  &models.Folder{},
 				TheGoal:    &models.Goal{},
 			},
-			want: time.Date(2022, 02, 24, 20, 0, 0, 0, utils.ChinaTimeZone),
+			want: time.Date(2022, 02, 24, 20, 0, 0, 0, utils.DefaultTimeZone),
 		},
 	}
 	for _, tt := range tests {
@@ -102,7 +102,7 @@ func TestRichTask_Due(t1 *testing.T) {
 func TestRIchTask_Timer(t *testing.T) {
 	var task = models.RichTask{}
 	task.Timer = 5
-	task.Timeron = time.Date(2022, 11, 06, 13, 00, 00, 0, utils.ChinaTimeZone).Unix()
+	task.Timeron = time.Date(2022, 11, 06, 13, 00, 00, 0, utils.DefaultTimeZone).Unix()
 	t.Log(task.TimerString())
 	assert.NotNil(t, task.TimerString())
 	assert.Contains(t, task.TimerString(), "*")

@@ -15,7 +15,7 @@ func TestView(t *testing.T) {
 		Task: models.Task{
 			Title:   "test",
 			Note:    "nnn",
-			Duedate: time.Date(2018, 9, 1, 10, 24, 0, 0, utils.ChinaTimeZone).Unix(),
+			Duedate: time.Date(2018, 9, 1, 10, 24, 0, 0, utils.DefaultTimeZone).Unix(),
 		},
 		TheContext: &models.Context{Name: "c"},
 		TheFolder:  &models.Folder{Name: "f"},

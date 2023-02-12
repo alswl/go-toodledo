@@ -393,56 +393,77 @@ func (m *Model) LoadTasks() tea.Cmd {
 func (m *Model) handleEditTask(id int64) tea.Cmd {
 	t, err := m.taskLocalSvc.FindByID(id)
 	if err != nil {
+		m.statusBar.Error("task not found")
 		return nil
 	}
 	e, err := editor.NewDefaultEditor()
 	if err != nil {
+		m.statusBar.Error("internal error")
 		return nil
 	}
 	tmpFilePath := fmt.Sprintf("/tmp/tt-task-editor-%d.yaml", t.ID)
+	e.CleanScience(tmpFilePath)
+	// clean tmpFile
+	defer func() {
+		e.CleanScience(tmpFilePath)
+	}()
 	tmpFile, err := os.OpenFile(tmpFilePath, os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
+		m.statusBar.Error("internal error")
 		return nil
 	}
-	bs, _ := yaml.Marshal(t)
-	_, err = tmpFile.Write(bs)
+	bs := models.PrettyYAML(t)
+	_, err = tmpFile.Write([]byte(bs))
 	if err != nil {
+		m.statusBar.Error("internal error")
 		return nil
 	}
 	err = tmpFile.Close()
 	if err != nil {
+		m.statusBar.Error("internal error")
 		return nil
 	}
 	err = e.Launch(tmpFilePath)
 	if err != nil {
+		m.statusBar.Error("internal error")
 		return nil
 	}
 	tmpFile, err = os.OpenFile(tmpFilePath, os.O_RDONLY, 0644)
 	if err != nil {
+		m.statusBar.Error("internal error")
 		return nil
 	}
 	defer func() {
 		err = tmpFile.Close()
 		if err != nil {
+			m.statusBar.Error("internal error")
 			return
 		}
 	}()
 	var newBs []byte
 	newBs, err = os.ReadFile(tmpFilePath)
 	if err != nil {
+		m.statusBar.Error(err.Error())
 		return nil
 	}
 
-	var inputT models.TaskEdit
-	err = yaml.Unmarshal(newBs, &inputT)
+	// nothing change
+	if string(newBs) == bs {
+		m.statusBar.Warn("nothing change")
+		return nil
+	}
+	inputT, err := models.LoadTaskFromYAML(string(newBs))
 	if err != nil {
+		// FIXME if set error, no response to terminal, all hang
+		m.statusBar.Error(err.Error())
 		return nil
 	}
 	return tea.Batch(
 		tea.ClearScreen,
 		func() tea.Msg {
-			_, ierr := m.taskLocalSvc.Edit(id, &inputT)
+			_, ierr := m.taskLocalSvc.Edit(id, inputT)
 			if ierr != nil {
+				m.statusBar.Warn("saved error")
 				return nil
 			}
 			return models.FetchTasksMsg{IsHardRefresh: false}
