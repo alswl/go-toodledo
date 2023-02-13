@@ -31,7 +31,7 @@ const (
 
 var (
 	DefaultColumns = []table.Column{
-		table.NewColumn(columnKeyCompleted, "[ ]", 3).WithFiltered(true).
+		table.NewColumn(columnKeyCompleted, "[ ]", 3).
 			WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
 		table.NewFlexColumn(columnKeyTitle, "Title", 0).WithFiltered(true),
 		table.NewColumn(columnKeyContext, "Context", 10),
