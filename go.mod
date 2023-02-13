@@ -8,7 +8,7 @@ require (
 	github.com/charmbracelet/bubbles v0.11.0
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/lipgloss v0.5.0
-	github.com/evertras/bubble-table v0.14.6
+	github.com/evertras/bubble-table v0.14.8
 	github.com/go-openapi/errors v0.20.1
 	github.com/go-openapi/runtime v0.21.0
 	github.com/go-openapi/strfmt v0.21.1
@@ -95,4 +95,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-replace github.com/evertras/bubble-table => github.com/alswl/bubble-table v0.5.1-0.20230213073936-9987fac0b9f3
+//replace github.com/evertras/bubble-table => github.com/alswl/bubble-table v0.5.1-0.20230213073936-9987fac0b9f3
