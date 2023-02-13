@@ -5,7 +5,9 @@ import (
 	"runtime"
 )
 
-const (
+var (
+	// Version is the version of the build.
+	// it will be overwritten automatically by the build system.
 	Version   = "0.0.0"
 	Commit    = "UNKNOWN"
 	Package   = "github.com/alswl/toodledo"

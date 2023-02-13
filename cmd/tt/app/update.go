@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/charmbracelet/bubbles/spinner"
+
 	"github.com/alswl/go-toodledo/pkg/ui/primarypane"
 
 	"github.com/alswl/go-toodledo/pkg/utils/editor"
@@ -66,6 +68,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		cmd = m.handleResize(typedMsg)
 
+	case spinner.TickMsg:
+		m.statusBar, cmd = m.statusBar.UpdateTyped(msg)
+
 	default:
 		// all others message broadcast to subcomponent
 		mm := m.getFocusedModel()
@@ -75,6 +80,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case primarypane.Model:
 			m.primaryPane, cmd = focused.UpdateTyped(msg)
 		case sidebar.Model:
+			m.sidebar, cmd = focused.UpdateTyped(msg)
+		case comstatusbar.Model:
 			m.statusBar, cmd = m.statusBar.UpdateTyped(msg)
 		}
 	}

@@ -159,7 +159,8 @@ func InitialModel() (*Model, error) {
 		return nil
 	}, func() error {
 		// TODO using register fun instead of invoke m in ModeNew func
-		m.statusBar.Info("fetch done")
+		now := time.Now()
+		m.statusBar.Info("fetch done at " + now.Format("15:04:05"))
 		return nil
 	}, func(err error) error {
 		// TODO using register fun instead of invoke m in ModeNew func

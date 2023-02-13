@@ -16,20 +16,23 @@ func (m *Model) FetchTasks(isHardRefresh bool) tea.Cmd {
 		return nil
 	}
 	defer refreshLock.Unlock()
-	m.statusBar.StartSpinner()
-
-	// io blocking in msg
-	return func() tea.Msg {
-		err := m.fetcher.Fetch(isHardRefresh)
-		m.log.WithField("hard", isHardRefresh).Info("refreshing done")
-		if err != nil {
-			m.log.WithError(err).Error("refresh failed")
-			m.statusBar.Error(fmt.Sprintf("refresh failed, %s", err.Error()))
-			return nil
-		}
-		m.statusBar.StopSpinner()
-		return models.RefreshTasksMsg{}
-	}
+	return tea.Batch(
+		func() tea.Msg {
+			return m.statusBar.StartSpinner()
+		},
+		// io blocking in msg
+		func() tea.Msg {
+			err := m.fetcher.Fetch(isHardRefresh)
+			m.log.WithField("hard", isHardRefresh).Info("refreshing done")
+			if err != nil {
+				m.log.WithError(err).Error("refresh failed")
+				m.statusBar.Error(fmt.Sprintf("refresh failed, %s", err.Error()))
+				return nil
+			}
+			m.statusBar.StopSpinner()
+			return models.RefreshTasksMsg{}
+		},
+	)
 }
 
 func (m *Model) handleCompleteToggle(id int64) tea.Cmd {
