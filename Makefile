@@ -131,15 +131,20 @@ generate-code-wire:
 	@(cd test/suites/itinjector; $$GOPATH/bin/wire)
 
 .PHONY: build
-build:
-	@for target in $(TARGETS); do                                                             \
-	  GOOS=$(GOOS) GOARCH=$(GOARCH) go build -v -o $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) \
-	    -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)                             \
-	    -X $(ROOT)/pkg/version.Commit=$(COMMIT)                                               \
-	    -X $(ROOT)/pkg/version.Package=$(ROOT)"                                               \
-	    $(CMD_DIR)/$${target};                                                                \
-	  cp $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) $(OUTPUT_DIR)/$${target};                 \
-	  cp $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) $(OUTPUT_DIR)/$${target}-$(VERSION);      \
+MINIMAL_BUILD = 0
+build: 
+	@for target in $(TARGETS); do                                                                                          \
+	  GOOS=$(GOOS) GOARCH=$(GOARCH) go build -v -o $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH)                              \
+	    -ldflags "-s -w -X $(ROOT)/pkg/version.Version=$(VERSION)                                                          \
+	    -X $(ROOT)/pkg/version.Commit=$(COMMIT)                                                                            \
+	    -X $(ROOT)/pkg/version.Package=$(ROOT)"                                                                            \
+	    $(CMD_DIR)/$${target};                                                                                             \
+	  if [ $(MINIMAL_BUILD) -eq 1 ]; then                                                                                  \
+	    upx $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH);                                                                    \
+	  fi;                                                                                                                  \
+	  cp $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) $(OUTPUT_DIR)/$${target}-$(VERSION)-$(GOOS)-$(GOARCH);                 \
+	  cp $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) $(OUTPUT_DIR)/$${target}-$(VERSION);                                   \
+	  cp $(OUTPUT_DIR)/$${target}-$(GOOS)-$(GOARCH) $(OUTPUT_DIR)/$${target};                                              \
 	done
 
 .PHONY: compress
