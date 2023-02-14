@@ -270,6 +270,8 @@ func (s *taskService) Complete(id int64) (*models.Task, error) {
 	}
 	return s.Edit(id, &models.TaskEdit{
 		Completed: utils.WrapPointerInt64(time.Now().Unix()),
+		// auto reschedule by toodledo
+		Reschedule: 1,
 	})
 }
 

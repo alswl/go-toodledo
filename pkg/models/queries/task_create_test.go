@@ -15,5 +15,5 @@ func TestTaskCreateQueryMarshal(t *testing.T) {
 
 	assert.NoError(t, err)
 	// default marshall of empty task
-	assert.Equal(t, `{"priority":0,"star":0,"status":0,"via":""}`, string(bs))
+	assert.Equal(t, `{"duedatemod":0,"priority":0,"star":0,"status":0,"via":""}`, string(bs))
 }

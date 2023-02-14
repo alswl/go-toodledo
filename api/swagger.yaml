@@ -1112,7 +1112,7 @@ definitions:
           still be in the past. Toodledo will have the option to indicate that
           certain repeating tasks should be rescheduled to the next future
           occurance of the task. If this is the case, the custom ";FASTFORWARD"
-          string will be appended to the RRULE.      
+          string will be appended to the RRULE.
       status:
         type: integer
         x-omitempty: false
@@ -1419,7 +1419,7 @@ definitions:
           still be in the past. Toodledo will have the option to indicate that
           certain repeating tasks should be rescheduled to the next future
           occurance of the task. If this is the case, the custom ";FASTFORWARD"
-          string will be appended to the RRULE.      
+          string will be appended to the RRULE.
       status:
         type: integer
         x-nullable: true
@@ -1577,6 +1577,13 @@ definitions:
           A read-only field that contains the id number of the task that this
           task is a reference to. This is useful for tasks that are created
           from another task.
+      reschedule:
+        type: integer
+        description: >-
+          Set the "reschedule" variable to "1" if you want Toodledo to automatically reschedule the repeating task for you.
+          This will only apply if you also set the completion date, and if the task has a due-date and repeating value.
+          If you do not set this, then you are responsible for rescheduling repeating tasks yourself, as well as properly handling any subtasks that the task may have.
+          It is recommended that you allow Toodledo to reschedule repeating tasks for you.
   TaskDeleted:
     type: object
     properties:

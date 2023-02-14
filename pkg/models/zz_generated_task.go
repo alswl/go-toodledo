@@ -48,7 +48,7 @@ type Task struct {
 	// 2 = Due After (>)
 	// 3 = Optionally (?)
 	//
-	Duedatemod int64 `json:"duedatemod,omitempty"`
+	Duedatemod int64 `json:"duedatemod"`
 
 	// A GMT unix timestamp for when the task is due. If the task does not have a time set, then this will be 0. If the task has a duetime without a duedate set, then the date component of this timestamp will be Jan 1, 1970. Times are stored as floating times. In other words, 10am is always 10am, regardless of your timezone. You can convert this timestamp to a GMT string and display the time component without worrying about timezones.
 	Duetime int64 `json:"duetime,omitempty"`

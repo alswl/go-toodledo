@@ -112,6 +112,9 @@ type TaskEdit struct {
 	//
 	Repeat *string `json:"repeat,omitempty"`
 
+	// Set the "reschedule" variable to "1" if you want Toodledo to automatically reschedule the repeating task for you. This will only apply if you also set the completion date, and if the task has a due-date and repeating value. If you do not set this, then you are responsible for rescheduling repeating tasks yourself, as well as properly handling any subtasks that the task may have. It is recommended that you allow Toodledo to reschedule repeating tasks for you.
+	Reschedule int64 `json:"reschedule,omitempty"`
+
 	// The user id of the person who owns the task that is being shared with the current user. If the current user is not the owner, then they cannot make changes to the collaboration settings for this task, although they can make other changes. Read only.
 	Sharedowner *int64 `json:"sharedowner,omitempty"`
 
