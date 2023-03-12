@@ -1,4 +1,4 @@
-package fetchers
+package common
 
 import (
 	"sync"

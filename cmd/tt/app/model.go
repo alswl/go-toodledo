@@ -4,6 +4,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/alswl/go-toodledo/pkg/common"
+
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/ui/primarypane"
 
@@ -156,7 +158,7 @@ func InitialModel() (*Model, error) {
 	m.primaryPane = primaryPane
 
 	// init fetcher
-	describer := fetchers.NewStatusDescriber(func() error {
+	describer := common.NewStatusDescriber(func() error {
 		//// TODO using register fun instead of invoke m in ModeNew func
 		m.statusBar.Info("fetching...")
 		return nil

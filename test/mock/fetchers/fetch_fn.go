@@ -3,7 +3,7 @@
 package mockfetchers
 
 import (
-	fetchers "github.com/alswl/go-toodledo/pkg/fetchers"
+	fetchers "github.com/alswl/go-toodledo/pkg/common"
 	mock "github.com/stretchr/testify/mock"
 )
 

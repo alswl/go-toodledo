@@ -50,7 +50,7 @@ func NewToodledoFetchSvcsPartial(
 	return NewToodledoFetchService(log, folderSvc, contextSvc, goalSvc, taskSvc, accountSvc).Fetch
 }
 
-func (s *ToodledoFetchService) Fetch(statusDescriber fetchers.StatusDescriber, isHardRefresh bool) error {
+func (s *ToodledoFetchService) Fetch(statusDescriber common.StatusDescriber, isHardRefresh bool) error {
 	statusDescriber.Syncing()
 
 	me, err := s.accountSvc.Me()

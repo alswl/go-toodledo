@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/alswl/go-toodledo/pkg/common"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
-	"github.com/alswl/go-toodledo/pkg/fetchers"
 	tpriority "github.com/alswl/go-toodledo/pkg/models/enums/tasks/priority"
 	tstatus "github.com/alswl/go-toodledo/pkg/models/enums/tasks/status"
 	"github.com/alswl/go-toodledo/pkg/models/enums/tasks/subtasksview"
@@ -168,7 +169,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				appExt.TaskExtSvc,
 				app.AccountSvc,
 			)
-			err = fetcher.Fetch(fetchers.NewNoOpStatusDescriber(), false)
+			err = fetcher.Fetch(common.NewNoOpStatusDescriber(), false)
 			if err != nil {
 				log.WithError(err).Fatal("fetch failed")
 				return
