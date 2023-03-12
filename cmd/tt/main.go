@@ -3,9 +3,10 @@ package main
 import (
 	"os"
 
+	"github.com/alswl/go-toodledo/cmd/tt/app"
+
 	"github.com/sirupsen/logrus"
 
-	"github.com/alswl/go-toodledo/cmd/tt/app"
 	"github.com/alswl/go-toodledo/pkg/common"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
 	tea "github.com/charmbracelet/bubbletea"

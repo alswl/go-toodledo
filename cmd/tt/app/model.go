@@ -4,9 +4,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alswl/go-toodledo/pkg/fetchers"
-
+	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/common"
+	"github.com/alswl/go-toodledo/pkg/common/logging"
+	"github.com/alswl/go-toodledo/pkg/models/constants"
+
+	"github.com/alswl/go-toodledo/pkg/fetchers"
 
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/ui/primarypane"
@@ -15,8 +18,6 @@ import (
 
 	"github.com/alswl/go-toodledo/pkg/ui"
 
-	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
-	"github.com/alswl/go-toodledo/pkg/common/logging"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/services"
 	uisidebar "github.com/alswl/go-toodledo/pkg/ui/sidebar"
@@ -99,7 +100,7 @@ type Model struct {
 
 func InitialModel() (*Model, error) {
 	// prepare
-	log := logging.GetLogger("tt")
+	log := logging.GetLoggerOrCreate(constants.LogTT)
 	var err error
 	app, err := injector.InitTUIApp()
 	if err != nil {

@@ -67,7 +67,7 @@ func InitModel(props Properties, taskRichSvc services.TaskRichService, width, he
 
 		props: props,
 		// TODO using specific logger
-		log: logging.GetLogger("tt"),
+		log: logging.GetLoggerOrDefault("tt"),
 	}
 	m.Width = width
 	m.Height = height

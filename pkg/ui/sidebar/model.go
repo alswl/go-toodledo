@@ -67,7 +67,7 @@ type Model struct {
 func InitModel(p Properties) Model {
 	m := Model{
 		Visible:     ui.NewVisible(true),
-		log:         logging.GetLogger("tt"),
+		log:         logging.GetLoggerOrDefault("tt"),
 		properties:  p,
 		states:      NewStates(),
 		contextList: common.NewSimpleList(),

@@ -39,7 +39,7 @@ type statusDescriber struct {
 
 func NewStatusDescriber(onSyncing, onSuccess func() error, onError func(err error) error) StatusDescriber {
 	return &statusDescriber{
-		log:       logging.GetLogger("pkg.fetchers"),
+		log:       logging.GetLoggerOrDefault("pkg.fetchers"),
 		syncingFn: onSyncing,
 		successFn: onSuccess,
 		errorFn:   onError,
@@ -48,7 +48,7 @@ func NewStatusDescriber(onSyncing, onSuccess func() error, onError func(err erro
 
 func NewNoOpStatusDescriber() StatusDescriber {
 	return &statusDescriber{
-		log: logging.GetLogger("pkg.fetchers"),
+		log: logging.GetLoggerOrDefault("pkg.fetchers"),
 		syncingFn: func() error {
 			return nil
 		},
