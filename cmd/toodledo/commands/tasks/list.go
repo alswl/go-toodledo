@@ -160,7 +160,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			folderSvc := app.FolderSvc
 			goalSvc := app.GoalSvc
 			taskRichSvc := app.TaskRichSvc
-			fetcher := fetchers.NewToodledoFetchFunc(
+			fetcher := services.NewToodledoFetchService(
 				log,
 				appExt.FolderExtSvc,
 				appExt.ContextExtSvc,

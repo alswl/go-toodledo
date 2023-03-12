@@ -1,34 +1,35 @@
-package fetchers
+package services
 
 import (
 	"errors"
 	"fmt"
 
+	"github.com/alswl/go-toodledo/pkg/fetchers"
+
 	"github.com/alswl/go-toodledo/pkg/common"
 
-	"github.com/alswl/go-toodledo/pkg/services"
 	"github.com/sirupsen/logrus"
 )
 
-type ToodledoFetchFunc struct {
+type ToodledoFetchService struct {
 	log logrus.FieldLogger
 
-	folderPstSvc  services.FolderPersistenceService
-	contextPstSvc services.ContextPersistenceService
-	goalPstSvc    services.GoalPersistenceService
-	taskPstExtSvc services.TaskPersistenceExtService
-	accountSvc    services.AccountExtService
+	folderPstSvc  FolderPersistenceService
+	contextPstSvc ContextPersistenceService
+	goalPstSvc    GoalPersistenceService
+	taskPstExtSvc TaskPersistenceExtService
+	accountSvc    AccountExtService
 }
 
-func NewToodledoFetchFunc(
+func NewToodledoFetchService(
 	log logrus.FieldLogger,
-	folderPstSvc services.FolderPersistenceService,
-	contextPstSvc services.ContextPersistenceService,
-	goalPstSvc services.GoalPersistenceService,
-	taskPstSvc services.TaskPersistenceExtService,
-	accountSvc services.AccountExtService,
-) *ToodledoFetchFunc {
-	return &ToodledoFetchFunc{
+	folderPstSvc FolderPersistenceService,
+	contextPstSvc ContextPersistenceService,
+	goalPstSvc GoalPersistenceService,
+	taskPstSvc TaskPersistenceExtService,
+	accountSvc AccountExtService,
+) *ToodledoFetchService {
+	return &ToodledoFetchService{
 		log:           log,
 		folderPstSvc:  folderPstSvc,
 		contextPstSvc: contextPstSvc,
@@ -38,18 +39,18 @@ func NewToodledoFetchFunc(
 	}
 }
 
-func NewToodledoFetchFnPartial(
+func NewToodledoFetchSvcsPartial(
 	log logrus.FieldLogger,
-	folderSvc services.FolderPersistenceService,
-	contextSvc services.ContextPersistenceService,
-	goalSvc services.GoalPersistenceService,
-	taskSvc services.TaskPersistenceExtService,
-	accountSvc services.AccountExtService,
-) FetchFn {
-	return NewToodledoFetchFunc(log, folderSvc, contextSvc, goalSvc, taskSvc, accountSvc).Fetch
+	folderSvc FolderPersistenceService,
+	contextSvc ContextPersistenceService,
+	goalSvc GoalPersistenceService,
+	taskSvc TaskPersistenceExtService,
+	accountSvc AccountExtService,
+) fetchers.FetchFn {
+	return NewToodledoFetchService(log, folderSvc, contextSvc, goalSvc, taskSvc, accountSvc).Fetch
 }
 
-func (s *ToodledoFetchFunc) Fetch(statusDescriber StatusDescriber, isHardRefresh bool) error {
+func (s *ToodledoFetchService) Fetch(statusDescriber fetchers.StatusDescriber, isHardRefresh bool) error {
 	statusDescriber.Syncing()
 
 	me, err := s.accountSvc.Me()

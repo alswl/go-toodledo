@@ -175,7 +175,7 @@ func InitialModel() (*Model, error) {
 		log.WithField("duration", config.AutoRefresh).Error("parse duration error")
 		interval = defaultAutoSyncDuration
 	}
-	fetcher := fetchers.NewSimpleFetcher(log, interval, fetchers.NewToodledoFetchFnPartial(
+	fetcher := fetchers.NewSimpleFetcher(log, interval, services.NewToodledoFetchSvcsPartial(
 		log,
 		app.FolderExtSvc,
 		app.ContextExtSvc,
