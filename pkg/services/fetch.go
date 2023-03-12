@@ -4,12 +4,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/alswl/go-toodledo/pkg/fetchers"
-
 	"github.com/alswl/go-toodledo/pkg/common"
 
 	"github.com/sirupsen/logrus"
 )
+
+// FetchFn fetch data.
+type FetchFn func(sd common.StatusDescriber, isHardRefresh bool) error
 
 type ToodledoFetchService struct {
 	log logrus.FieldLogger
@@ -39,14 +40,14 @@ func NewToodledoFetchService(
 	}
 }
 
-func NewToodledoFetchSvcsPartial(
+func NewToodledoFetchFn(
 	log logrus.FieldLogger,
 	folderSvc FolderPersistenceService,
 	contextSvc ContextPersistenceService,
 	goalSvc GoalPersistenceService,
 	taskSvc TaskPersistenceExtService,
 	accountSvc AccountExtService,
-) fetchers.FetchFn {
+) FetchFn {
 	return NewToodledoFetchService(log, folderSvc, contextSvc, goalSvc, taskSvc, accountSvc).Fetch
 }
 

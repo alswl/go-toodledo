@@ -17,7 +17,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Resize(typedMsg.Width, typedMsg.Height)
 	case spinner.TickMsg:
 		if m.loading {
-			m.spinner, cmd = m.spinner.Update(msg)
+			m.loadingSpinner, cmd = m.loadingSpinner.Update(msg)
 		}
 	}
 
@@ -31,14 +31,14 @@ func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
 
 func (m *Model) StartSpinner() tea.Msg {
 	m.loading = true
-	return m.spinner.Tick()
+	return m.loadingSpinner.Tick()
 }
 
 func (m *Model) StopSpinner() {
 	m.loading = false
 	newSpinner := spinner.New()
 	newSpinner.Spinner = spinner.Dot
-	m.spinner = newSpinner
+	m.loadingSpinner = newSpinner
 }
 
 func (m Model) updateTextInput(msg tea.Msg) (Model, tea.Cmd) {

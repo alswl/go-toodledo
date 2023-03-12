@@ -40,8 +40,8 @@ type Model struct {
 	info2Colors   common.ColorConfig
 
 	// view
-	spinner spinner.Model
-	input   textinput.Model
+	loadingSpinner spinner.Model
+	input          textinput.Model
 }
 
 func (m Model) Init() tea.Cmd {
@@ -75,8 +75,8 @@ func NewDefault() Model {
 			Foreground: lipgloss.AdaptiveColor{Light: styles.White, Dark: styles.White},
 			Background: lipgloss.AdaptiveColor{Light: styles.DarkPurple, Dark: styles.DarkPurple},
 		},
-		input:   ti,
-		spinner: s,
+		input:          ti,
+		loadingSpinner: s,
 	}
 	return m
 }

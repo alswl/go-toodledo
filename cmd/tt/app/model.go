@@ -4,6 +4,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/alswl/go-toodledo/pkg/fetchers"
+
 	"github.com/alswl/go-toodledo/pkg/common"
 
 	"github.com/alswl/go-toodledo/pkg/models/queries"
@@ -15,7 +17,6 @@ import (
 
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/common/logging"
-	"github.com/alswl/go-toodledo/pkg/fetchers"
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/services"
 	uisidebar "github.com/alswl/go-toodledo/pkg/ui/sidebar"
@@ -68,6 +69,7 @@ type Model struct {
 	ui.Focusable
 	ui.Containerized
 
+	// services
 	taskRichSvc   services.TaskRichService
 	contextExtSvc services.ContextPersistenceService
 	folderExtSvc  services.FolderPersistenceService
@@ -77,12 +79,11 @@ type Model struct {
 	settingSvc    services.SettingService
 	fetcher       fetchers.DaemonFetcher
 
-	// properties
+	// properties(immutable)
 	log logrus.FieldLogger
 
 	// states TODO
 	states *States
-
 	// TODO ready check
 	ready bool
 	// TODO remove this, using focus to statusbar
@@ -177,16 +178,16 @@ func InitialModel() (*Model, error) {
 		log.WithField("duration", config.AutoRefresh).Error("parse duration error")
 		interval = defaultAutoSyncDuration
 	}
-	fetcher := fetchers.NewSimpleFetcher(log, interval, services.NewToodledoFetchSvcsPartial(
+	fetchFn := services.NewToodledoFetchFn(
 		log,
 		app.FolderExtSvc,
 		app.ContextExtSvc,
 		app.GoalExtSvc,
 		app.TaskExtSvc,
 		app.AccountSvc,
-	), describer)
+	)
 	// TODO using register fun instead of invoke m in ModeNew func
-	m.fetcher = fetcher
+	m.fetcher = fetchers.NewSimpleFetcher(log, interval, fetchFn, describer)
 
 	m.primaryPane.Focus()
 

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/alswl/go-toodledo/pkg/services"
+
 	"github.com/alswl/go-toodledo/pkg/common"
 
 	"github.com/sirupsen/logrus"
@@ -28,9 +30,6 @@ type DaemonFetcher interface {
 	UIRefresh() chan bool
 }
 
-// FetchFn fetch data.
-type FetchFn func(sd common.StatusDescriber, isHardRefresh bool) error
-
 type FetchPromise struct {
 	Done          chan bool
 	IsHardRefresh bool
@@ -45,14 +44,14 @@ type intervalDaemonFetcher struct {
 	// refreshed chan bool
 
 	log             logrus.FieldLogger
-	fn              FetchFn
+	fn              services.FetchFn
 	statusDescriber common.StatusDescriber
 }
 
 func NewSimpleFetcher(
 	log logrus.FieldLogger,
 	interval time.Duration,
-	fn FetchFn,
+	fn services.FetchFn,
 	statusDescriber common.StatusDescriber,
 ) DaemonFetcher {
 	var ticker *time.Ticker

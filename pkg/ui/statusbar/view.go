@@ -12,10 +12,10 @@ func (m Model) simpleView() string {
 
 	spinnerView := ""
 	if m.loading {
-		spinnerView = m.spinner.View()
+		spinnerView = m.loadingSpinner.View()
 	}
 
-	m.spinner.Style = lipgloss.NewStyle().
+	m.loadingSpinner.Style = lipgloss.NewStyle().
 		Foreground(m.spinnerColors.Foreground).
 		Background(m.spinnerColors.Background).
 		Padding(0, 1).
