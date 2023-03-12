@@ -48,7 +48,10 @@ func InitModel(tasks []*models.RichTask, width, height int) Model {
 		// WithNoPagination().
 		WithFooterVisibility(false).
 		WithTargetWidth(defaultTableWidth).
-		WithKeyMap(keys)
+		WithKeyMap(keys).
+		SortByDesc(columnKeyPriorityValue).
+		ThenSortByDesc(columnKeyStatusValue).
+		ThenSortByDesc(columnKeyDueValue)
 
 	m := Model{
 		//parent: parent,

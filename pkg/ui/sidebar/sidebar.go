@@ -13,6 +13,9 @@ func (m Model) Init() tea.Cmd {
 }
 
 func (m Model) View() string {
+	if !m.IsVisible() {
+		return ""
+	}
 	tabName := defaultTabs[m.states.CurrentTabIndex]
 	tabRender := styles.NoStyle.Render("<" + tabName + ">")
 

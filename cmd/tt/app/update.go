@@ -176,6 +176,7 @@ func (m Model) handleKeyPress(msg tea.KeyMsg) (Model, tea.Cmd) {
 		if m.statusBar.GetMode() == comstatusbar.ModeSearch {
 			// TODO using update
 			m.primaryPane.GetOrCreateTaskPaneByQuery().Filter(m.statusBar.GetInput())
+			m.primaryPane.GetOrCreateTaskPaneByQuery().GoToPage(1)
 		}
 		cmds = append(cmds, cmd)
 		return m, tea.Batch(cmds...)
@@ -206,6 +207,16 @@ func (m *Model) handleCommandMode(msg tea.KeyMsg) (tea.Cmd, bool) {
 		m.isInputting = true
 		m.focus(statusbarModel)
 		m.statusBar.FocusInputNew()
+	case "0":
+		m.states.isSidebarVisible = !m.states.isSidebarVisible
+		m.sidebar.Toggle()
+
+		return func() tea.Msg {
+			return tea.WindowSizeMsg{
+				Width:  m.Width,
+				Height: m.Height,
+			}
+		}, false
 	}
 	return nil, true
 }
@@ -224,6 +235,9 @@ func (m *Model) handleResize(msg tea.WindowSizeMsg) tea.Cmd {
 	const twoColumns = 2
 	const totalColumns = 12
 	sideBarWidth := msg.Width * twoColumns / totalColumns
+	if !m.states.isSidebarVisible {
+		sideBarWidth = 0
+	}
 	mainPaneWidth := msg.Width - sideBarWidth
 
 	m.primaryPane, cmd = m.primaryPane.UpdateTyped(tea.WindowSizeMsg{

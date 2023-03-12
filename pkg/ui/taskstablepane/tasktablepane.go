@@ -13,32 +13,40 @@ import (
 )
 
 const (
-	columnKeyID        = "id"
-	columnKeyCompleted = "completed"
-	columnKeyTitle     = "title"
-	columnKeyContext   = "context"
-	columnKeyStatus    = "status"
-	columnKeyPriority  = "priority"
-	columnKeyGoal      = "goal"
-	columnKeyDue       = "due"
-	columnKeyRepeat    = "repeat"
-	columnKeyLength    = "length"
-	columnKeyTimer     = "timer"
-	columnKeyTag       = "tag"
-	defaultTableWidth  = 120
-	defaultPageSize    = 20
+	columnKeyID             = "id"
+	columnKeyCompleted      = "completed"
+	columnKeyCompletedValue = "completedValue"
+	columnKeyTitle          = "title"
+	columnKeyContext        = "context"
+	columnKeyStatus         = "status"
+	columnKeyStatusValue    = "statusValue"
+	columnKeyPriority       = "priority"
+	columnKeyPriorityValue  = "priorityValue"
+	columnKeyGoal           = "goal"
+	columnKeyDue            = "due"
+	columnKeyDueValue       = "dueValue"
+	columnKeyRepeat         = "repeat"
+	columnKeyLength         = "length"
+	columnKeyTimer          = "timer"
+	columnKeyTag            = "tag"
+	defaultTableWidth       = 120
+	defaultPageSize         = 20
 )
 
 var (
 	DefaultColumns = []table.Column{
 		table.NewColumn(columnKeyCompleted, "[ ]", 3).
 			WithStyle(lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#88f"))),
+		table.NewColumn(columnKeyCompletedValue, "", 0),
 		table.NewFlexColumn(columnKeyTitle, "Title", 0).WithFiltered(true),
 		table.NewColumn(columnKeyContext, "Context", 10),
 		table.NewColumn(columnKeyPriority, "Priority", 10),
+		table.NewColumn(columnKeyPriorityValue, "", 0),
 		table.NewColumn(columnKeyStatus, "Status", 10),
+		table.NewColumn(columnKeyStatusValue, "", 0),
 		table.NewColumn(columnKeyGoal, "Goal", 10),
 		table.NewColumn(columnKeyDue, "DueString", 10),
+		table.NewColumn(columnKeyDueValue, "", 0),
 		table.NewColumn(columnKeyRepeat, "Repeat", 10),
 		table.NewColumn(columnKeyLength, "Length", 10),
 		table.NewColumn(columnKeyTimer, "Timer", 10),
@@ -88,20 +96,31 @@ func RenderTasksRows(tasks []*models.RichTask) []table.Row {
 			dueStyled = table.NewStyledCell(due, styles.WarningStyle)
 		}
 
+		if t.Completed != 0 {
+			titleStyled = table.NewStyledCell(title, styles.GrayStyle)
+			priorityStyled = table.NewStyledCell(priority.String(), styles.GrayStyle)
+			statusStyled = table.NewStyledCell(status.String(), styles.GrayStyle)
+			dueStyled = table.NewStyledCell(due, styles.GrayStyle)
+		}
+
 		rows = append(rows, table.NewRow(
 			table.RowData{
-				columnKeyID:        t.ID,
-				columnKeyCompleted: t.CompletedString(),
-				columnKeyTitle:     titleStyled,
-				columnKeyContext:   context.Name,
-				columnKeyPriority:  priorityStyled,
-				columnKeyStatus:    statusStyled,
-				columnKeyGoal:      goal.Name,
-				columnKeyDue:       dueStyled,
-				columnKeyRepeat:    t.RepeatString(),
-				columnKeyLength:    t.LengthString(),
-				columnKeyTimer:     t.TimerString(),
-				columnKeyTag:       t.TagString(),
+				columnKeyID:             t.ID,
+				columnKeyCompleted:      t.CompletedString(),
+				columnKeyCompletedValue: t.Completed,
+				columnKeyTitle:          titleStyled,
+				columnKeyContext:        context.Name,
+				columnKeyPriority:       priorityStyled,
+				columnKeyPriorityValue:  t.Priority,
+				columnKeyStatus:         statusStyled,
+				columnKeyStatusValue:    t.Status,
+				columnKeyGoal:           goal.Name,
+				columnKeyDue:            dueStyled,
+				columnKeyDueValue:       t.Duedate,
+				columnKeyRepeat:         t.RepeatString(),
+				columnKeyLength:         t.LengthString(),
+				columnKeyTimer:          t.TimerString(),
+				columnKeyTag:            t.TagString(),
 			},
 		))
 	}

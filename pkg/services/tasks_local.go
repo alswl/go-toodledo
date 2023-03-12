@@ -191,7 +191,7 @@ func (s *taskLocalExtService) ListAll() ([]*models.Task, int, error) {
 		}
 		ts = append(ts, &t)
 	}
-	return ts, len(all), nil
+	return sortTasks(ts), len(all), nil
 }
 
 func (s *taskLocalExtService) List(start, limit int64) ([]*models.Task, *models.PaginatedInfo, error) {
@@ -290,7 +290,7 @@ func (s *taskLocalExtService) ListAllByQuery(query *queries.TaskListQuery) ([]*m
 		}).([]*models.Task)
 	}
 
-	return ts, nil
+	return sortTasks(ts), nil
 }
 
 func (s *taskLocalExtService) Create(title string) (*models.Task, error) {

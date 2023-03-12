@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"time"
 
@@ -314,4 +315,35 @@ func (s *taskService) Stop(id int64) error {
 		Timeron: utils.WrapPointerInt64(0),
 	})
 	return err
+}
+
+func rankTask(task *models.Task) int64 {
+	var rank int64
+	const scale1 = 10000
+	const scale2 = 1000
+	const scale3 = 100
+	const scale100 = 100
+	const to10 = 10.0
+	const to11 = 11.0
+	const maxTimestamp = 2147483647.0
+
+	rank += int64((float64(task.Priority+1) / to10 * scale100) * scale1)
+	statusValue := task.Status
+	if statusValue == 0 {
+		statusValue = 11
+	}
+	rank += int64(float64(statusValue)/to11*scale100) * scale2
+	if task.Duedate != 0 {
+		rank += int64(float64(maxTimestamp-task.Duedate) / maxTimestamp * scale100 * scale3)
+	}
+	return rank
+}
+func sortTasks(tasks []*models.Task) []*models.Task {
+	// sort by rankTask
+	sorted := make([]*models.Task, len(tasks))
+	copy(sorted, tasks)
+	sort.SliceStable(sorted, func(i, j int) bool {
+		return rankTask(sorted[i]) > rankTask(sorted[j])
+	})
+	return sorted
 }

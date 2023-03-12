@@ -50,6 +50,7 @@ type ItemChangeSubscriber func(tab string, item models.Item) error
 type Model struct {
 	ui.Focusable
 	ui.Resizable
+	ui.Visible
 
 	log        logrus.FieldLogger
 	properties Properties
@@ -65,6 +66,7 @@ type Model struct {
 
 func InitModel(p Properties) Model {
 	m := Model{
+		Visible:     ui.NewVisible(true),
 		log:         logging.GetLogger("tt"),
 		properties:  p,
 		states:      NewStates(),

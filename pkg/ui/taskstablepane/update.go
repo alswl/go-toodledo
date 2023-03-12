@@ -38,3 +38,7 @@ func (m Model) UpdateTyped(msg tea.Msg) (Model, tea.Cmd) {
 	newM, cmd := m.Update(msg)
 	return newM.(Model), cmd
 }
+
+func (m *Model) GoToPage(num int) {
+	m.tableModel = m.tableModel.WithCurrentPage(num)
+}

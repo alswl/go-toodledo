@@ -18,6 +18,8 @@ var (
 	WarningStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#F8AC30")).Bold(true)
 	ErrorStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#FD4F54")).Bold(true)
 
+	GrayStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#A3A3A3")).Bold(true)
+
 	ProcessingStyle = SuccessStyle
 	// }}}.
 

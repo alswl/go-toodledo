@@ -44,15 +44,18 @@ type States struct {
 
 	// query is current query of task pane
 	query *queries.TaskListQuery
+
+	isSidebarVisible bool
 }
 
 func NewStates() *States {
 	return &States{
-		Tasks:    []*models.RichTask{},
-		Contexts: []*models.Context{},
-		Folders:  []*models.Folder{},
-		Goals:    []*models.Goal{},
-		query:    queries.NewTaskListQuery(),
+		Tasks:            []*models.RichTask{},
+		Contexts:         []*models.Context{},
+		Folders:          []*models.Folder{},
+		Goals:            []*models.Goal{},
+		query:            queries.NewTaskListQuery(),
+		isSidebarVisible: true,
 	}
 }
 

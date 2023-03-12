@@ -95,6 +95,38 @@ func (c *Containerized) Next() string {
 func (c *Containerized) Children() []string {
 	return c.children
 }
+
 func (c *Containerized) FocusChild(child string) {
 	c.focused = child
+}
+
+// VisibleInterface is a component that can be shown or hidden.
+type VisibleInterface interface {
+	IsVisible() bool
+	Show()
+	Hide()
+}
+
+type Visible struct {
+	visible bool
+}
+
+func NewVisible(visible bool) Visible {
+	return Visible{visible: visible}
+}
+
+func (v *Visible) IsVisible() bool {
+	return v.visible
+}
+
+func (v *Visible) Show() {
+	v.visible = true
+}
+
+func (v *Visible) Hide() {
+	v.visible = false
+}
+
+func (v *Visible) Toggle() {
+	v.visible = !v.visible
 }

@@ -10,11 +10,16 @@ func (m *Model) View() string {
 
 	left := m.sidebar.View()
 	right := m.primaryPane.View()
-	mainFrame := lipgloss.JoinHorizontal(
-		lipgloss.Top,
-		left,
-		right,
-	)
+	var mainFrame string
+	if m.states.isSidebarVisible {
+		mainFrame = lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			left,
+			right,
+		)
+	} else {
+		mainFrame = right
+	}
 	return styles.NoStyle.Render(
 		lipgloss.JoinVertical(
 			lipgloss.Top,
