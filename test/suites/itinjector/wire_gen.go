@@ -26,7 +26,8 @@ func InitCLIOption() (common.ToodledoCliConfig, error) {
 }
 
 func InitCLIApp() (*app.ToodledoCLIApp, error) {
-	toodledo := client0.NewToodledoClient()
+	fieldLogger := logging.ProvideLogger()
+	toodledo := client0.NewToodledoClient(fieldLogger)
 	toodledoCliConfig, err := common.NewCliConfigMockForTesting()
 	if err != nil {
 		return nil, err
@@ -46,7 +47,6 @@ func InitCLIApp() (*app.ToodledoCLIApp, error) {
 	}
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
 	accountExtService := services.NewAccountExtService(toodledo, clientAuthInfoWriter, backend, accountService)
-	fieldLogger := logging.ProvideLogger()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)
 	contextService := services.NewContextService(toodledo, clientAuthInfoWriter)
@@ -62,7 +62,8 @@ func InitCLIApp() (*app.ToodledoCLIApp, error) {
 }
 
 func InitTUIApp() (*app.ToodledoTUIApp, error) {
-	toodledo := client0.NewToodledoClient()
+	fieldLogger := logging.ProvideLogger()
+	toodledo := client0.NewToodledoClient(fieldLogger)
 	toodledoCliConfig, err := common.NewCliConfigMockForTesting()
 	if err != nil {
 		return nil, err
@@ -82,7 +83,6 @@ func InitTUIApp() (*app.ToodledoTUIApp, error) {
 	}
 	accountService := services.NewAccountService(toodledo, clientAuthInfoWriter)
 	accountExtService := services.NewAccountExtService(toodledo, clientAuthInfoWriter, backend, accountService)
-	fieldLogger := logging.ProvideLogger()
 	taskService := services.NewTaskService(toodledo, clientAuthInfoWriter, fieldLogger)
 	taskPersistenceExtService := services.ProvideTaskLocalExtService(taskService, accountExtService, backend)
 	folderService := services.NewFolderService(toodledo, clientAuthInfoWriter)

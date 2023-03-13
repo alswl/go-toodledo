@@ -4,13 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-
 	"github.com/alswl/go-toodledo/pkg/common"
 
 	utilsviper "github.com/alswl/go-toodledo/pkg/utils/viper"
 	"github.com/go-openapi/runtime"
-	openapiclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -91,14 +88,6 @@ func NewAuthWithRefresh(clientID, clientSecret, accessToken, refreshToken string
 		return nil, err
 	}
 	return NewAuthByToken(newToken.AccessToken), nil
-}
-
-func NewToodledoClient() *Toodledo {
-	debug := os.Getenv("DEBUG") != "" || os.Getenv("SWAGGER_DEBUG") != ""
-
-	transportConfig := openapiclient.New(DefaultHost, DefaultBasePath, []string{"https"})
-	transportConfig.Debug = debug
-	return New(transportConfig, strfmt.Default)
 }
 
 func NewOAuth2ConfigFromConfigs(cfg common.ToodledoConfig) (*oauth2.Config, error) {
