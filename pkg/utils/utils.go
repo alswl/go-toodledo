@@ -20,7 +20,7 @@ var DefaultTimeZone = asiaShanghaiTimeZone
 var asiaShanghaiTimeZone = time.FixedZone("CST", 8*3600)
 
 func Bool2int(input bool) int {
-	output := 0
+	var output int
 	if input {
 		output = 1
 	} else {

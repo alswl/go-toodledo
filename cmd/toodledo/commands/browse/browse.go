@@ -37,7 +37,7 @@ func NewCmd(f *cmdutil.Factory) *cobra.Command {
 				opts.selector = args[0]
 			}
 
-			url := ""
+			var url string
 			if opts.task {
 				id, err := strconv.Atoi(opts.selector)
 				if err != nil {

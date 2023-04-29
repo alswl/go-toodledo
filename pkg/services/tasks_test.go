@@ -56,6 +56,6 @@ func Test_sortTasks(t *testing.T) {
 }
 
 func Test_rankTask(t *testing.T) {
-	assert.Equal(t, int64(2000), rankTask(&models.Task{Priority: 1}))
-	assert.Equal(t, int64(3000), rankTask(&models.Task{Priority: 2}))
+	assert.Equal(t, int64(300000), rankTask(&models.Task{Priority: 1}))
+	assert.Equal(t, int64(400000), rankTask(&models.Task{Priority: 2}))
 }

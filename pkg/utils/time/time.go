@@ -19,7 +19,7 @@ func ParseDurationInSecondToDuration(second int64) time.Duration {
 // ParseDurationToReadableShort return human-readable duration.
 // it only returns main unit, so it was no accurate.
 func ParseDurationToReadableShort(duration time.Duration) string {
-	s := ""
+	var s string
 	// nolint: gocritic
 	if duration < time.Minute {
 		s = duration.Round(time.Second).String()
