@@ -5,7 +5,12 @@
 
 Go CLI / TUI / SDK for Toodledo.
 
-Status: CLI Stable / SDK Stable / TUI under development
+Status: CLI Stable / SDK Stable / TUI under development(did NOT continue)
+
+I’ve used Toodledo for over twelve years now paying eight years’ subscription fees.
+Now I migrate to Obsidian Tasks. Read
+[From Toodledo To Obsidian Tasks - my GTD best practices | Log4D](https://en.blog.alswl.com/2023/02/gtd/)
+for more details.
 
 ## Usage (CLI)
 
