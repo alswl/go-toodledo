@@ -7,7 +7,7 @@ import (
 
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
 	"github.com/alswl/go-toodledo/pkg/models"
-	mockservices "github.com/alswl/go-toodledo/test/mock/services"
+	mockservices "github.com/alswl/go-toodledo/test/mock/pkg/services"
 	"github.com/alswl/go-toodledo/test/suites/itinjector"
 	"github.com/stretchr/testify/assert"
 )
