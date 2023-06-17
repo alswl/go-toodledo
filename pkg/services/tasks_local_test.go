@@ -9,8 +9,8 @@ import (
 
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
-	mockdal "github.com/alswl/go-toodledo/test/mock/dal"
-	mockservices "github.com/alswl/go-toodledo/test/mock/services"
+	mockdal "github.com/alswl/go-toodledo/test/mock/pkg/dal"
+	mockservices "github.com/alswl/go-toodledo/test/mock/pkg/services"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
