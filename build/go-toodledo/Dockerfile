@@ -13,16 +13,4 @@ ENV GOFLAGS=""
 COPY Makefile .
 COPY go.mod .
 COPY go.sum .
-RUN make download TARGET=toodledo
-
-## builder-env end, build start
-
-COPY . .
-RUN make build compress GOOS=linux GOARCH=amd64
-
-FROM alpine:3.18.2
-WORKDIR /
-
-COPY --from=builder /app/bin/toodledo /toodledo
-
-ENTRYPOINT ["/toodledo"]
+RUN make download
