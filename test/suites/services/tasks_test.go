@@ -4,10 +4,11 @@
 package services
 
 import (
-	"github.com/alswl/go-toodledo/test/suites/itinjector"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/alswl/go-toodledo/test/suites/itinjector"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTaskServiceFindById(t *testing.T) {

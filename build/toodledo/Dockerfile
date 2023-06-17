@@ -1,5 +1,7 @@
-FROM golang:1.16.5-buster as builder
-# TODO build-env contains all dependencies
+FROM golang:1.18-buster as builder
+
+RUN sed -i "s@http://.*.debian.org@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
+RUN apt update && apt install -y bash make curl git binutils findutils libreadline7 upx && apt clean && rm -rf /var/apt/cache/*
 
 WORKDIR /app
 
@@ -11,15 +13,14 @@ ENV GOFLAGS=""
 COPY Makefile .
 COPY go.mod .
 COPY go.sum .
-RUN make download
+RUN make download TARGET=toodledo
+
+## builder-env end, build start
 
 COPY . .
-RUN make build GOOS=linux GOARCH=amd64
+RUN make build compress GOOS=linux GOARCH=amd64
 
-FROM golang:1.16.5-buster
-RUN sed -i "s@http://.*.debian.org@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
-RUN apt update && apt install -y bash make curl git binutils findutils libreadline7 && apt clean && rm -rf /var/apt/cache/*
-
+FROM alpine:3.18.2
 WORKDIR /
 
 COPY --from=builder /app/bin/toodledo /toodledo

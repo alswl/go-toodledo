@@ -4,10 +4,11 @@ package fetcher
 
 import (
 	"context"
-	"github.com/alswl/go-toodledo/pkg/fetchers"
-	"github.com/sirupsen/logrus"
 	"testing"
 	"time"
+
+	"github.com/alswl/go-toodledo/pkg/fetchers"
+	"github.com/sirupsen/logrus"
 )
 
 func TestFetcherProgress(t *testing.T) {

@@ -3,10 +3,11 @@
 package suites
 
 import (
+	"testing"
+
 	"github.com/alswl/go-toodledo/test/suites/itinjector"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func Test_contextService_Get(t *testing.T) {

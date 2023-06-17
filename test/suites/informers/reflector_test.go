@@ -5,10 +5,11 @@ package informers
 
 import (
 	"context"
-	"github.com/alswl/go-toodledo/pkg/common/informers"
-	"github.com/sirupsen/logrus"
 	"testing"
 	"time"
+
+	"github.com/alswl/go-toodledo/pkg/common/informers"
+	"github.com/sirupsen/logrus"
 )
 
 func TestReflector(t *testing.T) {

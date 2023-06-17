@@ -6,7 +6,7 @@ import (
 
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
-	mockservices "github.com/alswl/go-toodledo/test/mock/services"
+	mockservices "github.com/alswl/go-toodledo/test/mock/pkg/services"
 	"github.com/stretchr/testify/mock"
 )
 
