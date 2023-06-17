@@ -5,11 +5,12 @@ package suites
 
 import (
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/alswl/go-toodledo/test/suites/itinjector"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func TestGoalService_Get(t *testing.T) {

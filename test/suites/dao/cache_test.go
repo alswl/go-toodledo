@@ -4,9 +4,10 @@
 package dao
 
 import (
+	"testing"
+
 	"github.com/alswl/go-toodledo/test/suites/itinjector"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func Test_cache_ListAll(t *testing.T) {
