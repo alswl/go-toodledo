@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/alswl/go-common/pointers"
 	"sort"
 	"strconv"
 	"time"
@@ -13,7 +14,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/alswl/go-toodledo/pkg/models/enums"
 	"github.com/alswl/go-toodledo/pkg/models/queries"
-	"github.com/alswl/go-toodledo/pkg/utils"
 	"github.com/go-openapi/runtime"
 	"github.com/sirupsen/logrus"
 	"github.com/thoas/go-funk"
@@ -114,7 +114,7 @@ func (s *taskService) ListWithChanged(lastEditTime *int32, start, limit int64) (
 	startPtr := &start
 	p.SetStart(startPtr)
 	if lastEditTime != nil {
-		p.After = utils.WrapPointerInt64((int64)(utils.UnwrapPointerInt32(lastEditTime)))
+		p.After = pointers.WrapPointerInt64((int64)(pointers.UnwrapPointerInt32(lastEditTime)))
 	}
 
 	res, err := s.cli.Task.GetTasksGetPhp(p, s.auth)
@@ -134,7 +134,7 @@ func (s *taskService) ListWithChanged(lastEditTime *int32, start, limit int64) (
 func (s *taskService) ListDeleted(lastEditTime *int32) ([]*models.TaskDeleted, error) {
 	p := task.NewGetTasksDeletedPhpParams()
 	if lastEditTime != nil {
-		p.After = utils.WrapPointerInt64((int64)(utils.UnwrapPointerInt32(lastEditTime)))
+		p.After = pointers.WrapPointerInt64((int64)(pointers.UnwrapPointerInt32(lastEditTime)))
 	}
 
 	res, err := s.cli.Task.GetTasksDeletedPhp(p, s.auth)
@@ -270,7 +270,7 @@ func (s *taskService) Complete(id int64) (*models.Task, error) {
 		return nil, err
 	}
 	return s.Edit(id, &models.TaskEdit{
-		Completed: utils.WrapPointerInt64(time.Now().Unix()),
+		Completed: pointers.WrapPointerInt64(time.Now().Unix()),
 		// auto reschedule by toodledo
 		Reschedule: 1,
 	})
@@ -282,7 +282,7 @@ func (s *taskService) UnComplete(id int64) (*models.Task, error) {
 		return nil, err
 	}
 	return s.Edit(id, &models.TaskEdit{
-		Completed: utils.WrapPointerInt64(0),
+		Completed: pointers.WrapPointerInt64(0),
 	})
 }
 
@@ -296,7 +296,7 @@ func (s *taskService) Start(id int64) error {
 	}
 
 	_, err = s.Edit(id, &models.TaskEdit{
-		Timeron: utils.WrapPointerInt64(time.Now().Unix()),
+		Timeron: pointers.WrapPointerInt64(time.Now().Unix()),
 	})
 	return err
 }
@@ -311,8 +311,8 @@ func (s *taskService) Stop(id int64) error {
 	}
 
 	_, err = s.Edit(id, &models.TaskEdit{
-		Timer:   utils.WrapPointerInt64(t.Timer + time.Now().Unix() - t.Timeron),
-		Timeron: utils.WrapPointerInt64(0),
+		Timer:   pointers.WrapPointerInt64(t.Timer + time.Now().Unix() - t.Timeron),
+		Timeron: pointers.WrapPointerInt64(0),
 	})
 	return err
 }

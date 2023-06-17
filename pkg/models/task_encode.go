@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/alswl/go-common/pointers"
 	"time"
 
 	"github.com/alswl/go-toodledo/pkg/models/constants"
@@ -87,21 +88,21 @@ func LoadTaskFromYAML(prettyFormatYAMLString string) (*TaskEdit, error) {
 		if ierr != nil {
 			return nil, ierr
 		}
-		newT.Added = utils.WrapPointerInt64(added.Unix())
+		newT.Added = pointers.WrapPointerInt64(added.Unix())
 	}
 	if t.Completed != "" {
 		completed, ierr := time.Parse(constants.DefaultTimeLayout, t.Completed)
 		if ierr != nil {
 			return nil, ierr
 		}
-		newT.Completed = utils.WrapPointerInt64(completed.Unix())
+		newT.Completed = pointers.WrapPointerInt64(completed.Unix())
 	}
 	if t.Duedate != "" {
 		duedate, ierr := time.Parse(constants.DefaultDateOnlyLayout, t.Duedate)
 		if ierr != nil {
 			return nil, ierr
 		}
-		newT.Duedate = utils.WrapPointerInt64(duedate.Unix())
+		newT.Duedate = pointers.WrapPointerInt64(duedate.Unix())
 	}
 	if t.Duetime != "" {
 		// fill 1970-01-01 to make it a valid time
@@ -109,35 +110,35 @@ func LoadTaskFromYAML(prettyFormatYAMLString string) (*TaskEdit, error) {
 		if ierr != nil {
 			return nil, ierr
 		}
-		newT.Duetime = utils.WrapPointerInt64(duetime.Unix())
+		newT.Duetime = pointers.WrapPointerInt64(duetime.Unix())
 	}
 	if t.Modified != "" {
 		modified, ierr := time.Parse(constants.DefaultTimeLayout, t.Modified)
 		if ierr != nil {
 			return nil, ierr
 		}
-		newT.Modified = utils.WrapPointerInt64(modified.Unix())
+		newT.Modified = pointers.WrapPointerInt64(modified.Unix())
 	}
 	if t.Startdate != "" {
 		startdate, ierr := time.Parse(constants.DefaultDateOnlyLayout, t.Startdate)
 		if ierr != nil {
 			return nil, ierr
 		}
-		newT.Startdate = utils.WrapPointerInt64(startdate.Unix())
+		newT.Startdate = pointers.WrapPointerInt64(startdate.Unix())
 	}
 	if t.Starttime != "" {
 		starttime, ierr := time.Parse(constants.DefaultTimeLayout, t.Starttime)
 		if ierr != nil {
 			return nil, ierr
 		}
-		newT.Starttime = utils.WrapPointerInt64(starttime.Unix())
+		newT.Starttime = pointers.WrapPointerInt64(starttime.Unix())
 	}
 	if t.Timeron != "" {
 		timeron, ierr := time.Parse(constants.DefaultTimeOnlyLayout, t.Timeron)
 		if ierr != nil {
 			return nil, ierr
 		}
-		newT.Timeron = utils.WrapPointerInt64(timeron.Unix())
+		newT.Timeron = pointers.WrapPointerInt64(timeron.Unix())
 	}
 
 	return newT, nil
