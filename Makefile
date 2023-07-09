@@ -11,9 +11,8 @@
 #
 # The makefile is also responsible to populate project version information.
 
-#
 # Tweak the variables based on your project.
-#
+
 SHELL := /bin/bash
 NOW_SHORT := $(shell date +%Y%m%d%H%M)
 
@@ -51,15 +50,17 @@ COMMIT := $(COMMIT)$(shell [[ -z $$(git status -s) ]] || echo '-dirty')
 COMMIT := $(if $(COMMIT),$(COMMIT), $${COMMIT})
 COMMIT := $(if $(COMMIT),$(COMMIT),"Unknown")
 
+DEFAULT_BUMP_STAGE := final # final, alpha, beta, candidate
+DEFAULT_BUMP_SCOPE := minor # major, minor, patch
+DEFAULT_BUMP_DRY_RUN := true # true, false
+
 # Current version of the project.
-MAJOR_VERSION = 0
-MINOR_VERSION = 1
-PATCH_VERSION = 0
+VERSION_IN_FILE = $(shell cat VERSION)
 BUILD_VERSION = $(COMMIT)
 GO_MOD_VERSION = $(shell cat go.mod | sha256sum | cut -c-6)
 GOOS = $(shell go env GOOS)
 GOARCH = $(shell go env GOARCH)
-VERSION ?= v$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)-$(BUILD_VERSION)
+VERSION ?= $(VERSION_IN_FILE)-$(BUILD_VERSION)
 
 UT_COVER_PACKAGES := $(shell go list ./pkg/... |grep -Ev 'pkg/clientsets|pkg/dal|pkg/models|pkg/version|pkg/injector')
 
@@ -256,3 +257,11 @@ integration-test: ## Run integration tests
 .PHONY: clean
 clean: ## Clean temp files
 	@rm -vrf ${OUTPUT_DIR}/*
+
+.PHONY: bump
+STAGE=$(DEFAULT_BUMP_STAGE)
+SCOPE=$(DEFAULT_BUMP_SCOPE)
+DRY_RUN=$(DEFAULT_BUMP_DRY_RUN)
+bump: check-git-status ## Bump version
+	(bash ./hack/bump.sh ${STAGE} ${SCOPE} ${DRY_RUN})
+
