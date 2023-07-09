@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"github.com/alswl/go-common/pointers"
 	"os"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -13,13 +14,11 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/alswl/go-toodledo/pkg/models"
+	"github.com/alswl/go-toodledo/pkg/models/constants"
+	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/ui"
 	"github.com/alswl/go-toodledo/pkg/ui/sidebar"
 	comstatusbar "github.com/alswl/go-toodledo/pkg/ui/statusbar"
-	"github.com/alswl/go-toodledo/pkg/utils"
-
-	"github.com/alswl/go-toodledo/pkg/models/constants"
-	"github.com/alswl/go-toodledo/pkg/models/queries"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -392,9 +391,9 @@ func (m *Model) ReloadDependencies() tea.Cmd {
 		Name: "None",
 	})
 
-	m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Contexts))
-	m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Folders))
-	m.sidebar, _ = m.sidebar.UpdateTyped(utils.UnwrapListPointer(m.states.Goals))
+	m.sidebar, _ = m.sidebar.UpdateTyped(pointers.UnwrapListPointer(m.states.Contexts))
+	m.sidebar, _ = m.sidebar.UpdateTyped(pointers.UnwrapListPointer(m.states.Folders))
+	m.sidebar, _ = m.sidebar.UpdateTyped(pointers.UnwrapListPointer(m.states.Goals))
 
 	return nil
 }
