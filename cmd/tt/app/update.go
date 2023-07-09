@@ -2,8 +2,9 @@ package app
 
 import (
 	"fmt"
-	"github.com/alswl/go-common/pointers"
 	"os"
+
+	"github.com/alswl/go-common/pointers"
 
 	"github.com/charmbracelet/bubbles/spinner"
 

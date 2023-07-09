@@ -3,10 +3,11 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/alswl/go-common/pointers"
 	"sort"
 	"strconv"
 	"time"
+
+	"github.com/alswl/go-common/pointers"
 
 	"github.com/alswl/go-toodledo/pkg/client0"
 	"github.com/alswl/go-toodledo/pkg/client0/task"

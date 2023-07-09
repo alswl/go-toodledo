@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/alswl/go-toodledo/pkg/utils/flags"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -13,7 +15,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/alswl/go-toodledo/pkg/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/thoas/go-funk"
@@ -90,7 +91,7 @@ func NewEditCmd(f *cmdutil.Factory) *cobra.Command {
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
 			cmdQ := cmdEditQuery{}
-			err := utils.FillQueryByFlags(cmd, &cmdQ)
+			err := flags.FillQueryByFlags(cmd, &cmdQ)
 			if err != nil {
 				logrus.WithError(err).Fatal("parse query failed")
 			}
@@ -135,7 +136,7 @@ func NewEditCmd(f *cmdutil.Factory) *cobra.Command {
 			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4RichTasks([]*models.RichTask{rt}))
 		},
 	}
-	err := utils.BindFlagsByQuery(cmd, cmdEditQuery{})
+	err := flags.BindFlagsByQuery(cmd, cmdEditQuery{})
 	if err != nil {
 		logrus.WithError(err).Fatal("bind flags failed")
 		return nil

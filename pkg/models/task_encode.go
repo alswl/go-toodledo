@@ -1,8 +1,9 @@
 package models
 
 import (
-	"github.com/alswl/go-common/pointers"
 	"time"
+
+	"github.com/alswl/go-common/pointers"
 
 	"github.com/alswl/go-toodledo/pkg/models/constants"
 	"github.com/alswl/go-toodledo/pkg/utils"

@@ -3,6 +3,8 @@ package tasks
 import (
 	"fmt"
 
+	"github.com/alswl/go-toodledo/pkg/utils/flags"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -12,7 +14,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/alswl/go-toodledo/pkg/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -82,7 +83,7 @@ func NewCreateCmd(f *cmdutil.Factory) *cobra.Command {
 `),
 		Run: func(cmd *cobra.Command, args []string) {
 			cmdQ := cmdCreateQuery{}
-			err := utils.FillQueryByFlags(cmd, &cmdQ)
+			err := flags.FillQueryByFlags(cmd, &cmdQ)
 			if err != nil {
 				logrus.WithError(err).Fatal("failed")
 			}
@@ -118,7 +119,7 @@ func NewCreateCmd(f *cmdutil.Factory) *cobra.Command {
 			_, _ = fmt.Fprintln(f.IOStreams.Out, render.Tables4RichTasks([]*models.RichTask{rt}))
 		},
 	}
-	err := utils.BindFlagsByQuery(cmd, cmdCreateQuery{})
+	err := flags.BindFlagsByQuery(cmd, cmdCreateQuery{})
 	if err != nil {
 		logrus.WithError(err).Fatal("bind flags failed")
 	}

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/alswl/go-toodledo/pkg/utils/flags"
+
 	"github.com/MakeNowJust/heredoc"
 	"github.com/alswl/go-toodledo/cmd/toodledo/injector"
 	"github.com/alswl/go-toodledo/pkg/cmdutil"
@@ -14,7 +16,6 @@ import (
 	"github.com/alswl/go-toodledo/pkg/models/queries"
 	"github.com/alswl/go-toodledo/pkg/render"
 	"github.com/alswl/go-toodledo/pkg/services"
-	"github.com/alswl/go-toodledo/pkg/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -135,7 +136,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 			$ toodledo tasks list --due-date "2020-01-01"
 		`),
 		Run: func(cmd *cobra.Command, args []string) {
-			err := utils.FillQueryByFlags(cmd, cmdQ)
+			err := flags.FillQueryByFlags(cmd, cmdQ)
 			if err != nil {
 				log.WithError(err).Fatal("failed")
 			}
@@ -205,7 +206,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 		},
 	}
 
-	err := utils.BindFlagsByQuery(cmd, cmdListQuery{})
+	err := flags.BindFlagsByQuery(cmd, cmdListQuery{})
 	if err != nil {
 		logrus.WithError(err).Fatal("bind flags failed")
 	}

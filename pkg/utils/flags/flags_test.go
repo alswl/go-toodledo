@@ -1,4 +1,5 @@
-package utils_test
+// nolint: all
+package flags
 
 import (
 	"testing"
@@ -21,7 +22,7 @@ type Q struct {
 
 func TestGenerateFlagsByQuery(t *testing.T) {
 	cmd := cobra.Command{}
-	err := utils.BindFlagsByQuery(&cmd, Q{})
+	err := BindFlagsByQuery(&cmd, Q{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, `Usage:
@@ -38,7 +39,7 @@ Flags:
 
 func TestFillQueryByFlags(t *testing.T) {
 	cmd := cobra.Command{}
-	err := utils.BindFlagsByQuery(&cmd, Q{})
+	err := BindFlagsByQuery(&cmd, Q{})
 	assert.NoError(t, err)
 
 	q := Q{}
@@ -50,7 +51,7 @@ func TestFillQueryByFlags(t *testing.T) {
 	_ = cmd.Flags().Set("ss", "a")
 	_ = cmd.Flags().Set("ss", "b")
 
-	err = utils.FillQueryByFlags(&cmd, &q)
+	err = FillQueryByFlags(&cmd, &q)
 	assert.NoError(t, err)
 	assert.Equal(t, "test", q.S)
 	assert.Equal(t, 1, q.I)

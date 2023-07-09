@@ -2,9 +2,10 @@ package services
 
 import (
 	"encoding/json"
-	"github.com/alswl/go-common/pointers"
 	"testing"
 	"time"
+
+	"github.com/alswl/go-common/pointers"
 
 	"github.com/alswl/go-toodledo/pkg/models"
 	"github.com/stretchr/testify/assert"
