@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+go install golang.org/x/tools/cmd/goimports@latest
+
 # install golangci-lint
 if ! command -v golangci-lint &> /dev/null; then
   echo "Installing golangci-lint"
