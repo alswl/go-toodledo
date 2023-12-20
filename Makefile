@@ -79,7 +79,8 @@ help: ## Display this help.
 
 .PHONY: install-dev-tools
 install-dev-tools: ## Install dev tools
-	go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
+# 	go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
+# 	go get -u github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
 	go install golang.org/x/tools/cmd/stringer@latest
 	bash ./hack/install-dev-tools.sh
 
