@@ -1,6 +1,6 @@
 module github.com/alswl/go-toodledo
 
-go 1.18
+go 1.22
 
 require (
 	github.com/MakeNowJust/heredoc v0.0.0-20170808103936-bb23615498cd

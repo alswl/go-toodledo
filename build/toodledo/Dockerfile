@@ -1,4 +1,4 @@
-FROM golang:1.18-buster as builder
+FROM golang:1.22-buster as builder
 
 RUN sed -i "s@http://.*.debian.org@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
 RUN apt update && apt install -y bash make curl git binutils findutils libreadline7 upx && apt clean && rm -rf /var/apt/cache/*
