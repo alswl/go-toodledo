@@ -40,6 +40,7 @@ func (m Model) simpleView() string {
 		Padding(0, 1).
 		Height(Height).
 		Render(m.info2)
+	//nolint:gosec
 	statusC := lipgloss.NewStyle().
 		Foreground(m.statusColors.Foreground).
 		Background(m.statusColors.Background).

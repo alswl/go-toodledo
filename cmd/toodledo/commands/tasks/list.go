@@ -190,6 +190,7 @@ func NewListCmd(f *cmdutil.Factory) *cobra.Command {
 				log.Error(err)
 				return
 			}
+			//nolint:gosec
 			tasks = tasks[:funk.MinInt32([]int32{cmdQ.Limit, int32(len(tasks))})]
 			sorted, _ := services.SortSubTasks(tasks, subtasksview.ModeString2Type(cmdQ.SubTasksMode))
 			rts, _ := taskRichSvc.RichThem(sorted)
