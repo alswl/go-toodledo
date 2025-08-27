@@ -29,7 +29,6 @@ generate-code-enum: ## Generate enum String for models
 .PHONY: generate-manual
 generate-manual: ## Generate develop docs
 	@# go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
-	@# gomarkdoc --output MANUAL.md code.alipay.com/sigma-sre/hyper-common-utils
 
 	@# if contains go files in .
 	@if [ -n "$(shell ls *.go 2>/dev/null)" ]; then \
